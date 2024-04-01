@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:kli_utils/kli_utils.dart';
 
@@ -11,27 +9,15 @@ class MainScreen extends StatefulWidget {
 }
 
 class _MainScreenState extends State<MainScreen> {
+  late final KLIServer _server;
+  ServerIPType _ipType = ServerIPType.local;
   String _ipAddress = '';
-  ServerSocket? serverSocket;
 
-  void startServer() async {
-    serverSocket?.close();
-
-    final localIP = await getLocalIP();
-
-    serverSocket = await initServer(localIP);
-
-    // show snackbar here, show ip of server
-    if (context.mounted) {
-      showToastMessage(context, 'Server started at $_ipAddress');
-    }
-
-    serverSocket!.listen((socket) {
-      final connectionAddress = socket.remoteAddress.address;
-      debugPrint('Connection from $connectionAddress:${socket.remotePort}');
-      socket.write('Hello, $connectionAddress!');
-      socket.close();
-    });
+  @override
+  void initState() {
+    super.initState();
+    getPublicIP().then((value) => setState(() => _ipAddress += '\nPublic: $value'));
+    getLocalIP().then((value) => setState(() => _ipAddress += '\nLocal: $value'));
   }
 
   @override
@@ -48,16 +34,25 @@ class _MainScreenState extends State<MainScreen> {
               _ipAddress,
               style: Theme.of(context).textTheme.headlineMedium,
             ),
-            TextButton(
-              onPressed: () async {
-                _ipAddress = await getPublicIP();
-                setState(() {});
+            DropdownMenu(
+              dropdownMenuEntries: const [
+                DropdownMenuEntry(value: 'local', label: 'Local'),
+                DropdownMenuEntry(value: 'public', label: 'Public'),
+              ],
+              onSelected: (value) {
+                showToastMessage(context, value ?? 'None');
+                _ipType = ServerIPType.values.firstWhere((e) => e.toString() == value);
               },
-              child: const Text("Get IP"),
             ),
             TextButton(
-              onPressed: startServer,
-              child: const Text("Init Server"),
+              onPressed: () async {
+                KLIServer.startServer(_ipType).then((s) {
+                  setState(() => _server = s);
+
+                  showToastMessage(context, 'Started a ${_ipType.name} server with IP: ${_server.address}');
+                });
+              },
+              child: const Text("Create Server"),
             ),
           ],
         ),

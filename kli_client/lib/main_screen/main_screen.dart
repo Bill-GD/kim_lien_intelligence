@@ -14,19 +14,24 @@ class MainScreen extends StatefulWidget {
 class _MainScreenState extends State<MainScreen> {
   final _ipTextController = TextEditingController();
   bool _connected = false;
-  late Socket socket;
   String serverMessage = '';
+  late final KLIClient _client;
 
   void connectServer() {
     final ip = _ipTextController.value.text;
     debugPrint('Trying to connect to: $ip');
 
     runZonedGuarded(() async {
-      socket = await connectToServer(ip);
-      socket.listen((data) {
+      _client = await KLIClient.initClient(ip);
+
+      setState(() => _connected = true);
+      if (mounted) {
+        showToastMessage(context, 'Connected to server with IP: ${_client.socket.address.address}');
+      }
+
+      _client.socket.listen((data) {
         setState(() => serverMessage = String.fromCharCodes(data).trim());
       });
-      setState(() => _connected = true);
     }, (e, _) {
       setState(() => _connected = false);
       if (e is SocketException) {
@@ -35,10 +40,6 @@ class _MainScreenState extends State<MainScreen> {
         debugPrint('Error: $e');
       }
     });
-  }
-
-  void sendMessage(String msg) {
-    socket.write(msg);
   }
 
   @override
@@ -71,7 +72,7 @@ class _MainScreenState extends State<MainScreen> {
             ),
             // send message button
             TextButton(
-              onPressed: () => sendMessage('socket'),
+              onPressed: () => _client.sendMessage('socket'),
               child: const Text('Send message'),
             ),
           ],
