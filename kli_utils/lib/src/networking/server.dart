@@ -1,11 +1,10 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 
 import 'networking.dart';
-
-enum ServerIPType { local, public }
 
 class KLIServer {
   static const int _maxConnectionCount = 7;
@@ -21,12 +20,11 @@ class KLIServer {
   static int get totalClientCount => _clientList.length;
   static int get connectedClientCount => _clientList.where((element) => element != null).length;
 
-  static Future<void> start([ServerIPType type = ServerIPType.local, int port = 8080]) async {
-    String ip = type == ServerIPType.local ? await getLocalIP() : await getPublicIP();
+  static final _onClientConnectivityChangedController = StreamController<bool>.broadcast();
+  static Stream<bool> get onClientConnectivityChanged => _onClientConnectivityChangedController.stream;
 
-    if (type == ServerIPType.public && ip == 'None') {
-      throw Exception('Internet access not available, please create local server instead.');
-    }
+  static Future<void> start([int port = 8080]) async {
+    String ip = await getLocalIP();
 
     _serverSocket = await ServerSocket.bind(InternetAddress(ip, type: InternetAddressType.IPv4), port);
 
@@ -55,6 +53,7 @@ class KLIServer {
             cID = 'mc';
           }
 
+          _onClientConnectivityChangedController.add(true);
           debugPrint('Client $cID disconnected');
         },
         onError: (error) {
@@ -66,24 +65,31 @@ class KLIServer {
 
   static void handleClientConnection(Socket clientSocket, KLISocketMessage socMsg) {
     final msg = socMsg.msg;
-    
-    if (msg.contains('ms')) {
-      _clientList[6] = clientSocket;
+    int idx = -1;
+
+    if (msg.contains('mc')) {
+      idx = 6;
     } else {
-      int id = int.parse(msg.substring(msg.length - 1));
+      idx = int.parse(msg.substring(msg.length - 1)) - 1;
 
       if (msg.contains('viewer')) {
-        id += 4;
+        idx += 4;
       }
-
-      _clientList[id - 1] = clientSocket;
     }
+    // print error if idx is < 0
+    if (idx < 0) {
+      debugPrint('Trying to assign to index -1, aborting');
+      return;
+    }
+
+    _clientList[idx] = clientSocket;
     debugPrint('Client $msg connected');
 
     clientSocket.write('Welcome, $msg');
+    _onClientConnectivityChangedController.add(true);
   }
 
-  static Future<void> close() async {
+  static Future<void> stop() async {
     for (final client in _clientList) {
       client?.destroy();
     }

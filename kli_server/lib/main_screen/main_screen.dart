@@ -9,19 +9,19 @@ class MainScreen extends StatefulWidget {
 }
 
 class _MainScreenState extends State<MainScreen> {
-  ServerIPType _ipType = ServerIPType.local;
-  String _ipAddress = '';
+  String _localAddress = '';
 
   @override
   void initState() {
     super.initState();
     getIpAddresses();
+    KLIServer.onClientConnectivityChanged.listen((event) {
+      setState(() {});
+    });
   }
 
   void getIpAddresses() async {
-    _ipAddress = 'Local: ${await getLocalIP()}';
-    setState(() {});
-    _ipAddress += '\nPublic: ${await getPublicIP()}';
+    _localAddress = await getLocalIP();
     setState(() {});
   }
 
@@ -29,7 +29,7 @@ class _MainScreenState extends State<MainScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(_ipAddress),
+        title: Text('Server: $_localAddress'),
       ),
       body: Center(
         child: Column(
@@ -44,23 +44,6 @@ class _MainScreenState extends State<MainScreen> {
                 ),
               ),
             ),
-            DropdownButton(
-              value: _ipType.name,
-              items: const [
-                DropdownMenuItem(
-                  value: 'local',
-                  child: Text('Local'),
-                ),
-                DropdownMenuItem(
-                  value: 'public',
-                  child: Text('Public'),
-                ),
-              ],
-              onChanged: (value) {
-                _ipType = ServerIPType.values.byName(value!);
-                setState(() {});
-              },
-            ),
             TextButton(
               onPressed: () async {
                 if (KLIServer.started) {
@@ -69,7 +52,7 @@ class _MainScreenState extends State<MainScreen> {
                 }
 
                 try {
-                  await KLIServer.start(_ipType);
+                  await KLIServer.start();
                 } on Exception catch (error) {
                   if (context.mounted) {
                     showToastMessage(context, error.toString());
@@ -80,11 +63,11 @@ class _MainScreenState extends State<MainScreen> {
                 if (context.mounted) {
                   showToastMessage(
                     context,
-                    'Started a ${_ipType.name} server with IP: ${KLIServer.address}',
+                    'Started a local server with IP: ${KLIServer.address}',
                   );
                 }
               },
-              child: const Text("Create Server"),
+              child: const Text("Start Server"),
             ),
             TextButton(
               onPressed: () async {
@@ -92,7 +75,7 @@ class _MainScreenState extends State<MainScreen> {
                   showToastMessage(context, 'No server exist');
                   return;
                 }
-                await KLIServer.close();
+                await KLIServer.stop();
                 if (context.mounted) {
                   showToastMessage(
                     context,
@@ -100,7 +83,7 @@ class _MainScreenState extends State<MainScreen> {
                   );
                 }
               },
-              child: const Text("Kill Server"),
+              child: const Text("Stop Server"),
             ),
           ],
         ),
