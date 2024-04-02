@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:kli_utils/kli_utils.dart';
 
-import '../global/global.dart';
-
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
 
@@ -31,18 +29,23 @@ class _MainScreenState extends State<MainScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Server"),
+        title: Text(_ipAddress),
       ),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            Text(
-              _ipAddress,
-              style: Theme.of(context).textTheme.headlineMedium,
+            Expanded(
+              child: ListView.builder(
+                itemCount: KLIServer.totalClientCount,
+                itemBuilder: (context, index) => ListTile(
+                  title: Text(KLIClient.listOfClient[index]),
+                  subtitle: Text('IP: ${KLIServer.clientAt(index)?.address.address}'),
+                ),
+              ),
             ),
             DropdownButton(
-              value: 'local',
+              value: _ipType.name,
               items: const [
                 DropdownMenuItem(
                   value: 'local',
@@ -54,18 +57,19 @@ class _MainScreenState extends State<MainScreen> {
                 ),
               ],
               onChanged: (value) {
-                _ipType = ServerIPType.values.firstWhere((e) => e.name == value);
+                _ipType = ServerIPType.values.byName(value!);
+                setState(() {});
               },
             ),
             TextButton(
               onPressed: () async {
-                if (kliServer != null) {
+                if (KLIServer.started) {
                   showToastMessage(context, 'Server already exist.');
                   return;
                 }
 
                 try {
-                  kliServer = await KLIServer.startServer(_ipType);
+                  await KLIServer.start(_ipType);
                 } on Exception catch (error) {
                   if (context.mounted) {
                     showToastMessage(context, error.toString());
@@ -76,7 +80,7 @@ class _MainScreenState extends State<MainScreen> {
                 if (context.mounted) {
                   showToastMessage(
                     context,
-                    'Started a ${_ipType.name} server with IP: ${kliServer!.address}',
+                    'Started a ${_ipType.name} server with IP: ${KLIServer.address}',
                   );
                 }
               },
@@ -84,15 +88,17 @@ class _MainScreenState extends State<MainScreen> {
             ),
             TextButton(
               onPressed: () async {
-                if (kliServer == null) {
-                  showToastMessage(
-                    context,
-                    'No server exist',
-                  );
+                if (!KLIServer.started) {
+                  showToastMessage(context, 'No server exist');
                   return;
                 }
-                await kliServer!.closeServer();
-                kliServer = null;
+                await KLIServer.close();
+                if (context.mounted) {
+                  showToastMessage(
+                    context,
+                    'Closed server.',
+                  );
+                }
               },
               child: const Text("Kill Server"),
             ),

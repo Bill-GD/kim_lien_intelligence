@@ -1,59 +1,94 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 
-import 'client.dart';
 import 'networking.dart';
 
 enum ServerIPType { local, public }
 
 class KLIServer {
-  final ServerSocket _serverSocket;
-  final List<KLIClient> _clients = [];
+  static const int _maxConnectionCount = 7;
 
-  KLIServer(this._serverSocket);
+  static ServerSocket? _serverSocket;
+  static ServerSocket? get serverSocket => _serverSocket;
+  static String? get address => _serverSocket?.address.address;
+  static bool get started => _serverSocket != null;
 
-  String get address => _serverSocket.address.address;
-  ServerSocket get socket => _serverSocket;
-  int get clientCount => _clients.length;
+  // 0-3: player, 4-5: viewer, 6: mc
+  static List<Socket?> _clientList = List.generate(_maxConnectionCount, (_) => null);
+  static Socket? clientAt(int index) => _clientList[index];
+  static int get totalClientCount => _clientList.length;
+  static int get connectedClientCount => _clientList.where((element) => element != null).length;
 
-  static Future<KLIServer> startServer([ServerIPType type = ServerIPType.local, int port = 8080]) async {
+  static Future<void> start([ServerIPType type = ServerIPType.local, int port = 8080]) async {
     String ip = type == ServerIPType.local ? await getLocalIP() : await getPublicIP();
 
     if (type == ServerIPType.public && ip == 'None') {
       throw Exception('Internet access not available, please create local server instead.');
     }
 
-    ServerSocket serverSocket = await ServerSocket.bind(
-      InternetAddress(ip, type: InternetAddressType.IPv4),
-      port,
-    );
+    _serverSocket = await ServerSocket.bind(InternetAddress(ip, type: InternetAddressType.IPv4), port);
 
-    final s = KLIServer(serverSocket);
-    s._serverSocket.listen(s.handleClientConnection);
+    _serverSocket!.listen((Socket clientSocket) {
+      clientSocket.listen(
+        (data) {
+          KLISocketMessage socMsg = KLISocketMessage.fromJson(jsonDecode(String.fromCharCodes(data)));
+          debugPrint(
+            '[${clientSocket.address.address}:${clientSocket.port}] ${socMsg.type}: ${socMsg.msg}',
+          );
 
-    return s;
-  }
+          if (socMsg.type == KLIMessageType.sendID) {
+            handleClientConnection(clientSocket, socMsg);
+          }
+        },
+        onDone: () {
+          final idx = _clientList.indexOf(clientSocket);
+          _clientList[idx] = null;
 
-  void handleClientConnection(Socket clientSocket) {
-    if (_clients.length >= 4) return;
+          String cID;
+          if (idx < 4) {
+            cID = 'player${idx + 1}';
+          } else if (idx < 6) {
+            cID = 'viewer${idx - 3}';
+          } else {
+            cID = 'mc';
+          }
 
-    final newClient = KLIClient.fromSocket(clientSocket);
-    newClient.socket.listen((data) {
-      debugPrint(
-        '[${clientSocket.address.address}:${clientSocket.port}, id=${_clients.length}] ${String.fromCharCodes(data).trim()}',
+          debugPrint('Client $cID disconnected');
+        },
+        onError: (error) {
+          debugPrint(error.toString());
+        },
       );
     });
-    _clients.add(newClient);
-
-    debugPrint('Client connected: ${clientSocket.address.address}:${clientSocket.port}');
   }
 
-  void sendMessage(KLIClient client, String msg) {
-    client.sendMessage(msg);
+  static void handleClientConnection(Socket clientSocket, KLISocketMessage socMsg) {
+    final msg = socMsg.msg;
+    
+    if (msg.contains('ms')) {
+      _clientList[6] = clientSocket;
+    } else {
+      int id = int.parse(msg.substring(msg.length - 1));
+
+      if (msg.contains('viewer')) {
+        id += 4;
+      }
+
+      _clientList[id - 1] = clientSocket;
+    }
+    debugPrint('Client $msg connected');
+
+    clientSocket.write('Welcome, $msg');
   }
 
-  Future<void> closeServer() async {
-    await _serverSocket.close();
+  static Future<void> close() async {
+    for (final client in _clientList) {
+      client?.destroy();
+    }
+    _clientList = List.generate(_maxConnectionCount, (_) => null);
+    await _serverSocket?.close();
+    _serverSocket = null;
   }
 }
