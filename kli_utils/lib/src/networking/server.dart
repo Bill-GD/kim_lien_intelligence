@@ -7,7 +7,17 @@ import 'package:flutter/foundation.dart';
 import 'networking.dart';
 
 class KLIServer {
-  static const int _maxConnectionCount = 7;
+  static const _maxConnectionCount = 7;
+
+  static const mapIDToIndex = {
+    'player1': 0,
+    'player2': 1,
+    'player3': 2,
+    'player4': 3,
+    'viewer1': 4,
+    'viewer2': 5,
+    'mc': 6
+  };
 
   static ServerSocket? _serverSocket;
   static ServerSocket? get serverSocket => _serverSocket;
@@ -16,12 +26,17 @@ class KLIServer {
 
   // 0-3: player, 4-5: viewer, 6: mc
   static List<Socket?> _clientList = List.generate(_maxConnectionCount, (_) => null);
+  static List<Socket?> get clientList => _clientList;
   static Socket? clientAt(int index) => _clientList[index];
   static int get totalClientCount => _clientList.length;
   static int get connectedClientCount => _clientList.where((element) => element != null).length;
 
   static final _onClientConnectivityChangedController = StreamController<bool>.broadcast();
   static Stream<bool> get onClientConnectivityChanged => _onClientConnectivityChangedController.stream;
+
+  // stream for client message
+  static final _onClientMessageController = StreamController<KLISocketMessage>.broadcast();
+  static Stream<KLISocketMessage> get onClientMessage => _onClientMessageController.stream;
 
   static Future<void> start([int port = 8080]) async {
     String ip = await getLocalIP();
@@ -33,25 +48,20 @@ class KLIServer {
         (data) {
           KLISocketMessage socMsg = KLISocketMessage.fromJson(jsonDecode(String.fromCharCodes(data)));
           debugPrint(
-            '[${clientSocket.address.address}:${clientSocket.port}] ${socMsg.type}: ${socMsg.msg}',
+            '[${clientSocket.address.address}:${clientSocket.port}, ${socMsg.senderID}] ${socMsg.type}: ${socMsg.msg}',
           );
 
           if (socMsg.type == KLIMessageType.sendID) {
             handleClientConnection(clientSocket, socMsg);
+          } else {
+            handleClientMessage(clientSocket, socMsg);
           }
         },
         onDone: () {
           final idx = _clientList.indexOf(clientSocket);
           _clientList[idx] = null;
 
-          String cID;
-          if (idx < 4) {
-            cID = 'player${idx + 1}';
-          } else if (idx < 6) {
-            cID = 'viewer${idx - 3}';
-          } else {
-            cID = 'mc';
-          }
+          String cID = mapIDToIndex.keys.firstWhere((e) => mapIDToIndex[e] == idx);
 
           _onClientConnectivityChangedController.add(true);
           debugPrint('Client $cID disconnected');
@@ -63,30 +73,47 @@ class KLIServer {
     });
   }
 
-  static void handleClientConnection(Socket clientSocket, KLISocketMessage socMsg) {
-    final msg = socMsg.msg;
-    int idx = -1;
-
-    if (msg.contains('mc')) {
-      idx = 6;
-    } else {
-      idx = int.parse(msg.substring(msg.length - 1)) - 1;
-
-      if (msg.contains('viewer')) {
-        idx += 4;
-      }
+  static void sendMessage(String clientID, KLISocketMessage message) {
+    Socket? client = getClient(clientID);
+    if (client == null) {
+      debugPrint('Client $clientID not connected, aborting');
+      return;
     }
-    // print error if idx is < 0
+
+    client.write(message);
+  }
+
+  static void handleClientConnection(Socket clientSocket, KLISocketMessage socMsg) {
+    final clientID = socMsg.msg;
+    int idx = getClientIndex(clientID);
+
     if (idx < 0) {
       debugPrint('Trying to assign to index -1, aborting');
       return;
     }
 
     _clientList[idx] = clientSocket;
-    debugPrint('Client $msg connected');
+    debugPrint('Client $clientID connected');
 
-    clientSocket.write('Welcome, $msg');
+    // clientSocket.write('Welcome, $clientID');
     _onClientConnectivityChangedController.add(true);
+  }
+
+  static void handleClientMessage(Socket clientSocket, KLISocketMessage socMsg) {
+    _onClientMessageController.add(socMsg);
+  }
+
+  static int getClientIndex(String clientID) {
+    return mapIDToIndex[clientID] ?? -1;
+  }
+
+  static Socket? getClient(String clientID) {
+    int idx = getClientIndex(clientID);
+    if (idx < 0) {
+      debugPrint('Trying to assign to index -1, aborting');
+      return null;
+    }
+    return clientAt(idx);
   }
 
   static Future<void> stop() async {
