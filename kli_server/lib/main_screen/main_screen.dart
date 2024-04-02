@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:kli_utils/kli_utils.dart';
 
+import '../global/global.dart';
+
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
 
@@ -9,15 +11,20 @@ class MainScreen extends StatefulWidget {
 }
 
 class _MainScreenState extends State<MainScreen> {
-  late final KLIServer _server;
   ServerIPType _ipType = ServerIPType.local;
   String _ipAddress = '';
 
   @override
   void initState() {
     super.initState();
-    getPublicIP().then((value) => setState(() => _ipAddress += '\nPublic: $value'));
-    getLocalIP().then((value) => setState(() => _ipAddress += '\nLocal: $value'));
+    getIpAddresses();
+  }
+
+  void getIpAddresses() async {
+    _ipAddress = 'Local: ${await getLocalIP()}';
+    setState(() {});
+    _ipAddress += '\nPublic: ${await getPublicIP()}';
+    setState(() {});
   }
 
   @override
@@ -35,24 +42,47 @@ class _MainScreenState extends State<MainScreen> {
               style: Theme.of(context).textTheme.headlineMedium,
             ),
             DropdownMenu(
+              label: const Text('Local'),
               dropdownMenuEntries: const [
                 DropdownMenuEntry(value: 'local', label: 'Local'),
                 DropdownMenuEntry(value: 'public', label: 'Public'),
               ],
               onSelected: (value) {
-                showToastMessage(context, value ?? 'None');
-                _ipType = ServerIPType.values.firstWhere((e) => e.toString() == value);
+                _ipType = ServerIPType.values.firstWhere((e) => e.name == value);
               },
             ),
             TextButton(
               onPressed: () async {
-                KLIServer.startServer(_ipType).then((s) {
-                  setState(() => _server = s);
+                if (kliServer != null) {
+                  showToastMessage(context, 'Server already exist.');
+                  return;
+                }
 
-                  showToastMessage(context, 'Started a ${_ipType.name} server with IP: ${_server.address}');
-                });
+                try {
+                  kliServer = await KLIServer.startServer(_ipType);
+                } on Exception catch (error) {
+                  if (context.mounted) {
+                    showToastMessage(context, error.toString());
+                  }
+                  return;
+                }
+
+                if (context.mounted) {
+                  showToastMessage(
+                    context,
+                    'Started a ${_ipType.name} server with IP: ${kliServer!.address}',
+                  );
+                }
               },
               child: const Text("Create Server"),
+            ),
+            TextButton(
+              onPressed: () async {
+                if (kliServer == null) return;
+                await kliServer!.closeServer();
+                kliServer = null;
+              },
+              child: const Text("Kill Server"),
             ),
           ],
         ),

@@ -3,11 +3,11 @@ import 'package:flutter/material.dart';
 import 'main_screen/main_screen.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(const KliServerApp());
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class KliServerApp extends StatelessWidget {
+  const KliServerApp({super.key});
 
   @override
   Widget build(BuildContext context) {

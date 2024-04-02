@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:kli_client/main_screen/main_screen.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(const KliClientApp());
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class KliClientApp extends StatelessWidget {
+  const KliClientApp({super.key});
 
   @override
   Widget build(BuildContext context) {
