@@ -46,7 +46,7 @@ class KLIServer {
     _serverSocket!.listen((Socket clientSocket) {
       clientSocket.listen(
         (data) {
-          KLISocketMessage socMsg = KLISocketMessage.fromJson(jsonDecode(String.fromCharCodes(data)));
+          KLISocketMessage socMsg = KLISocketMessage.fromJson(jsonDecode(String.fromCharCodes(data).trim()));
           debugPrint(
             '[${clientSocket.address.address}:${clientSocket.port}, ${socMsg.senderID}] ${socMsg.type}: ${socMsg.msg}',
           );

@@ -36,10 +36,14 @@ class KLISocketMessage {
 
   @override
   String toString() {
-    return jsonEncode({'senderID': senderID, 'message': msg, 'type': type.name});
+    return jsonEncode({'senderID': senderID, 'message': utf8.encode(msg), 'type': type.name});
   }
 
   factory KLISocketMessage.fromJson(Map<String, dynamic> json) {
-    return KLISocketMessage(json['senderID'], json['message'], KLIMessageType.values.byName(json['type']));
+    return KLISocketMessage(
+      json['senderID'],
+      utf8.decode(List<int>.from(json['message'])),
+      KLIMessageType.values.byName(json['type']),
+    );
   }
 }
