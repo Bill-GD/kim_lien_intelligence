@@ -15,6 +15,7 @@ class KLIServer {
 
   String get address => _serverSocket.address.address;
   ServerSocket get socket => _serverSocket;
+  int get clientCount => _clients.length;
 
   static Future<KLIServer> startServer([ServerIPType type = ServerIPType.local, int port = 8080]) async {
     String ip = type == ServerIPType.local ? await getLocalIP() : await getPublicIP();
@@ -36,7 +37,7 @@ class KLIServer {
 
   void handleClientConnection(Socket clientSocket) {
     if (_clients.length >= 4) return;
-    
+
     final newClient = KLIClient.fromSocket(clientSocket);
     newClient.socket.listen((data) {
       debugPrint(

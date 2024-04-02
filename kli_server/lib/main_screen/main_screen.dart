@@ -41,13 +41,19 @@ class _MainScreenState extends State<MainScreen> {
               _ipAddress,
               style: Theme.of(context).textTheme.headlineMedium,
             ),
-            DropdownMenu(
-              label: const Text('Local'),
-              dropdownMenuEntries: const [
-                DropdownMenuEntry(value: 'local', label: 'Local'),
-                DropdownMenuEntry(value: 'public', label: 'Public'),
+            DropdownButton(
+              value: 'local',
+              items: const [
+                DropdownMenuItem(
+                  value: 'local',
+                  child: Text('Local'),
+                ),
+                DropdownMenuItem(
+                  value: 'public',
+                  child: Text('Public'),
+                ),
               ],
-              onSelected: (value) {
+              onChanged: (value) {
                 _ipType = ServerIPType.values.firstWhere((e) => e.name == value);
               },
             ),
@@ -78,7 +84,13 @@ class _MainScreenState extends State<MainScreen> {
             ),
             TextButton(
               onPressed: () async {
-                if (kliServer == null) return;
+                if (kliServer == null) {
+                  showToastMessage(
+                    context,
+                    'No server exist',
+                  );
+                  return;
+                }
                 await kliServer!.closeServer();
                 kliServer = null;
               },
