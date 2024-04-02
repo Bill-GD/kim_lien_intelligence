@@ -6,14 +6,14 @@ import 'package:kli_utils/kli_utils.dart';
 
 import '../global/global.dart';
 
-class MainScreen extends StatefulWidget {
-  const MainScreen({super.key});
+class ConnectPage extends StatefulWidget {
+  const ConnectPage({super.key});
 
   @override
-  State<MainScreen> createState() => _MainScreenState();
+  State<ConnectPage> createState() => _ConnectPageState();
 }
 
-class _MainScreenState extends State<MainScreen> {
+class _ConnectPageState extends State<ConnectPage> {
   final _ipTextController = TextEditingController();
   bool _isConnected = false;
   String serverMessage = '';
@@ -46,6 +46,7 @@ class _MainScreenState extends State<MainScreen> {
       },
       (e, _) {
         setState(() => _isConnected = false);
+        debugPrint('Error when trying to connect: $e');
         if (e is SocketException) {
           showToastMessage(context, 'Host (ip=$ip) not known');
         } else {

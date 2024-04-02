@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:kli_utils/kli_utils.dart';
 
-class MainScreen extends StatefulWidget {
-  const MainScreen({super.key});
+class ServerSetupPage extends StatefulWidget {
+  const ServerSetupPage({super.key});
 
   @override
-  State<MainScreen> createState() => _MainScreenState();
+  State<ServerSetupPage> createState() => _ServerSetupPageState();
 }
 
-class _MainScreenState extends State<MainScreen> {
+class _ServerSetupPageState extends State<ServerSetupPage> {
   String _localAddress = '';
 
   @override

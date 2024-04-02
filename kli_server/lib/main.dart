@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 
-import 'main_screen/main_screen.dart';
+import 'server_setup/server_setup.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
   runApp(const KliServerApp());
 }
 
@@ -15,7 +16,7 @@ class KliServerApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: const MainScreen(),
+      home: const ServerSetupPage(),
     );
   }
 }

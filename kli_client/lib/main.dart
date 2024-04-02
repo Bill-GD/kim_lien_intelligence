@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:kli_client/main_screen/main_screen.dart';
+import 'package:kli_client/connect_screen/connect_screen.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
   runApp(const KliClientApp());
 }
 
@@ -14,7 +15,7 @@ class KliClientApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: const MainScreen(),
+      home: const ConnectPage(),
     );
   }
 }
