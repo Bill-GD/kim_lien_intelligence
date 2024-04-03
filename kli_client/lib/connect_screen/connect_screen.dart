@@ -4,6 +4,8 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:kli_utils/kli_utils.dart';
 
+import '../global.dart';
+
 class ConnectPage extends StatefulWidget {
   const ConnectPage({super.key});
 
@@ -66,7 +68,7 @@ class _ConnectPageState extends State<ConnectPage> {
                   showToastMessage(context, 'Please select a player ID');
                   return;
                 }
-                debugPrint('Client $_playerId is trying to connect to: $ip');
+                logger.i('Client $_playerId is trying to connect to: $ip');
 
                 runZonedGuarded(
                   () async {
@@ -82,7 +84,7 @@ class _ConnectPageState extends State<ConnectPage> {
                   },
                   (e, _) {
                     setState(() => _isConnected = false);
-                    debugPrint('Error when trying to connect: $e');
+                    logger.e('Error when trying to connect: $e');
                     if (e is SocketException) {
                       showToastMessage(context, 'Host (ip=$ip) not known');
                     } else {

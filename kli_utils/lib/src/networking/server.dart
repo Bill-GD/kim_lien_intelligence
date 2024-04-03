@@ -2,8 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:flutter/foundation.dart';
-
+import '../global.dart';
 import 'networking.dart';
 
 class KLIServer {
@@ -42,7 +41,7 @@ class KLIServer {
     String ip = await getLocalIP();
 
     _serverSocket = await ServerSocket.bind(InternetAddress(ip, type: InternetAddressType.IPv4), port);
-    debugPrint('Server started on ${_serverSocket?.address}');
+    logger.i('Server started on ${_serverSocket?.address}');
 
     _serverSocket!.listen((Socket clientSocket) {
       clientSocket.listen(
@@ -62,10 +61,10 @@ class KLIServer {
           String cID = mapIDToIndex.keys.firstWhere((e) => mapIDToIndex[e] == idx);
 
           _onClientConnectivityChangedController.add(true);
-          debugPrint('Client $cID disconnected');
+          logger.i('Client $cID disconnected');
         },
         onError: (error) {
-          debugPrint(error.toString());
+          logger.e(error.toString());
         },
       );
     });
@@ -74,7 +73,7 @@ class KLIServer {
   static void sendMessage(String clientID, KLISocketMessage message) {
     Socket? client = getClient(clientID);
     if (client == null) {
-      debugPrint('Client $clientID not connected, aborting');
+      logger.i('Client $clientID not connected, aborting');
       return;
     }
 
@@ -86,18 +85,18 @@ class KLIServer {
     int idx = getClientIndex(clientID);
 
     if (idx < 0) {
-      debugPrint('Trying to assign to index -1, aborting');
+      logger.w('Trying to assign to index -1, aborting');
       return;
     }
 
     _clientList[idx] = clientSocket;
-    debugPrint('Client $clientID connected, saved to index $idx');
+    logger.i('Client $clientID connected, saved to index $idx');
 
     _onClientConnectivityChangedController.add(true);
   }
 
   static void handleClientMessage(Socket clientSocket, KLISocketMessage socMsg) {
-    debugPrint('[${clientSocket.address.address}, ${socMsg.senderID}, ${socMsg.type}] ${socMsg.msg}');
+    logger.i('[${clientSocket.address.address}, ${socMsg.senderID}, ${socMsg.type}] ${socMsg.msg}');
     _onClientMessageController.add(socMsg);
   }
 
@@ -108,7 +107,7 @@ class KLIServer {
   static Socket? getClient(String clientID) {
     int idx = getClientIndex(clientID);
     if (idx < 0) {
-      debugPrint('Trying to assign to index -1, aborting');
+      logger.w('Trying to assign to index -1, aborting');
       return null;
     }
     return clientAt(idx);
@@ -117,13 +116,13 @@ class KLIServer {
   static Future<void> stop() async {
     if (!started) return;
 
-    debugPrint('Disconnecting all clients');
+    logger.i('Disconnecting all clients');
     for (final client in _clientList) {
       client?.destroy();
     }
     _clientList = List.generate(_maxConnectionCount, (_) => null);
 
-    debugPrint('Closing server socket');
+    logger.i('Closing server socket');
     await _serverSocket?.close();
     _serverSocket = null;
   }

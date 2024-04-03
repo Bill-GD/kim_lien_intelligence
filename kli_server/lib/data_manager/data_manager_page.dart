@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:kli_server/data_manager/match_manager.dart';
 
+import '../global.dart';
 import 'accel_question_manager.dart';
 import 'extra_question_manager.dart';
 import 'finish_question_manager.dart';
+import 'match_manager.dart';
 import 'obstacle_question_manager.dart';
 import 'start_question_manager.dart';
 
@@ -23,6 +24,7 @@ class _DataManagerPageState extends State<DataManagerPage> {
   Widget getButton(String text, Widget destination) {
     return FilledButton(
       onPressed: () {
+        logger.i('Pressed $text');
         Navigator.of(context).push(
           MaterialPageRoute(
             builder: (context) => destination,
@@ -41,6 +43,7 @@ class _DataManagerPageState extends State<DataManagerPage> {
       ),
       body: Center(
         child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Column(
               children: [

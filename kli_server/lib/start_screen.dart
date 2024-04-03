@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:kli_utils/kli_utils.dart';
 
 import 'data_manager/data_manager_page.dart';
+import 'global.dart';
 import 'server_setup/server_setup.dart';
 
 // This page shows 2 options:
@@ -25,6 +26,7 @@ class _StartPageState extends State<StartPage> {
           children: [
             TextButton(
               onPressed: () {
+                logger.i('Opening Data Manager page...');
                 Navigator.of(context).push(
                   MaterialPageRoute(
                     builder: (context) => const DataManagerPage(),
@@ -35,6 +37,7 @@ class _StartPageState extends State<StartPage> {
             ),
             TextButton(
               onPressed: () async {
+                logger.i('Opening Server Setup page...');
                 await Navigator.of(context).push(
                   MaterialPageRoute(
                     builder: (context) => const ServerSetupPage(),

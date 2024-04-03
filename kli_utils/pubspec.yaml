@@ -13,6 +13,7 @@ dependencies:
   network_info_plus: ^5.0.2
   http: ^1.2.1
   excel: ^4.0.3
+  logger: ^2.2.0
 
 dev_dependencies:
   flutter_test:

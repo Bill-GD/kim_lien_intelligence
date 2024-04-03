@@ -2,11 +2,15 @@ import 'dart:io';
 
 import 'package:excel/excel.dart';
 
+import '../global.dart';
+
 /// A static class for reading & writing to file.
 class FileDataManager {
   // D:/Downloads/KĐ trận BK1.xlsx
   // D:/Downloads/output.txt
   static Future<String> readFromExcel(String path, int maxColumnCount, [int startRow = 0]) async {
+    logger.i('Reading from $path');
+    
     final bytes = await File(path).readAsBytes();
     final excel = Excel.decodeBytes(bytes);
     String result = '';
