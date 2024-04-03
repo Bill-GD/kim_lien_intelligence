@@ -30,8 +30,6 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  http: ^1.2.1
-  window_manager: ^0.3.8
   kli_utils:
     path: D:/Code/Flutter/kim_lien_intelligence/kli_utils
 

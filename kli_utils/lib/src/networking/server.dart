@@ -115,10 +115,15 @@ class KLIServer {
   }
 
   static Future<void> stop() async {
+    if (!started) return;
+
+    debugPrint('Disconnecting all clients');
     for (final client in _clientList) {
       client?.destroy();
     }
     _clientList = List.generate(_maxConnectionCount, (_) => null);
+
+    debugPrint('Closing server socket');
     await _serverSocket?.close();
     _serverSocket = null;
   }
