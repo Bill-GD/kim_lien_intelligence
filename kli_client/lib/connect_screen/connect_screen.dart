@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -18,42 +17,13 @@ class _ConnectPageState extends State<ConnectPage> {
   String _serverMessage = '';
   String _playerId = '';
 
-  void connectToServer() {
-    final ip = _ipTextController.value.text.trim();
-    if (ip.isEmpty) {
-      showToastMessage(context, 'Please enter an IP');
-      return;
-    }
-    if (_playerId.isEmpty) {
-      showToastMessage(context, 'Please select a player ID');
-      return;
-    }
-    debugPrint('Client $_playerId is trying to connect to: $ip');
-
-    runZonedGuarded(
-      () async {
-        await KLIClient.init(ip, _playerId);
-
-        setState(() => _isConnected = true);
-        if (mounted) {
-          showToastMessage(context, 'Connected to server with IP: ${KLIClient.address}');
-        }
-
-        KLIClient.socket?.listen((data) {
-          setState(() =>
-              _serverMessage = KLISocketMessage.fromJson(jsonDecode(String.fromCharCodes(data).trim())).msg);
-        });
-      },
-      (e, _) {
-        setState(() => _isConnected = false);
-        debugPrint('Error when trying to connect: $e');
-        if (e is SocketException) {
-          showToastMessage(context, 'Host (ip=$ip) not known');
-        } else {
-          showToastMessage(context, '$e');
-        }
-      },
-    );
+  @override
+  void initState() {
+    super.initState();
+    KLIClient.onMessageReceived.listen((newMessage) {
+      _serverMessage = newMessage.msg;
+      setState(() {});
+    });
   }
 
   @override
@@ -86,7 +56,41 @@ class _ConnectPageState extends State<ConnectPage> {
             ),
             Text('$_isConnected'),
             TextButton(
-              onPressed: connectToServer,
+              onPressed: () {
+                final ip = _ipTextController.value.text.trim();
+                if (ip.isEmpty) {
+                  showToastMessage(context, 'Please enter an IP');
+                  return;
+                }
+                if (_playerId.isEmpty) {
+                  showToastMessage(context, 'Please select a player ID');
+                  return;
+                }
+                debugPrint('Client $_playerId is trying to connect to: $ip');
+
+                runZonedGuarded(
+                  () async {
+                    await KLIClient.init(ip, _playerId);
+                    setState(() => _isConnected = true);
+
+                    if (context.mounted) {
+                      showToastMessage(
+                        context,
+                        'Connected to server as $_playerId with IP: ${KLIClient.address}',
+                      );
+                    }
+                  },
+                  (e, _) {
+                    setState(() => _isConnected = false);
+                    debugPrint('Error when trying to connect: $e');
+                    if (e is SocketException) {
+                      showToastMessage(context, 'Host (ip=$ip) not known');
+                    } else {
+                      showToastMessage(context, '$e');
+                    }
+                  },
+                );
+              },
               child: const Text('Connect'),
             ),
             Text('From server: $_serverMessage'),

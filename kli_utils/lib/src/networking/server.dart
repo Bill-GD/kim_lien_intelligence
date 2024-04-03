@@ -42,14 +42,12 @@ class KLIServer {
     String ip = await getLocalIP();
 
     _serverSocket = await ServerSocket.bind(InternetAddress(ip, type: InternetAddressType.IPv4), port);
+    debugPrint('Server started on ${_serverSocket?.address}');
 
     _serverSocket!.listen((Socket clientSocket) {
       clientSocket.listen(
         (data) {
           KLISocketMessage socMsg = KLISocketMessage.fromJson(jsonDecode(String.fromCharCodes(data).trim()));
-          debugPrint(
-            '[${clientSocket.address.address}:${clientSocket.port}, ${socMsg.senderID}] ${socMsg.type}: ${socMsg.msg}',
-          );
 
           if (socMsg.type == KLIMessageType.sendID) {
             handleClientConnection(clientSocket, socMsg);
@@ -93,13 +91,13 @@ class KLIServer {
     }
 
     _clientList[idx] = clientSocket;
-    debugPrint('Client $clientID connected');
+    debugPrint('Client $clientID connected, saved to index $idx');
 
-    // clientSocket.write('Welcome, $clientID');
     _onClientConnectivityChangedController.add(true);
   }
 
   static void handleClientMessage(Socket clientSocket, KLISocketMessage socMsg) {
+    debugPrint('[${clientSocket.address.address}, ${socMsg.senderID}, ${socMsg.type}] ${socMsg.msg}');
     _onClientMessageController.add(socMsg);
   }
 
