@@ -67,6 +67,7 @@ flutter:
   assets:
     - assets/images/ttkl_logo.png
     - assets/images/ttkl_logo_title.png
+    - assets/images/ttkl_logo_title_light.png
     - assets/images/ttkl_background.png
 
   # An image asset can refer to one or more resolution-specific "variants", see

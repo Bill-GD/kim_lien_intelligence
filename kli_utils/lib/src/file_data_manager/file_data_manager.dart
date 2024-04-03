@@ -42,4 +42,8 @@ class FileDataManager {
   static Future<void> writeToFile(String path, String data) async {
     await File(path).writeAsString(data);
   }
+
+  static Future<void> createFile(String path) async {
+    await File(path).create();
+  }
 }

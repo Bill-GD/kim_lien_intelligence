@@ -7,8 +7,11 @@ import 'start_screen/start_screen.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
+
   initLogger();
   initPackageInfo();
+  initExePath();
+
   runApp(const KliServerApp());
 }
 
@@ -18,8 +21,6 @@ class KliServerApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ThemeProvider(
-      // saveThemesOnChange: true,
-      loadThemeOnInit: true,
       defaultThemeId: '${SchedulerBinding.instance.platformDispatcher.platformBrightness.name}_theme',
       themes: [
         AppTheme(

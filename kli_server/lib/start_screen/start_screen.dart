@@ -1,8 +1,5 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:kli_server/start_screen/help_page.dart';
 import 'package:kli_utils/kli_utils.dart';
 import 'package:side_navigation/side_navigation.dart';
 
@@ -44,21 +41,27 @@ class _StartPageState extends State<StartPage> {
                 selectedIndex: _sidebarIndex,
                 expandable: false,
                 header: SideNavigationBarHeader(
-                  image: Padding(
-                    padding: const EdgeInsets.only(left: 10, bottom: 10, top: 10),
-                    child: Image.asset(
-                      'assets/images/ttkl_logo_title.png',
-                      scale: 15,
+                  image: const SizedBox.shrink(),
+                  title: Padding(
+                    padding: const EdgeInsets.only(right: 20, top: 10),
+                    child: Image.asset('assets/images/ttkl_logo_title_light.png'),
+                  ),
+                  subtitle: Padding(
+                    padding: const EdgeInsets.only(left: 100, bottom: 10),
+                    child: Text(
+                      'Host',
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: Theme.of(context).colorScheme.secondary.withOpacity(0.8),
+                      ),
                     ),
                   ),
-                  title: const SizedBox.shrink(),
-                  subtitle: const SizedBox.shrink(),
                 ),
                 footer: SideNavigationBarFooter(
                   label: Text(
                     'v${packageInfo.version}',
                     style: TextStyle(
-                      color: Theme.of(context).colorScheme.background.withOpacity(0.8),
+                      color: Theme.of(context).colorScheme.secondary.withOpacity(0.8),
                     ),
                   ),
                 ),
@@ -103,7 +106,7 @@ class _StartPageState extends State<StartPage> {
                         ),
                       );
                     },
-                    child: const Text('Manage Data'),
+                    child: const Text('Open Data Manager', style: TextStyle(fontSize: 30)),
                   ),
                   ElevatedButton(
                     onPressed: () async {
@@ -115,9 +118,10 @@ class _StartPageState extends State<StartPage> {
                       );
                       await KLIServer.stop();
                     },
-                    child: const Text('Start Hosting'),
+                    child: const Text('Open Server Setup', style: TextStyle(fontSize: 30)),
                   ),
-                  const HelpPage(),
+                  // Help screen
+                  const Text('To be implemented'),
                 ].elementAt(_sidebarIndex),
               ),
             ),

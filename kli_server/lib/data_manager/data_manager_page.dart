@@ -2,7 +2,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:side_navigation/side_navigation.dart';
 
-import '../global.dart';
 import 'accel_question_manager.dart';
 import 'extra_question_manager.dart';
 import 'finish_question_manager.dart';
@@ -23,26 +22,8 @@ class DataManagerPage extends StatefulWidget {
 }
 
 class _DataManagerPageState extends State<DataManagerPage> {
-  Widget getButton(String text, Widget destination) {
-    return ElevatedButton(
-      onPressed: () {
-        logger.i('Pressed $text');
-        Navigator.of(context).push(
-          MaterialPageRoute(
-            builder: (context) => destination,
-          ),
-        );
-      },
-      child: Text(text),
-    );
-  }
-
-  int _selectedIndex = 0;
-  final List<Widget> views = [
-    // Help message here
-    const Center(
-      child: Text('Data Manager'),
-    ),
+  int _selectedPage = 0;
+  final List<Widget> _contentPages = [
     const MatchManager(),
     const StartQuestionManager(),
     const ObstacleQuestionManager(),
@@ -52,6 +33,18 @@ class _DataManagerPageState extends State<DataManagerPage> {
   ];
 
   @override
+  void initState() {
+    super.initState();
+    // TODO: implement storage init here
+    // Match: same dir
+
+  }
+
+  void _initStorage() {
+
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Row(
@@ -59,13 +52,25 @@ class _DataManagerPageState extends State<DataManagerPage> {
           Container(
             decoration: const BoxDecoration(border: Border(right: BorderSide(width: 1))),
             child: SideNavigationBar(
-              selectedIndex: _selectedIndex,
+              selectedIndex: _selectedPage,
               expandable: false,
-              items: const [
-                SideNavigationBarItem(
-                  icon: Icons.arrow_back,
-                  label: 'Back',
+              header: SideNavigationBarHeader(
+                image: Padding(
+                  padding: const EdgeInsets.only(left: 5),
+                  child: IconButton(
+                    icon: const Icon(Icons.arrow_back),
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                  ),
                 ),
+                title: Padding(
+                  padding: const EdgeInsets.only(right: 20, top: 30, bottom: 30),
+                  child: Text('Data Manager', style: Theme.of(context).textTheme.titleLarge),
+                ),
+                subtitle: const SizedBox.shrink(),
+              ),
+              items: const [
                 SideNavigationBarItem(
                   icon: CupertinoIcons.add,
                   label: 'Match',
@@ -93,11 +98,7 @@ class _DataManagerPageState extends State<DataManagerPage> {
               ],
               onTap: (newIndex) {
                 setState(() {
-                  if (newIndex == 0) {
-                    Navigator.of(context).pop();
-                    return;
-                  }
-                  _selectedIndex = newIndex;
+                  _selectedPage = newIndex;
                 });
               },
               theme: SideNavigationBarTheme(
@@ -110,7 +111,7 @@ class _DataManagerPageState extends State<DataManagerPage> {
               ),
             ),
           ),
-          Expanded(child: views.elementAt(_selectedIndex)),
+          Expanded(child: _contentPages.elementAt(_selectedPage)),
         ],
       ),
     );
