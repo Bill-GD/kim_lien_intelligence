@@ -3,8 +3,6 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:kli_utils/kli_utils.dart';
 
-import '../global.dart';
-
 class ServerSetupPage extends StatefulWidget {
   const ServerSetupPage({super.key});
 
@@ -43,32 +41,10 @@ class _ServerSetupPageState extends State<ServerSetupPage> {
       onPopInvoked: (pop) {
         if (pop) return;
 
-        showDialog<void>(
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              title: const Text('Are you sure?'),
-              content: const Text(
-                'Are you sure you want to leave this page?',
-              ),
-              actions: <Widget>[
-                TextButton(
-                  child: const Text('Nevermind'),
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
-                ),
-                TextButton(
-                  child: const Text('Leave'),
-                  onPressed: () {
-                    logger.i('Leaving Server Setup page...');
-                    Navigator.pop(context);
-                    Navigator.pop(context);
-                  },
-                ),
-              ],
-            );
-          },
+        showBackDialog(
+          context,
+          'Are you sure you want to exit?\nThe server will close.',
+          'Leaving Server Setup page...',
         );
       },
       child: Scaffold(
