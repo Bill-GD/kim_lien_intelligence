@@ -40,7 +40,10 @@ class _ServerSetupPageState extends State<ServerSetupPage> {
       canPop: false,
       onPopInvoked: (pop) {
         if (pop) return;
-
+        if (!KLIServer.started) {
+          Navigator.pop(context);
+          return;
+        }
         showBackDialog(
           context,
           'Are you sure you want to exit?\nThe server will close.',

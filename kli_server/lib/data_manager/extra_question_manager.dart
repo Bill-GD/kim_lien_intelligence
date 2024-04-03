@@ -10,9 +10,8 @@ class ExtraQuestionManager extends StatefulWidget {
 class _ExtraQuestionManagerState extends State<ExtraQuestionManager> {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(),
-      body: const Center(
+    return const Scaffold(
+      body: Center(
         child: Text('Extra Manager'),
       ),
     );

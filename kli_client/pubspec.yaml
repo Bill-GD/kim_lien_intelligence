@@ -31,6 +31,8 @@ dependencies:
   flutter:
     sdk: flutter
   logger: ^2.2.0
+  package_info_plus: ^6.0.0
+  theme_provider: ^0.6.0
   kli_utils:
     path: D:/Code/Flutter/kim_lien_intelligence/kli_utils
 
@@ -75,7 +77,14 @@ flutter:
   # "family" key with the font family name, and a "fonts" key with a
   # list giving the asset and other descriptors for the font. For
   # example:
-  # fonts:
+  fonts:
+    - family: Nunito
+      fonts:
+        - asset: assets/fonts/Nunito-Regular.ttf
+        - asset: assets/fonts/Nunito-SemiBold.ttf
+        - asset: assets/fonts/Nunito-Bold.ttf
+        - asset: assets/fonts/Nunito-Italic.ttf
+          style: italic
   #   - family: Schyler
   #     fonts:
   #       - asset: fonts/Schyler-Regular.ttf

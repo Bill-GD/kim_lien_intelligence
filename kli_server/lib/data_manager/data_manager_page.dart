@@ -1,4 +1,6 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:side_navigation/side_navigation.dart';
 
 import '../global.dart';
 import 'accel_question_manager.dart';
@@ -22,7 +24,7 @@ class DataManagerPage extends StatefulWidget {
 
 class _DataManagerPageState extends State<DataManagerPage> {
   Widget getButton(String text, Widget destination) {
-    return FilledButton(
+    return ElevatedButton(
       onPressed: () {
         logger.i('Pressed $text');
         Navigator.of(context).push(
@@ -35,28 +37,81 @@ class _DataManagerPageState extends State<DataManagerPage> {
     );
   }
 
+  int _selectedIndex = 0;
+  final List<Widget> views = [
+    // Help message here
+    const Center(
+      child: Text('Data Manager'),
+    ),
+    const MatchManager(),
+    const StartQuestionManager(),
+    const ObstacleQuestionManager(),
+    const AccelQuestionManager(),
+    const FinishQuestionManager(),
+    const ExtraQuestionManager(),
+  ];
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Data Manager'),
-      ),
-      body: Center(
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Column(
-              children: [
-                getButton('Match', const MatchManager()),
-                getButton('Start Questions', const StartQuestionManager()),
-                getButton('Obstacle Questions', const ObstacleQuestionManager()),
-                getButton('Accel Questions', const AccelQuestionManager()),
-                getButton('Finish Questions', const FinishQuestionManager()),
-                getButton('Extra Questions', const ExtraQuestionManager()),
+      body: Row(
+        children: [
+          Container(
+            decoration: const BoxDecoration(border: Border(right: BorderSide(width: 1))),
+            child: SideNavigationBar(
+              selectedIndex: _selectedIndex,
+              expandable: false,
+              items: const [
+                SideNavigationBarItem(
+                  icon: Icons.arrow_back,
+                  label: 'Back',
+                ),
+                SideNavigationBarItem(
+                  icon: CupertinoIcons.add,
+                  label: 'Match',
+                ),
+                SideNavigationBarItem(
+                  icon: Icons.format_list_numbered_rtl,
+                  label: 'Start',
+                ),
+                SideNavigationBarItem(
+                  icon: Icons.local_fire_department_outlined,
+                  label: 'Obstacle',
+                ),
+                SideNavigationBarItem(
+                  icon: Icons.battery_charging_full_outlined,
+                  label: 'Acceleration',
+                ),
+                SideNavigationBarItem(
+                  icon: Icons.check_circle_outline,
+                  label: 'Finish',
+                ),
+                SideNavigationBarItem(
+                  icon: Icons.filter_list_outlined,
+                  label: 'Extra',
+                ),
               ],
+              onTap: (newIndex) {
+                setState(() {
+                  if (newIndex == 0) {
+                    Navigator.of(context).pop();
+                    return;
+                  }
+                  _selectedIndex = newIndex;
+                });
+              },
+              theme: SideNavigationBarTheme(
+                itemTheme: SideNavigationBarItemTheme(
+                  selectedItemColor: Theme.of(context).colorScheme.primary,
+                  labelTextStyle: const TextStyle(fontWeight: FontWeight.bold),
+                ),
+                togglerTheme: SideNavigationBarTogglerTheme.standard(),
+                dividerTheme: SideNavigationBarDividerTheme.standard(),
+              ),
             ),
-          ],
-        ),
+          ),
+          Expanded(child: views.elementAt(_selectedIndex)),
+        ],
       ),
     );
   }

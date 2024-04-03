@@ -10,9 +10,8 @@ class AccelQuestionManager extends StatefulWidget {
 class _AccelQuestionManagerState extends State<AccelQuestionManager> {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(),
-      body: const Center(
+    return const Scaffold(
+      body: Center(
         child: Text('Accel Manager'),
       ),
     );

@@ -10,9 +10,8 @@ class MatchManager extends StatefulWidget {
 class _MatchManagerState extends State<MatchManager> {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(),
-      body: const Center(
+    return const Scaffold(
+      body: Center(
         child: Text('Match Manager'),
       ),
     );

@@ -10,9 +10,8 @@ class StartQuestionManager extends StatefulWidget {
 class _StartQuestionManagerState extends State<StartQuestionManager> {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(),
-      body: const Center(
+    return const Scaffold(
+      body: Center(
         child: Text('Start Manager'),
       ),
     );

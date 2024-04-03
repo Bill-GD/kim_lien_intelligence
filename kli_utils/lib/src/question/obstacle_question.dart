@@ -1,4 +1,3 @@
-// create a class similar to StartQuestion
 class ObstacleQuestion {
   final int id;
   final String question;
