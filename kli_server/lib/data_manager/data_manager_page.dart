@@ -54,14 +54,9 @@ class _DataManagerPageState extends State<DataManagerPage> {
               selectedIndex: _selectedPage,
               expandable: false,
               header: SideNavigationBarHeader(
-                image: Padding(
-                  padding: const EdgeInsets.only(left: 5),
-                  child: IconButton(
-                    icon: const Icon(Icons.arrow_back),
-                    onPressed: () {
-                      Navigator.pop(context);
-                    },
-                  ),
+                image: const Padding(
+                  padding: EdgeInsets.only(left: 5),
+                  child: BackButton(),
                 ),
                 title: Padding(
                   padding: const EdgeInsets.only(right: 20, top: 30, bottom: 30),

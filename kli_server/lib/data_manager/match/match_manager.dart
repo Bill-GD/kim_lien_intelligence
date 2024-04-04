@@ -1,9 +1,10 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
-import 'package:kli_server/global.dart';
 import 'package:kli_utils/kli_utils.dart';
+
+import '../../global.dart';
+import 'match_editor.dart';
 
 class MatchManager extends StatefulWidget {
   const MatchManager({super.key});
@@ -14,15 +15,18 @@ class MatchManager extends StatefulWidget {
 
 class _MatchManagerState extends State<MatchManager> {
   bool _isLoading = true;
+  int _currentSelectedMatchIndex = -1;
   List<KLIMatch> _matches = [];
-  List<KLIPlayer> _players = [];
+  List<KLIPlayer?> _players = [];
 
   @override
   void initState() {
     super.initState();
     StorageHandler.readFromFile('$parentFolder/${StorageHandler.matchSaveFile}').then((value) {
       if (value.isNotEmpty) {
-        // final List list = jsonDecode(value);
+        _matches = (jsonDecode(value) as List).map((e) => KLIMatch.fromJson(e)).toList();
+        _currentSelectedMatchIndex = -1;
+        setState(() {});
       }
       setState(() => _isLoading = false);
     });
@@ -50,21 +54,29 @@ class _MatchManagerState extends State<MatchManager> {
                 children: [
                   ElevatedButton(
                     child: const Text('Add Match'),
-                    onPressed: () {
-                      showDataManagerDialog(
-                        context,
-                        title: 'Add Match',
-                        content: matchEditor(context),
-                        acceptText: 'Add',
-                        onAccept: () {},
-                        cancelText: 'Cancel',
-                        onCancel: () {},
+                    onPressed: () async {
+                      await Navigator.of(context).push(
+                        DialogRoute(
+                          context: context,
+                          barrierDismissible: false,
+                          barrierLabel: '',
+                          builder: (_) => const MatchEditorDialog(),
+                        ),
                       );
                     },
                   ),
                   ElevatedButton(
                     child: const Text('Modify Match'),
-                    onPressed: () {},
+                    onPressed: () async {
+                      await Navigator.of(context).push(
+                        DialogRoute(
+                          context: context,
+                          barrierDismissible: false,
+                          barrierLabel: '',
+                          builder: (_) => MatchEditorDialog(match: _matches[_currentSelectedMatchIndex]),
+                        ),
+                      );
+                    },
                   ),
                   ElevatedButton(
                     child: const Text('Remove Match'),
@@ -84,7 +96,14 @@ class _MatchManagerState extends State<MatchManager> {
                           'Match',
                           ListView.builder(
                             itemCount: _matches.length,
-                            itemBuilder: (_, index) => ListTile(title: Text('Item $index')),
+                            itemBuilder: (_, index) => ListTile(
+                              title: Text('Item $index'),
+                              onTap: () {
+                                _currentSelectedMatchIndex = index;
+                                _players = _matches[index].playerList;
+                                setState(() {});
+                              },
+                            ),
                           ),
                         ),
                         buildList(
@@ -103,15 +122,6 @@ class _MatchManagerState extends State<MatchManager> {
       ),
     );
   }
-}
-
-Widget matchEditor(BuildContext context) {
-  return Container(
-    child: textFieldWithLabel(
-      context,
-      'Match Name',
-    ),
-  );
 }
 
 Widget buildList(BuildContext context, String title, ListView listView) {

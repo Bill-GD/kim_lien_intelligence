@@ -99,8 +99,9 @@ class StorageHandler {
       } else {
         f = Directory(path);
       }
+      if (f.existsSync()) return;
 
-      await (f is File ? f.create(exclusive: true) : (f as Directory).create(recursive: true));
+      await (f is File ? f.create(recursive: true) : (f as Directory).create(recursive: true));
       logger.i('Created: $path');
     } on PathExistsException {
       return;

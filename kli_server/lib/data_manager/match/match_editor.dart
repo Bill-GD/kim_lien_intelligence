@@ -1,15 +1,156 @@
+import 'dart:io';
+
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:kli_utils/kli_utils.dart';
+
+import '../../global.dart';
 
 class MatchEditorDialog extends StatefulWidget {
-  const MatchEditorDialog({super.key});
+  final KLIMatch? match;
+  const MatchEditorDialog({super.key, this.match});
 
   @override
   State<MatchEditorDialog> createState() => _MatchEditorDialogState();
 }
 
 class _MatchEditorDialogState extends State<MatchEditorDialog> {
+  final TextEditingController _matchNameController = TextEditingController();
+  final List<TextEditingController> _playerNameControllers = [
+    TextEditingController(),
+    TextEditingController(),
+    TextEditingController(),
+    TextEditingController(),
+  ];
+  final _imagePaths = List<String>.filled(4, '');
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.match == null) return;
+
+    _matchNameController.text = widget.match!.name;
+    for (int i = 0; i < widget.match!.playerList.length; i++) {
+      _playerNameControllers[i].text = widget.match!.playerList[i]?.name ?? '';
+      _imagePaths[i] = widget.match!.playerList[i]?.imagePath ?? '';
+    }
+  }
+
+  Widget playerWidget(int index) {
+    return Expanded(
+      child: Container(
+        margin: const EdgeInsets.symmetric(horizontal: 10.0),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text('Player ${index + 1}', textAlign: TextAlign.center),
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 8.0),
+              child: TextField(
+                controller: _playerNameControllers[index],
+                decoration: InputDecoration(
+                  labelText: 'Name',
+                  labelStyle: TextStyle(
+                    fontWeight: FontWeight.w600,
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
+                  border: const OutlineInputBorder(),
+                ),
+              ),
+            ),
+            Container(
+              margin: const EdgeInsets.symmetric(vertical: 8.0),
+              decoration: BoxDecoration(border: Border.all(width: 1, color: Colors.black54)),
+              width: 300,
+              height: 400,
+              child: _imagePaths[index].isEmpty
+                  ? null
+                  : Image.file(
+                      File(_imagePaths[index]),
+                      fit: BoxFit.cover,
+                    ),
+            ),
+            ElevatedButton(
+              child: const Text('Select Image'),
+              onPressed: () async {
+                logger.i('Selecting image from $parentFolder/${StorageHandler.mediaDir}');
+                final result = await FilePicker.platform.pickFiles(
+                  dialogTitle: 'Select image',
+                  initialDirectory: '$parentFolder/${StorageHandler.mediaDir}'.replaceAll('/', '\\'),
+                );
+
+                if (result != null) {
+                  final p = result.files.single.path!;
+                  _imagePaths[index] = p;
+                  logger.i('Chose $p for player ${index + 1}');
+                  setState(() {});
+                }
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    return const Placeholder();
+    return AlertDialog(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      content: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 256.0, vertical: 32),
+            child: TextField(
+              controller: _matchNameController,
+              decoration: InputDecoration(
+                labelText: 'Match Name',
+                labelStyle: TextStyle(
+                  fontWeight: FontWeight.w600,
+                  color: Theme.of(context).colorScheme.primary,
+                ),
+                border: const OutlineInputBorder(),
+              ),
+            ),
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            mainAxisSize: MainAxisSize.min,
+            children: [for (int i = 0; i < 4; i++) playerWidget(i)],
+          ),
+        ],
+      ),
+      actionsAlignment: MainAxisAlignment.spaceAround,
+      actions: <Widget>[
+        TextButton(
+          child: const Text('Done', style: TextStyle(fontSize: 20)),
+          onPressed: () {
+            if (_matchNameController.text.isEmpty) {
+              showToastMessage(context, 'Match name can\'t be empty');
+              return;
+            }
+
+            final newMatch = KLIMatch(
+              _matchNameController.text,
+              _playerNameControllers.map((c) {
+                return c.text.isEmpty
+                    ? null
+                    : KLIPlayer(c.text, _imagePaths[_playerNameControllers.indexOf(c)]);
+              }).toList(),
+            );
+
+            Navigator.pop(context);
+          },
+        ),
+        TextButton(
+          child: Text('Cancel', style: TextStyle(fontSize: 20, color: Theme.of(context).colorScheme.error)),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
+      ],
+    );
   }
 }

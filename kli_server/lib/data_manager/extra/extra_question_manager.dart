@@ -17,7 +17,7 @@ class _ExtraQuestionManagerState extends State<ExtraQuestionManager> {
         titleTextStyle: const TextStyle(fontSize: 30),
         centerTitle: true,
       ),
-      body: Center(),
+      body: const Center(),
     );
   }
 }
