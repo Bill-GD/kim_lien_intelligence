@@ -1,7 +1,9 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:kli_utils/kli_utils.dart';
 import 'package:side_navigation/side_navigation.dart';
 
+import '../global.dart';
 import 'accel_question_manager.dart';
 import 'extra_question_manager.dart';
 import 'finish_question_manager.dart';
@@ -22,26 +24,23 @@ class DataManagerPage extends StatefulWidget {
 }
 
 class _DataManagerPageState extends State<DataManagerPage> {
+  bool _isLoading = true;
+
   int _selectedPage = 0;
-  final List<Widget> _contentPages = [
-    const MatchManager(),
-    const StartQuestionManager(),
-    const ObstacleQuestionManager(),
-    const AccelQuestionManager(),
-    const FinishQuestionManager(),
-    const ExtraQuestionManager(),
-  ];
+  late final List<Widget> _contentPages;
 
   @override
   void initState() {
     super.initState();
-    // TODO: implement storage init here
-    // Match: same dir
-
-  }
-
-  void _initStorage() {
-
+    _contentPages = [
+      const MatchManager(),
+      const StartQuestionManager(),
+      const ObstacleQuestionManager(),
+      const AccelQuestionManager(),
+      const FinishQuestionManager(),
+      const ExtraQuestionManager(),
+    ];
+    StorageHandler.init(parentFolder).whenComplete(() => setState(() => _isLoading = false));
   }
 
   @override
@@ -72,27 +71,27 @@ class _DataManagerPageState extends State<DataManagerPage> {
               ),
               items: const [
                 SideNavigationBarItem(
-                  icon: CupertinoIcons.add,
+                  icon: Icons.settings_rounded,
                   label: 'Match',
                 ),
                 SideNavigationBarItem(
-                  icon: Icons.format_list_numbered_rtl,
+                  icon: Icons.start_rounded,
                   label: 'Start',
                 ),
                 SideNavigationBarItem(
-                  icon: Icons.local_fire_department_outlined,
+                  icon: FontAwesomeIcons.roadBarrier,
                   label: 'Obstacle',
                 ),
                 SideNavigationBarItem(
-                  icon: Icons.battery_charging_full_outlined,
+                  icon: Icons.local_fire_department_rounded,
                   label: 'Acceleration',
                 ),
                 SideNavigationBarItem(
-                  icon: Icons.check_circle_outline,
+                  icon: FontAwesomeIcons.flagCheckered,
                   label: 'Finish',
                 ),
                 SideNavigationBarItem(
-                  icon: Icons.filter_list_outlined,
+                  icon: Icons.add_box_rounded,
                   label: 'Extra',
                 ),
               ],
@@ -111,7 +110,10 @@ class _DataManagerPageState extends State<DataManagerPage> {
               ),
             ),
           ),
-          Expanded(child: _contentPages.elementAt(_selectedPage)),
+          Expanded(
+              child: _isLoading
+                  ? const Center(child: CircularProgressIndicator())
+                  : _contentPages.elementAt(_selectedPage)),
         ],
       ),
     );

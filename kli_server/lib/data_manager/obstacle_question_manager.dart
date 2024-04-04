@@ -10,10 +10,14 @@ class ObstacleQuestionManager extends StatefulWidget {
 class _ObstacleQuestionManagerState extends State<ObstacleQuestionManager> {
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
-      body: Center(
-        child: Text('Obstacle Manager'),
+    return Scaffold(
+      appBar: AppBar(
+        automaticallyImplyLeading: false,
+        title: const Text('Obstacle Question Manager'),
+        titleTextStyle: const TextStyle(fontSize: 30),
+        centerTitle: true,
       ),
+      body: Center(),
     );
   }
 }

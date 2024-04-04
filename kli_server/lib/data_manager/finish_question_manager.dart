@@ -10,10 +10,14 @@ class FinishQuestionManager extends StatefulWidget {
 class _FinishQuestionManagerState extends State<FinishQuestionManager> {
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
-      body: Center(
-        child: Text('Finish Manager'),
+    return Scaffold(
+      appBar: AppBar(
+        automaticallyImplyLeading: false,
+        title: const Text('Finish Question Manager'),
+        titleTextStyle: const TextStyle(fontSize: 30),
+        centerTitle: true,
       ),
+      body: Center(),
     );
   }
 }

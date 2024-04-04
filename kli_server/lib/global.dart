@@ -7,17 +7,18 @@ late final Logger logger;
 
 void initLogger() {
   logger = Logger(printer: SimplePrinter());
-  logger.i('Logger finished init');
+  logger.i('Logger init');
 }
 
 late final PackageInfo packageInfo;
 void initPackageInfo() async {
   packageInfo = await PackageInfo.fromPlatform();
-  logger.i('PackageInfo finished init');
+  logger.i('PackageInfo init');
 }
 
 late final String parentFolder;
 void initExePath() {
-  parentFolder = Platform.resolvedExecutable.split(Platform.executable).first;
+  final rawDir = Platform.resolvedExecutable.split(Platform.executable).first;
+  parentFolder = rawDir.substring(0, rawDir.length - 1).replaceAll('\\', '/');
   logger.i('Parent folder path: $parentFolder');
 }
