@@ -4,12 +4,12 @@ import 'package:kli_utils/kli_utils.dart';
 import 'package:side_navigation/side_navigation.dart';
 
 import '../global.dart';
-import 'accel_question_manager.dart';
-import 'extra_question_manager.dart';
-import 'finish_question_manager.dart';
-import 'match_manager.dart';
-import 'obstacle_question_manager.dart';
-import 'start_question_manager.dart';
+import 'accel/accel_question_manager.dart';
+import 'extra/extra_question_manager.dart';
+import 'finish/finish_question_manager.dart';
+import 'match/match_manager.dart';
+import 'obstacle/obstacle_question_manager.dart';
+import 'start/start_question_manager.dart';
 
 // This page allows user to manage data
 // Has options to manage match, questions
