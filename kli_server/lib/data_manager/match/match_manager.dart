@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:kli_utils/kli_utils.dart';
@@ -15,17 +16,16 @@ class MatchManager extends StatefulWidget {
 
 class _MatchManagerState extends State<MatchManager> {
   bool _isLoading = true;
-  int _currentSelectedMatchIndex = -1;
+  int _currentMatchIndex = -1;
   List<KLIMatch> _matches = [];
-  List<KLIPlayer?> _players = [];
 
   @override
   void initState() {
     super.initState();
-    StorageHandler.readFromFile('$parentFolder/${StorageHandler.matchSaveFile}').then((value) {
+    storageHandler.readFromFile(storageHandler.matchSaveFile).then((value) {
       if (value.isNotEmpty) {
         _matches = (jsonDecode(value) as List).map((e) => KLIMatch.fromJson(e)).toList();
-        _currentSelectedMatchIndex = -1;
+        _currentMatchIndex = -1;
         setState(() {});
       }
       setState(() => _isLoading = false);
@@ -47,40 +47,73 @@ class _MatchManagerState extends State<MatchManager> {
         child: Column(
           children: [
             Padding(
-              padding: const EdgeInsets.only(bottom: 16),
+              padding: const EdgeInsets.symmetric(vertical: 32),
               child: Row(
                 mainAxisSize: MainAxisSize.max,
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
                   ElevatedButton(
-                    child: const Text('Add Match'),
+                    style: const ButtonStyle(
+                      padding: MaterialStatePropertyAll<EdgeInsets>(EdgeInsets.all(20.0)),
+                    ),
                     onPressed: () async {
-                      await Navigator.of(context).push(
-                        DialogRoute(
+                      final newMatch = await Navigator.of(context).push<KLIMatch>(
+                        DialogRoute<KLIMatch>(
                           context: context,
                           barrierDismissible: false,
                           barrierLabel: '',
                           builder: (_) => const MatchEditorDialog(),
                         ),
                       );
+
+                      if (newMatch != null) {
+                        _matches.add(newMatch);
+                        setState(() {});
+                      }
                     },
+                    child: const Text('Add Match', style: TextStyle(fontSize: 24)),
                   ),
                   ElevatedButton(
-                    child: const Text('Modify Match'),
+                    style: const ButtonStyle(
+                      padding: MaterialStatePropertyAll<EdgeInsets>(EdgeInsets.all(20.0)),
+                    ),
                     onPressed: () async {
-                      await Navigator.of(context).push(
-                        DialogRoute(
+                      if (_currentMatchIndex < 0) {
+                        showToastMessage(context, 'Please select a match');
+                        return;
+                      }
+                      final newMatch = await Navigator.of(context).push<KLIMatch>(
+                        DialogRoute<KLIMatch>(
                           context: context,
                           barrierDismissible: false,
                           barrierLabel: '',
-                          builder: (_) => MatchEditorDialog(match: _matches[_currentSelectedMatchIndex]),
+                          builder: (_) => MatchEditorDialog(match: _matches[_currentMatchIndex]),
                         ),
                       );
+
+                      if (newMatch != null) {
+                        _matches[_currentMatchIndex] = newMatch;
+                        setState(() {});
+                      }
                     },
+                    child: Text(
+                      'Modify Match${_currentMatchIndex < 0 ? '' : ': ${_matches[_currentMatchIndex].name}'}',
+                      style: const TextStyle(fontSize: 24),
+                    ),
                   ),
                   ElevatedButton(
-                    child: const Text('Remove Match'),
-                    onPressed: () {},
+                    style: const ButtonStyle(
+                      padding: MaterialStatePropertyAll<EdgeInsets>(EdgeInsets.all(20.0)),
+                    ),
+                    onPressed: () {
+                      if (_currentMatchIndex < 0) {
+                        showToastMessage(context, 'Please select a match');
+                        return;
+                      }
+                      _matches.removeAt(_currentMatchIndex);
+                      setState(() {});
+                    },
+                    child: const Text('Remove Match', style: TextStyle(fontSize: 24)),
                   ),
                 ],
               ),
@@ -91,29 +124,8 @@ class _MatchManagerState extends State<MatchManager> {
                   : Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        buildList(
-                          context,
-                          'Match',
-                          ListView.builder(
-                            itemCount: _matches.length,
-                            itemBuilder: (_, index) => ListTile(
-                              title: Text('Item $index'),
-                              onTap: () {
-                                _currentSelectedMatchIndex = index;
-                                _players = _matches[index].playerList;
-                                setState(() {});
-                              },
-                            ),
-                          ),
-                        ),
-                        buildList(
-                          context,
-                          'Player',
-                          ListView.builder(
-                            itemCount: _players.length,
-                            itemBuilder: (_, index) => ListTile(title: Text('Item $index')),
-                          ),
-                        ),
+                        matchList(),
+                        playerShowcase(),
                       ],
                     ),
             ),
@@ -122,26 +134,89 @@ class _MatchManagerState extends State<MatchManager> {
       ),
     );
   }
-}
 
-Widget buildList(BuildContext context, String title, ListView listView) {
-  return Flexible(
-    child: Container(
-      margin: const EdgeInsets.symmetric(vertical: 16, horizontal: 48),
-      child: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.only(bottom: 20),
-            child: Text(title, style: Theme.of(context).textTheme.titleMedium),
-          ),
-          Flexible(
-            child: Container(
-              decoration: BoxDecoration(color: Theme.of(context).colorScheme.secondaryContainer),
-              child: listView,
+  Widget playerShowcase() {
+    return Flexible(
+      child: Container(
+        margin: const EdgeInsets.symmetric(vertical: 16, horizontal: 48),
+        child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.only(bottom: 20),
+              child: Text('Players', style: Theme.of(context).textTheme.titleMedium),
             ),
-          ),
-        ],
+            Flexible(
+              child: Container(
+                decoration: BoxDecoration(
+                  border: Border.all(width: 1),
+                ),
+                child: _currentMatchIndex < 0 ? const Center(child: Text('No match selected')) : playerGrid(),
+              ),
+            ),
+          ],
+        ),
       ),
-    ),
-  );
+    );
+  }
+
+  GridView playerGrid() {
+    return GridView.builder(
+      itemCount: 4,
+      itemBuilder: (_, index) {
+        List<KLIPlayer?> p = _matches[_currentMatchIndex].playerList;
+        return p[index] == null
+            ? const GridTile(
+                child: Center(
+                  child: Text('No player'),
+                ),
+              )
+            : GridTile(
+                footer: Center(child: Text('${index + 1}: ${p[index]?.name}')),
+                child: Container(
+                  margin: const EdgeInsets.only(bottom: 0),
+                  child: Image.file(
+                    fit: BoxFit.cover,
+                    File(
+                      '${storageHandler.parentFolder}\\${p[index]?.imagePath}',
+                    ),
+                  ),
+                ),
+              );
+      },
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2),
+    );
+  }
+
+  Widget matchList() {
+    return Flexible(
+      child: Container(
+        margin: const EdgeInsets.symmetric(vertical: 16, horizontal: 48),
+        child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.only(bottom: 20),
+              child: Text('Matches', style: Theme.of(context).textTheme.titleMedium),
+            ),
+            Flexible(
+              child: Container(
+                decoration: BoxDecoration(
+                  border: Border.all(width: 1),
+                ),
+                child: ListView.builder(
+                  itemCount: _matches.length,
+                  itemBuilder: (_, index) => ListTile(
+                    title: Text(_matches[index].name),
+                    onTap: () {
+                      _currentMatchIndex = index;
+                      setState(() {});
+                    },
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 }

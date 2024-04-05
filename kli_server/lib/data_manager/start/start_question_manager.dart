@@ -1,7 +1,8 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:kli_utils/kli_utils.dart';
+
+import '../../global.dart';
 
 class StartQuestionManager extends StatefulWidget {
   const StartQuestionManager({super.key});
@@ -24,9 +25,9 @@ class _StartQuestionManagerState extends State<StartQuestionManager> {
         child: TextButton(
           child: const Text('Read Excel'),
           onPressed: () async {
-            StorageHandler.writeToFile(
+            storageHandler.writeToFile(
               'D:/Downloads/output.json',
-              jsonEncode(await StorageHandler.readFromExcel('D:/Downloads/KĐ trận BK1.xlsx', 3)),
+              jsonEncode(await storageHandler.readFromExcel('D:/Downloads/KĐ trận BK1.xlsx', 3)),
             );
           },
         ),

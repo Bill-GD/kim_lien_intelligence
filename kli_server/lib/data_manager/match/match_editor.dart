@@ -36,12 +36,94 @@ class _MatchEditorDialogState extends State<MatchEditorDialog> {
     }
   }
 
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.transparent,
+      body: AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        content: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 256.0, vertical: 32),
+              child: TextField(
+                controller: _matchNameController,
+                decoration: InputDecoration(
+                  labelText: 'Match Name',
+                  labelStyle: TextStyle(
+                    fontWeight: FontWeight.w600,
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
+                  border: const OutlineInputBorder(),
+                ),
+              ),
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              mainAxisSize: MainAxisSize.min,
+              children: [for (int i = 0; i < 4; i++) playerWidget(i)],
+            ),
+          ],
+        ),
+        actionsAlignment: MainAxisAlignment.spaceAround,
+        actions: <Widget>[
+          TextButton(
+            child: const Text('Done', style: TextStyle(fontSize: 20)),
+            onPressed: () {
+              if (_matchNameController.text.isEmpty) {
+                showToastMessage(context, 'Match name can\'t be empty');
+                return;
+              }
+
+              for (var e in _playerNameControllers) {
+                if (e.value.text.isNotEmpty && _imagePaths[_playerNameControllers.indexOf(e)].isEmpty) {
+                  showToastMessage(
+                    context,
+                    'Please select an image for player ${_playerNameControllers.indexOf(e) + 1}',
+                  );
+                  return;
+                }
+
+                if (e.value.text.isEmpty && _imagePaths[_playerNameControllers.indexOf(e)].isNotEmpty) {
+                  showToastMessage(
+                    context,
+                    'Player ${_playerNameControllers.indexOf(e) + 1} name can\'t be empty',
+                  );
+                  return;
+                }
+              }
+
+              final newMatch = KLIMatch(
+                _matchNameController.text,
+                _playerNameControllers.map((c) {
+                  return c.text.isEmpty
+                      ? null
+                      : KLIPlayer(c.text, _imagePaths[_playerNameControllers.indexOf(c)]);
+                }).toList(),
+              );
+
+              Navigator.of(context).pop(newMatch);
+            },
+          ),
+          TextButton(
+            child: Text('Cancel', style: TextStyle(fontSize: 20, color: Theme.of(context).colorScheme.error)),
+            onPressed: () {
+              Navigator.pop(context);
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget playerWidget(int index) {
     return Expanded(
       child: Container(
         margin: const EdgeInsets.symmetric(horizontal: 10.0),
         child: Column(
-          mainAxisSize: MainAxisSize.min,
+          // mainAxisSize: MainAxisSize.min,
           children: [
             Text('Player ${index + 1}', textAlign: TextAlign.center),
             Padding(
@@ -61,27 +143,26 @@ class _MatchEditorDialogState extends State<MatchEditorDialog> {
             Container(
               margin: const EdgeInsets.symmetric(vertical: 8.0),
               decoration: BoxDecoration(border: Border.all(width: 1, color: Colors.black54)),
-              width: 300,
-              height: 400,
+              constraints: const BoxConstraints(maxHeight: 400, maxWidth: 300, minHeight: 1, minWidth: 1),
               child: _imagePaths[index].isEmpty
                   ? null
                   : Image.file(
-                      File(_imagePaths[index]),
-                      fit: BoxFit.cover,
+                      File('${storageHandler.parentFolder}\\${_imagePaths[index]}'),
+                      fit: BoxFit.contain,
                     ),
             ),
             ElevatedButton(
               child: const Text('Select Image'),
               onPressed: () async {
-                logger.i('Selecting image from $parentFolder/${StorageHandler.mediaDir}');
+                logger.i('Selecting image from ${storageHandler.mediaDir}');
                 final result = await FilePicker.platform.pickFiles(
                   dialogTitle: 'Select image',
-                  initialDirectory: '$parentFolder/${StorageHandler.mediaDir}'.replaceAll('/', '\\'),
+                  initialDirectory: storageHandler.mediaDir.replaceAll('/', '\\'),
                 );
 
                 if (result != null) {
                   final p = result.files.single.path!;
-                  _imagePaths[index] = p;
+                  _imagePaths[index] = p.split(storageHandler.parentFolder).last;
                   logger.i('Chose $p for player ${index + 1}');
                   setState(() {});
                 }
@@ -90,67 +171,6 @@ class _MatchEditorDialogState extends State<MatchEditorDialog> {
           ],
         ),
       ),
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return AlertDialog(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-      content: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 256.0, vertical: 32),
-            child: TextField(
-              controller: _matchNameController,
-              decoration: InputDecoration(
-                labelText: 'Match Name',
-                labelStyle: TextStyle(
-                  fontWeight: FontWeight.w600,
-                  color: Theme.of(context).colorScheme.primary,
-                ),
-                border: const OutlineInputBorder(),
-              ),
-            ),
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            mainAxisSize: MainAxisSize.min,
-            children: [for (int i = 0; i < 4; i++) playerWidget(i)],
-          ),
-        ],
-      ),
-      actionsAlignment: MainAxisAlignment.spaceAround,
-      actions: <Widget>[
-        TextButton(
-          child: const Text('Done', style: TextStyle(fontSize: 20)),
-          onPressed: () {
-            if (_matchNameController.text.isEmpty) {
-              showToastMessage(context, 'Match name can\'t be empty');
-              return;
-            }
-
-            final newMatch = KLIMatch(
-              _matchNameController.text,
-              _playerNameControllers.map((c) {
-                return c.text.isEmpty
-                    ? null
-                    : KLIPlayer(c.text, _imagePaths[_playerNameControllers.indexOf(c)]);
-              }).toList(),
-            );
-
-            Navigator.pop(context);
-          },
-        ),
-        TextButton(
-          child: Text('Cancel', style: TextStyle(fontSize: 20, color: Theme.of(context).colorScheme.error)),
-          onPressed: () {
-            Navigator.pop(context);
-          },
-        ),
-      ],
     );
   }
 }

@@ -7,38 +7,44 @@ import '../global.dart';
 /// A static class for reading & writing to file.
 class StorageHandler {
   // these are reletive to exe path
-  static const String _userDataDir = 'UserData';
+  final String _parentFolder;
+  String get parentFolder => _parentFolder;
+  final String _userDataDir;
 
-  static String get mediaDir => '$_userDataDir/Media';
+  String get mediaDir => '$_userDataDir\\Media';
+  String get excelDir => '$_userDataDir\\NewData';
+  String get questionDir => '$_userDataDir\\Questions';
 
-  static String get excelDir => '$_userDataDir/NewData';
+  String get matchSaveFile => '$_userDataDir\\match.txt';
+  String get startSaveFile => '$questionDir\\start.txt';
+  String get obstacleSaveFile => '$questionDir\\obstacle.txt';
+  String get accelSaveFile => '$questionDir\\accel.txt';
+  String get finishSaveFile => '$questionDir\\finish.txt';
+  String get extraSaveFile => '$questionDir\\extra.txt';
 
-  static String get matchSaveFile => '$_userDataDir/match.txt';
+  /// Use [StorageHandler.init] to create an instance instead.
+  StorageHandler(this._parentFolder) : _userDataDir = '$_parentFolder\\UserData';
 
-  static String get questionDir => '$_userDataDir/Questions';
-  static String get startSaveFile => '$questionDir/start.txt';
-  static String get obstacleSaveFile => '$questionDir/obstacle.txt';
-  static String get accelSaveFile => '$questionDir/accel.txt';
-  static String get finishSaveFile => '$questionDir/finish.txt';
-  static String get extraSaveFile => '$questionDir/extra.txt';
-
-  static Future<void> init(String prefixPath) async {
+  static Future<StorageHandler> init(String prefixPath) async {
     logger.i('StorageHandler init');
-    await StorageHandler.createFileEntity('$prefixPath/$mediaDir', StorageType.dir);
-    await StorageHandler.createFileEntity('$prefixPath/$excelDir', StorageType.dir);
 
-    await StorageHandler.createFileEntity('$prefixPath/$matchSaveFile', StorageType.file);
+    final sh = StorageHandler(prefixPath.replaceAll('/', '\\'));
 
-    await StorageHandler.createFileEntity('$prefixPath/$startSaveFile', StorageType.file);
-    await StorageHandler.createFileEntity('$prefixPath/$obstacleSaveFile', StorageType.file);
-    await StorageHandler.createFileEntity('$prefixPath/$accelSaveFile', StorageType.file);
-    await StorageHandler.createFileEntity('$prefixPath/$finishSaveFile', StorageType.file);
-    await StorageHandler.createFileEntity('$prefixPath/$extraSaveFile', StorageType.file);
+    await sh.createFileEntity(sh.mediaDir, StorageType.dir);
+    await sh.createFileEntity(sh.excelDir, StorageType.dir);
+    await sh.createFileEntity(sh.matchSaveFile, StorageType.file);
+    await sh.createFileEntity(sh.startSaveFile, StorageType.file);
+    await sh.createFileEntity(sh.obstacleSaveFile, StorageType.file);
+    await sh.createFileEntity(sh.accelSaveFile, StorageType.file);
+    await sh.createFileEntity(sh.finishSaveFile, StorageType.file);
+    await sh.createFileEntity(sh.extraSaveFile, StorageType.file);
+
+    return sh;
   }
 
   // D:/Downloads/KĐ trận BK1.xlsx
   // D:/Downloads/output.txt
-  static Future readFromExcel(String path, int maxColumnCount) async {
+  Future readFromExcel(String path, int maxColumnCount) async {
     logger.i('Reading from $path');
 
     final bytes = await File(path).readAsBytes();
@@ -46,7 +52,7 @@ class StorageHandler {
     return excelToJson(excel, maxColumnCount);
   }
 
-  static Future<Map<String, List<Map<String, dynamic>>>> excelToJson(Excel excel, int maxColumnCount) async {
+  Future<Map<String, List<Map<String, dynamic>>>> excelToJson(Excel excel, int maxColumnCount) async {
     final res = <String, List<Map<String, dynamic>>>{};
 
     for (final tableName in excel.tables.keys) {
@@ -82,15 +88,15 @@ class StorageHandler {
     return res;
   }
 
-  static Future<String> readFromFile(String path) async {
+  Future<String> readFromFile(String path) async {
     return await File(path).readAsString();
   }
 
-  static Future<void> writeToFile(String path, String data) async {
+  Future<void> writeToFile(String path, String data) async {
     await File(path).writeAsString(data);
   }
 
-  static Future<void> createFileEntity(String path, StorageType type) async {
+  Future<void> createFileEntity(String path, StorageType type) async {
     try {
       final FileSystemEntity f;
 

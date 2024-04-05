@@ -36,6 +36,7 @@ dependencies:
   theme_provider: ^0.6.0
   font_awesome_flutter: ^10.7.0
   file_picker: ^8.0.0+1
+  window_manager: ^0.3.8
   kli_utils:
     path: D:/Code/Flutter/kim_lien_intelligence/kli_utils
 

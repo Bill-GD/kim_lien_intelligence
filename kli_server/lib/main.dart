@@ -1,16 +1,38 @@
+import 'dart:io';
+
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:theme_provider/theme_provider.dart';
+import 'package:window_manager/window_manager.dart';
 
 import 'global.dart';
 import 'start_screen/start_screen.dart';
 
-void main() {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   initLogger();
-  initPackageInfo();
-  initExePath();
+  await initPackageInfo();
+  await initStorageHandler();
+
+  if (!kIsWeb && (Platform.isLinux || Platform.isMacOS || Platform.isWindows)) {
+    await windowManager.ensureInitialized();
+  }
+
+  // WindowOptions windowOptions = const WindowOptions(
+  //   size: Size(800, 600),
+  //   center: true,
+  //   backgroundColor: Colors.transparent,
+  //   skipTaskbar: false,
+  //   titleBarStyle: TitleBarStyle.hidden,
+  //   windowButtonVisibility: false,
+  // );
+  windowManager.waitUntilReadyToShow(null, () async {
+    await windowManager.show();
+    await windowManager.focus();
+    await WindowManager.instance.setFullScreen(true);
+  });
 
   runApp(const KliServerApp());
 }
