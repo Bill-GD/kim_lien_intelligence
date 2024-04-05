@@ -14,20 +14,10 @@ void main() async {
 
   initLogger();
   await initPackageInfo();
-  await initStorageHandler();
 
   if (!kIsWeb && (Platform.isLinux || Platform.isMacOS || Platform.isWindows)) {
     await windowManager.ensureInitialized();
   }
-
-  // WindowOptions windowOptions = const WindowOptions(
-  //   size: Size(800, 600),
-  //   center: true,
-  //   backgroundColor: Colors.transparent,
-  //   skipTaskbar: false,
-  //   titleBarStyle: TitleBarStyle.hidden,
-  //   windowButtonVisibility: false,
-  // );
   windowManager.waitUntilReadyToShow(null, () async {
     await windowManager.show();
     await windowManager.focus();

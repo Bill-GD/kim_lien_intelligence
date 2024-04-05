@@ -42,27 +42,25 @@ class _MatchEditorDialogState extends State<MatchEditorDialog> {
       backgroundColor: Colors.transparent,
       body: AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        titlePadding: const EdgeInsets.symmetric(vertical: 32, horizontal: 256),
+        title: TextField(
+          controller: _matchNameController,
+          decoration: InputDecoration(
+            labelText: 'Match Name',
+            labelStyle: TextStyle(
+              fontWeight: FontWeight.w600,
+              color: Theme.of(context).colorScheme.primary,
+            ),
+            border: const OutlineInputBorder(),
+          ),
+        ),
+        contentPadding: const EdgeInsets.only(bottom: 40),
         content: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
           mainAxisSize: MainAxisSize.min,
           children: [
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 256.0, vertical: 32),
-              child: TextField(
-                controller: _matchNameController,
-                decoration: InputDecoration(
-                  labelText: 'Match Name',
-                  labelStyle: TextStyle(
-                    fontWeight: FontWeight.w600,
-                    color: Theme.of(context).colorScheme.primary,
-                  ),
-                  border: const OutlineInputBorder(),
-                ),
-              ),
-            ),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [for (int i = 0; i < 4; i++) playerWidget(i)],
             ),
           ],
@@ -70,7 +68,7 @@ class _MatchEditorDialogState extends State<MatchEditorDialog> {
         actionsAlignment: MainAxisAlignment.spaceAround,
         actions: <Widget>[
           TextButton(
-            child: const Text('Done', style: TextStyle(fontSize: 20)),
+            child: const Text('Done', style: TextStyle(fontSize: fontSizeMedium)),
             onPressed: () {
               if (_matchNameController.text.isEmpty) {
                 showToastMessage(context, 'Match name can\'t be empty');
@@ -108,7 +106,7 @@ class _MatchEditorDialogState extends State<MatchEditorDialog> {
             },
           ),
           TextButton(
-            child: Text('Cancel', style: TextStyle(fontSize: 20, color: Theme.of(context).colorScheme.error)),
+            child: Text('Cancel', style: TextStyle(fontSize: fontSizeMedium, color: Theme.of(context).colorScheme.error)),
             onPressed: () {
               Navigator.pop(context);
             },
@@ -121,13 +119,12 @@ class _MatchEditorDialogState extends State<MatchEditorDialog> {
   Widget playerWidget(int index) {
     return Expanded(
       child: Container(
-        margin: const EdgeInsets.symmetric(horizontal: 10.0),
+        margin: const EdgeInsets.symmetric(horizontal: 10),
         child: Column(
-          // mainAxisSize: MainAxisSize.min,
           children: [
             Text('Player ${index + 1}', textAlign: TextAlign.center),
             Padding(
-              padding: const EdgeInsets.symmetric(vertical: 8.0),
+              padding: const EdgeInsets.symmetric(vertical: 8),
               child: TextField(
                 controller: _playerNameControllers[index],
                 decoration: InputDecoration(
@@ -141,11 +138,15 @@ class _MatchEditorDialogState extends State<MatchEditorDialog> {
               ),
             ),
             Container(
-              margin: const EdgeInsets.symmetric(vertical: 8.0),
+              margin: const EdgeInsets.symmetric(vertical: 8),
               decoration: BoxDecoration(border: Border.all(width: 1, color: Colors.black54)),
-              constraints: const BoxConstraints(maxHeight: 400, maxWidth: 300, minHeight: 1, minWidth: 1),
+              constraints: const BoxConstraints(maxHeight: 400, maxWidth: 300, minHeight: 1, minWidth: 260),
               child: _imagePaths[index].isEmpty
-                  ? null
+                  ? Container(
+                      margin: const EdgeInsets.symmetric(horizontal: 20),
+                      alignment: Alignment.center,
+                      child: const Text('No Image'),
+                    )
                   : Image.file(
                       File('${storageHandler.parentFolder}\\${_imagePaths[index]}'),
                       fit: BoxFit.contain,

@@ -87,7 +87,7 @@ class _StartPageState extends State<StartPage> {
                 theme: SideNavigationBarTheme(
                   itemTheme: SideNavigationBarItemTheme(
                     selectedItemColor: Theme.of(context).colorScheme.primary,
-                    labelTextStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 20, height: 2),
+                    labelTextStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: fontSizeMedium, height: 2),
                   ),
                   togglerTheme: SideNavigationBarTogglerTheme.standard(),
                   dividerTheme: SideNavigationBarDividerTheme.standard(),
@@ -106,7 +106,7 @@ class _StartPageState extends State<StartPage> {
                         ),
                       );
                     },
-                    child: const Text('Open Data Manager', style: TextStyle(fontSize: 30)),
+                    child: const Text('Open Data Manager', style: TextStyle(fontSize: fontSizeLarge)),
                   ),
                   ElevatedButton(
                     onPressed: () async {
@@ -118,7 +118,7 @@ class _StartPageState extends State<StartPage> {
                       );
                       await KLIServer.stop();
                     },
-                    child: const Text('Open Server Setup', style: TextStyle(fontSize: 30)),
+                    child: const Text('Open Server Setup', style: TextStyle(fontSize: fontSizeLarge)),
                   ),
                   // Help screen
                   const Text('To be implemented'),

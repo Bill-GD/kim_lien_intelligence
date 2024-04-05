@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:kli_utils/kli_utils.dart';
 
 import '../../global.dart';
 
@@ -16,10 +17,12 @@ class _StartQuestionManagerState extends State<StartQuestionManager> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        automaticallyImplyLeading: false,
         title: const Text('Start Question Manager'),
-        titleTextStyle: const TextStyle(fontSize: 30),
+        surfaceTintColor: Theme.of(context).colorScheme.background,
+        automaticallyImplyLeading: false,
+        titleTextStyle: const TextStyle(fontSize: fontSizeXL),
         centerTitle: true,
+        toolbarHeight: kToolbarHeight * 1.5,
       ),
       body: Center(
         child: TextButton(

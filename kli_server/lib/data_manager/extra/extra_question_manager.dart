@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:kli_utils/kli_utils.dart';
 
 class ExtraQuestionManager extends StatefulWidget {
   const ExtraQuestionManager({super.key});
@@ -12,10 +13,12 @@ class _ExtraQuestionManagerState extends State<ExtraQuestionManager> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        automaticallyImplyLeading: false,
         title: const Text('Extra Question Manager'),
-        titleTextStyle: const TextStyle(fontSize: 30),
+        surfaceTintColor: Theme.of(context).colorScheme.background,
+        automaticallyImplyLeading: false,
+        titleTextStyle: const TextStyle(fontSize: fontSizeXL),
         centerTitle: true,
+        toolbarHeight: kToolbarHeight * 1.5,
       ),
       body: const Center(),
     );

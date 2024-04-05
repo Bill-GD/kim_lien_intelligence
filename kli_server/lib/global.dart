@@ -25,3 +25,5 @@ Future<void> initStorageHandler() async {
 
   storageHandler = await StorageHandler.init(parentFolder);
 }
+
+// late final KLIServer kliServer;

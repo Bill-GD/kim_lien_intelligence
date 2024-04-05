@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:side_navigation/side_navigation.dart';
 
+import '../global.dart';
 import 'accel/accel_question_manager.dart';
 import 'extra/extra_question_manager.dart';
 import 'finish/finish_question_manager.dart';
@@ -30,19 +31,18 @@ class _DataManagerPageState extends State<DataManagerPage> {
   @override
   void initState() {
     super.initState();
-    _contentPages = [
-      const MatchManager(),
-      const StartQuestionManager(),
-      const ObstacleQuestionManager(),
-      const AccelQuestionManager(),
-      const FinishQuestionManager(),
-      const ExtraQuestionManager(),
-    ];
 
-    // initStorageHandler().whenComplete(() =>
-    setState(() => _isLoading = false)
-        // )
-        ;
+    initStorageHandler().whenComplete(() {
+      _contentPages = [
+        const MatchManager(),
+        const StartQuestionManager(),
+        const ObstacleQuestionManager(),
+        const AccelQuestionManager(),
+        const FinishQuestionManager(),
+        const ExtraQuestionManager(),
+      ];
+      setState(() => _isLoading = false);
+    });
   }
 
   @override

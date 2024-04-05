@@ -4,7 +4,6 @@ import 'package:excel/excel.dart';
 
 import '../global.dart';
 
-/// A static class for reading & writing to file.
 class StorageHandler {
   // these are reletive to exe path
   final String _parentFolder;

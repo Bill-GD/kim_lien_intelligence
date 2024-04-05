@@ -32,15 +32,20 @@ class _MatchManagerState extends State<MatchManager> {
     });
   }
 
+  Future<void> overwriteSave() async {
+    await storageHandler.writeToFile(storageHandler.matchSaveFile, jsonEncode(_matches));
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        title: const Text('Match Manager'),
         surfaceTintColor: Theme.of(context).colorScheme.background,
         automaticallyImplyLeading: false,
-        title: const Text('Match Manager'),
-        titleTextStyle: const TextStyle(fontSize: 30),
+        titleTextStyle: const TextStyle(fontSize: fontSizeXL),
         centerTitle: true,
+        toolbarHeight: kToolbarHeight * 1.5,
       ),
       body: Padding(
         padding: const EdgeInsets.all(16),
@@ -54,7 +59,7 @@ class _MatchManagerState extends State<MatchManager> {
                 children: [
                   ElevatedButton(
                     style: const ButtonStyle(
-                      padding: MaterialStatePropertyAll<EdgeInsets>(EdgeInsets.all(20.0)),
+                      padding: MaterialStatePropertyAll<EdgeInsets>(EdgeInsets.all(20)),
                     ),
                     onPressed: () async {
                       final newMatch = await Navigator.of(context).push<KLIMatch>(
@@ -68,14 +73,15 @@ class _MatchManagerState extends State<MatchManager> {
 
                       if (newMatch != null) {
                         _matches.add(newMatch);
+                        await overwriteSave();
                         setState(() {});
                       }
                     },
-                    child: const Text('Add Match', style: TextStyle(fontSize: 24)),
+                    child: const Text('Add Match', style: TextStyle(fontSize: fontSizeMedium)),
                   ),
                   ElevatedButton(
                     style: const ButtonStyle(
-                      padding: MaterialStatePropertyAll<EdgeInsets>(EdgeInsets.all(20.0)),
+                      padding: MaterialStatePropertyAll<EdgeInsets>(EdgeInsets.all(20)),
                     ),
                     onPressed: () async {
                       if (_currentMatchIndex < 0) {
@@ -93,27 +99,58 @@ class _MatchManagerState extends State<MatchManager> {
 
                       if (newMatch != null) {
                         _matches[_currentMatchIndex] = newMatch;
+                        await overwriteSave();
                         setState(() {});
                       }
                     },
                     child: Text(
                       'Modify Match${_currentMatchIndex < 0 ? '' : ': ${_matches[_currentMatchIndex].name}'}',
-                      style: const TextStyle(fontSize: 24),
+                      style: const TextStyle(fontSize: fontSizeMedium),
                     ),
                   ),
                   ElevatedButton(
                     style: const ButtonStyle(
-                      padding: MaterialStatePropertyAll<EdgeInsets>(EdgeInsets.all(20.0)),
+                      padding: MaterialStatePropertyAll<EdgeInsets>(EdgeInsets.all(20)),
                     ),
-                    onPressed: () {
+                    onPressed: () async {
                       if (_currentMatchIndex < 0) {
                         showToastMessage(context, 'Please select a match');
                         return;
                       }
-                      _matches.removeAt(_currentMatchIndex);
-                      setState(() {});
+
+                      showDialog<bool>(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return AlertDialog(
+                            title: const Text('Confirm Delete'),
+                            content: Text(
+                                'Are you sure you want to delete match: ${_matches[_currentMatchIndex].name}?'),
+                            actionsAlignment: MainAxisAlignment.spaceEvenly,
+                            actions: <Widget>[
+                              TextButton(
+                                child: const Text('Yes', style: TextStyle(fontSize: fontSizeMedium)),
+                                onPressed: () {
+                                  Navigator.pop(context, true);
+                                },
+                              ),
+                              TextButton(
+                                child: const Text('No', style: TextStyle(fontSize: fontSizeMedium)),
+                                onPressed: () {
+                                  Navigator.pop(context, false);
+                                },
+                              ),
+                            ],
+                          );
+                        },
+                      ).then((value) async {
+                        if (value != true) return;
+
+                        _matches.removeAt(_currentMatchIndex);
+                        await overwriteSave();
+                        setState(() => _currentMatchIndex = -1);
+                      });
                     },
-                    child: const Text('Remove Match', style: TextStyle(fontSize: 24)),
+                    child: const Text('Remove Match', style: TextStyle(fontSize: fontSizeMedium)),
                   ),
                 ],
               ),
@@ -138,20 +175,24 @@ class _MatchManagerState extends State<MatchManager> {
   Widget playerShowcase() {
     return Flexible(
       child: Container(
-        margin: const EdgeInsets.symmetric(vertical: 16, horizontal: 48),
+        margin: const EdgeInsets.symmetric(vertical: 32, horizontal: 96),
         child: Column(
           children: [
             Padding(
-              padding: const EdgeInsets.only(bottom: 20),
-              child: Text('Players', style: Theme.of(context).textTheme.titleMedium),
+              padding: const EdgeInsets.only(bottom: 30),
+              child: Text('Players', style: Theme.of(context).textTheme.titleLarge),
             ),
             Flexible(
-              child: Container(
-                decoration: BoxDecoration(
-                  border: Border.all(width: 1),
-                ),
-                child: _currentMatchIndex < 0 ? const Center(child: Text('No match selected')) : playerGrid(),
-              ),
+              child: _currentMatchIndex < 0
+                  ? Container(
+                      decoration: BoxDecoration(
+                        border: Border.all(
+                          width: 1,
+                          color: Theme.of(context).colorScheme.onBackground,
+                        ),
+                      ),
+                      child: const Center(child: Text('No match selected')))
+                  : playerGrid(),
             ),
           ],
         ),
@@ -162,26 +203,45 @@ class _MatchManagerState extends State<MatchManager> {
   GridView playerGrid() {
     return GridView.builder(
       itemCount: 4,
+      padding: const EdgeInsets.symmetric(vertical: 40),
       itemBuilder: (_, index) {
         List<KLIPlayer?> p = _matches[_currentMatchIndex].playerList;
-        return p[index] == null
-            ? const GridTile(
-                child: Center(
-                  child: Text('No player'),
-                ),
-              )
-            : GridTile(
-                footer: Center(child: Text('${index + 1}: ${p[index]?.name}')),
-                child: Container(
-                  margin: const EdgeInsets.only(bottom: 0),
-                  child: Image.file(
-                    fit: BoxFit.cover,
-                    File(
-                      '${storageHandler.parentFolder}\\${p[index]?.imagePath}',
+        return Container(
+          margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+          child: p[index] == null
+              ? GridTile(
+                  child: Container(
+                    decoration: BoxDecoration(
+                      border: Border.all(
+                        width: 1,
+                        color: Theme.of(context).colorScheme.onBackground,
+                      ),
+                    ),
+                    alignment: Alignment.center,
+                    child: const Text('No player'),
+                  ),
+                )
+              : GridTile(
+                  footer: Center(
+                    child: Text(
+                      '${p[index]?.name}',
+                      style: const TextStyle(
+                        fontSize: fontSizeSmall,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.only(bottom: 35),
+                    child: Image.file(
+                      fit: BoxFit.cover,
+                      File(
+                        '${storageHandler.parentFolder}\\${p[index]?.imagePath}',
+                      ),
                     ),
                   ),
                 ),
-              );
+        );
       },
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2),
     );
@@ -190,29 +250,37 @@ class _MatchManagerState extends State<MatchManager> {
   Widget matchList() {
     return Flexible(
       child: Container(
-        margin: const EdgeInsets.symmetric(vertical: 16, horizontal: 48),
+        margin: const EdgeInsets.symmetric(vertical: 32, horizontal: 96),
         child: Column(
           children: [
             Padding(
-              padding: const EdgeInsets.only(bottom: 20),
-              child: Text('Matches', style: Theme.of(context).textTheme.titleMedium),
+              padding: const EdgeInsets.only(bottom: 30),
+              child: Text('Matches', style: Theme.of(context).textTheme.titleLarge),
             ),
             Flexible(
-              child: Container(
-                decoration: BoxDecoration(
-                  border: Border.all(width: 1),
-                ),
-                child: ListView.builder(
-                  itemCount: _matches.length,
-                  itemBuilder: (_, index) => ListTile(
-                    title: Text(_matches[index].name),
-                    onTap: () {
-                      _currentMatchIndex = index;
-                      setState(() {});
-                    },
-                  ),
-                ),
-              ),
+              child: _matches.isEmpty
+                  ? Container(
+                      decoration: BoxDecoration(
+                      border: Border.all(
+                        width: 1,
+                        color: Theme.of(context).colorScheme.onBackground,
+                      ),
+                    ))
+                  : ListView.separated(
+                      itemCount: _matches.length,
+                      separatorBuilder: (_, index) => const SizedBox(height: 20),
+                      itemBuilder: (_, index) => ListTile(
+                        title: Text(_matches[index].name, style: const TextStyle(fontSize: fontSizeMedium)),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20),
+                          side: BorderSide(width: 2, color: Theme.of(context).colorScheme.primaryContainer),
+                        ),
+                        onTap: () {
+                          _currentMatchIndex = index;
+                          setState(() {});
+                        },
+                      ),
+                    ),
             ),
           ],
         ),
