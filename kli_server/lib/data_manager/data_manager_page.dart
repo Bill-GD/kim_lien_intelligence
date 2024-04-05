@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:kli_utils/kli_utils.dart';
 import 'package:side_navigation/side_navigation.dart';
 
 import '../global.dart';
@@ -50,61 +51,71 @@ class _DataManagerPageState extends State<DataManagerPage> {
     return Scaffold(
       body: Row(
         children: [
-          Container(
-            decoration: const BoxDecoration(border: Border(right: BorderSide(width: 1))),
-            child: SideNavigationBar(
-              selectedIndex: _selectedPage,
-              expandable: false,
-              header: SideNavigationBarHeader(
-                image: const Padding(
-                  padding: EdgeInsets.only(left: 5),
-                  child: BackButton(),
-                ),
-                title: Padding(
-                  padding: const EdgeInsets.only(right: 20, top: 30, bottom: 30),
-                  child: Text('Data Manager', style: Theme.of(context).textTheme.titleLarge),
-                ),
-                subtitle: const SizedBox.shrink(),
+          SideNavigationBar(
+            selectedIndex: _selectedPage,
+            expandable: false,
+            header: SideNavigationBarHeader(
+              image: BackButton(
+                onPressed: () {
+                  logger.i('Exiting data manager...');
+                  Navigator.of(context).pop();
+                },
               ),
-              items: const [
-                SideNavigationBarItem(
-                  icon: Icons.settings_rounded,
-                  label: 'Match',
+              title: const Padding(
+                padding: EdgeInsets.symmetric(vertical: 30),
+                child: Text(
+                  'Data Manager',
+                  style: TextStyle(
+                    fontSize: fontSizeLarge,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
-                SideNavigationBarItem(
-                  icon: Icons.start_rounded,
-                  label: 'Start',
-                ),
-                SideNavigationBarItem(
-                  icon: FontAwesomeIcons.roadBarrier,
-                  label: 'Obstacle',
-                ),
-                SideNavigationBarItem(
-                  icon: Icons.local_fire_department_rounded,
-                  label: 'Acceleration',
-                ),
-                SideNavigationBarItem(
-                  icon: FontAwesomeIcons.flagCheckered,
-                  label: 'Finish',
-                ),
-                SideNavigationBarItem(
-                  icon: Icons.add_box_rounded,
-                  label: 'Extra',
-                ),
-              ],
-              onTap: (newIndex) {
-                setState(() {
-                  _selectedPage = newIndex;
-                });
-              },
-              theme: SideNavigationBarTheme(
-                itemTheme: SideNavigationBarItemTheme(
-                  selectedItemColor: Theme.of(context).colorScheme.primary,
-                  labelTextStyle: const TextStyle(fontWeight: FontWeight.bold),
-                ),
-                togglerTheme: SideNavigationBarTogglerTheme.standard(),
-                dividerTheme: SideNavigationBarDividerTheme.standard(),
               ),
+              subtitle: SizedBox.shrink(),
+            ),
+            items: const [
+              SideNavigationBarItem(
+                icon: Icons.settings_rounded,
+                label: 'Match',
+              ),
+              SideNavigationBarItem(
+                icon: Icons.start_rounded,
+                label: 'Start',
+              ),
+              SideNavigationBarItem(
+                icon: FontAwesomeIcons.roadBarrier,
+                label: 'Obstacle',
+              ),
+              SideNavigationBarItem(
+                icon: Icons.local_fire_department_rounded,
+                label: 'Acceleration',
+              ),
+              SideNavigationBarItem(
+                icon: FontAwesomeIcons.flagCheckered,
+                label: 'Finish',
+              ),
+              SideNavigationBarItem(
+                icon: Icons.add_box_rounded,
+                label: 'Extra',
+              ),
+            ],
+            onTap: (newIndex) {
+              setState(() {
+                _selectedPage = newIndex;
+                logger.i('Selecting ${_contentPages[newIndex].runtimeType}');
+              });
+            },
+            theme: SideNavigationBarTheme(
+              itemTheme: SideNavigationBarItemTheme(
+                selectedItemColor: Theme.of(context).colorScheme.primary,
+                labelTextStyle: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: fontSizeMSmall,
+                  height: 2,
+                ),
+              ),
+              togglerTheme: SideNavigationBarTogglerTheme.standard(),
+              dividerTheme: SideNavigationBarDividerTheme.standard(),
             ),
           ),
           Expanded(

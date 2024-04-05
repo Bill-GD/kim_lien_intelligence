@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:kli_utils/kli_utils.dart';
@@ -35,94 +37,106 @@ class _StartPageState extends State<StartPage> {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Container(
-              decoration: const BoxDecoration(border: Border(right: BorderSide(width: 1))),
-              child: SideNavigationBar(
-                selectedIndex: _sidebarIndex,
-                expandable: false,
-                header: SideNavigationBarHeader(
-                  image: const SizedBox.shrink(),
-                  title: Padding(
-                    padding: const EdgeInsets.only(right: 20, top: 10),
-                    child: Image.asset('assets/images/ttkl_logo_title_light.png'),
-                  ),
-                  subtitle: Padding(
-                    padding: const EdgeInsets.only(left: 100, bottom: 10),
-                    child: Text(
-                      'Host',
-                      style: TextStyle(
-                        fontSize: 16,
-                        color: Theme.of(context).colorScheme.secondary.withOpacity(0.8),
-                      ),
-                    ),
-                  ),
+            SideNavigationBar(
+              selectedIndex: _sidebarIndex,
+              expandable: false,
+              header: SideNavigationBarHeader(
+                image: const SizedBox.shrink(),
+                title: Padding(
+                  padding: const EdgeInsets.only(right: 20, top: 10),
+                  child: Image.asset('assets/images/ttkl_logo_title_light.png'),
                 ),
-                footer: SideNavigationBarFooter(
-                  label: Text(
-                    'v${packageInfo.version}',
+                subtitle: Padding(
+                  padding: const EdgeInsets.only(left: 100, bottom: 10),
+                  child: Text(
+                    'Host',
                     style: TextStyle(
+                      fontSize: 16,
                       color: Theme.of(context).colorScheme.secondary.withOpacity(0.8),
                     ),
                   ),
                 ),
-                items: const [
-                  SideNavigationBarItem(
-                    icon: FontAwesomeIcons.database,
-                    label: 'Data Manager',
+              ),
+              footer: SideNavigationBarFooter(
+                label: Text(
+                  'v${packageInfo.version}',
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.secondary.withOpacity(0.8),
                   ),
-                  SideNavigationBarItem(
-                    icon: FontAwesomeIcons.server,
-                    label: 'Server Setup',
-                  ),
-                  SideNavigationBarItem(
-                    icon: FontAwesomeIcons.circleQuestion,
-                    label: 'Instruction',
-                  ),
-                ],
-                onTap: (newIndex) {
-                  setState(() {
-                    _sidebarIndex = newIndex;
-                  });
-                },
-                theme: SideNavigationBarTheme(
-                  itemTheme: SideNavigationBarItemTheme(
-                    selectedItemColor: Theme.of(context).colorScheme.primary,
-                    labelTextStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: fontSizeMedium, height: 2),
-                  ),
-                  togglerTheme: SideNavigationBarTogglerTheme.standard(),
-                  dividerTheme: SideNavigationBarDividerTheme.standard(),
                 ),
+              ),
+              items: const [
+                SideNavigationBarItem(
+                  icon: FontAwesomeIcons.database,
+                  label: 'Data Manager',
+                ),
+                SideNavigationBarItem(
+                  icon: FontAwesomeIcons.server,
+                  label: 'Server Setup',
+                ),
+                SideNavigationBarItem(
+                  icon: FontAwesomeIcons.circleQuestion,
+                  label: 'Instruction',
+                ),
+              ],
+              onTap: (newIndex) {
+                setState(() {
+                  _sidebarIndex = newIndex;
+                });
+              },
+              theme: SideNavigationBarTheme(
+                itemTheme: SideNavigationBarItemTheme(
+                  selectedItemColor: Theme.of(context).colorScheme.primary,
+                  labelTextStyle: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: fontSizeMSmall,
+                    height: 2,
+                  ),
+                ),
+                togglerTheme: SideNavigationBarTogglerTheme.standard(),
+                dividerTheme: SideNavigationBarDividerTheme.standard(),
               ),
             ),
             Expanded(
-              child: Center(
-                child: [
-                  ElevatedButton(
+              child: Stack(
+                alignment: Alignment.topRight,
+                children: [
+                  CloseButton(
+                    color: Colors.amber,
                     onPressed: () {
-                      logger.i('Opening Data Manager page...');
-                      Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (context) => const DataManagerPage(),
-                        ),
-                      );
+                      exit(0);
                     },
-                    child: const Text('Open Data Manager', style: TextStyle(fontSize: fontSizeLarge)),
                   ),
-                  ElevatedButton(
-                    onPressed: () async {
-                      logger.i('Opening Server Setup page...');
-                      await Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (context) => const ServerSetupPage(),
-                        ),
-                      );
-                      await KLIServer.stop();
-                    },
-                    child: const Text('Open Server Setup', style: TextStyle(fontSize: fontSizeLarge)),
+                  Center(
+                    child: [
+                      ElevatedButton(
+                        onPressed: () {
+                          logger.i('Opening Data Manager page...');
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (context) => const DataManagerPage(),
+                            ),
+                          );
+                        },
+                        child: const Text('Open Data Manager', style: TextStyle(fontSize: fontSizeLarge)),
+                      ),
+                      ElevatedButton(
+                        onPressed: () async {
+                          logger.i('Opening Server Setup page...');
+                          await Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (context) => const ServerSetupPage(),
+                            ),
+                          );
+                          await KLIServer.stop();
+                        },
+                        child: const Text('Open Server Setup', style: TextStyle(fontSize: fontSizeLarge)),
+                      ),
+                      // Help screen
+                      const Text('To be implemented'),
+                    ].elementAt(_sidebarIndex),
                   ),
-                  // Help screen
-                  const Text('To be implemented'),
-                ].elementAt(_sidebarIndex),
+                ],
               ),
             ),
           ],

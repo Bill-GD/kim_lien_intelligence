@@ -44,6 +44,7 @@ class KliServerApp extends StatelessWidget {
             colorScheme: ColorScheme.fromSeed(
               seedColor: Colors.white,
               brightness: Brightness.light,
+              error: Colors.redAccent,
             ).copyWith(background: Colors.white),
           ),
         ),
@@ -56,6 +57,7 @@ class KliServerApp extends StatelessWidget {
             colorScheme: ColorScheme.fromSeed(
               seedColor: Colors.grey,
               brightness: Brightness.dark,
+              error: Colors.redAccent,
             ),
           ),
         ),

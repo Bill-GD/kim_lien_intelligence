@@ -29,6 +29,7 @@ class _MatchManagerState extends State<MatchManager> {
         setState(() {});
       }
       setState(() => _isLoading = false);
+      logger.i('Loaded ${_matches.length} matches');
     });
   }
 
@@ -51,6 +52,7 @@ class _MatchManagerState extends State<MatchManager> {
         padding: const EdgeInsets.all(16),
         child: Column(
           children: [
+            // buttons
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 32),
               child: Row(
@@ -67,7 +69,7 @@ class _MatchManagerState extends State<MatchManager> {
                           context: context,
                           barrierDismissible: false,
                           barrierLabel: '',
-                          builder: (_) => const MatchEditorDialog(),
+                          builder: (_) => MatchEditorDialog(matchNames: _matches.map((e) => e.name)),
                         ),
                       );
 
@@ -83,26 +85,27 @@ class _MatchManagerState extends State<MatchManager> {
                     style: const ButtonStyle(
                       padding: MaterialStatePropertyAll<EdgeInsets>(EdgeInsets.all(20)),
                     ),
-                    onPressed: () async {
-                      if (_currentMatchIndex < 0) {
-                        showToastMessage(context, 'Please select a match');
-                        return;
-                      }
-                      final newMatch = await Navigator.of(context).push<KLIMatch>(
-                        DialogRoute<KLIMatch>(
-                          context: context,
-                          barrierDismissible: false,
-                          barrierLabel: '',
-                          builder: (_) => MatchEditorDialog(match: _matches[_currentMatchIndex]),
-                        ),
-                      );
+                    onPressed: _currentMatchIndex < 0
+                        ? null
+                        : () async {
+                            final newMatch = await Navigator.of(context).push<KLIMatch>(
+                              DialogRoute<KLIMatch>(
+                                context: context,
+                                barrierDismissible: false,
+                                barrierLabel: '',
+                                builder: (_) => MatchEditorDialog(
+                                  match: _matches[_currentMatchIndex],
+                                  matchNames: _matches.map((e) => e.name),
+                                ),
+                              ),
+                            );
 
-                      if (newMatch != null) {
-                        _matches[_currentMatchIndex] = newMatch;
-                        await overwriteSave();
-                        setState(() {});
-                      }
-                    },
+                            if (newMatch != null) {
+                              _matches[_currentMatchIndex] = newMatch;
+                              await overwriteSave();
+                              setState(() {});
+                            }
+                          },
                     child: Text(
                       'Modify Match${_currentMatchIndex < 0 ? '' : ': ${_matches[_currentMatchIndex].name}'}',
                       style: const TextStyle(fontSize: fontSizeMedium),
@@ -112,49 +115,48 @@ class _MatchManagerState extends State<MatchManager> {
                     style: const ButtonStyle(
                       padding: MaterialStatePropertyAll<EdgeInsets>(EdgeInsets.all(20)),
                     ),
-                    onPressed: () async {
-                      if (_currentMatchIndex < 0) {
-                        showToastMessage(context, 'Please select a match');
-                        return;
-                      }
-
-                      showDialog<bool>(
-                        context: context,
-                        builder: (BuildContext context) {
-                          return AlertDialog(
-                            title: const Text('Confirm Delete'),
-                            content: Text(
-                                'Are you sure you want to delete match: ${_matches[_currentMatchIndex].name}?'),
-                            actionsAlignment: MainAxisAlignment.spaceEvenly,
-                            actions: <Widget>[
-                              TextButton(
-                                child: const Text('Yes', style: TextStyle(fontSize: fontSizeMedium)),
-                                onPressed: () {
-                                  Navigator.pop(context, true);
-                                },
-                              ),
-                              TextButton(
-                                child: const Text('No', style: TextStyle(fontSize: fontSizeMedium)),
-                                onPressed: () {
-                                  Navigator.pop(context, false);
-                                },
-                              ),
-                            ],
-                          );
-                        },
-                      ).then((value) async {
-                        if (value != true) return;
-
-                        _matches.removeAt(_currentMatchIndex);
-                        await overwriteSave();
-                        setState(() => _currentMatchIndex = -1);
-                      });
-                    },
+                    onPressed: _currentMatchIndex < 0
+                        ? null
+                        : () async {
+                            showDialog<bool>(
+                              context: context,
+                              builder: (BuildContext context) {
+                                return AlertDialog(
+                                  title: const Text('Confirm Delete'),
+                                  content: Text(
+                                    'Are you sure you want to delete match: ${_matches[_currentMatchIndex].name}?',
+                                  ),
+                                  actionsAlignment: MainAxisAlignment.spaceEvenly,
+                                  actions: <Widget>[
+                                    TextButton(
+                                      child: const Text('Yes', style: TextStyle(fontSize: fontSizeMedium)),
+                                      onPressed: () {
+                                        Navigator.pop(context, true);
+                                      },
+                                    ),
+                                    TextButton(
+                                      child: const Text('No', style: TextStyle(fontSize: fontSizeMedium)),
+                                      onPressed: () {
+                                        Navigator.pop(context, false);
+                                      },
+                                    ),
+                                  ],
+                                );
+                              },
+                            ).then((value) async {
+                              if (value != true) return;
+                              logger.i('Remove match: ${_matches[_currentMatchIndex].name}');
+                              _matches.removeAt(_currentMatchIndex);
+                              await overwriteSave();
+                              setState(() => _currentMatchIndex = -1);
+                            });
+                          },
                     child: const Text('Remove Match', style: TextStyle(fontSize: fontSizeMedium)),
                   ),
                 ],
               ),
             ),
+            // data viewer
             Expanded(
               child: _isLoading
                   ? const Center(child: CircularProgressIndicator())
@@ -186,10 +188,7 @@ class _MatchManagerState extends State<MatchManager> {
               child: _currentMatchIndex < 0
                   ? Container(
                       decoration: BoxDecoration(
-                        border: Border.all(
-                          width: 1,
-                          color: Theme.of(context).colorScheme.onBackground,
-                        ),
+                        border: Border.all(width: 1, color: Theme.of(context).colorScheme.onBackground),
                       ),
                       child: const Center(child: Text('No match selected')))
                   : playerGrid(),
@@ -212,10 +211,7 @@ class _MatchManagerState extends State<MatchManager> {
               ? GridTile(
                   child: Container(
                     decoration: BoxDecoration(
-                      border: Border.all(
-                        width: 1,
-                        color: Theme.of(context).colorScheme.onBackground,
-                      ),
+                      border: Border.all(width: 1, color: Theme.of(context).colorScheme.onBackground),
                     ),
                     alignment: Alignment.center,
                     child: const Text('No player'),
@@ -225,10 +221,7 @@ class _MatchManagerState extends State<MatchManager> {
                   footer: Center(
                     child: Text(
                       '${p[index]?.name}',
-                      style: const TextStyle(
-                        fontSize: fontSizeSmall,
-                        fontWeight: FontWeight.bold,
-                      ),
+                      style: const TextStyle(fontSize: fontSizeSmall, fontWeight: FontWeight.bold),
                     ),
                   ),
                   child: Padding(
@@ -261,11 +254,11 @@ class _MatchManagerState extends State<MatchManager> {
               child: _matches.isEmpty
                   ? Container(
                       decoration: BoxDecoration(
-                      border: Border.all(
-                        width: 1,
-                        color: Theme.of(context).colorScheme.onBackground,
+                        border: Border.all(width: 1, color: Theme.of(context).colorScheme.onBackground),
                       ),
-                    ))
+                      alignment: Alignment.center,
+                      child: const Text('No match'),
+                    )
                   : ListView.separated(
                       itemCount: _matches.length,
                       separatorBuilder: (_, index) => const SizedBox(height: 20),

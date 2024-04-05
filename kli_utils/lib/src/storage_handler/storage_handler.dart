@@ -88,10 +88,12 @@ class StorageHandler {
   }
 
   Future<String> readFromFile(String path) async {
+    logger.i('Read from ${getRelative(path)}');
     return await File(path).readAsString();
   }
 
   Future<void> writeToFile(String path, String data) async {
+    logger.i('Write to ${getRelative(path)}');
     await File(path).writeAsString(data);
   }
 
@@ -111,6 +113,10 @@ class StorageHandler {
     } on PathExistsException {
       return;
     }
+  }
+
+  String getRelative(String abs) {
+    return abs.replaceAll(_parentFolder, '').replaceAll('\\', '/');
   }
 }
 
