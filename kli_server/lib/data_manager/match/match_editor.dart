@@ -106,7 +106,8 @@ class _MatchEditorDialogState extends State<MatchEditorDialog> {
             },
           ),
           TextButton(
-            child: Text('Cancel', style: TextStyle(fontSize: fontSizeMedium, color: Theme.of(context).colorScheme.error)),
+            child: Text('Cancel',
+                style: TextStyle(fontSize: fontSizeMedium, color: Theme.of(context).colorScheme.error)),
             onPressed: () {
               Navigator.pop(context);
             },
@@ -119,10 +120,14 @@ class _MatchEditorDialogState extends State<MatchEditorDialog> {
   Widget playerWidget(int index) {
     return Expanded(
       child: Container(
-        margin: const EdgeInsets.symmetric(horizontal: 10),
+        margin: const EdgeInsets.symmetric(horizontal: 32),
         child: Column(
           children: [
-            Text('Player ${index + 1}', textAlign: TextAlign.center),
+            Text(
+              'Player ${index + 1}',
+              textAlign: TextAlign.center,
+              style: TextStyle(fontSize: fontSizeMedium),
+            ),
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 8),
               child: TextField(
