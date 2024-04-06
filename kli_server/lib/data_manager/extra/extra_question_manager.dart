@@ -18,7 +18,7 @@ class _ExtraQuestionManagerState extends State<ExtraQuestionManager> {
         automaticallyImplyLeading: false,
         titleTextStyle: const TextStyle(fontSize: fontSizeXL),
         centerTitle: true,
-        toolbarHeight: kToolbarHeight * 1.5,
+        toolbarHeight: kToolbarHeight * 1.1,
       ),
       body: const Center(),
     );

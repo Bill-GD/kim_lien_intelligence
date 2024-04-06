@@ -71,7 +71,7 @@ class _DataManagerPageState extends State<DataManagerPage> {
                   ),
                 ),
               ),
-              subtitle: SizedBox.shrink(),
+              subtitle: const SizedBox.shrink(),
             ),
             items: const [
               SideNavigationBarItem(

@@ -26,22 +26,30 @@ class _MatchEditorDialogState extends State<MatchEditorDialog> {
   final _imagePaths = List<String>.filled(4, '');
 
   String _matchNameError = '';
-  bool _disableDone = true;
+  bool _disableDone = true, _setNewMatch = false;
 
   @override
   void initState() {
     super.initState();
-    _disableDone = widget.match == null;
+    _disableDone = _setNewMatch = widget.match == null;
     logger.i(
-      widget.match != null ? 'Opened editor for match: ${widget.match?.name}' : 'Opened editor: new match',
+      'Match editor: ${_setNewMatch ? ' New' : '${widget.match?.name}'}',
     );
-    if (widget.match == null) return;
+    if (_setNewMatch) return;
 
     _matchNameController.text = widget.match!.name;
     for (int i = 0; i < widget.match!.playerList.length; i++) {
       _playerNameControllers[i].text = widget.match!.playerList[i]?.name ?? '';
       _imagePaths[i] = widget.match!.playerList[i]?.imagePath ?? '';
     }
+  }
+
+  @override
+  void dispose() {
+    for (var c in [_matchNameController, ..._playerNameControllers]) {
+      c.dispose();
+    }
+    super.dispose();
   }
 
   @override
@@ -129,9 +137,7 @@ class _MatchEditorDialogState extends State<MatchEditorDialog> {
                       }).toList(),
                     );
 
-                    logger.i(widget.match == null
-                        ? 'New match: ${newMatch.name}'
-                        : 'Modified match: ${newMatch.name}');
+                    logger.i('${_setNewMatch ? 'New' : 'Modified'} match: ${newMatch.name}');
 
                     Navigator.of(context).pop(newMatch);
                   },

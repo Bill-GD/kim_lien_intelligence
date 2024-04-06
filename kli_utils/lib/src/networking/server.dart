@@ -38,7 +38,7 @@ class KLIServer {
   static Stream<KLISocketMessage> get onClientMessage => _onClientMessageController.stream;
 
   static Future<void> start([int port = 8080]) async {
-    String ip = await getLocalIP();
+    String ip = await Networking.getLocalIP();
 
     _serverSocket = await ServerSocket.bind(InternetAddress(ip, type: InternetAddressType.IPv4), port);
     logger.i('Server started on ${_serverSocket?.address}');
@@ -123,6 +123,8 @@ class KLIServer {
     _clientList = List.generate(_maxConnectionCount, (_) => null);
 
     logger.i('Closing server socket');
+    _onClientConnectivityChangedController.close();
+    _onClientMessageController.close();
     await _serverSocket?.close();
     _serverSocket = null;
   }

@@ -2,25 +2,12 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:network_info_plus/network_info_plus.dart';
-import 'package:http/http.dart' as http;
 
-Future<String> getPublicIP() async {
-  final http.Response response;
+class Networking {
+  static Future<String> getLocalIP() async => (await NetworkInfo().getWifiIP()).toString();
 
-  try {
-    response = await http.get(Uri.parse('https://api.ipify.org'));
-  } on Exception {
-    return 'None';
-  }
-
-  return response.body;
+  static const listOfClient = ['Player 1', 'Player 2', 'Player 3', 'Player 4', 'Viewer 1', 'Viewer 2', 'MC'];
 }
-
-Future<String> getLocalIP() async {
-  return (await NetworkInfo().getWifiIP()).toString();
-}
-
-const listOfClient = ['Player 1', 'Player 2', 'Player 3', 'Player 4', 'Viewer 1', 'Viewer 2', 'MC'];
 
 enum KLIMessageType {
   sendID,

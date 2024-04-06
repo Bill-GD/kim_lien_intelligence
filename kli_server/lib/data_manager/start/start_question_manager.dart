@@ -22,7 +22,7 @@ class _StartQuestionManagerState extends State<StartQuestionManager> {
         automaticallyImplyLeading: false,
         titleTextStyle: const TextStyle(fontSize: fontSizeXL),
         centerTitle: true,
-        toolbarHeight: kToolbarHeight * 1.5,
+        toolbarHeight: kToolbarHeight * 1.1,
       ),
       body: Center(
         child: TextButton(

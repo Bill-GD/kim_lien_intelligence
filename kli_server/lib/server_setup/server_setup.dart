@@ -29,8 +29,14 @@ class _ServerSetupPageState extends State<ServerSetupPage> {
     });
   }
 
+  @override
+  void dispose() {
+    _clientMessageController.dispose();
+    super.dispose();
+  }
+
   void getIpAddresses() async {
-    _localAddress = await getLocalIP();
+    _localAddress = await Networking.getLocalIP();
     setState(() {});
   }
 
@@ -64,7 +70,7 @@ class _ServerSetupPageState extends State<ServerSetupPage> {
                   itemBuilder: (context, index) {
                     Socket? client = KLIServer.clientAt(index);
                     return ListTile(
-                      title: Text(listOfClient[index]),
+                      title: Text(Networking.listOfClient[index]),
                       subtitle: Text('IP: ${client?.address.address}:${client?.port}'),
                     );
                   },
@@ -111,10 +117,10 @@ class _ServerSetupPageState extends State<ServerSetupPage> {
               DropdownButton(
                 value: chosenClientID.isEmpty ? null : chosenClientID,
                 items: [
-                  for (var i = 0; i < listOfClient.length; i++)
+                  for (var i = 0; i < Networking.listOfClient.length; i++)
                     DropdownMenuItem(
                       value: KLIServer.mapIDToIndex.keys.elementAt(i),
-                      child: Text(listOfClient[i]),
+                      child: Text(Networking.listOfClient[i]),
                     )
                 ],
                 onChanged: (value) {

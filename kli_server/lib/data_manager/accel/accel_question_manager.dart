@@ -18,7 +18,7 @@ class _AccelQuestionManagerState extends State<AccelQuestionManager> {
         automaticallyImplyLeading: false,
         titleTextStyle: const TextStyle(fontSize: fontSizeXL),
         centerTitle: true,
-        toolbarHeight: kToolbarHeight * 1.5,
+        toolbarHeight: kToolbarHeight * 1.1,
       ),
       body: const Center(),
     );

@@ -22,10 +22,17 @@ class _ConnectPageState extends State<ConnectPage> {
   @override
   void initState() {
     super.initState();
-    KLIClient.onMessageReceived.listen((newMessage) {
+    kliClient.onMessageReceived.listen((newMessage) {
       _serverMessage = newMessage.msg;
       setState(() {});
     });
+  }
+
+  @override
+  void dispose() {
+    _ipTextController.dispose();
+    _messageController.dispose();
+    super.dispose();
   }
 
   @override
@@ -41,7 +48,7 @@ class _ConnectPageState extends State<ConnectPage> {
             DropdownButton(
               value: _playerId.isEmpty ? null : _playerId,
               items: [
-                for (final c in listOfClient)
+                for (final c in Networking.listOfClient)
                   DropdownMenuItem(value: c.toLowerCase().replaceAll(' ', ''), child: Text(c))
               ],
               onChanged: (value) {
@@ -72,13 +79,13 @@ class _ConnectPageState extends State<ConnectPage> {
 
                 runZonedGuarded(
                   () async {
-                    await KLIClient.init(ip, _playerId);
+                    await initClient(ip, _playerId);
                     setState(() => _isConnected = true);
 
                     if (context.mounted) {
                       showToastMessage(
                         context,
-                        'Connected to server as $_playerId with IP: ${KLIClient.address}',
+                        'Connected to server as $_playerId with IP: ${kliClient.address}',
                       );
                     }
                   },
@@ -112,7 +119,7 @@ class _ConnectPageState extends State<ConnectPage> {
                   showToastMessage(context, 'Please enter a message');
                   return;
                 }
-                KLIClient.sendMessage(
+                kliClient.sendMessage(
                   KLISocketMessage(_playerId, _messageController.value.text, KLIMessageType.normal),
                 );
                 if (context.mounted) {
