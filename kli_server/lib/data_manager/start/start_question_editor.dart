@@ -40,20 +40,23 @@ class _StartEditorDialogState extends State<StartEditorDialog> {
       body: AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         titlePadding: const EdgeInsets.symmetric(vertical: 32, horizontal: 256),
-        title: DropdownMenu(
-          label: const Text('Type'),
-          initialSelection: _type,
-          dropdownMenuEntries: [
-            for (final s in QuestionSubject.values)
-              DropdownMenuEntry(
-                value: s,
-                label: StartQuestion.mapTypeDisplay(s),
-              )
-          ],
-          onSelected: (value) async {
-            _type = value!;
-            setState(() {});
-          },
+        title: Center(
+          child: DropdownMenu(
+            label: const Text('Type'),
+            textStyle: const TextStyle(fontSize: fontSizeMSmall),
+            initialSelection: _type,
+            dropdownMenuEntries: [
+              for (final s in QuestionSubject.values)
+                DropdownMenuEntry(
+                  value: s,
+                  label: StartQuestion.mapTypeDisplay(s),
+                )
+            ],
+            onSelected: (value) async {
+              _type = value!;
+              setState(() {});
+            },
+          ),
         ),
         contentPadding: const EdgeInsets.only(bottom: 40, left: 60, right: 60),
         content: Column(
@@ -61,6 +64,7 @@ class _StartEditorDialogState extends State<StartEditorDialog> {
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
             TextField(
+              style: const TextStyle(fontSize: fontSizeMedium),
               onChanged: (value) {
                 if (value.isEmpty) {
                   _qErrorText = 'Can\'t be empty';
@@ -70,6 +74,8 @@ class _StartEditorDialogState extends State<StartEditorDialog> {
                 setState(() => _qErrorText = null);
               },
               controller: _questionController,
+              maxLines: 5,
+              minLines: 1,
               decoration: InputDecoration(
                 labelText: 'Question',
                 labelStyle: TextStyle(
@@ -82,6 +88,7 @@ class _StartEditorDialogState extends State<StartEditorDialog> {
             ),
             const SizedBox(height: 30),
             TextField(
+              style: const TextStyle(fontSize: fontSizeMedium),
               onChanged: (value) {
                 if (value.isEmpty) {
                   _aErrorText = 'Can\'t be empty';

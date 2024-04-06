@@ -134,11 +134,11 @@ class _StartQuestionManagerState extends State<StartQuestionManager> {
           ),
           // sort player pos
           DropdownMenu(
-            label: const Text('Sort'),
+            label: const Text('Filter position'),
             initialSelection: -1,
             enabled: selectedMatchIndex >= 0,
             dropdownMenuEntries: [
-              const DropdownMenuEntry(value: -1, label: 'None'),
+              const DropdownMenuEntry(value: -1, label: 'All'),
               for (var i = 0; i < 4; i++)
                 DropdownMenuEntry(
                   value: i,
@@ -152,7 +152,7 @@ class _StartQuestionManagerState extends State<StartQuestionManager> {
           ),
           // sort subject
           DropdownMenu(
-            label: const Text('Sort'),
+            label: const Text('Filter subject'),
             initialSelection: null,
             enabled: selectedMatchIndex >= 0,
             dropdownMenuEntries: [
@@ -258,33 +258,37 @@ class _StartQuestionManagerState extends State<StartQuestionManager> {
         ),
         child: Column(
           children: [
-            customListTile('Thí sinh', 'Subject', 'Question', 'Answer', background: true),
+            customListTile('Thí sinh', 'Subject', 'Question', 'Answer'),
             Flexible(
-              child: ListView.builder(
-                itemCount: filtered.length,
-                itemBuilder: (_, index) {
-                  final q = filtered[index];
+              child: Material(
+                borderRadius: BorderRadius.circular(20),
+                child: ListView.builder(
+                  itemCount: filtered.length,
+                  itemBuilder: (_, index) {
+                    final q = filtered[index];
 
-                  return customListTile(
-                    '${q.playerPos + 1}',
-                    StartQuestion.mapTypeDisplay(q.subject),
-                    q.question,
-                    q.answer,
-                    onTap: () async {
-                      final newQ = await Navigator.of(context).push<StartQuestion>(DialogRoute<StartQuestion>(
-                        context: context,
-                        barrierDismissible: false,
-                        barrierLabel: '',
-                        builder: (_) => StartEditorDialog(question: q),
-                      ));
-                      if (newQ != null) {
-                        questions[index] = newQ;
-                        await overwriteSave();
-                      }
-                      setState(() {});
-                    },
-                  );
-                },
+                    return customListTile(
+                      '${q.playerPos + 1}',
+                      StartQuestion.mapTypeDisplay(q.subject),
+                      q.question,
+                      q.answer,
+                      onTap: () async {
+                        final newQ =
+                            await Navigator.of(context).push<StartQuestion>(DialogRoute<StartQuestion>(
+                          context: context,
+                          barrierDismissible: false,
+                          barrierLabel: '',
+                          builder: (_) => StartEditorDialog(question: q),
+                        ));
+                        if (newQ != null) {
+                          questions[index] = newQ;
+                          await overwriteSave();
+                        }
+                        setState(() {});
+                      },
+                    );
+                  },
+                ),
               ),
             ),
           ],
@@ -293,14 +297,7 @@ class _StartQuestionManagerState extends State<StartQuestionManager> {
     );
   }
 
-  Widget customListTile(
-    String col1,
-    String col2,
-    String col3,
-    String col4, {
-    bool background = false,
-    void Function()? onTap,
-  }) {
+  Widget customListTile(String col1, String col2, String col3, String col4, {void Function()? onTap}) {
     return MouseRegion(
       cursor: onTap != null ? SystemMouseCursors.click : SystemMouseCursors.basic,
       child: InkWell(
@@ -308,8 +305,6 @@ class _StartQuestionManagerState extends State<StartQuestionManager> {
         child: Container(
           padding: const EdgeInsets.only(right: 24, top: 24, bottom: 24),
           decoration: BoxDecoration(
-            borderRadius: background ? const BorderRadius.vertical(top: Radius.circular(20)) : null,
-            color: background ? Theme.of(context).colorScheme.background : null,
             border: Border(
               bottom: BorderSide(width: 2, color: Theme.of(context).colorScheme.primaryContainer),
             ),
