@@ -10,6 +10,8 @@ class StorageHandler {
   String get parentFolder => _parentFolder;
   final String _userDataDir;
 
+  String get _excelOutput => '$_userDataDir\\ExcelExport';
+
   String get mediaDir => '$_userDataDir\\Media';
   String get newDataDir => '$_userDataDir\\NewData';
   String get questionDir => '$_userDataDir\\Questions';
@@ -31,6 +33,7 @@ class StorageHandler {
 
     await sh.createFileEntity(sh.mediaDir, StorageType.dir);
     await sh.createFileEntity(sh.newDataDir, StorageType.dir);
+    await sh.createFileEntity(sh._excelOutput, StorageType.dir);
     await sh.createFileEntity(sh.matchSaveFile, StorageType.file);
     await sh.createFileEntity(sh.startSaveFile, StorageType.file);
     await sh.createFileEntity(sh.obstacleSaveFile, StorageType.file);
@@ -52,8 +55,10 @@ class StorageHandler {
     return excelToJson(excel, maxColumnCount);
   }
 
-  Future<void> writeToExcel(String path, Map json) async {
+  Future<void> writeToExcel(String fileName, Map json) async {
+    logger.i('Writing Excel to ${getRelative('$_excelOutput\\$fileName')}');
 
+    final excel = Excel.createExcel();
   }
 
   Future<Map<String, List<Map<String, dynamic>>>> excelToJson(Excel excel, int maxColumnCount) async {

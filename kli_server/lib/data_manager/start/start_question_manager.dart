@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:kli_utils/kli_utils.dart';
 
 import '../../global.dart';
+import 'start_question_editor.dart';
 
 class StartQuestionManager extends StatefulWidget {
   const StartQuestionManager({super.key});
@@ -97,6 +98,7 @@ class _StartQuestionManagerState extends State<StartQuestionManager> {
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
           : Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 managementButtons(),
                 questionList(),
@@ -109,10 +111,8 @@ class _StartQuestionManagerState extends State<StartQuestionManager> {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 32),
       child: Row(
-        mainAxisSize: MainAxisSize.max,
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
-          // select match
           DropdownMenu(
             label: const Text('Match'),
             dropdownMenuEntries: [
@@ -161,7 +161,7 @@ class _StartQuestionManagerState extends State<StartQuestionManager> {
                 )
             ],
             onSelected: (value) async {
-              _sortType = value!;
+              _sortType = value;
               setState(() {});
             },
           ),
@@ -171,7 +171,7 @@ class _StartQuestionManagerState extends State<StartQuestionManager> {
                 ? null
                 : () async {
                     logger.i(
-                      'Selecting Start Question (.xlsx) at ${storageHandler.getRelative(storageHandler.newDataDir)}',
+                      'Selecting Start Questions (.xlsx) at ${storageHandler.getRelative(storageHandler.newDataDir)}',
                     );
 
                     final result = await FilePicker.platform.pickFiles(
@@ -194,6 +194,14 @@ class _StartQuestionManagerState extends State<StartQuestionManager> {
                     logger.i('No file selected');
                   },
           ),
+          button(
+            'Export Excel',
+            _selectedMatchIndex < 0
+                ? null
+                : () async {
+                    logger.i('Exporting match ${_matchNames[_selectedMatchIndex]} to (.xlsx)}');
+                  },
+          ),
         ],
       ),
     );
@@ -212,7 +220,7 @@ class _StartQuestionManagerState extends State<StartQuestionManager> {
         margin: const EdgeInsets.symmetric(vertical: 32, horizontal: 96),
         decoration: BoxDecoration(
           border: Border.all(width: 2, color: Theme.of(context).colorScheme.primaryContainer),
-          borderRadius: BorderRadius.circular(2),
+          borderRadius: BorderRadius.circular(20),
         ),
         child: Column(
           children: [
@@ -229,7 +237,16 @@ class _StartQuestionManagerState extends State<StartQuestionManager> {
                     q.question,
                     q.answer,
                     onTap: () async {
-                      // open dialog to modify question
+                      final newQ = await Navigator.of(context).push<StartQuestion>(DialogRoute<StartQuestion>(
+                        context: context,
+                        barrierDismissible: false,
+                        barrierLabel: '',
+                        builder: (_) => StartEditorDialog(question: q),
+                      ));
+                      if (newQ != null) {
+                        _questions[index] = newQ;
+                        await overwriteSave();
+                      }
                       setState(() {});
                     },
                   );

@@ -1,54 +1,35 @@
-import 'dart:io';
-
-import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:kli_utils/kli_utils.dart';
 
 import '../../global.dart';
 
 class StartEditorDialog extends StatefulWidget {
-  final KLIMatch? match;
-  final Iterable<String> matchNames;
-  const StartEditorDialog({super.key, this.match, required this.matchNames});
+  final StartQuestion question;
+  const StartEditorDialog({super.key, required this.question});
 
   @override
   State<StartEditorDialog> createState() => _StartEditorDialogState();
 }
 
 class _StartEditorDialogState extends State<StartEditorDialog> {
-  final TextEditingController _matchNameController = TextEditingController();
-  final List<TextEditingController> _playerNameControllers = [
-    TextEditingController(),
-    TextEditingController(),
-    TextEditingController(),
-    TextEditingController(),
-  ];
-  final _imagePaths = List<String>.filled(4, '');
-
-  String _matchNameError = '';
-  bool _disableDone = true, _setNewMatch = false;
+  final _questionController = TextEditingController();
+  final _answerController = TextEditingController();
+  late QuestionSubject _type;
+  String? _qErrorText, _aErrorText;
 
   @override
   void initState() {
     super.initState();
-    _disableDone = _setNewMatch = widget.match == null;
-    logger.i(
-      'Match editor: ${_setNewMatch ? ' New' : '${widget.match?.name}'}',
-    );
-    if (_setNewMatch) return;
-
-    _matchNameController.text = widget.match!.name;
-    for (int i = 0; i < widget.match!.playerList.length; i++) {
-      _playerNameControllers[i].text = widget.match!.playerList[i]?.name ?? '';
-      _imagePaths[i] = widget.match!.playerList[i]?.imagePath ?? '';
-    }
+    logger.i('Opened start question editor');
+    _questionController.text = widget.question.question;
+    _answerController.text = widget.question.answer;
+    _type = widget.question.subject;
   }
 
   @override
   void dispose() {
-    for (var c in [_matchNameController, ..._playerNameControllers]) {
-      c.dispose();
-    }
+    _questionController.dispose();
+    _answerController.dispose();
     super.dispose();
   }
 
@@ -59,88 +40,102 @@ class _StartEditorDialogState extends State<StartEditorDialog> {
       body: AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         titlePadding: const EdgeInsets.symmetric(vertical: 32, horizontal: 256),
-        title: TextField(
-          onChanged: (value) {
-            if (value.isEmpty) {
-              _matchNameError = 'Can\'t be empty';
-              _disableDone = true;
-              setState(() {});
-              return;
-            }
-            if (value != widget.match?.name && widget.matchNames.contains(value)) {
-              _matchNameError = 'Already exists';
-              _disableDone = true;
-              setState(() {});
-              return;
-            }
-            setState(() {
-              _matchNameError = '';
-              _disableDone = false;
-            });
+        title: DropdownMenu(
+          label: const Text('Type'),
+          initialSelection: _type,
+          dropdownMenuEntries: [
+            for (final s in QuestionSubject.values)
+              DropdownMenuEntry(
+                value: s,
+                label: StartQuestion.mapTypeDisplay(s),
+              )
+          ],
+          onSelected: (value) async {
+            _type = value!;
+            setState(() {});
           },
-          controller: _matchNameController,
-          decoration: InputDecoration(
-            labelText: 'Match Name',
-            labelStyle: TextStyle(
-              fontWeight: FontWeight.w600,
-              color: Theme.of(context).colorScheme.primary,
-            ),
-            errorText: _matchNameError.isEmpty ? null : _matchNameError,
-            border: const OutlineInputBorder(),
-          ),
         ),
-        contentPadding: const EdgeInsets.only(bottom: 40),
+        contentPadding: const EdgeInsets.only(bottom: 40, left: 60, right: 60),
         content: Column(
           mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [for (int i = 0; i < 4; i++) playerWidget(i)],
+            TextField(
+              onChanged: (value) {
+                if (value.isEmpty) {
+                  _qErrorText = 'Can\'t be empty';
+                  setState(() {});
+                  return;
+                }
+                setState(() => _qErrorText = null);
+              },
+              controller: _questionController,
+              decoration: InputDecoration(
+                labelText: 'Question',
+                labelStyle: TextStyle(
+                  fontWeight: FontWeight.w600,
+                  color: Theme.of(context).colorScheme.primary,
+                ),
+                errorText: _qErrorText,
+                border: const OutlineInputBorder(),
+              ),
+            ),
+            const SizedBox(height: 30),
+            TextField(
+              onChanged: (value) {
+                if (value.isEmpty) {
+                  _aErrorText = 'Can\'t be empty';
+                  setState(() {});
+                  return;
+                }
+                setState(() => _aErrorText = null);
+              },
+              controller: _answerController,
+              decoration: InputDecoration(
+                labelText: 'Answer',
+                labelStyle: TextStyle(
+                  fontWeight: FontWeight.w600,
+                  color: Theme.of(context).colorScheme.primary,
+                ),
+                errorText: _aErrorText,
+                border: const OutlineInputBorder(),
+              ),
             ),
           ],
         ),
         actionsAlignment: MainAxisAlignment.spaceAround,
         actions: <Widget>[
           TextButton(
-            onPressed: _disableDone
-                ? null
-                : () {
-                    if (_matchNameController.text.isEmpty) {
-                      showToastMessage(context, 'Match name can\'t be empty');
-                      return;
-                    }
+            onPressed: () {
+              if (_questionController.text.isEmpty) {
+                showToastMessage(context, 'Question can\'t be empty');
+                return;
+              }
+              if (_answerController.text.isEmpty) {
+                showToastMessage(context, 'Answer can\'t be empty');
+                return;
+              }
 
-                    for (var e in _playerNameControllers) {
-                      if (e.value.text.isNotEmpty && _imagePaths[_playerNameControllers.indexOf(e)].isEmpty) {
-                        showToastMessage(
-                          context,
-                          'Please select an image for player ${_playerNameControllers.indexOf(e) + 1}',
-                        );
-                        return;
-                      }
-                      if (e.value.text.isEmpty && _imagePaths[_playerNameControllers.indexOf(e)].isNotEmpty) {
-                        showToastMessage(
-                          context,
-                          'Player ${_playerNameControllers.indexOf(e) + 1} name can\'t be empty',
-                        );
-                        return;
-                      }
-                    }
+              bool hasChanged = _questionController.text != widget.question.question ||
+                  _answerController.text != widget.question.answer ||
+                  _type != widget.question.subject;
 
-                    final newMatch = KLIMatch(
-                      _matchNameController.text,
-                      _playerNameControllers.map((c) {
-                        return c.text.isEmpty
-                            ? null
-                            : KLIPlayer(c.text, _imagePaths[_playerNameControllers.indexOf(c)]);
-                      }).toList(),
-                    );
+              if (!hasChanged) {
+                logger.i('No change, exiting');
+                Navigator.of(context).pop();
+                return;
+              }
+              final newQ = StartQuestion(
+                _type,
+                _questionController.text,
+                _answerController.text,
+                widget.question.match,
+                widget.question.playerPos,
+              );
 
-                    logger.i('${_setNewMatch ? 'New' : 'Modified'} match: ${newMatch.name}');
-
-                    Navigator.of(context).pop(newMatch);
-                  },
+              logger.i('Modified question: ${newQ.subject.name}, ${newQ.match}, pos=${newQ.playerPos}');
+              Navigator.of(context).pop(newQ);
+            },
             child: const Text('Done', style: TextStyle(fontSize: fontSizeMedium)),
           ),
           TextButton(
@@ -154,70 +149,6 @@ class _StartEditorDialogState extends State<StartEditorDialog> {
             },
           ),
         ],
-      ),
-    );
-  }
-
-  Widget playerWidget(int index) {
-    return Expanded(
-      child: Container(
-        margin: const EdgeInsets.symmetric(horizontal: 32),
-        child: Column(
-          children: [
-            Text(
-              'Player ${index + 1}',
-              textAlign: TextAlign.center,
-              style: const TextStyle(fontSize: fontSizeMedium),
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 8),
-              child: TextField(
-                controller: _playerNameControllers[index],
-                decoration: InputDecoration(
-                  labelText: 'Name',
-                  labelStyle: TextStyle(
-                    fontWeight: FontWeight.w600,
-                    color: Theme.of(context).colorScheme.primary,
-                  ),
-                  border: const OutlineInputBorder(),
-                ),
-              ),
-            ),
-            Container(
-              margin: const EdgeInsets.symmetric(vertical: 8),
-              decoration: BoxDecoration(border: Border.all(width: 1, color: Colors.black54)),
-              constraints: const BoxConstraints(maxHeight: 400, maxWidth: 300, minHeight: 1, minWidth: 260),
-              child: _imagePaths[index].isEmpty
-                  ? Container(
-                      margin: const EdgeInsets.symmetric(horizontal: 20),
-                      alignment: Alignment.center,
-                      child: const Text('No Image'),
-                    )
-                  : Image.file(
-                      File('${storageHandler.parentFolder}\\${_imagePaths[index]}'),
-                      fit: BoxFit.contain,
-                    ),
-            ),
-            ElevatedButton(
-              child: const Text('Select Image'),
-              onPressed: () async {
-                logger.i('Selecting image at ${storageHandler.getRelative(storageHandler.mediaDir)}');
-                final result = await FilePicker.platform.pickFiles(
-                  dialogTitle: 'Select image',
-                  initialDirectory: storageHandler.mediaDir.replaceAll('/', '\\'),
-                  type: FileType.image,
-                );
-
-                if (result != null) {
-                  final p = result.files.single.path!;
-                  _imagePaths[index] = storageHandler.getRelative(p);
-                  logger.i('Chose ${_imagePaths[index]} for player ${index + 1}');
-                  setState(() {});
-                }
-              },
-            ),
-          ],
-        ),
       ),
     );
   }
