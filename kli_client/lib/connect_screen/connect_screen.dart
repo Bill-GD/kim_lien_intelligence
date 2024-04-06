@@ -22,10 +22,6 @@ class _ConnectPageState extends State<ConnectPage> {
   @override
   void initState() {
     super.initState();
-    kliClient.onMessageReceived.listen((newMessage) {
-      _serverMessage = newMessage.msg;
-      setState(() {});
-    });
   }
 
   @override
@@ -82,6 +78,10 @@ class _ConnectPageState extends State<ConnectPage> {
                     await initClient(ip, _playerId);
                     setState(() => _isConnected = true);
 
+                    kliClient.onMessageReceived.listen((newMessage) {
+                      _serverMessage = newMessage.msg;
+                      setState(() {});
+                    });
                     if (context.mounted) {
                       showToastMessage(
                         context,

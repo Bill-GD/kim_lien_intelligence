@@ -62,8 +62,8 @@ dev_dependencies:
 # flutter_launcher_icons:
 #   windows:
 #     generate: true
-#     image_path: 'windows\runner\resources\app_icon.ico'
-#     icon_size: 48 # min:48, max:256, default: 48
+#     image_path: 'assets\images\ttkl_logo.png'
+#     icon_size: 256 # min:48, max:256, default: 48
 
 # The following section is specific to Flutter packages.
 flutter:
