@@ -11,7 +11,7 @@ class StorageHandler {
   final String _userDataDir;
 
   String get mediaDir => '$_userDataDir\\Media';
-  String get excelDir => '$_userDataDir\\NewData';
+  String get newDataDir => '$_userDataDir\\NewData';
   String get questionDir => '$_userDataDir\\Questions';
 
   String get matchSaveFile => '$_userDataDir\\match.txt';
@@ -30,7 +30,7 @@ class StorageHandler {
     final sh = StorageHandler(prefixPath.replaceAll('/', '\\'));
 
     await sh.createFileEntity(sh.mediaDir, StorageType.dir);
-    await sh.createFileEntity(sh.excelDir, StorageType.dir);
+    await sh.createFileEntity(sh.newDataDir, StorageType.dir);
     await sh.createFileEntity(sh.matchSaveFile, StorageType.file);
     await sh.createFileEntity(sh.startSaveFile, StorageType.file);
     await sh.createFileEntity(sh.obstacleSaveFile, StorageType.file);
@@ -43,12 +43,17 @@ class StorageHandler {
 
   // D:/Downloads/KĐ trận BK1.xlsx
   // D:/Downloads/output.txt
+  /// Return: ```{tableName: [rows]}```
   Future readFromExcel(String path, int maxColumnCount) async {
-    logger.i('Reading from $path');
+    logger.i('Reading Excel from ${getRelative(path)}');
 
     final bytes = await File(path).readAsBytes();
     final excel = Excel.decodeBytes(bytes);
     return excelToJson(excel, maxColumnCount);
+  }
+
+  Future<void> writeToExcel(String path, Map json) async {
+
   }
 
   Future<Map<String, List<Map<String, dynamic>>>> excelToJson(Excel excel, int maxColumnCount) async {
@@ -109,7 +114,7 @@ class StorageHandler {
       if (f.existsSync()) return;
 
       await (f is File ? f.create(recursive: true) : (f as Directory).create(recursive: true));
-      logger.i('Created: $path');
+      logger.i('Created: ${getRelative(path)}');
     } on PathExistsException {
       return;
     }

@@ -21,7 +21,7 @@ class _MatchManagerState extends State<MatchManager> {
 
   @override
   void initState() {
-    super.initState();
+    logger.i('Match manager init');
     storageHandler.readFromFile(storageHandler.matchSaveFile).then((value) {
       if (value.isNotEmpty) {
         _matches = (jsonDecode(value) as List).map((e) => KLIMatch.fromJson(e)).toList();
@@ -31,6 +31,7 @@ class _MatchManagerState extends State<MatchManager> {
       setState(() => _isLoading = false);
       logger.i('Loaded ${_matches.length} matches');
     });
+    super.initState();
   }
 
   Future<void> overwriteSave() async {
@@ -55,7 +56,6 @@ class _MatchManagerState extends State<MatchManager> {
               child: Column(
                 children: [
                   managementButtons(),
-                  // data viewer
                   Expanded(
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -162,16 +162,6 @@ class _MatchManagerState extends State<MatchManager> {
           ),
         ],
       ),
-    );
-  }
-
-  Widget button(final String label, void Function()? onPressed) {
-    return ElevatedButton(
-      style: const ButtonStyle(
-        padding: MaterialStatePropertyAll<EdgeInsets>(EdgeInsets.all(20)),
-      ),
-      onPressed: onPressed,
-      child: Text(label, style: const TextStyle(fontSize: fontSizeMedium)),
     );
   }
 

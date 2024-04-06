@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:flutter/material.dart';
 import 'package:kli_utils/kli_utils.dart';
 import 'package:logger/logger.dart';
 import 'package:package_info_plus/package_info_plus.dart';
@@ -27,3 +28,13 @@ Future<void> initStorageHandler() async {
 }
 
 // late final KLIServer kliServer;
+
+Widget button(final String label, void Function()? onPressed) {
+  return ElevatedButton(
+    style: const ButtonStyle(
+      padding: MaterialStatePropertyAll<EdgeInsets>(EdgeInsets.all(20)),
+    ),
+    onPressed: onPressed,
+    child: Text(label, style: const TextStyle(fontSize: fontSizeMedium)),
+  );
+}

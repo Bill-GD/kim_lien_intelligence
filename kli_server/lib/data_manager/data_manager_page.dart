@@ -49,6 +49,7 @@ class _DataManagerPageState extends State<DataManagerPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.transparent,
       body: Row(
         children: [
           SideNavigationBar(
@@ -114,6 +115,7 @@ class _DataManagerPageState extends State<DataManagerPage> {
                   height: 2,
                 ),
               ),
+              backgroundColor: Theme.of(context).colorScheme.background,
               togglerTheme: SideNavigationBarTogglerTheme.standard(),
               dividerTheme: SideNavigationBarDividerTheme.standard(),
             ),

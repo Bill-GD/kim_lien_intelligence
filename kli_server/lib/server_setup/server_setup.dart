@@ -3,6 +3,8 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:kli_utils/kli_utils.dart';
 
+import '../global.dart';
+
 class ServerSetupPage extends StatefulWidget {
   const ServerSetupPage({super.key});
 
@@ -47,6 +49,7 @@ class _ServerSetupPageState extends State<ServerSetupPage> {
       onPopInvoked: (pop) {
         if (pop) return;
         if (!KLIServer.started) {
+          logger.i('Leaving Server Setup page...');
           Navigator.pop(context);
           return;
         }
@@ -114,16 +117,16 @@ class _ServerSetupPageState extends State<ServerSetupPage> {
                 },
                 child: const Text("Stop Server"),
               ),
-              DropdownButton(
-                value: chosenClientID.isEmpty ? null : chosenClientID,
-                items: [
+              DropdownMenu(
+                label: const Text('Client'),
+                dropdownMenuEntries: [
                   for (var i = 0; i < Networking.listOfClient.length; i++)
-                    DropdownMenuItem(
+                    DropdownMenuEntry(
                       value: KLIServer.mapIDToIndex.keys.elementAt(i),
-                      child: Text(Networking.listOfClient[i]),
+                      label: Networking.listOfClient[i],
                     )
                 ],
-                onChanged: (value) {
+                onSelected: (value) {
                   chosenClientID = value!;
                   setState(() {});
                 },
