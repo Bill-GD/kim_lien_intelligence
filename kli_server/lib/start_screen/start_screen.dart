@@ -90,7 +90,7 @@ class _StartPageState extends State<StartPage> {
                   labelTextStyle: const TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: fontSizeMSmall,
-                    height: 2,
+                    height: 3,
                   ),
                 ),
                 togglerTheme: SideNavigationBarTogglerTheme.standard(),
@@ -101,21 +101,14 @@ class _StartPageState extends State<StartPage> {
               child: Stack(
                 alignment: Alignment.topRight,
                 children: [
-                  CloseButton(
-                    color: Colors.amber,
-                    onPressed: () {
-                      exit(0);
-                    },
-                  ),
+                  CloseButton(onPressed: () => exit(0)),
                   Center(
                     child: [
                       ElevatedButton(
                         onPressed: () {
                           logger.i('Opening Data Manager page...');
                           Navigator.of(context).push(
-                            MaterialPageRoute(
-                              builder: (context) => const DataManagerPage(),
-                            ),
+                            MaterialPageRoute(builder: (context) => const DataManagerPage()),
                           );
                         },
                         child: const Text('Open Data Manager', style: TextStyle(fontSize: fontSizeLarge)),
@@ -124,9 +117,7 @@ class _StartPageState extends State<StartPage> {
                         onPressed: () async {
                           logger.i('Opening Server Setup page...');
                           await Navigator.of(context).push(
-                            MaterialPageRoute(
-                              builder: (context) => const ServerSetupPage(),
-                            ),
+                            MaterialPageRoute(builder: (context) => const ServerSetupPage()),
                           );
                           await KLIServer.stop();
                         },

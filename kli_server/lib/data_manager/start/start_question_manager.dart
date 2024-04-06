@@ -227,7 +227,13 @@ class _StartQuestionManagerState extends State<StartQuestionManager> {
                       }
                     }
 
-                    storageHandler.writeToExcel(fileName, newData);
+                    await storageHandler.writeToExcel(fileName, newData);
+                    if (mounted) {
+                      showToastMessage(
+                        context,
+                        'Saved to ${storageHandler.getRelative(storageHandler.excelOutput)}/$fileName',
+                      );
+                    }
                   },
           ),
         ],
@@ -252,7 +258,7 @@ class _StartQuestionManagerState extends State<StartQuestionManager> {
         ),
         child: Column(
           children: [
-            customListTile('Thí sinh', 'Subject', 'Question', 'Answer'),
+            customListTile('Thí sinh', 'Subject', 'Question', 'Answer', background: true),
             Flexible(
               child: ListView.builder(
                 itemCount: filtered.length,
@@ -287,14 +293,23 @@ class _StartQuestionManagerState extends State<StartQuestionManager> {
     );
   }
 
-  Widget customListTile(String col1, String col2, String col3, String col4, {void Function()? onTap}) {
+  Widget customListTile(
+    String col1,
+    String col2,
+    String col3,
+    String col4, {
+    bool background = false,
+    void Function()? onTap,
+  }) {
     return MouseRegion(
       cursor: onTap != null ? SystemMouseCursors.click : SystemMouseCursors.basic,
-      child: GestureDetector(
+      child: InkWell(
         onTap: onTap,
         child: Container(
           padding: const EdgeInsets.only(right: 24, top: 24, bottom: 24),
           decoration: BoxDecoration(
+            borderRadius: background ? const BorderRadius.vertical(top: Radius.circular(20)) : null,
+            color: background ? Theme.of(context).colorScheme.background : null,
             border: Border(
               bottom: BorderSide(width: 2, color: Theme.of(context).colorScheme.primaryContainer),
             ),

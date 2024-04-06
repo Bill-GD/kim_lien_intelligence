@@ -10,7 +10,7 @@ class StorageHandler {
   String get parentFolder => _parentFolder;
   final String _userDataDir;
 
-  String get _excelOutput => '$_userDataDir\\ExcelExport';
+  String get excelOutput => '$_userDataDir\\ExcelExport';
 
   String get mediaDir => '$_userDataDir\\Media';
   String get newDataDir => '$_userDataDir\\NewData';
@@ -33,7 +33,7 @@ class StorageHandler {
 
     await sh.createFileEntity(sh.mediaDir, StorageType.dir);
     await sh.createFileEntity(sh.newDataDir, StorageType.dir);
-    await sh.createFileEntity(sh._excelOutput, StorageType.dir);
+    await sh.createFileEntity(sh.excelOutput, StorageType.dir);
     await sh.createFileEntity(sh.matchSaveFile, StorageType.file);
     await sh.createFileEntity(sh.startSaveFile, StorageType.file);
     await sh.createFileEntity(sh.obstacleSaveFile, StorageType.file);
@@ -56,7 +56,7 @@ class StorageHandler {
   }
 
   Future<void> writeToExcel(String fileName, Map<String, dynamic> json) async {
-    logger.i('Writing Excel to ${getRelative('$_excelOutput\\$fileName')}');
+    logger.i('Writing Excel to ${getRelative('$excelOutput\\$fileName')}');
 
     final columnTitles = ((json.values.elementAt(0) as List)[0] as Map<String, dynamic>).keys.toList();
 
@@ -84,7 +84,7 @@ class StorageHandler {
     }
     excel.delete('Sheet1');
 
-    await File('$_excelOutput\\$fileName').writeAsBytes(excel.encode()!);
+    await File('$excelOutput\\$fileName').writeAsBytes(excel.encode()!);
   }
 
   Future<Map<String, List<Map<String, dynamic>>>> excelToJson(Excel excel, int maxColumnCount) async {
