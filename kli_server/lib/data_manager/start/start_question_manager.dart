@@ -15,12 +15,12 @@ class StartQuestionManager extends StatefulWidget {
 }
 
 class _StartQuestionManagerState extends State<StartQuestionManager> {
-  bool _isLoading = true;
-  List<String> _matchNames = [];
-  int _selectedMatchIndex = -1;
-  List<StartQuestion> _questions = [];
-  int _sortPlayerPos = -1;
-  QuestionSubject? _sortType;
+  bool isLoading = true;
+  List<String> matchNames = [];
+  int selectedMatchIndex = -1;
+  List<StartQuestion> questions = [];
+  int sortPlayerPos = -1;
+  QuestionSubject? sortType;
 
   @override
   void initState() {
@@ -28,9 +28,9 @@ class _StartQuestionManagerState extends State<StartQuestionManager> {
     logger.i('Start question manager init');
     storageHandler.readFromFile(storageHandler.matchSaveFile).then((value) {
       if (value.isNotEmpty) {
-        _matchNames = (jsonDecode(value) as Iterable).map((e) => e['name'] as String).toList();
+        matchNames = (jsonDecode(value) as Iterable).map((e) => e['name'] as String).toList();
       }
-      setState(() => _isLoading = false);
+      setState(() => isLoading = false);
     });
   }
 
@@ -38,33 +38,36 @@ class _StartQuestionManagerState extends State<StartQuestionManager> {
     logger.i('Getting saved question');
     final saved = await storageHandler.readFromFile(storageHandler.startSaveFile);
     if (saved.isNotEmpty) {
-      _questions = (jsonDecode(saved) as List).map((e) => StartQuestion.fromJson(e)).toList();
+      questions = (jsonDecode(saved) as List)
+          .map((e) => StartQuestion.fromJson(e))
+          .where((e) => e.match == matchNames[selectedMatchIndex])
+          .toList();
       setState(() {});
     }
-    logger.i('Loaded ${_questions.length} questions from saved');
+    logger.i('Loaded ${questions.length} questions from saved');
   }
 
   Future<void> getNewQuestion(String path) async {
     Map<String, List> data = await storageHandler.readFromExcel(path, 3);
-    _questions = [];
+    questions = [];
 
     logger.i('Extracting data from excel');
     int idx = 0;
     for (var name in data.keys) {
-      _questions.addAll((data[name] as List<Map>).map((e) {
+      questions.addAll((data[name] as List<Map>).map((e) {
         final v = e.values;
         final q = StartQuestion(
           StartQuestion.mapType(v.elementAt(0)),
           v.elementAt(1),
           v.elementAt(2),
-          _matchNames[_selectedMatchIndex],
+          matchNames[selectedMatchIndex],
           idx,
         );
         return q;
       }));
       idx++;
     }
-    logger.i('Loaded ${_questions.length} questions from excel');
+    logger.i('Loaded ${questions.length} questions from excel');
   }
 
   Future<void> overwriteSave() async {
@@ -73,13 +76,13 @@ class _StartQuestionManagerState extends State<StartQuestionManager> {
     List<StartQuestion> savedList;
 
     if (saved.isEmpty) {
-      savedList = _questions.map((e) => e).toList();
+      savedList = questions.map((e) => e).toList();
     } else {
       savedList = (jsonDecode(saved) as List).map((e) => StartQuestion.fromJson(e)).toList();
     }
 
-    savedList.removeWhere((e) => e.match == _matchNames[_selectedMatchIndex]);
-    savedList.addAll(_questions);
+    savedList.removeWhere((e) => e.match == matchNames[selectedMatchIndex]);
+    savedList.addAll(questions);
 
     await storageHandler.writeToFile(storageHandler.startSaveFile, jsonEncode(savedList));
   }
@@ -95,7 +98,7 @@ class _StartQuestionManagerState extends State<StartQuestionManager> {
         centerTitle: true,
         toolbarHeight: kToolbarHeight * 1.1,
       ),
-      body: _isLoading
+      body: isLoading
           ? const Center(child: CircularProgressIndicator())
           : Column(
               crossAxisAlignment: CrossAxisAlignment.center,
@@ -116,15 +119,15 @@ class _StartQuestionManagerState extends State<StartQuestionManager> {
           DropdownMenu(
             label: const Text('Match'),
             dropdownMenuEntries: [
-              for (var i = 0; i < _matchNames.length; i++)
+              for (var i = 0; i < matchNames.length; i++)
                 DropdownMenuEntry(
-                  value: _matchNames[i],
-                  label: _matchNames[i],
+                  value: matchNames[i],
+                  label: matchNames[i],
                 )
             ],
             onSelected: (value) async {
-              _selectedMatchIndex = _matchNames.indexOf(value!);
-              logger.i('Selected match: ${_matchNames[_selectedMatchIndex]}');
+              selectedMatchIndex = matchNames.indexOf(value!);
+              logger.i('Selected match: ${matchNames[selectedMatchIndex]}');
               await getSavedQuestion();
               setState(() {});
             },
@@ -133,7 +136,7 @@ class _StartQuestionManagerState extends State<StartQuestionManager> {
           DropdownMenu(
             label: const Text('Sort'),
             initialSelection: -1,
-            enabled: _selectedMatchIndex >= 0,
+            enabled: selectedMatchIndex >= 0,
             dropdownMenuEntries: [
               const DropdownMenuEntry(value: -1, label: 'None'),
               for (var i = 0; i < 4; i++)
@@ -143,7 +146,7 @@ class _StartQuestionManagerState extends State<StartQuestionManager> {
                 )
             ],
             onSelected: (value) async {
-              _sortPlayerPos = value!;
+              sortPlayerPos = value!;
               setState(() {});
             },
           ),
@@ -151,7 +154,7 @@ class _StartQuestionManagerState extends State<StartQuestionManager> {
           DropdownMenu(
             label: const Text('Sort'),
             initialSelection: null,
-            enabled: _selectedMatchIndex >= 0,
+            enabled: selectedMatchIndex >= 0,
             dropdownMenuEntries: [
               const DropdownMenuEntry(value: null, label: 'None'),
               for (final s in QuestionSubject.values)
@@ -161,13 +164,13 @@ class _StartQuestionManagerState extends State<StartQuestionManager> {
                 )
             ],
             onSelected: (value) async {
-              _sortType = value;
+              sortType = value;
               setState(() {});
             },
           ),
           button(
-            'Add Question',
-            _selectedMatchIndex < 0
+            'Import Questions',
+            selectedMatchIndex < 0
                 ? null
                 : () async {
                     logger.i(
@@ -184,7 +187,7 @@ class _StartQuestionManagerState extends State<StartQuestionManager> {
                     if (result != null) {
                       final p = result.files.single.path!;
                       logger.i(
-                        'Chose ${storageHandler.getRelative(p)} for match ${_matchNames[_selectedMatchIndex]}',
+                        'Chose ${storageHandler.getRelative(p)} for match ${matchNames[selectedMatchIndex]}',
                       );
                       await getNewQuestion(p);
                       await overwriteSave();
@@ -196,10 +199,35 @@ class _StartQuestionManagerState extends State<StartQuestionManager> {
           ),
           button(
             'Export Excel',
-            _selectedMatchIndex < 0
+            selectedMatchIndex < 0
                 ? null
                 : () async {
-                    logger.i('Exporting match ${_matchNames[_selectedMatchIndex]} to (.xlsx)}');
+                    String fileName =
+                        'KĐ_${matchNames[selectedMatchIndex]}_${DateTime.now().toString().split('.').first.replaceAll(RegExp('[:-]'), '_')}.xlsx';
+                    logger.i('Exporting ${matchNames[selectedMatchIndex]} start questions to $fileName');
+
+                    final data =
+                        jsonDecode(await storageHandler.readFromFile(storageHandler.startSaveFile)) as List;
+
+                    final newData = <String, List>{};
+
+                    for (final Map<String, dynamic> q in data) {
+                      final kName = 'Thí sinh ${q['playerPos'] + 1}';
+                      final qMap = {
+                        'Loại câu hỏi':
+                            StartQuestion.mapTypeDisplay(QuestionSubject.values.byName(q['subject'])),
+                        'Nội dung': q['question'],
+                        'Đáp án': q['answer'],
+                      };
+
+                      if (newData[kName] == null) {
+                        newData[kName] = [qMap];
+                      } else {
+                        newData[kName]!.add(qMap);
+                      }
+                    }
+
+                    storageHandler.writeToExcel(fileName, newData);
                   },
           ),
         ],
@@ -208,10 +236,10 @@ class _StartQuestionManagerState extends State<StartQuestionManager> {
   }
 
   Widget questionList() {
-    List<StartQuestion> filtered = _questions.where((e) {
+    List<StartQuestion> filtered = questions.where((e) {
       bool res = true;
-      if (_sortType != null) res = res && e.subject == _sortType;
-      if (_sortPlayerPos >= 0) res = res && e.playerPos == _sortPlayerPos;
+      if (sortType != null) res = res && e.subject == sortType;
+      if (sortPlayerPos >= 0) res = res && e.playerPos == sortPlayerPos;
       return res;
     }).toList();
 
@@ -244,7 +272,7 @@ class _StartQuestionManagerState extends State<StartQuestionManager> {
                         builder: (_) => StartEditorDialog(question: q),
                       ));
                       if (newQ != null) {
-                        _questions[index] = newQ;
+                        questions[index] = newQ;
                         await overwriteSave();
                       }
                       setState(() {});

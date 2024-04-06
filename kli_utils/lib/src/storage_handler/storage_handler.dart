@@ -55,10 +55,36 @@ class StorageHandler {
     return excelToJson(excel, maxColumnCount);
   }
 
-  Future<void> writeToExcel(String fileName, Map json) async {
+  Future<void> writeToExcel(String fileName, Map<String, dynamic> json) async {
     logger.i('Writing Excel to ${getRelative('$_excelOutput\\$fileName')}');
 
+    final columnTitles = ((json.values.elementAt(0) as List)[0] as Map<String, dynamic>).keys.toList();
+
     final excel = Excel.createExcel();
+
+    for (final String tableName in json.keys) {
+      Sheet sheetObject = excel[tableName];
+
+      // first row
+      for (var i = 0; i < columnTitles.length; i++) {
+        sheetObject.cell(CellIndex.indexByColumnRow(columnIndex: i, rowIndex: 0)).value =
+            TextCellValue(columnTitles[i]);
+      }
+
+      int rIdx = 1;
+      final data = json[tableName] as List;
+      for (var i = 0; i < data.length; i++) {
+        final row = data[i].values;
+        for (var j = 0; j < row.length; j++) {
+          sheetObject.cell(CellIndex.indexByColumnRow(columnIndex: j, rowIndex: rIdx)).value =
+              TextCellValue(row.elementAt(j));
+        }
+        rIdx++;
+      }
+    }
+    excel.delete('Sheet1');
+
+    await File('$_excelOutput\\$fileName').writeAsBytes(excel.encode()!);
   }
 
   Future<Map<String, List<Map<String, dynamic>>>> excelToJson(Excel excel, int maxColumnCount) async {
