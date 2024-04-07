@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../global.dart';
+import '../global_export.dart';
 
 void showToastMessage(BuildContext context, String message) {
   ScaffoldMessenger.of(context).showSnackBar(
@@ -20,7 +21,7 @@ void showBackDialog(BuildContext context, String confirmMessage, String logMessa
           TextButton(
             child: const Text('Yes'),
             onPressed: () {
-              logger.i(logMessage);
+              logMessageController.add(MapEntry(LogType.info, logMessage));
               Navigator.pop(context);
               Navigator.pop(context);
             },

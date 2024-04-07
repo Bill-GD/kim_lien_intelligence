@@ -1,11 +1,14 @@
 import 'dart:io';
 
 import 'package:excel/excel.dart';
+import 'package:kli_utils/src/global_export.dart';
 
 import '../global.dart';
 
 class StorageHandler {
-  // these are reletive to exe path
+  // these are relative to exe path
+  String get logFile => '$_parentFolder\\log.txt';
+
   final String _parentFolder;
   String get parentFolder => _parentFolder;
   final String _userDataDir;
@@ -27,13 +30,14 @@ class StorageHandler {
   StorageHandler(this._parentFolder) : _userDataDir = '$_parentFolder\\UserData';
 
   static Future<StorageHandler> init(String prefixPath) async {
-    logger.i('StorageHandler init');
+    logMessageController.add(const MapEntry(LogType.info, 'StorageHandler init'));
 
     final sh = StorageHandler(prefixPath.replaceAll('/', '\\'));
 
     await sh.createFileEntity(sh.mediaDir, StorageType.dir);
     await sh.createFileEntity(sh.newDataDir, StorageType.dir);
     await sh.createFileEntity(sh.excelOutput, StorageType.dir);
+    await sh.createFileEntity(sh.logFile, StorageType.file);
     await sh.createFileEntity(sh.matchSaveFile, StorageType.file);
     await sh.createFileEntity(sh.startSaveFile, StorageType.file);
     await sh.createFileEntity(sh.obstacleSaveFile, StorageType.file);
@@ -44,11 +48,9 @@ class StorageHandler {
     return sh;
   }
 
-  // D:/Downloads/KĐ trận BK1.xlsx
-  // D:/Downloads/output.txt
   /// Return: ```{tableName: [rows]}```
   Future readFromExcel(String path, int maxColumnCount) async {
-    logger.i('Reading Excel from ${getRelative(path)}');
+    logMessageController.add(MapEntry(LogType.info, 'Reading Excel from ${getRelative(path)}'));
 
     final bytes = await File(path).readAsBytes();
     final excel = Excel.decodeBytes(bytes);
@@ -56,7 +58,8 @@ class StorageHandler {
   }
 
   Future<void> writeToExcel(String fileName, Map<String, dynamic> json) async {
-    logger.i('Writing Excel to ${getRelative('$excelOutput\\$fileName')}');
+    logMessageController
+        .add(MapEntry(LogType.info, 'Writing Excel to ${getRelative('$excelOutput\\$fileName')}'));
 
     final columnTitles = ((json.values.elementAt(0) as List)[0] as Map<String, dynamic>).keys.toList();
 
@@ -124,12 +127,12 @@ class StorageHandler {
   }
 
   Future<String> readFromFile(String path) async {
-    logger.i('Read from ${getRelative(path)}');
+    logMessageController.add(MapEntry(LogType.info, 'Read from ${getRelative(path)}'));
     return await File(path).readAsString();
   }
 
   Future<void> writeToFile(String path, String data) async {
-    logger.i('Write to ${getRelative(path)}');
+    logMessageController.add(MapEntry(LogType.info, 'Write to ${getRelative(path)}'));
     await File(path).writeAsString(data);
   }
 
@@ -145,7 +148,7 @@ class StorageHandler {
       if (f.existsSync()) return;
 
       await (f is File ? f.create(recursive: true) : (f as Directory).create(recursive: true));
-      logger.i('Created: ${getRelative(path)}');
+      logMessageController.add(MapEntry(LogType.info, 'Created: ${getRelative(path)}'));
     } on PathExistsException {
       return;
     }

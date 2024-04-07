@@ -4,6 +4,7 @@ import 'dart:io';
 import 'dart:typed_data';
 
 import '../global.dart';
+import '../global_export.dart';
 import 'networking.dart';
 
 class KLIClient {
@@ -21,7 +22,7 @@ class KLIClient {
   Stream<KLISocketMessage> get onMessageReceived => _onMessageReceivedController.stream;
 
   static Future<KLIClient> init(String ip, String clientID, [int port = 8080]) async {
-    logger.i('Trying to connect to: $ip');
+    logMessageController.add(MapEntry(LogType.info, 'Trying to connect to: $ip'));
 
     final s = KLIClient(await Socket.connect(ip, port).timeout(
       const Duration(seconds: 3),
@@ -30,10 +31,10 @@ class KLIClient {
       },
     ));
 
-    logger.i('Connected to $ip as $clientID');
+    logMessageController.add(MapEntry(LogType.info, 'Connected to $ip as $clientID'));
 
     s._socket!.write(KLISocketMessage(clientID, clientID, KLIMessageType.sendID));
-    logger.i('Sent ID ($clientID) to server');
+    logMessageController.add(MapEntry(LogType.info, 'Sent ID ($clientID) to server'));
 
     s._socket.listen(s.handleIncomingMessage);
 
@@ -42,7 +43,7 @@ class KLIClient {
 
   void handleIncomingMessage(Uint8List data) {
     final serverMessage = KLISocketMessage.fromJson(jsonDecode(String.fromCharCodes(data).trim()));
-    logger.i('[Server, ${serverMessage.type}] ${serverMessage.msg}');
+    logMessageController.add(MapEntry(LogType.info, '[Server, ${serverMessage.type}] ${serverMessage.msg}'));
     _onMessageReceivedController.add(serverMessage);
   }
 

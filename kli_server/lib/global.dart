@@ -6,9 +6,11 @@ import 'package:logger/logger.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
 late final Logger logger;
-
-void initLogger() {
-  logger = Logger(printer: SimplePrinter());
+void initLogger(String logPath) {
+  logger = Logger(
+    printer: SimplePrinter(),
+    output: FileOutput(file: File(storageHandler!.logFile), overrideExisting: true),
+  );
   logger.i('Logger init');
 }
 
@@ -24,7 +26,6 @@ Future<void> initStorageHandler() async {
 
   final rawDir = Platform.resolvedExecutable.split(Platform.executable).first;
   String parentFolder = rawDir.substring(0, rawDir.length - 1).replaceAll('\\', '/');
-  logger.i('Parent folder path: $parentFolder');
 
   storageHandler = await StorageHandler.init(parentFolder);
 }

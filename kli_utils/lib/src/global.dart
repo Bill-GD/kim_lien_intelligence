@@ -1,3 +1,5 @@
-import 'package:logger/logger.dart';
+import 'dart:async';
 
-final logger = Logger(printer: SimplePrinter());
+import 'global_export.dart';
+
+final logMessageController = StreamController<MapEntry<LogType, String>>.broadcast();

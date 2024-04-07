@@ -6,6 +6,7 @@ export 'src/match/kli_player.dart';
 export 'src/networking/networking_export.dart';
 export 'src/question/questions_export.dart';
 export 'src/widget/widgets.dart';
+export 'src/global_export.dart';
 
 const double fontSizeXL = 48;
 const double fontSizeLarge = 32;

@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import '../global.dart';
+import '../global_export.dart';
 import 'networking.dart';
 
 class KLIServer {
@@ -41,7 +42,7 @@ class KLIServer {
     String ip = await Networking.getLocalIP();
 
     _serverSocket = await ServerSocket.bind(InternetAddress(ip, type: InternetAddressType.IPv4), port);
-    logger.i('Server started on ${_serverSocket?.address}');
+    logMessageController.add(MapEntry(LogType.info, 'Server started on ${_serverSocket?.address}'));
 
     _serverSocket!.listen((Socket clientSocket) {
       clientSocket.listen(
@@ -61,10 +62,10 @@ class KLIServer {
           String cID = mapIDToIndex.keys.firstWhere((e) => mapIDToIndex[e] == idx);
 
           _onClientConnectivityChangedController.add(true);
-          logger.i('Client $cID disconnected');
+          logMessageController.add(MapEntry(LogType.info, 'Client $cID disconnected'));
         },
         onError: (error) {
-          logger.e(error.toString());
+          logMessageController.add(MapEntry(LogType.error, error.toString()));
         },
       );
     });
@@ -73,7 +74,7 @@ class KLIServer {
   static void sendMessage(String clientID, KLISocketMessage message) {
     Socket? client = getClient(clientID);
     if (client == null) {
-      logger.i('Client $clientID not connected, aborting');
+      logMessageController.add(MapEntry(LogType.info, 'Client $clientID not connected, aborting'));
       return;
     }
 
@@ -85,18 +86,21 @@ class KLIServer {
     int idx = getClientIndex(clientID);
 
     if (idx < 0) {
-      logger.w('Trying to assign to index -1, aborting');
+      logMessageController.add(const MapEntry(LogType.warn, 'Trying to assign to index -1, aborting'));
       return;
     }
 
     _clientList[idx] = clientSocket;
-    logger.i('Client $clientID connected, saved to index $idx');
+    logMessageController.add(MapEntry(LogType.info, 'Client $clientID connected, saved to index $idx'));
 
     _onClientConnectivityChangedController.add(true);
   }
 
   static void handleClientMessage(Socket clientSocket, KLISocketMessage socMsg) {
-    logger.i('[${clientSocket.address.address}, ${socMsg.senderID}, ${socMsg.type}] ${socMsg.msg}');
+    logMessageController.add(MapEntry(
+      LogType.info,
+      '[${clientSocket.address.address}, ${socMsg.senderID}, ${socMsg.type}] ${socMsg.msg}',
+    ));
     _onClientMessageController.add(socMsg);
   }
 
@@ -107,7 +111,7 @@ class KLIServer {
   static Socket? getClient(String clientID) {
     int idx = getClientIndex(clientID);
     if (idx < 0) {
-      logger.w('Trying to assign to index -1, aborting');
+      logMessageController.add(const MapEntry(LogType.warn, 'Trying to assign to index -1, aborting'));
       return null;
     }
     return clientAt(idx);
@@ -116,13 +120,13 @@ class KLIServer {
   static Future<void> stop() async {
     if (!started) return;
 
-    logger.i('Disconnecting all clients');
+    logMessageController.add(const MapEntry(LogType.info, 'Disconnecting all clients'));
     for (final client in _clientList) {
       client?.destroy();
     }
     _clientList = List.generate(_maxConnectionCount, (_) => null);
 
-    logger.i('Closing server socket');
+    logMessageController.add(const MapEntry(LogType.info, 'Closing server socket'));
     _onClientConnectivityChangedController.close();
     _onClientMessageController.close();
     await _serverSocket?.close();

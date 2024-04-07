@@ -1,0 +1,5 @@
+[38;5;12m[I][0m  Logger init
+[38;5;12m[I][0m  PackageInfo init
+[38;5;12m[I][0m  Opening Data Manager page...
+[38;5;12m[I][0m  Match manager init
+[38;5;12m[I][0m  Loaded 1 matches

@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:theme_provider/theme_provider.dart';
 import 'package:window_manager/window_manager.dart';
+import 'package:kli_utils/kli_utils.dart';
 
 import 'global.dart';
 import 'start_screen/start_screen.dart';
@@ -12,8 +13,21 @@ import 'start_screen/start_screen.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  initLogger();
+  await initStorageHandler();
+  initLogger(storageHandler!.logFile);
+  storageHandler = null;
   await initPackageInfo();
+  logMessageStream.listen((message) {
+    if (message.key == LogType.info) {
+      logger.i(message.value);
+    }
+    if (message.key == LogType.warn) {
+      logger.w(message.value);
+    }
+    if (message.key == LogType.error) {
+      logger.e(message.value);
+    }
+  });
 
   if (!kIsWeb && (Platform.isLinux || Platform.isMacOS || Platform.isWindows)) {
     await windowManager.ensureInitialized();
