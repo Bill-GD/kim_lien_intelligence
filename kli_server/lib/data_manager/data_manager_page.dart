@@ -47,6 +47,13 @@ class _DataManagerPageState extends State<DataManagerPage> {
   }
 
   @override
+  void dispose() {
+    logger.i('Disposing storage handler...');
+    storageHandler = null;
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.transparent,

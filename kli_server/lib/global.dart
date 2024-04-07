@@ -18,8 +18,10 @@ Future<void> initPackageInfo() async {
   logger.i('PackageInfo init');
 }
 
-late final StorageHandler storageHandler;
+StorageHandler? storageHandler;
 Future<void> initStorageHandler() async {
+  if (storageHandler != null) return;
+  
   final rawDir = Platform.resolvedExecutable.split(Platform.executable).first;
   String parentFolder = rawDir.substring(0, rawDir.length - 1).replaceAll('\\', '/');
   logger.i('Parent folder path: $parentFolder');
@@ -27,12 +29,10 @@ Future<void> initStorageHandler() async {
   storageHandler = await StorageHandler.init(parentFolder);
 }
 
-// late final KLIServer kliServer;
-
-Widget button(final String label, void Function()? onPressed) {
-  return ElevatedButton(
+Widget button(BuildContext context, final String label, void Function()? onPressed) {
+  return OutlinedButton(
     style: const ButtonStyle(
-      padding: MaterialStatePropertyAll<EdgeInsets>(EdgeInsets.all(20)),
+      padding: MaterialStatePropertyAll<EdgeInsets>(EdgeInsets.symmetric(vertical: 25, horizontal: 15)),
     ),
     onPressed: onPressed,
     child: Text(label, style: const TextStyle(fontSize: fontSizeMedium)),

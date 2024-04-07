@@ -25,7 +25,7 @@ class _StartQuestionManagerState extends State<StartQuestionManager> {
   void initState() {
     super.initState();
     logger.i('Start question manager init');
-    storageHandler.readFromFile(storageHandler.matchSaveFile).then((value) async {
+    storageHandler!.readFromFile(storageHandler!.matchSaveFile).then((value) async {
       if (value.isNotEmpty) {
         matchNames = (jsonDecode(value) as Iterable).map((e) => e['name'] as String).toList();
       }
@@ -36,7 +36,7 @@ class _StartQuestionManagerState extends State<StartQuestionManager> {
 
   Future<List<StartQuestion>> getAllSavedQuestions() async {
     logger.i('Getting all saved questions');
-    final saved = await storageHandler.readFromFile(storageHandler.startSaveFile);
+    final saved = await storageHandler!.readFromFile(storageHandler!.startSaveFile);
     if (saved.isEmpty) return [];
     final q = (jsonDecode(saved) as List).map((e) => StartQuestion.fromJson(e)).toList();
     return q;
@@ -52,7 +52,7 @@ class _StartQuestionManagerState extends State<StartQuestionManager> {
   }
 
   Future<void> getNewQuestion(String path) async {
-    Map<String, List> data = await storageHandler.readFromExcel(path, 3);
+    Map<String, List> data = await storageHandler!.readFromExcel(path, 3);
     questions = [];
 
     logger.i('Extracting data from excel');
@@ -105,7 +105,7 @@ class _StartQuestionManagerState extends State<StartQuestionManager> {
 
   Future<void> overwriteSave(List<StartQuestion> q) async {
     logger.i('Overwriting save');
-    await storageHandler.writeToFile(storageHandler.startSaveFile, jsonEncode(q));
+    await storageHandler!.writeToFile(storageHandler!.startSaveFile, jsonEncode(q));
   }
 
   @override
@@ -190,6 +190,7 @@ class _StartQuestionManagerState extends State<StartQuestionManager> {
             },
           ),
           button(
+            context,
             'Import Questions',
             selectedMatchIndex < 0
                 ? null
@@ -198,7 +199,7 @@ class _StartQuestionManagerState extends State<StartQuestionManager> {
 
                     final result = await FilePicker.platform.pickFiles(
                       dialogTitle: 'Select File',
-                      initialDirectory: storageHandler.newDataDir.replaceAll('/', '\\'),
+                      initialDirectory: storageHandler!.newDataDir.replaceAll('/', '\\'),
                       type: FileType.custom,
                       allowedExtensions: ['xlsx'],
                     );
@@ -206,7 +207,7 @@ class _StartQuestionManagerState extends State<StartQuestionManager> {
                     if (result != null) {
                       final p = result.files.single.path!;
                       logger.i(
-                        'Chose ${storageHandler.getRelative(p)} for match ${matchNames[selectedMatchIndex]}',
+                        'Chose ${storageHandler!.getRelative(p)} for match ${matchNames[selectedMatchIndex]}',
                       );
                       await getNewQuestion(p);
                       await saveNewQuestions();
@@ -217,6 +218,7 @@ class _StartQuestionManagerState extends State<StartQuestionManager> {
                   },
           ),
           button(
+            context,
             'Export Excel',
             selectedMatchIndex < 0
                 ? null
@@ -226,7 +228,7 @@ class _StartQuestionManagerState extends State<StartQuestionManager> {
                     logger.i('Exporting ${matchNames[selectedMatchIndex]} start questions to $fileName');
 
                     final data =
-                        jsonDecode(await storageHandler.readFromFile(storageHandler.startSaveFile)) as List;
+                        jsonDecode(await storageHandler!.readFromFile(storageHandler!.startSaveFile)) as List;
 
                     final newData = <String, List>{};
 
@@ -246,16 +248,17 @@ class _StartQuestionManagerState extends State<StartQuestionManager> {
                       }
                     }
 
-                    await storageHandler.writeToExcel(fileName, newData);
+                    await storageHandler!.writeToExcel(fileName, newData);
                     if (mounted) {
                       showToastMessage(
                         context,
-                        'Saved to ${storageHandler.getRelative(storageHandler.excelOutput)}/$fileName',
+                        'Saved to ${storageHandler!.getRelative(storageHandler!.excelOutput)}/$fileName',
                       );
                     }
                   },
           ),
           button(
+            context,
             'Remove Questions',
             selectedMatchIndex < 0
                 ? null
@@ -315,7 +318,7 @@ class _StartQuestionManagerState extends State<StartQuestionManager> {
         margin: const EdgeInsets.symmetric(vertical: 32, horizontal: 96),
         decoration: BoxDecoration(
           border: Border.all(width: 2, color: Theme.of(context).colorScheme.primaryContainer),
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(10),
         ),
         child: Column(
           children: [

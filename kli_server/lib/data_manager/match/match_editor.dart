@@ -194,23 +194,23 @@ class _MatchEditorDialogState extends State<MatchEditorDialog> {
                       child: const Text('No Image'),
                     )
                   : Image.file(
-                      File('${storageHandler.parentFolder}\\${_imagePaths[index]}'),
+                      File('${storageHandler!.parentFolder}\\${_imagePaths[index]}'),
                       fit: BoxFit.contain,
                     ),
             ),
             ElevatedButton(
               child: const Text('Select Image'),
               onPressed: () async {
-                logger.i('Selecting image at ${storageHandler.getRelative(storageHandler.mediaDir)}');
+                logger.i('Selecting image at ${storageHandler!.getRelative(storageHandler!.mediaDir)}');
                 final result = await FilePicker.platform.pickFiles(
                   dialogTitle: 'Select image',
-                  initialDirectory: storageHandler.mediaDir.replaceAll('/', '\\'),
+                  initialDirectory: storageHandler!.mediaDir.replaceAll('/', '\\'),
                   type: FileType.image,
                 );
 
                 if (result != null) {
                   final p = result.files.single.path!;
-                  _imagePaths[index] = storageHandler.getRelative(p);
+                  _imagePaths[index] = storageHandler!.getRelative(p);
                   logger.i('Chose ${_imagePaths[index]} for player ${index + 1}');
                   setState(() {});
                 }

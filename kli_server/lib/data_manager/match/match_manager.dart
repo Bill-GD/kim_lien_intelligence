@@ -22,7 +22,7 @@ class _MatchManagerState extends State<MatchManager> {
   @override
   void initState() {
     logger.i('Match manager init');
-    storageHandler.readFromFile(storageHandler.matchSaveFile).then((value) {
+    storageHandler!.readFromFile(storageHandler!.matchSaveFile).then((value) {
       if (value.isNotEmpty) {
         _matches = (jsonDecode(value) as List).map((e) => KLIMatch.fromJson(e)).toList();
         _currentMatchIndex = -1;
@@ -35,7 +35,7 @@ class _MatchManagerState extends State<MatchManager> {
   }
 
   Future<void> overwriteSave() async {
-    await storageHandler.writeToFile(storageHandler.matchSaveFile, jsonEncode(_matches));
+    await storageHandler!.writeToFile(storageHandler!.matchSaveFile, jsonEncode(_matches));
   }
 
   @override
@@ -79,6 +79,7 @@ class _MatchManagerState extends State<MatchManager> {
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
           button(
+            context,
             'Add Match',
             () async {
               final newMatch = await Navigator.of(context).push<KLIMatch>(
@@ -98,6 +99,7 @@ class _MatchManagerState extends State<MatchManager> {
             },
           ),
           button(
+            context,
             'Modify Match${_currentMatchIndex < 0 ? '' : ': ${_matches[_currentMatchIndex].name}'}',
             _currentMatchIndex < 0
                 ? null
@@ -122,6 +124,7 @@ class _MatchManagerState extends State<MatchManager> {
                   },
           ),
           button(
+            context,
             'Remove Match',
             _currentMatchIndex < 0
                 ? null
@@ -259,7 +262,7 @@ class _MatchManagerState extends State<MatchManager> {
                   child: Padding(
                     padding: const EdgeInsets.only(bottom: 35),
                     child: Image.file(
-                      File('${storageHandler.parentFolder}\\${p[index]?.imagePath}'),
+                      File('${storageHandler!.parentFolder}\\${p[index]?.imagePath}'),
                       fit: BoxFit.cover,
                     ),
                   ),
