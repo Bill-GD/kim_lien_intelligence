@@ -1,13 +1,15 @@
 import 'package:kli_utils/src/question/obstable/obstacle_question.dart';
 
 class ObstacleMatch {
-  final String keyword;
-  final List<ObstacleQuestion> hintQuestions;
-  final String imagePath;
-  final String explanation;
-  final int charCount;
+  String match;
+  String keyword;
+  List<ObstacleQuestion> hintQuestions;
+  String imagePath;
+  String explanation;
+  int charCount;
 
   ObstacleMatch({
+    required this.match,
     required this.keyword,
     required this.hintQuestions,
     required this.imagePath,
@@ -16,6 +18,7 @@ class ObstacleMatch {
   });
 
   Map<String, dynamic> toJson() => {
+        'match': match,
         'keyword': keyword,
         'hintQuestions': hintQuestions.map((e) => e.toJson()).toList(),
         'imagePath': imagePath,
@@ -24,6 +27,7 @@ class ObstacleMatch {
       };
 
   static ObstacleMatch fromJson(Map<String, dynamic> json) => ObstacleMatch(
+        match: json['match'],
         keyword: json['keyword'],
         hintQuestions: (json['hintQuestions'] as List).map((e) => ObstacleQuestion.fromJson(e)).toList(),
         imagePath: json['imagePath'],

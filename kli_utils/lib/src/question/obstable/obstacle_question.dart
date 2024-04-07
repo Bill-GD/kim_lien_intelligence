@@ -15,10 +15,10 @@ class ObstacleQuestion {
 
   factory ObstacleQuestion.fromJson(Map<String, dynamic> json) {
     return ObstacleQuestion(
-      int.parse(json['id']),
+      json['id'],
       json['question'],
       json['answer'],
-      int.parse(json['charCount']),
+      json['charCount'],
     );
   }
 }

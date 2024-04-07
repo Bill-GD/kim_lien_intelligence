@@ -193,8 +193,8 @@ class _MatchManagerState extends State<MatchManager> {
                       itemBuilder: (_, index) => ListTile(
                         title: Text(_matches[index].name, style: const TextStyle(fontSize: fontSizeMedium)),
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(20),
-                          side: BorderSide(width: 2, color: Theme.of(context).colorScheme.primaryContainer),
+                          borderRadius: BorderRadius.circular(10),
+                          side: BorderSide(width: 2, color: Theme.of(context).colorScheme.onBackground),
                         ),
                         onTap: () {
                           _currentMatchIndex = index;

@@ -21,7 +21,7 @@ Future<void> initPackageInfo() async {
 StorageHandler? storageHandler;
 Future<void> initStorageHandler() async {
   if (storageHandler != null) return;
-  
+
   final rawDir = Platform.resolvedExecutable.split(Platform.executable).first;
   String parentFolder = rawDir.substring(0, rawDir.length - 1).replaceAll('\\', '/');
   logger.i('Parent folder path: $parentFolder');

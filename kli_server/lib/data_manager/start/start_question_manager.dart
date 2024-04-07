@@ -317,7 +317,7 @@ class _StartQuestionManagerState extends State<StartQuestionManager> {
       child: Container(
         margin: const EdgeInsets.symmetric(vertical: 32, horizontal: 96),
         decoration: BoxDecoration(
-          border: Border.all(width: 2, color: Theme.of(context).colorScheme.primaryContainer),
+          border: Border.all(width: 2, color: Theme.of(context).colorScheme.onBackground),
           borderRadius: BorderRadius.circular(10),
         ),
         child: Column(
@@ -370,7 +370,7 @@ class _StartQuestionManagerState extends State<StartQuestionManager> {
           padding: const EdgeInsets.only(right: 24, top: 24, bottom: 24),
           decoration: BoxDecoration(
             border: Border(
-              bottom: BorderSide(width: 2, color: Theme.of(context).colorScheme.primaryContainer),
+              bottom: BorderSide(width: 2, color: Theme.of(context).colorScheme.onBackground),
             ),
           ),
           child: Row(
