@@ -199,7 +199,7 @@ class _ObstacleQuestionManagerState extends State<ObstacleQuestionManager> {
                     logger.i('No file selected');
                   },
           ),
-          button(context, 'Export Excel', null),
+          Tooltip(message: 'Not available yet', child: button(context, 'Export Excel', null)),
           button(
             context,
             'Remove Questions',

@@ -37,8 +37,12 @@ class _ObstacleEditorDialogState extends State<ObstacleEditorDialog> {
       backgroundColor: Colors.transparent,
       body: AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        titlePadding: const EdgeInsets.symmetric(vertical: 32, horizontal: 256),
-        contentPadding: const EdgeInsets.symmetric(vertical: 40, horizontal: 60),
+        titlePadding: const EdgeInsets.symmetric(vertical: 40, horizontal: 256),
+        contentPadding: const EdgeInsets.only(bottom: 32, left: 60, right: 60),
+        title: Text(
+          widget.question.id < 4 ? 'Question 0${widget.question.id + 1}' : 'Middle',
+          textAlign: TextAlign.center,
+        ),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           mainAxisAlignment: MainAxisAlignment.spaceAround,
