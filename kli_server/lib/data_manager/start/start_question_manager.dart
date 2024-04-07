@@ -17,7 +17,7 @@ class StartQuestionManager extends StatefulWidget {
 class _StartQuestionManagerState extends State<StartQuestionManager> {
   bool isLoading = true;
   List<String> matchNames = [];
-  List<StartQuestion> questions = [];
+  StartMatch? selectedMatch;
   int selectedMatchIndex = -1, sortPlayerPos = -1;
   QuestionSubject? sortType;
 
@@ -34,44 +34,47 @@ class _StartQuestionManagerState extends State<StartQuestionManager> {
     });
   }
 
-  Future<List<StartQuestion>> getAllSavedQuestions() async {
+  Future<List<StartMatch>> getAllSavedQuestions() async {
     logger.i('Getting all saved questions');
     final saved = await storageHandler!.readFromFile(storageHandler!.startSaveFile);
     if (saved.isEmpty) return [];
-    final q = (jsonDecode(saved) as List).map((e) => StartQuestion.fromJson(e)).toList();
+    final q = (jsonDecode(saved) as List).map((e) => StartMatch.fromJson(e)).toList();
     return q;
   }
 
   Future<void> loadMatchQuestions(String match) async {
     final saved = await getAllSavedQuestions();
-    if (saved.isNotEmpty) {
-      questions = saved.where((e) => e.match == match).toList();
+    if (saved.isEmpty) return;
+
+    try {
+      selectedMatch = saved.firstWhere((e) => e.match == match);
       setState(() {});
+      logger.i('Loaded ${selectedMatch!.questionCount} questions of match ${selectedMatch!.match}');
+    } on StateError {
+      selectedMatch = null;
     }
-    logger.i('Loaded ${questions.length} questions of match $match from saved');
   }
 
   Future<void> getNewQuestion(String path) async {
     Map<String, List> data = await storageHandler!.readFromExcel(path, 3);
-    questions = [];
 
     logger.i('Extracting data from excel');
+
+    final Map<int, List<StartQuestion>> allQ = {};
     int idx = 0;
     for (var name in data.keys) {
-      questions.addAll((data[name] as List<Map>).map((e) {
+      final List<StartQuestion> questions = [];
+
+      for (final e in (data[name] as List<Map>)) {
         final v = e.values;
-        final q = StartQuestion(
-          StartQuestion.mapType(v.elementAt(0)),
-          v.elementAt(1),
-          v.elementAt(2),
-          matchNames[selectedMatchIndex],
-          idx,
-        );
-        return q;
-      }));
+        final q = StartQuestion(StartQuestion.mapType(v.elementAt(0)), v.elementAt(1), v.elementAt(2));
+        questions.add(q);
+      }
+      allQ.putIfAbsent(idx, () => questions);
       idx++;
     }
-    logger.i('Loaded ${questions.length} questions from excel');
+    selectedMatch = StartMatch(match: matchNames[selectedMatchIndex], questions: allQ);
+    logger.i('Loaded ${selectedMatch!.questionCount} questions from excel');
   }
 
   Future<void> removeDeletedMatchQuestions() async {
@@ -81,29 +84,29 @@ class _StartQuestionManagerState extends State<StartQuestionManager> {
     await overwriteSave(saved);
   }
 
-  Future<void> removeMatchQuestions(String match) async {
+  Future<void> removeMatch(StartMatch sMatch) async {
     logger.i('Removing questions of match: ${matchNames[selectedMatchIndex]}');
     var saved = await getAllSavedQuestions();
-    saved.removeWhere((e) => e.match == match);
+    saved.removeWhere((e) => e.match == sMatch.match);
     await overwriteSave(saved);
   }
 
   Future<void> saveNewQuestions() async {
     logger.i('Saving new questions of match: ${matchNames[selectedMatchIndex]}');
     final saved = await getAllSavedQuestions();
-    saved.addAll(questions);
+    saved.add(selectedMatch!);
     await overwriteSave(saved);
   }
 
-  Future<void> updateSavedQuestions(String match) async {
+  Future<void> updateQuestions(StartMatch sMatch) async {
     logger.i('Updating questions of match: ${matchNames[selectedMatchIndex]}');
     final saved = await getAllSavedQuestions();
-    saved.removeWhere((e) => e.match == match);
-    saved.addAll(questions);
+    saved.removeWhere((e) => e.match == sMatch.match);
+    saved.add(sMatch);
     await overwriteSave(saved);
   }
 
-  Future<void> overwriteSave(List<StartQuestion> q) async {
+  Future<void> overwriteSave(List<StartMatch> q) async {
     logger.i('Overwriting save');
     await storageHandler!.writeToFile(storageHandler!.startSaveFile, jsonEncode(q));
   }
@@ -217,45 +220,48 @@ class _StartQuestionManagerState extends State<StartQuestionManager> {
                     logger.i('No file selected');
                   },
           ),
-          button(
-            context,
-            'Export Excel',
-            selectedMatchIndex < 0
-                ? null
-                : () async {
-                    String fileName =
-                        'KĐ_${matchNames[selectedMatchIndex]}_${DateTime.now().toString().split('.').first.replaceAll(RegExp('[:-]'), '_')}.xlsx';
-                    logger.i('Exporting ${matchNames[selectedMatchIndex]} start questions to $fileName');
+          Tooltip(
+            message: 'Can\'t use right now',
+            child: button(
+                context,
+                'Export Excel',
+                // selectedMatchIndex < 0 ?
+                null
+                // : () async {
+                //     String fileName =
+                //         'KĐ_${matchNames[selectedMatchIndex]}_${DateTime.now().toString().split('.').first.replaceAll(RegExp('[:-]'), '_')}.xlsx';
+                //     logger.i('Exporting ${matchNames[selectedMatchIndex]} start questions to $fileName');
 
-                    final data =
-                        jsonDecode(await storageHandler!.readFromFile(storageHandler!.startSaveFile)) as List;
+                //     final data =
+                //         jsonDecode(await storageHandler!.readFromFile(storageHandler!.startSaveFile)) as List;
 
-                    final newData = <String, List>{};
+                //     final newData = <String, List>{};
 
-                    for (final Map<String, dynamic> q in data) {
-                      final kName = 'Thí sinh ${q['playerPos'] + 1}';
-                      final qMap = {
-                        'Loại câu hỏi':
-                            StartQuestion.mapTypeDisplay(QuestionSubject.values.byName(q['subject'])),
-                        'Nội dung': q['question'],
-                        'Đáp án': q['answer'],
-                      };
+                //     for (final Map<String, dynamic> q in data) {
+                //       final kName = 'Thí sinh ${q['playerPos'] + 1}';
+                //       final qMap = {
+                //         'Loại câu hỏi':
+                //             StartQuestion.mapTypeDisplay(QuestionSubject.values.byName(q['subject'])),
+                //         'Nội dung': q['question'],
+                //         'Đáp án': q['answer'],
+                //       };
 
-                      if (newData[kName] == null) {
-                        newData[kName] = [qMap];
-                      } else {
-                        newData[kName]!.add(qMap);
-                      }
-                    }
+                //       if (newData[kName] == null) {
+                //         newData[kName] = [qMap];
+                //       } else {
+                //         newData[kName]!.add(qMap);
+                //       }
+                //     }
 
-                    await storageHandler!.writeToExcel(fileName, newData);
-                    if (mounted) {
-                      showToastMessage(
-                        context,
-                        'Saved to ${storageHandler!.getRelative(storageHandler!.excelOutput)}/$fileName',
-                      );
-                    }
-                  },
+                //     await storageHandler!.writeToExcel(fileName, newData);
+                //     if (mounted) {
+                //       showToastMessage(
+                //         context,
+                //         'Saved to ${storageHandler!.getRelative(storageHandler!.excelOutput)}/$fileName',
+                //       );
+                //     }
+                //   },
+                ),
           ),
           button(
             context,
@@ -294,8 +300,8 @@ class _StartQuestionManagerState extends State<StartQuestionManager> {
                         context,
                         'Removed questions for match: ${matchNames[selectedMatchIndex]}',
                       );
-                      questions = [];
-                      await removeMatchQuestions(matchNames[selectedMatchIndex]);
+                      await removeMatch(selectedMatch!);
+                      selectedMatch = null;
                       setState(() {});
                     });
                   },
@@ -306,12 +312,16 @@ class _StartQuestionManagerState extends State<StartQuestionManager> {
   }
 
   Widget questionList() {
-    List<StartQuestion> filtered = questions.where((e) {
-      bool res = true;
-      if (sortType != null) res = res && e.subject == sortType;
-      if (sortPlayerPos >= 0) res = res && e.playerPos == sortPlayerPos;
-      return res;
-    }).toList();
+    List<MapEntry<MapEntry<int, int>, StartQuestion>> filtered = [];
+    if (selectedMatch != null) {
+      selectedMatch!.questions.forEach((pos, qL) {
+        for (int i = 0; i < qL.length; i++) {
+          if (sortType != null && qL[i].subject != sortType) continue;
+          if (sortPlayerPos >= 0 && pos != sortPlayerPos) continue;
+          filtered.add(MapEntry(MapEntry(pos, i), qL[i]));
+        }
+      });
+    }
 
     return Flexible(
       child: Container(
@@ -332,21 +342,21 @@ class _StartQuestionManagerState extends State<StartQuestionManager> {
                     final q = filtered[index];
 
                     return customListTile(
-                      '${q.playerPos + 1}',
-                      StartQuestion.mapTypeDisplay(q.subject),
-                      q.question,
-                      q.answer,
+                      '${q.key.key + 1}',
+                      StartQuestion.mapTypeDisplay(q.value.subject),
+                      q.value.question,
+                      q.value.answer,
                       onTap: () async {
                         final newQ =
                             await Navigator.of(context).push<StartQuestion>(DialogRoute<StartQuestion>(
                           context: context,
                           barrierDismissible: false,
                           barrierLabel: '',
-                          builder: (_) => StartEditorDialog(question: q),
+                          builder: (_) => StartEditorDialog(question: q.value),
                         ));
                         if (newQ != null) {
-                          questions[index] = newQ;
-                          await updateSavedQuestions(matchNames[selectedMatchIndex]);
+                          selectedMatch!.questions[q.key.key]![q.key.value] = newQ;
+                          await updateQuestions(selectedMatch!);
                         }
                         setState(() {});
                       },

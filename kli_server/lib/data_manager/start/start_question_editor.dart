@@ -136,11 +136,9 @@ class _StartEditorDialogState extends State<StartEditorDialog> {
                 _type,
                 _questionController.text,
                 _answerController.text,
-                widget.question.match,
-                widget.question.playerPos,
               );
 
-              logger.i('Modified question: ${newQ.subject.name}, ${newQ.match}, pos=${newQ.playerPos}');
+              logger.i('Modified question: ${newQ.subject.name}');
               Navigator.of(context).pop(newQ);
             },
             child: const Text('Done', style: TextStyle(fontSize: fontSizeMedium)),

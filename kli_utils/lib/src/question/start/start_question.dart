@@ -4,17 +4,13 @@ class StartQuestion {
   QuestionSubject subject;
   String question;
   String answer;
-  String match;
-  int playerPos;
 
-  StartQuestion(this.subject, this.question, this.answer, this.match, this.playerPos);
+  StartQuestion(this.subject, this.question, this.answer);
 
   Map<String, dynamic> toJson() => {
         'subject': subject.name,
         'question': question,
         'answer': answer,
-        'match': match,
-        'playerPos': playerPos,
       };
 
   factory StartQuestion.fromJson(Map<String, dynamic> json) {
@@ -22,8 +18,6 @@ class StartQuestion {
       QuestionSubject.values.byName(json['subject']),
       json['question'],
       json['answer'],
-      json['match'],
-      json['playerPos'],
     );
   }
 

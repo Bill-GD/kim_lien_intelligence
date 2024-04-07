@@ -2,13 +2,11 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:file_picker/file_picker.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
-import 'package:kli_server/data_manager/obstacle/obstacle_question_editor.dart';
 import 'package:kli_utils/kli_utils.dart';
 
 import '../../global.dart';
+import 'obstacle_question_editor.dart';
 
 class ObstacleQuestionManager extends StatefulWidget {
   const ObstacleQuestionManager({super.key});
@@ -90,7 +88,7 @@ class _ObstacleQuestionManagerState extends State<ObstacleQuestionManager> {
     logger.i('Updating questions of match: ${matchNames[selectedMatchIndex]}');
     final saved = await getAllSavedQuestions();
     saved.removeWhere((e) => e.match == oMatch.match);
-    saved.add(selectedMatch!);
+    saved.add(oMatch);
     await overwriteSave(saved);
   }
 

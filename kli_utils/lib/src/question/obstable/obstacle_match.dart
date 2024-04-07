@@ -1,4 +1,4 @@
-import 'package:kli_utils/src/question/obstable/obstacle_question.dart';
+import 'obstacle_question.dart';
 
 class ObstacleMatch {
   String match;
