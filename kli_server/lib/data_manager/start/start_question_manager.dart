@@ -17,34 +17,38 @@ class StartQuestionManager extends StatefulWidget {
 class _StartQuestionManagerState extends State<StartQuestionManager> {
   bool isLoading = true;
   List<String> matchNames = [];
-  int selectedMatchIndex = -1;
   List<StartQuestion> questions = [];
-  int sortPlayerPos = -1;
+  int selectedMatchIndex = -1, sortPlayerPos = -1;
   QuestionSubject? sortType;
 
   @override
   void initState() {
     super.initState();
     logger.i('Start question manager init');
-    storageHandler.readFromFile(storageHandler.matchSaveFile).then((value) {
+    storageHandler.readFromFile(storageHandler.matchSaveFile).then((value) async {
       if (value.isNotEmpty) {
         matchNames = (jsonDecode(value) as Iterable).map((e) => e['name'] as String).toList();
       }
       setState(() => isLoading = false);
+      await removeDeletedMatchQuestions();
     });
   }
 
-  Future<void> getSavedQuestion() async {
-    logger.i('Getting saved question');
+  Future<List<StartQuestion>> getAllSavedQuestions() async {
+    logger.i('Getting all saved questions');
     final saved = await storageHandler.readFromFile(storageHandler.startSaveFile);
+    if (saved.isEmpty) return [];
+    final q = (jsonDecode(saved) as List).map((e) => StartQuestion.fromJson(e)).toList();
+    return q;
+  }
+
+  Future<void> loadMatchQuestions(String match) async {
+    final saved = await getAllSavedQuestions();
     if (saved.isNotEmpty) {
-      questions = (jsonDecode(saved) as List)
-          .map((e) => StartQuestion.fromJson(e))
-          .where((e) => e.match == matchNames[selectedMatchIndex])
-          .toList();
+      questions = saved.where((e) => e.match == match).toList();
       setState(() {});
     }
-    logger.i('Loaded ${questions.length} questions from saved');
+    logger.i('Loaded ${questions.length} questions of match $match from saved');
   }
 
   Future<void> getNewQuestion(String path) async {
@@ -70,21 +74,38 @@ class _StartQuestionManagerState extends State<StartQuestionManager> {
     logger.i('Loaded ${questions.length} questions from excel');
   }
 
-  Future<void> overwriteSave() async {
+  Future<void> removeDeletedMatchQuestions() async {
+    logger.i('Removing questions of deleted matches');
+    var saved = await getAllSavedQuestions();
+    saved = saved.where((e) => matchNames.contains(e.match)).toList();
+    await overwriteSave(saved);
+  }
+
+  Future<void> removeMatchQuestions(String match) async {
+    logger.i('Removing questions of match: ${matchNames[selectedMatchIndex]}');
+    var saved = await getAllSavedQuestions();
+    saved.removeWhere((e) => e.match == match);
+    await overwriteSave(saved);
+  }
+
+  Future<void> saveNewQuestions() async {
+    logger.i('Saving new questions of match: ${matchNames[selectedMatchIndex]}');
+    final saved = await getAllSavedQuestions();
+    saved.addAll(questions);
+    await overwriteSave(saved);
+  }
+
+  Future<void> updateSavedQuestions(String match) async {
+    logger.i('Updating questions of match: ${matchNames[selectedMatchIndex]}');
+    final saved = await getAllSavedQuestions();
+    saved.removeWhere((e) => e.match == match);
+    saved.addAll(questions);
+    await overwriteSave(saved);
+  }
+
+  Future<void> overwriteSave(List<StartQuestion> q) async {
     logger.i('Overwriting save');
-    final saved = await storageHandler.readFromFile(storageHandler.startSaveFile);
-    List<StartQuestion> savedList;
-
-    if (saved.isEmpty) {
-      savedList = questions.map((e) => e).toList();
-    } else {
-      savedList = (jsonDecode(saved) as List).map((e) => StartQuestion.fromJson(e)).toList();
-    }
-
-    savedList.removeWhere((e) => e.match == matchNames[selectedMatchIndex]);
-    savedList.addAll(questions);
-
-    await storageHandler.writeToFile(storageHandler.startSaveFile, jsonEncode(savedList));
+    await storageHandler.writeToFile(storageHandler.startSaveFile, jsonEncode(q));
   }
 
   @override
@@ -128,7 +149,7 @@ class _StartQuestionManagerState extends State<StartQuestionManager> {
             onSelected: (value) async {
               selectedMatchIndex = matchNames.indexOf(value!);
               logger.i('Selected match: ${matchNames[selectedMatchIndex]}');
-              await getSavedQuestion();
+              await loadMatchQuestions(matchNames[selectedMatchIndex]);
               setState(() {});
             },
           ),
@@ -156,7 +177,7 @@ class _StartQuestionManagerState extends State<StartQuestionManager> {
             initialSelection: null,
             enabled: selectedMatchIndex >= 0,
             dropdownMenuEntries: [
-              const DropdownMenuEntry(value: null, label: 'None'),
+              const DropdownMenuEntry(value: null, label: 'All'),
               for (final s in QuestionSubject.values)
                 DropdownMenuEntry(
                   value: s,
@@ -173,9 +194,7 @@ class _StartQuestionManagerState extends State<StartQuestionManager> {
             selectedMatchIndex < 0
                 ? null
                 : () async {
-                    logger.i(
-                      'Selecting Start Questions (.xlsx) at ${storageHandler.getRelative(storageHandler.newDataDir)}',
-                    );
+                    logger.i('Import new questions (.xlsx)');
 
                     final result = await FilePicker.platform.pickFiles(
                       dialogTitle: 'Select File',
@@ -190,7 +209,7 @@ class _StartQuestionManagerState extends State<StartQuestionManager> {
                         'Chose ${storageHandler.getRelative(p)} for match ${matchNames[selectedMatchIndex]}',
                       );
                       await getNewQuestion(p);
-                      await overwriteSave();
+                      await saveNewQuestions();
                       setState(() {});
                       return;
                     }
@@ -234,6 +253,48 @@ class _StartQuestionManagerState extends State<StartQuestionManager> {
                         'Saved to ${storageHandler.getRelative(storageHandler.excelOutput)}/$fileName',
                       );
                     }
+                  },
+          ),
+          button(
+            'Remove Questions',
+            selectedMatchIndex < 0
+                ? null
+                : () async {
+                    showDialog<bool>(
+                      context: context,
+                      builder: (BuildContext context) {
+                        return AlertDialog(
+                          title: const Text('Confirm Delete'),
+                          content: Text(
+                            'Are you sure you want to delete questions for match: ${matchNames[selectedMatchIndex]}?',
+                          ),
+                          actionsAlignment: MainAxisAlignment.spaceEvenly,
+                          actions: <Widget>[
+                            TextButton(
+                              child: const Text('Yes', style: TextStyle(fontSize: fontSizeMedium)),
+                              onPressed: () {
+                                Navigator.pop(context, true);
+                              },
+                            ),
+                            TextButton(
+                              child: const Text('No', style: TextStyle(fontSize: fontSizeMedium)),
+                              onPressed: () {
+                                Navigator.pop(context, false);
+                              },
+                            ),
+                          ],
+                        );
+                      },
+                    ).then((value) async {
+                      if (value != true) return;
+                      showToastMessage(
+                        context,
+                        'Removed questions for match: ${matchNames[selectedMatchIndex]}',
+                      );
+                      questions = [];
+                      await removeMatchQuestions(matchNames[selectedMatchIndex]);
+                      setState(() {});
+                    });
                   },
           ),
         ],
@@ -282,7 +343,7 @@ class _StartQuestionManagerState extends State<StartQuestionManager> {
                         ));
                         if (newQ != null) {
                           questions[index] = newQ;
-                          await overwriteSave();
+                          await updateSavedQuestions(matchNames[selectedMatchIndex]);
                         }
                         setState(() {});
                       },
