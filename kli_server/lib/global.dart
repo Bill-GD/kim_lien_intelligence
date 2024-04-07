@@ -8,7 +8,7 @@ import 'package:package_info_plus/package_info_plus.dart';
 late final Logger logger;
 void initLogger(String logPath) {
   logger = Logger(
-    printer: SimplePrinter(),
+    printer: SimplePrinter(colors: false),
     output: FileOutput(file: File(storageHandler!.logFile), overrideExisting: true),
   );
   logger.i('Logger init');

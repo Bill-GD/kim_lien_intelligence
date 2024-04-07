@@ -17,16 +17,10 @@ void main() async {
   initLogger(storageHandler!.logFile);
   storageHandler = null;
   await initPackageInfo();
-  logMessageStream.listen((message) {
-    if (message.key == LogType.info) {
-      logger.i(message.value);
-    }
-    if (message.key == LogType.warn) {
-      logger.w(message.value);
-    }
-    if (message.key == LogType.error) {
-      logger.e(message.value);
-    }
+  logMessageStream.listen((m) {
+    if (m.key == LogType.info) logger.i(m.value);
+    if (m.key == LogType.warn) logger.w(m.value);
+    if (m.key == LogType.error) logger.e(m.value);
   });
 
   if (!kIsWeb && (Platform.isLinux || Platform.isMacOS || Platform.isWindows)) {

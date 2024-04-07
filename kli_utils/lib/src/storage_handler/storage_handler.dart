@@ -5,6 +5,8 @@ import 'package:kli_utils/src/global_export.dart';
 
 import '../global.dart';
 
+enum StorageType { file, dir }
+
 class StorageHandler {
   // these are relative to exe path
   String get logFile => '$_parentFolder\\log.txt';
@@ -57,9 +59,59 @@ class StorageHandler {
     return excelToJson(excel, maxColumnCount);
   }
 
+  Future<Map<String, List<Map<String, dynamic>>>> excelToJson(Excel excel, int maxColumnCount) async {
+    logMessageController.add(const MapEntry(LogType.info, 'Format: Excel -> Json'));
+    final res = <String, List<Map<String, dynamic>>>{};
+
+    for (final tableName in excel.tables.keys) {
+      final allRows = excel.tables[tableName]!.rows;
+
+      // attribute name
+      final firstRow = allRows[0];
+      final attributes = firstRow.map((e) => (e?.value).toString()).take(maxColumnCount);
+
+      logMessageController.add(MapEntry(LogType.info, 'First row: ${attributes.join(', ')}'));
+
+      final records = <Map<String, dynamic>>[];
+
+      for (var rIdx = 1; rIdx < allRows.length; rIdx++) {
+        final row = allRows[rIdx];
+
+        // check for empty row
+        final firstCell = row[0];
+        if (firstCell?.value == null) {
+          logMessageController.add(MapEntry(LogType.info, 'row=${rIdx + 1} -> empty -> break'));
+          break;
+        }
+
+        final rec = <String, dynamic>{};
+
+        int cIdx = 0;
+        for (final cell in row) {
+          if (cIdx >= maxColumnCount) {
+            // logMessageController.add(MapEntry(
+            //   LogType.info,
+            //   'row=${rIdx + 1} -> maxColumnCount exceeded -> break',
+            // ));
+            break;
+          }
+
+          rec[attributes.elementAt(cIdx)] = (cell?.value).toString();
+          cIdx++;
+        }
+
+        records.add(rec);
+      }
+      res[tableName] = records;
+    }
+    return res;
+  }
+
   Future<void> writeToExcel(String fileName, Map<String, dynamic> json) async {
-    logMessageController
-        .add(MapEntry(LogType.info, 'Writing Excel to ${getRelative('$excelOutput\\$fileName')}'));
+    logMessageController.add(MapEntry(
+      LogType.info,
+      'Writing Excel to ${getRelative('$excelOutput\\$fileName')}',
+    ));
 
     final columnTitles = ((json.values.elementAt(0) as List)[0] as Map<String, dynamic>).keys.toList();
 
@@ -88,42 +140,7 @@ class StorageHandler {
     excel.delete('Sheet1');
 
     await File('$excelOutput\\$fileName').writeAsBytes(excel.encode()!);
-  }
-
-  Future<Map<String, List<Map<String, dynamic>>>> excelToJson(Excel excel, int maxColumnCount) async {
-    final res = <String, List<Map<String, dynamic>>>{};
-
-    for (final tableName in excel.tables.keys) {
-      final allRows = excel.tables[tableName]!.rows;
-
-      // attribute name
-      final firstRow = allRows[0];
-      final attributes = firstRow.map((e) => (e?.value).toString());
-
-      final records = <Map<String, dynamic>>[];
-
-      for (var rIdx = 1; rIdx < allRows.length; rIdx++) {
-        final row = allRows[rIdx];
-
-        // check for empty row
-        final firstCell = row[0];
-        if (firstCell?.value == null) break;
-
-        final rec = <String, dynamic>{};
-
-        int cIdx = 0;
-        for (final cell in row) {
-          if (cIdx >= maxColumnCount) break;
-
-          rec[attributes.elementAt(cIdx)] = (cell?.value).toString();
-          cIdx++;
-        }
-
-        records.add(rec);
-      }
-      res[tableName] = records;
-    }
-    return res;
+    logMessageController.add(MapEntry(LogType.info, 'Done writing to $excelOutput\\$fileName'));
   }
 
   Future<String> readFromFile(String path) async {
@@ -158,5 +175,3 @@ class StorageHandler {
     return abs.replaceAll(_parentFolder, '').replaceAll('\\', '/');
   }
 }
-
-enum StorageType { file, dir }

@@ -56,7 +56,7 @@ class _StartQuestionManagerState extends State<StartQuestionManager> {
   }
 
   Future<void> getNewQuestion(String path) async {
-    Map<String, List> data = await storageHandler!.readFromExcel(path, 3);
+    Map<String, List> data = await storageHandler!.readFromExcel(path, 4);
 
     logger.i('Extracting data from excel');
 
@@ -67,7 +67,7 @@ class _StartQuestionManagerState extends State<StartQuestionManager> {
 
       for (final e in (data[name] as List<Map>)) {
         final v = e.values;
-        final q = StartQuestion(StartQuestion.mapType(v.elementAt(0)), v.elementAt(1), v.elementAt(2));
+        final q = StartQuestion(StartQuestion.mapType(v.elementAt(1)), v.elementAt(2), v.elementAt(3));
         questions.add(q);
       }
       allQ.putIfAbsent(idx, () => questions);
@@ -94,6 +94,7 @@ class _StartQuestionManagerState extends State<StartQuestionManager> {
   Future<void> saveNewQuestions() async {
     logger.i('Saving new questions of match: ${matchNames[selectedMatchIndex]}');
     final saved = await getAllSavedQuestions();
+    saved.removeWhere((e) => e.match == selectedMatch!.match);
     saved.add(selectedMatch!);
     await overwriteSave(saved);
   }
@@ -171,6 +172,7 @@ class _StartQuestionManagerState extends State<StartQuestionManager> {
             ],
             onSelected: (value) async {
               sortPlayerPos = value!;
+              logger.i('Sort position: $value');
               setState(() {});
             },
           ),
@@ -188,6 +190,7 @@ class _StartQuestionManagerState extends State<StartQuestionManager> {
                 )
             ],
             onSelected: (value) async {
+              logger.i('Sort subject: $value');
               sortType = value;
               setState(() {});
             },
@@ -220,48 +223,50 @@ class _StartQuestionManagerState extends State<StartQuestionManager> {
                     logger.i('No file selected');
                   },
           ),
-          Tooltip(
-            message: 'Can\'t use right now',
-            child: button(
-                context,
-                'Export Excel',
-                // selectedMatchIndex < 0 ?
-                null
-                // : () async {
-                //     String fileName =
-                //         'KĐ_${matchNames[selectedMatchIndex]}_${DateTime.now().toString().split('.').first.replaceAll(RegExp('[:-]'), '_')}.xlsx';
-                //     logger.i('Exporting ${matchNames[selectedMatchIndex]} start questions to $fileName');
+          button(
+            context,
+            'Export Excel',
+            selectedMatchIndex < 0
+                ? null
+                : () async {
+                    String fileName =
+                        'KĐ_${matchNames[selectedMatchIndex]}_${DateTime.now().toString().split('.').first.replaceAll(RegExp('[:-]'), '_')}.xlsx';
+                    logger.i('Exporting ${matchNames[selectedMatchIndex]} start questions to $fileName');
 
-                //     final data =
-                //         jsonDecode(await storageHandler!.readFromFile(storageHandler!.startSaveFile)) as List;
+                    final data = (jsonDecode(
+                      await storageHandler!.readFromFile(storageHandler!.startSaveFile),
+                    ) as List)
+                        .map((e) => StartMatch.fromJson(e))
+                        .toList();
 
-                //     final newData = <String, List>{};
+                    final newData = <String, List>{};
 
-                //     for (final Map<String, dynamic> q in data) {
-                //       final kName = 'Thí sinh ${q['playerPos'] + 1}';
-                //       final qMap = {
-                //         'Loại câu hỏi':
-                //             StartQuestion.mapTypeDisplay(QuestionSubject.values.byName(q['subject'])),
-                //         'Nội dung': q['question'],
-                //         'Đáp án': q['answer'],
-                //       };
+                    int idx = 0;
+                    for (final m in data) {
+                      for (final qL in m.questions.entries) {
+                        final kName = 'Thí sinh ${qL.key + 1}';
+                        final qMap = qL.value.map((q) {
+                          idx++;
+                          return {
+                            'STT': '$idx',
+                            'Loại câu hỏi': StartQuestion.mapTypeDisplay(q.subject),
+                            'Nội dung': q.question,
+                            'Đáp án': q.answer,
+                          };
+                        }).toList();
 
-                //       if (newData[kName] == null) {
-                //         newData[kName] = [qMap];
-                //       } else {
-                //         newData[kName]!.add(qMap);
-                //       }
-                //     }
+                        newData[kName] = qMap;
+                      }
+                    }
 
-                //     await storageHandler!.writeToExcel(fileName, newData);
-                //     if (mounted) {
-                //       showToastMessage(
-                //         context,
-                //         'Saved to ${storageHandler!.getRelative(storageHandler!.excelOutput)}/$fileName',
-                //       );
-                //     }
-                //   },
-                ),
+                    await storageHandler!.writeToExcel(fileName, newData);
+                    if (mounted) {
+                      showToastMessage(
+                        context,
+                        'Saved to ${storageHandler!.getRelative(storageHandler!.excelOutput)}/$fileName',
+                      );
+                    }
+                  },
           ),
           button(
             context,

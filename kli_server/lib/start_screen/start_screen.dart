@@ -101,7 +101,10 @@ class _StartPageState extends State<StartPage> {
               child: Stack(
                 alignment: Alignment.topRight,
                 children: [
-                  CloseButton(onPressed: () => exit(0)),
+                  CloseButton(onPressed: () {
+                    logger.i('Exiting app');
+                    exit(0);
+                  }),
                   Center(
                     child: [
                       ElevatedButton(
