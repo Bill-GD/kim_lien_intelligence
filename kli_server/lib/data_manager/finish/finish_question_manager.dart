@@ -288,6 +288,7 @@ class _FinishQuestionManagerState extends State<FinishQuestionManager> {
                       q.value.answer,
                       q.value.explanation,
                       290,
+                      bottomBorder: !(index == filtered.length - 1),
                       onTap: () async {
                         final newQ =
                             await Navigator.of(context).push<FinishQuestion>(DialogRoute<FinishQuestion>(

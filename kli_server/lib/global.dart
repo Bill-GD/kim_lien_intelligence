@@ -5,10 +5,16 @@ import 'package:kli_utils/kli_utils.dart';
 import 'package:logger/logger.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
+class Filter extends LogFilter {
+  @override
+  bool shouldLog(LogEvent event) => true;
+}
+
 late final Logger logger;
 void initLogger(String logPath) {
   logger = Logger(
     printer: SimplePrinter(colors: false),
+    filter: Filter(),
     output: FileOutput(file: File(storageHandler!.logFile), overrideExisting: true),
   );
   logger.i('Logger init');
@@ -60,6 +66,7 @@ Widget customListTile(
   String col3,
   String col4,
   double width4, {
+  bool bottomBorder = true,
   void Function()? onTap,
 }) {
   return MouseRegion(
@@ -68,11 +75,13 @@ Widget customListTile(
       onTap: onTap,
       child: Container(
         padding: const EdgeInsets.only(right: 24, top: 24, bottom: 24),
-        decoration: BoxDecoration(
-          border: Border(
-            bottom: BorderSide(width: 2, color: Theme.of(context).colorScheme.onBackground),
-          ),
-        ),
+        decoration: bottomBorder
+            ? BoxDecoration(
+                border: Border(
+                  bottom: BorderSide(width: 2, color: Theme.of(context).colorScheme.onBackground),
+                ),
+              )
+            : null,
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [

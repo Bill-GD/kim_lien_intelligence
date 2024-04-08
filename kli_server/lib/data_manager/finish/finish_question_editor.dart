@@ -1,8 +1,9 @@
+import 'dart:io';
+
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:kli_utils/kli_utils.dart';
-import 'package:media_kit/media_kit.dart';
-import 'package:media_kit_video/media_kit_video.dart';
+import 'package:video_player/video_player.dart';
 
 import '../../global.dart';
 
@@ -18,24 +19,25 @@ class _FinishEditorDialogState extends State<FinishEditorDialog> {
   final questionController = TextEditingController(),
       answerController = TextEditingController(),
       explanationController = TextEditingController();
-  final vidPlayer = Player();
-  late final VideoController vidController;
-  int point = -1;
   String? qErrorText, aErrorText;
+
+  late final VideoPlayerController vidController;
+
   bool changedMedia = false;
+  int selectedPointValue = -1;
 
   @override
   void initState() {
     super.initState();
     logger.i('Opened finish question editor');
-    vidController = VideoController(vidPlayer);
     if (widget.question.mediaPath.isNotEmpty) {
-      vidPlayer.open(Media(storageHandler!.parentFolder + widget.question.mediaPath), play: false);
+      changeVideoSource(widget.question.mediaPath);
     }
     questionController.text = widget.question.question;
     answerController.text = widget.question.answer;
     explanationController.text = widget.question.explanation;
-    point = widget.question.point;
+    selectedPointValue = widget.question.point;
+    setState(() {});
   }
 
   @override
@@ -43,8 +45,13 @@ class _FinishEditorDialogState extends State<FinishEditorDialog> {
     questionController.dispose();
     answerController.dispose();
     explanationController.dispose();
-    vidPlayer.dispose();
+    vidController.dispose();
     super.dispose();
+  }
+
+  Future<void> changeVideoSource(String relativePath) async {
+    vidController = VideoPlayerController.file(File(storageHandler!.parentFolder + relativePath));
+    await vidController.initialize();
   }
 
   @override
@@ -58,7 +65,7 @@ class _FinishEditorDialogState extends State<FinishEditorDialog> {
           child: DropdownMenu(
             label: const Text('Point'),
             textStyle: const TextStyle(fontSize: fontSizeMSmall),
-            initialSelection: point,
+            initialSelection: selectedPointValue,
             dropdownMenuEntries: [
               for (final s in [10, 20, 30])
                 DropdownMenuEntry(
@@ -67,7 +74,7 @@ class _FinishEditorDialogState extends State<FinishEditorDialog> {
                 )
             ],
             onSelected: (value) async {
-              point = value!;
+              selectedPointValue = value!;
               setState(() {});
             },
           ),
@@ -158,39 +165,90 @@ class _FinishEditorDialogState extends State<FinishEditorDialog> {
                     constraints: const BoxConstraints(maxHeight: 400, maxWidth: 710),
                     child: widget.question.mediaPath.isEmpty
                         ? const Center(child: Text('No Video'))
-                        : MaterialDesktopVideoControlsTheme(
-                            normal: const MaterialDesktopVideoControlsThemeData(
-                              bottomButtonBar: [
-                                MaterialPlayOrPauseButton(),
-                                MaterialDesktopVolumeButton(),
-                                MaterialDesktopPositionIndicator()
+                        : ColoredBox(
+                            color: Colors.black38,
+                            child: Stack(
+                              children: [
+                                VideoPlayer(vidController),
+                                Positioned(
+                                  bottom: 0,
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      ValueListenableBuilder(
+                                        valueListenable: vidController,
+                                        builder: (_, v, ___) => IconButton(
+                                          icon: Icon(v.isPlaying ? Icons.pause : Icons.play_arrow_rounded),
+                                          onPressed: () {
+                                            v.isPlaying ? vidController.pause() : vidController.play();
+                                          },
+                                        ),
+                                      ),
+                                      ValueListenableBuilder(
+                                        valueListenable: vidController,
+                                        builder: ((_, __, ___) {
+                                          int min = vidController.value.position.inMinutes;
+                                          int sec = (vidController.value.position.inSeconds % 60);
+                                          return Text(
+                                            "${min.toString().padLeft(2, '0')}:${sec.toString().padLeft(2, '0')}",
+                                          );
+                                        }),
+                                      ),
+                                      ValueListenableBuilder(
+                                        valueListenable: vidController,
+                                        builder: (_, __, ___) => Slider(
+                                          value: vidController.value.position.inMilliseconds * 1.0,
+                                          min: 0,
+                                          max: vidController.value.duration.inMilliseconds * 1.0,
+                                          onChanged: (_) {},
+                                          onChangeEnd: (value) {
+                                            vidController.seekTo(Duration(milliseconds: value.toInt()));
+                                          },
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
                               ],
                             ),
-                            fullscreen: const MaterialDesktopVideoControlsThemeData(),
-                            child: Video(controller: vidController, fit: BoxFit.fitWidth),
                           ),
                   ),
-                  ElevatedButton(
-                    child: const Text('Select Video'),
-                    onPressed: () async {
-                      logger.i(
-                        'Selecting image at ${storageHandler!.getRelative(storageHandler!.mediaDir)}',
-                      );
-                      final result = await FilePicker.platform.pickFiles(
-                        dialogTitle: 'Select image',
-                        initialDirectory: storageHandler!.mediaDir.replaceAll('/', '\\'),
-                        type: FileType.video,
-                      );
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      ElevatedButton(
+                        child: const Text('Select Video'),
+                        onPressed: () async {
+                          logger.i(
+                            'Selecting video at ${storageHandler!.getRelative(storageHandler!.mediaDir)}',
+                          );
+                          final result = await FilePicker.platform.pickFiles(
+                            dialogTitle: 'Select image',
+                            initialDirectory: storageHandler!.mediaDir.replaceAll('/', '\\'),
+                            type: FileType.video,
+                          );
 
-                      if (result != null) {
-                        final p = result.files.single.path!;
-                        widget.question.mediaPath = storageHandler!.getRelative(p);
-                        vidPlayer.open(Media(p), play: false);
-                        logger.i('Chose ${widget.question.mediaPath}');
-                        changedMedia = true;
-                        setState(() {});
-                      }
-                    },
+                          if (result != null) {
+                            final p = result.files.single.path!;
+                            widget.question.mediaPath = storageHandler!.getRelative(p);
+                            await changeVideoSource(widget.question.mediaPath);
+                            logger.i('Chose ${widget.question.mediaPath}');
+                            changedMedia = true;
+                            setState(() {});
+                          }
+                        },
+                      ),
+                      ElevatedButton(
+                        child: const Text('Remove Video'),
+                        onPressed: () {
+                          logger.i('Removing video');
+
+                          widget.question.mediaPath = '';
+                          changedMedia = true;
+                          setState(() {});
+                        },
+                      ),
+                    ],
                   ),
                 ],
               ),
@@ -213,7 +271,7 @@ class _FinishEditorDialogState extends State<FinishEditorDialog> {
               bool hasChanged = questionController.text != widget.question.question ||
                   answerController.text != widget.question.answer ||
                   explanationController.text != widget.question.explanation ||
-                  point != widget.question.point ||
+                  selectedPointValue != widget.question.point ||
                   changedMedia;
 
               if (!hasChanged) {
@@ -222,7 +280,7 @@ class _FinishEditorDialogState extends State<FinishEditorDialog> {
                 return;
               }
               final newQ = FinishQuestion(
-                point: point,
+                point: selectedPointValue,
                 question: questionController.text,
                 answer: answerController.text,
                 explanation: explanationController.text,

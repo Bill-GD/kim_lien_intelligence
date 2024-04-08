@@ -348,6 +348,7 @@ class _StartQuestionManagerState extends State<StartQuestionManager> {
                       q.value.question,
                       q.value.answer,
                       290,
+                      bottomBorder: !(index == filtered.length - 1),
                       onTap: () async {
                         final newQ =
                             await Navigator.of(context).push<StartQuestion>(DialogRoute<StartQuestion>(
