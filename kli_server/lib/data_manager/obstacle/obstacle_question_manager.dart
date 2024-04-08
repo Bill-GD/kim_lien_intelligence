@@ -74,12 +74,12 @@ class _ObstacleQuestionManagerState extends State<ObstacleQuestionManager> {
       hintQuestions: qL,
     );
     logger.i('Loaded ${selectedMatch!.match} (${selectedMatch!.keyword})');
-    await updateQuestions(selectedMatch!);
   }
 
   Future<void> saveNewQuestions() async {
     logger.i('Saving new questions of match: ${matchNames[selectedMatchIndex]}');
     final saved = await getAllSavedQuestions();
+    saved.removeWhere((e) => e.match == selectedMatch!.match);
     saved.add(selectedMatch!);
     await overwriteSave(saved);
   }
@@ -127,14 +127,7 @@ class _ObstacleQuestionManagerState extends State<ObstacleQuestionManager> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Obstacle Question Manager'),
-        surfaceTintColor: Theme.of(context).colorScheme.background,
-        automaticallyImplyLeading: false,
-        titleTextStyle: const TextStyle(fontSize: fontSizeXL),
-        centerTitle: true,
-        toolbarHeight: kToolbarHeight * 1.1,
-      ),
+      appBar: managerAppBar(context, 'Obstacle Question Manager'),
       body: isLoading
           ? const Center(child: CircularProgressIndicator())
           : Column(

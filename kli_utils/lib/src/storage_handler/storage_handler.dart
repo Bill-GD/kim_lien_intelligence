@@ -1,20 +1,19 @@
 import 'dart:io';
 
 import 'package:excel/excel.dart';
-import 'package:kli_utils/src/global_export.dart';
 
 import '../global.dart';
+import '../global_export.dart';
 
 enum StorageType { file, dir }
 
 class StorageHandler {
   // these are relative to exe path
-  String get logFile => '$_parentFolder\\log.txt';
-
   final String _parentFolder;
   String get parentFolder => _parentFolder;
   final String _userDataDir;
 
+  String get logFile => '$_userDataDir\\log.txt';
   String get excelOutput => '$_userDataDir\\ExcelExport';
 
   String get mediaDir => '$_userDataDir\\Media';

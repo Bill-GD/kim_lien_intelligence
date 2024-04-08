@@ -65,8 +65,8 @@ class _StartQuestionManagerState extends State<StartQuestionManager> {
     for (var name in data.keys) {
       final List<StartQuestion> questions = [];
 
-      for (final e in (data[name] as List<Map>)) {
-        final v = e.values;
+      for (final r in (data[name] as List<Map>)) {
+        final v = r.values;
         final q = StartQuestion(StartQuestion.mapType(v.elementAt(1)), v.elementAt(2), v.elementAt(3));
         questions.add(q);
       }
@@ -115,14 +115,7 @@ class _StartQuestionManagerState extends State<StartQuestionManager> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Start Question Manager'),
-        surfaceTintColor: Theme.of(context).colorScheme.background,
-        automaticallyImplyLeading: false,
-        titleTextStyle: const TextStyle(fontSize: fontSizeXL),
-        centerTitle: true,
-        toolbarHeight: kToolbarHeight * 1.1,
-      ),
+      appBar: managerAppBar(context, 'Start Question Manager'),
       body: isLoading
           ? const Center(child: CircularProgressIndicator())
           : Column(
@@ -337,7 +330,7 @@ class _StartQuestionManagerState extends State<StartQuestionManager> {
         ),
         child: Column(
           children: [
-            customListTile('Thí sinh', 'Subject', 'Question', 'Answer'),
+            customListTile(context, 'Thí sinh', 130, 'Subject', 150, 'Question', 'Answer', 290),
             Flexible(
               child: Material(
                 borderRadius: BorderRadius.circular(20),
@@ -347,10 +340,14 @@ class _StartQuestionManagerState extends State<StartQuestionManager> {
                     final q = filtered[index];
 
                     return customListTile(
+                      context,
                       '${q.key.key + 1}',
+                      130,
                       StartQuestion.mapTypeDisplay(q.value.subject),
+                      150,
                       q.value.question,
                       q.value.answer,
+                      290,
                       onTap: () async {
                         final newQ =
                             await Navigator.of(context).push<StartQuestion>(DialogRoute<StartQuestion>(
@@ -371,58 +368,6 @@ class _StartQuestionManagerState extends State<StartQuestionManager> {
               ),
             ),
           ],
-        ),
-      ),
-    );
-  }
-
-  Widget customListTile(String col1, String col2, String col3, String col4, {void Function()? onTap}) {
-    return MouseRegion(
-      cursor: onTap != null ? SystemMouseCursors.click : SystemMouseCursors.basic,
-      child: InkWell(
-        onTap: onTap,
-        child: Container(
-          padding: const EdgeInsets.only(right: 24, top: 24, bottom: 24),
-          decoration: BoxDecoration(
-            border: Border(
-              bottom: BorderSide(width: 2, color: Theme.of(context).colorScheme.onBackground),
-            ),
-          ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Container(
-                constraints: const BoxConstraints(minWidth: 130),
-                child: Text(
-                  col1,
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(fontSize: fontSizeMedium),
-                ),
-              ),
-              Container(
-                constraints: const BoxConstraints(minWidth: 150, maxWidth: 150),
-                child: Text(
-                  col2,
-                  // textAlign: TextAlign.center,
-                  style: const TextStyle(fontSize: fontSizeMedium),
-                ),
-              ),
-              Expanded(
-                child: Text(
-                  col3,
-                  style: const TextStyle(fontSize: fontSizeMedium),
-                ),
-              ),
-              Container(
-                constraints: const BoxConstraints(minWidth: 290, maxWidth: 290),
-                child: Text(
-                  col4,
-                  textAlign: TextAlign.right,
-                  style: const TextStyle(fontSize: fontSizeMedium),
-                ),
-              ),
-            ],
-          ),
         ),
       ),
     );

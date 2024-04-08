@@ -41,14 +41,7 @@ class _MatchManagerState extends State<MatchManager> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Match Manager'),
-        surfaceTintColor: Theme.of(context).colorScheme.background,
-        automaticallyImplyLeading: false,
-        titleTextStyle: const TextStyle(fontSize: fontSizeXL),
-        centerTitle: true,
-        toolbarHeight: kToolbarHeight * 1.1,
-      ),
+      appBar: managerAppBar(context, 'Match Manager'),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
           : Padding(

@@ -39,3 +39,79 @@ Widget button(BuildContext context, final String label, void Function()? onPress
     child: Text(label, style: const TextStyle(fontSize: fontSizeMedium)),
   );
 }
+
+AppBar managerAppBar(BuildContext context, String title) {
+  return AppBar(
+    title: Text(title),
+    surfaceTintColor: Theme.of(context).colorScheme.background,
+    automaticallyImplyLeading: false,
+    titleTextStyle: const TextStyle(fontSize: fontSizeXL),
+    centerTitle: true,
+    toolbarHeight: kToolbarHeight * 1.1,
+  );
+}
+
+Widget customListTile(
+  BuildContext context,
+  String col1,
+  double width1,
+  String col2,
+  double width2,
+  String col3,
+  String col4,
+  double width4, {
+  void Function()? onTap,
+}) {
+  return MouseRegion(
+    cursor: onTap != null ? SystemMouseCursors.click : SystemMouseCursors.basic,
+    child: InkWell(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.only(right: 24, top: 24, bottom: 24),
+        decoration: BoxDecoration(
+          border: Border(
+            bottom: BorderSide(width: 2, color: Theme.of(context).colorScheme.onBackground),
+          ),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Container(
+              constraints: BoxConstraints(minWidth: width1, maxWidth: width1),
+              child: Text(
+                col1,
+                textAlign: TextAlign.center,
+                style: const TextStyle(fontSize: fontSizeMedium),
+              ),
+            ),
+            Container(
+              constraints: BoxConstraints(minWidth: width2, maxWidth: width2),
+              child: Text(
+                col2,
+                // textAlign: TextAlign.center,
+                style: const TextStyle(fontSize: fontSizeMedium),
+              ),
+            ),
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: Text(
+                  col3,
+                  style: const TextStyle(fontSize: fontSizeMedium),
+                ),
+              ),
+            ),
+            Container(
+              constraints: BoxConstraints(minWidth: width4, maxWidth: width4),
+              child: Text(
+                col4,
+                textAlign: TextAlign.right,
+                style: const TextStyle(fontSize: fontSizeMedium),
+              ),
+            ),
+          ],
+        ),
+      ),
+    ),
+  );
+}

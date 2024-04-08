@@ -19,7 +19,7 @@ class _ObstacleEditorDialogState extends State<ObstacleEditorDialog> {
   @override
   void initState() {
     super.initState();
-    logger.i('Opened start question editor');
+    logger.i('Opened obstacle question editor');
     _questionController.text = widget.question.question;
     _answerController.text = widget.question.answer;
   }
