@@ -1,6 +1,8 @@
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:kli_utils/kli_utils.dart';
+import 'package:media_kit/media_kit.dart';
+import 'package:media_kit_video/media_kit_video.dart';
 
 import '../../global.dart';
 
@@ -16,13 +18,20 @@ class _FinishEditorDialogState extends State<FinishEditorDialog> {
   final questionController = TextEditingController(),
       answerController = TextEditingController(),
       explanationController = TextEditingController();
+  final vidPlayer = Player();
+  late final VideoController vidController;
   int point = -1;
   String? qErrorText, aErrorText;
+  bool changedMedia = false;
 
   @override
   void initState() {
     super.initState();
     logger.i('Opened finish question editor');
+    vidController = VideoController(vidPlayer);
+    if (widget.question.mediaPath.isNotEmpty) {
+      vidPlayer.open(Media(storageHandler!.parentFolder + widget.question.mediaPath), play: false);
+    }
     questionController.text = widget.question.question;
     answerController.text = widget.question.answer;
     explanationController.text = widget.question.explanation;
@@ -34,6 +43,7 @@ class _FinishEditorDialogState extends State<FinishEditorDialog> {
     questionController.dispose();
     answerController.dispose();
     explanationController.dispose();
+    vidPlayer.dispose();
     super.dispose();
   }
 
@@ -67,7 +77,7 @@ class _FinishEditorDialogState extends State<FinishEditorDialog> {
           mainAxisAlignment: MainAxisAlignment.center,
           mainAxisSize: MainAxisSize.min,
           children: [
-            Expanded(
+            Flexible(
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -133,48 +143,57 @@ class _FinishEditorDialogState extends State<FinishEditorDialog> {
                 ],
               ),
             ),
-            Column(
-              mainAxisSize: MainAxisSize.min,
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Container(
-                  margin: const EdgeInsets.only(left: 32),
-                  alignment: Alignment.center,
-                  decoration: BoxDecoration(
-                    border: Border.all(width: 1, color: Theme.of(context).colorScheme.onBackground),
+            Expanded(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Container(
+                    margin: const EdgeInsets.only(left: 32, bottom: 16),
+                    alignment: Alignment.center,
+                    decoration: BoxDecoration(
+                      border: Border.all(width: 1, color: Theme.of(context).colorScheme.onBackground),
+                    ),
+                    constraints: const BoxConstraints(maxHeight: 400, maxWidth: 710),
+                    child: widget.question.mediaPath.isEmpty
+                        ? const Center(child: Text('No Video'))
+                        : MaterialDesktopVideoControlsTheme(
+                            normal: const MaterialDesktopVideoControlsThemeData(
+                              bottomButtonBar: [
+                                MaterialPlayOrPauseButton(),
+                                MaterialDesktopVolumeButton(),
+                                MaterialDesktopPositionIndicator()
+                              ],
+                            ),
+                            fullscreen: const MaterialDesktopVideoControlsThemeData(),
+                            child: Video(controller: vidController, fit: BoxFit.fitWidth),
+                          ),
                   ),
-                  constraints: const BoxConstraints(maxHeight: 300, maxWidth: 400),
-                  child:
-                      // widget.question.mediaPath.isEmpty ?
-                      const Center(child: Text('No Video'))
-                  // : Image.file(
-                  //     File('${storageHandler!.parentFolder}\\${selectedMatch!.imagePath}'),
-                  //     fit: BoxFit.contain,
-                  //   ),
-                  ,
-                ),
-                ElevatedButton(
-                  child: const Text('Select Video'),
-                  onPressed: () async {
-                    logger.i(
-                      'Selecting image at ${storageHandler!.getRelative(storageHandler!.mediaDir)}',
-                    );
-                    final result = await FilePicker.platform.pickFiles(
-                      dialogTitle: 'Select image',
-                      initialDirectory: storageHandler!.mediaDir.replaceAll('/', '\\'),
-                      type: FileType.image,
-                    );
+                  ElevatedButton(
+                    child: const Text('Select Video'),
+                    onPressed: () async {
+                      logger.i(
+                        'Selecting image at ${storageHandler!.getRelative(storageHandler!.mediaDir)}',
+                      );
+                      final result = await FilePicker.platform.pickFiles(
+                        dialogTitle: 'Select image',
+                        initialDirectory: storageHandler!.mediaDir.replaceAll('/', '\\'),
+                        type: FileType.video,
+                      );
 
-                    if (result != null) {
-                      final p = result.files.single.path!;
-                      widget.question.mediaPath = storageHandler!.getRelative(p);
-                      logger.i('Chose ${widget.question.mediaPath}');
-                      setState(() {});
-                    }
-                  },
-                ),
-              ],
+                      if (result != null) {
+                        final p = result.files.single.path!;
+                        widget.question.mediaPath = storageHandler!.getRelative(p);
+                        vidPlayer.open(Media(p), play: false);
+                        logger.i('Chose ${widget.question.mediaPath}');
+                        changedMedia = true;
+                        setState(() {});
+                      }
+                    },
+                  ),
+                ],
+              ),
             )
           ],
         ),
@@ -194,7 +213,8 @@ class _FinishEditorDialogState extends State<FinishEditorDialog> {
               bool hasChanged = questionController.text != widget.question.question ||
                   answerController.text != widget.question.answer ||
                   explanationController.text != widget.question.explanation ||
-                  point != widget.question.point;
+                  point != widget.question.point ||
+                  changedMedia;
 
               if (!hasChanged) {
                 logger.i('No change, exiting');
@@ -206,6 +226,7 @@ class _FinishEditorDialogState extends State<FinishEditorDialog> {
                 question: questionController.text,
                 answer: answerController.text,
                 explanation: explanationController.text,
+                mediaPath: widget.question.mediaPath,
               );
 
               logger.i('Modified finish question');
