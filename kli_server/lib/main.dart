@@ -18,9 +18,9 @@ void main() async {
   storageHandler = null;
   await initPackageInfo();
   logMessageStream.listen((m) {
-    if (m.key == LogType.info) logger.i(m.value);
-    if (m.key == LogType.warn) logger.w(m.value);
-    if (m.key == LogType.error) logger.e(m.value);
+    if (m.$1 == LogType.info) logger.i(m.$2);
+    if (m.$1 == LogType.warn) logger.w(m.$2);
+    if (m.$1 == LogType.error) logger.e(m.$2);
   });
 
   if (!kIsWeb && (Platform.isLinux || Platform.isMacOS || Platform.isWindows)) {

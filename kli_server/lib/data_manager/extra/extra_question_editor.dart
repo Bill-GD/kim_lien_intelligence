@@ -4,8 +4,8 @@ import 'package:kli_utils/kli_utils.dart';
 import '../../global.dart';
 
 class ExtraEditorDialog extends StatefulWidget {
-  final ExtraQuestion question;
-  const ExtraEditorDialog({super.key, required this.question});
+  final ExtraQuestion? question;
+  const ExtraEditorDialog({super.key, this.question});
 
   @override
   State<ExtraEditorDialog> createState() => _ExtraEditorDialogState();
@@ -16,12 +16,22 @@ class _ExtraEditorDialogState extends State<ExtraEditorDialog> {
   final _answerController = TextEditingController();
   String? _qErrorText, _aErrorText;
 
+  bool createNew = false;
+
   @override
   void initState() {
     super.initState();
     logger.i('Opened obstacle question editor');
-    _questionController.text = widget.question.question;
-    _answerController.text = widget.question.answer;
+    if (widget.question != null) {
+      logger.i('Modify extra question');
+      _questionController.text = widget.question!.question;
+      _answerController.text = widget.question!.answer;
+    } else {
+      logger.i('Add new extra question');
+      createNew = true;
+      _questionController.text = '';
+      _answerController.text = '';
+    }
   }
 
   @override
@@ -104,8 +114,10 @@ class _ExtraEditorDialogState extends State<ExtraEditorDialog> {
                 return;
               }
 
-              bool hasChanged = _questionController.text != widget.question.question ||
-                  _answerController.text != widget.question.answer;
+              bool hasChanged = createNew
+                  ? true
+                  : _questionController.text != widget.question!.question ||
+                      _answerController.text != widget.question!.answer;
 
               if (!hasChanged) {
                 logger.i('No change, exiting');
@@ -117,7 +129,7 @@ class _ExtraEditorDialogState extends State<ExtraEditorDialog> {
                 answer: _answerController.text,
               );
 
-              logger.i('Modified extra question');
+              logger.i('${createNew ? 'Created' : 'Modified'} extra question');
               Navigator.of(context).pop(newQ);
             },
             child: const Text('Done', style: TextStyle(fontSize: fontSizeMedium)),

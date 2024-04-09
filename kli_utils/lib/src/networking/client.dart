@@ -22,7 +22,7 @@ class KLIClient {
   Stream<KLISocketMessage> get onMessageReceived => _onMessageReceivedController.stream;
 
   static Future<KLIClient> init(String ip, String clientID, [int port = 8080]) async {
-    logMessageController.add(MapEntry(LogType.info, 'Trying to connect to: $ip'));
+    logMessageController.add((LogType.info, 'Trying to connect to: $ip'));
 
     final s = KLIClient(await Socket.connect(ip, port).timeout(
       3.seconds,
@@ -31,19 +31,19 @@ class KLIClient {
       },
     ));
 
-    logMessageController.add(MapEntry(LogType.info, 'Connected to $ip as $clientID'));
+    logMessageController.add((LogType.info, 'Connected to $ip as $clientID'));
 
     s._socket!.write(KLISocketMessage(clientID, clientID, KLIMessageType.sendID));
-    logMessageController.add(MapEntry(LogType.info, 'Sent ID ($clientID) to server'));
+    logMessageController.add((LogType.info, 'Sent ID ($clientID) to server'));
 
-    s._socket.listen(s.handleIncomingMessage);
+    s._socket!.listen(s.handleIncomingMessage);
 
     return s;
   }
 
   void handleIncomingMessage(Uint8List data) {
     final serverMessage = KLISocketMessage.fromJson(jsonDecode(String.fromCharCodes(data).trim()));
-    logMessageController.add(MapEntry(LogType.info, '[Server, ${serverMessage.type}] ${serverMessage.msg}'));
+    logMessageController.add((LogType.info, '[Server, ${serverMessage.type}] ${serverMessage.msg}'));
     _onMessageReceivedController.add(serverMessage);
   }
 

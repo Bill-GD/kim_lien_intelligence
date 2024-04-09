@@ -31,10 +31,10 @@ class StorageHandler {
   StorageHandler(this._parentFolder) : _userDataDir = '$_parentFolder\\UserData';
 
   static Future<StorageHandler> init(String prefixPath) async {
-    logMessageController.add(const MapEntry(LogType.info, 'StorageHandler init'));
+    logMessageController.add(const (LogType.info, 'StorageHandler init'));
 
     final sh = StorageHandler(prefixPath.replaceAll('/', '\\'));
-    logMessageController.add(MapEntry(LogType.info, sh.parentFolder));
+    logMessageController.add((LogType.info, sh.parentFolder));
 
     await sh.createFileEntity(sh.mediaDir, StorageType.dir);
     await sh.createFileEntity(sh.newDataDir, StorageType.dir);
@@ -52,7 +52,7 @@ class StorageHandler {
 
   /// Return: ```{tableName: [rows]}```
   Future readFromExcel(String path, int maxColumnCount) async {
-    logMessageController.add(MapEntry(LogType.info, 'Reading Excel from ${getRelative(path)}'));
+    logMessageController.add((LogType.info, 'Reading Excel from ${getRelative(path)}'));
 
     final bytes = await File(path).readAsBytes();
     final excel = Excel.decodeBytes(bytes);
@@ -60,7 +60,7 @@ class StorageHandler {
   }
 
   Future<Map<String, List<Map<String, dynamic>>>> excelToJson(Excel excel, int maxColumnCount) async {
-    logMessageController.add(const MapEntry(LogType.info, 'Format: Excel -> Json'));
+    logMessageController.add(const (LogType.info, 'Format: Excel -> Json'));
     final res = <String, List<Map<String, dynamic>>>{};
 
     for (final tableName in excel.tables.keys) {
@@ -70,7 +70,7 @@ class StorageHandler {
       final firstRow = allRows[0];
       final attributes = firstRow.map((e) => (e?.value).toString()).take(maxColumnCount);
 
-      logMessageController.add(MapEntry(LogType.info, 'First row: ${attributes.join(', ')}'));
+      logMessageController.add((LogType.info, 'First row: ${attributes.join(', ')}'));
 
       final records = <Map<String, dynamic>>[];
 
@@ -80,7 +80,7 @@ class StorageHandler {
         // check for empty row
         final firstCell = row[0];
         if (firstCell?.value == null) {
-          logMessageController.add(MapEntry(LogType.info, 'row=${rIdx + 1} -> empty -> break'));
+          logMessageController.add((LogType.info, 'row=${rIdx + 1} -> empty -> break'));
           break;
         }
 
@@ -89,7 +89,7 @@ class StorageHandler {
         int cIdx = 0;
         for (final cell in row) {
           if (cIdx >= maxColumnCount) {
-            // logMessageController.add(MapEntry(
+            // logMessageController.add((
             //   LogType.info,
             //   'row=${rIdx + 1} -> maxColumnCount exceeded -> break',
             // ));
@@ -108,7 +108,7 @@ class StorageHandler {
   }
 
   Future<void> writeToExcel(String fileName, Map<String, dynamic> json) async {
-    logMessageController.add(MapEntry(
+    logMessageController.add((
       LogType.info,
       'Writing Excel to ${getRelative('$excelOutput\\$fileName')}',
     ));
@@ -140,16 +140,16 @@ class StorageHandler {
     excel.delete('Sheet1');
 
     await File('$excelOutput\\$fileName').writeAsBytes(excel.encode()!);
-    logMessageController.add(MapEntry(LogType.info, 'Done writing to $excelOutput\\$fileName'));
+    logMessageController.add((LogType.info, 'Done writing to $excelOutput\\$fileName'));
   }
 
   Future<String> readFromFile(String path) async {
-    logMessageController.add(MapEntry(LogType.info, 'Read from ${getRelative(path)}'));
+    logMessageController.add((LogType.info, 'Read from ${getRelative(path)}'));
     return await File(path).readAsString();
   }
 
   Future<void> writeToFile(String path, String data) async {
-    logMessageController.add(MapEntry(LogType.info, 'Write to ${getRelative(path)}'));
+    logMessageController.add((LogType.info, 'Write to ${getRelative(path)}'));
     await File(path).writeAsString(data);
   }
 
@@ -165,7 +165,7 @@ class StorageHandler {
       if (f.existsSync()) return;
 
       await (f is File ? f.create(recursive: true) : (f as Directory).create(recursive: true));
-      logMessageController.add(MapEntry(LogType.info, 'Created: ${getRelative(path)}'));
+      logMessageController.add((LogType.info, 'Created: ${getRelative(path)}'));
     } on PathExistsException {
       return;
     }

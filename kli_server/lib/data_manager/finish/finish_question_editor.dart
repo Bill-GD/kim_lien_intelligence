@@ -9,8 +9,8 @@ import 'package:video_player/video_player.dart';
 import '../../global.dart';
 
 class FinishEditorDialog extends StatefulWidget {
-  final FinishQuestion question;
-  const FinishEditorDialog({super.key, required this.question});
+  final FinishQuestion? question;
+  const FinishEditorDialog({super.key, this.question});
 
   @override
   State<FinishEditorDialog> createState() => _FinishEditorDialogState();
@@ -28,16 +28,26 @@ class _FinishEditorDialogState extends State<FinishEditorDialog> {
   String fullVideoPath = '';
   bool videoFound = false, vidControlInit = false;
   int selectedPointValue = -1;
+  bool createNew = false;
 
   @override
   void initState() {
     super.initState();
     logger.i('Opened finish question editor');
-    questionController.text = widget.question.question;
-    answerController.text = widget.question.answer;
-    explanationController.text = widget.question.explanation;
-    selectedPointValue = widget.question.point;
-    newMediaPath = widget.question.mediaPath;
+    if (widget.question == null) {
+      logger.i('Create new finish question');
+      createNew = true;
+      questionController.text = '';
+      answerController.text = '';
+      explanationController.text = '';
+    } else {
+      logger.i('Modify finish question');
+      questionController.text = widget.question!.question;
+      answerController.text = widget.question!.answer;
+      explanationController.text = widget.question!.explanation;
+      selectedPointValue = widget.question!.point;
+      newMediaPath = widget.question!.mediaPath;
+    }
 
     if (newMediaPath.isNotEmpty) changeVideoSource(newMediaPath);
 
@@ -49,7 +59,7 @@ class _FinishEditorDialogState extends State<FinishEditorDialog> {
     questionController.dispose();
     answerController.dispose();
     explanationController.dispose();
-    vidController.dispose();
+    if (vidControlInit) vidController.dispose();
     super.dispose();
   }
 
@@ -269,12 +279,18 @@ class _FinishEditorDialogState extends State<FinishEditorDialog> {
                 showToastMessage(context, 'Answer can\'t be empty');
                 return;
               }
+              if (selectedPointValue < 0) {
+                showToastMessage(context, 'Point value not chosen');
+                return;
+              }
 
-              bool hasChanged = questionController.text != widget.question.question ||
-                  answerController.text != widget.question.answer ||
-                  explanationController.text != widget.question.explanation ||
-                  selectedPointValue != widget.question.point ||
-                  newMediaPath != widget.question.mediaPath;
+              bool hasChanged = createNew
+                  ? true
+                  : questionController.text != widget.question!.question ||
+                      answerController.text != widget.question!.answer ||
+                      explanationController.text != widget.question!.explanation ||
+                      selectedPointValue != widget.question!.point ||
+                      newMediaPath != widget.question!.mediaPath;
 
               if (!hasChanged) {
                 logger.i('No change, exiting');
@@ -289,7 +305,7 @@ class _FinishEditorDialogState extends State<FinishEditorDialog> {
                 mediaPath: newMediaPath,
               );
 
-              logger.i('Modified finish question');
+              logger.i('${createNew ? 'Created' : 'Modified'} finish question');
               Navigator.of(context).pop(newQ);
             },
             child: const Text('Done', style: TextStyle(fontSize: fontSizeMedium)),

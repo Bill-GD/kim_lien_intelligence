@@ -21,7 +21,7 @@ void showBackDialog(BuildContext context, String confirmMessage, String logMessa
           TextButton(
             child: const Text('Yes'),
             onPressed: () {
-              logMessageController.add(MapEntry(LogType.info, logMessage));
+              logMessageController.add((LogType.info, logMessage));
               Navigator.pop(context);
               Navigator.pop(context);
             },

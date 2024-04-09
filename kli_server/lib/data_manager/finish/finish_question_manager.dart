@@ -25,10 +25,8 @@ class _FinishQuestionManagerState extends State<FinishQuestionManager> {
   void initState() {
     super.initState();
     logger.i('Finish question manager init');
-    storageHandler!.readFromFile(storageHandler!.matchSaveFile).then((value) async {
-      if (value.isNotEmpty) {
-        matchNames = (jsonDecode(value) as Iterable).map((e) => e['name'] as String).toList();
-      }
+    getMatchNames().then((value) async {
+      if (value.isNotEmpty) matchNames = value;
       setState(() => isLoading = false);
       await removeDeletedMatchQuestions();
     });
@@ -150,7 +148,7 @@ class _FinishQuestionManagerState extends State<FinishQuestionManager> {
           }),
           // sort point
           DropdownMenu(
-            label: const Text('Filter position'),
+            label: const Text('Filter point'),
             initialSelection: -1,
             enabled: selectedMatchIndex >= 0,
             dropdownMenuEntries: [
@@ -169,8 +167,26 @@ class _FinishQuestionManagerState extends State<FinishQuestionManager> {
           ),
           button(
             context,
+            'Add Question',
+            enableCondition: selectedMatchIndex >= 0,
+            onPressed: () async {
+              final newQ = await Navigator.of(context).push<FinishQuestion>(DialogRoute<FinishQuestion>(
+                context: context,
+                barrierDismissible: false,
+                barrierLabel: '',
+                builder: (_) => const FinishEditorDialog(),
+              ));
+              if (newQ != null) {
+                selectedMatch!.questions.add(newQ);
+                await updateQuestions(selectedMatch!);
+              }
+              setState(() {});
+            },
+          ),
+          button(
+            context,
             'Import Questions',
-            enableCondition: selectedMatchIndex < 0,
+            enableCondition: selectedMatchIndex >= 0,
             onPressed: () async {
               logger.i('Import new questions (.xlsx)');
 
@@ -197,7 +213,7 @@ class _FinishQuestionManagerState extends State<FinishQuestionManager> {
           button(
             context,
             'Remove Questions',
-            enableCondition: selectedMatchIndex < 0,
+            enableCondition: selectedMatchIndex >= 0,
             onPressed: () async {
               showDialog<bool>(
                 context: context,
@@ -226,10 +242,7 @@ class _FinishQuestionManagerState extends State<FinishQuestionManager> {
                 },
               ).then((value) async {
                 if (value != true) return;
-                showToastMessage(
-                  context,
-                  'Removed questions for match: ${matchNames[selectedMatchIndex]}',
-                );
+                showToastMessage(context, 'Removed questions for match: ${matchNames[selectedMatchIndex]}');
                 await removeMatch(selectedMatch!);
                 selectedMatch = null;
                 setState(() {});
@@ -242,13 +255,15 @@ class _FinishQuestionManagerState extends State<FinishQuestionManager> {
   }
 
   Widget questionList() {
-    List<MapEntry<int, FinishQuestion>> filtered = [];
+    List<(int, FinishQuestion)> filtered = [];
     if (selectedMatch != null) {
       for (int i = 0; i < selectedMatch!.questions.length; i++) {
         if (sortPoint > 0 && selectedMatch!.questions[i].point != sortPoint) continue;
-        filtered.add(MapEntry(i, selectedMatch!.questions[i]));
+        filtered.add((i, selectedMatch!.questions[i]));
       }
     }
+
+    List<double> widthRatios = [0.035, 0.4, 0.1, 0.1, 0.03];
 
     return Flexible(
       child: Container(
@@ -259,7 +274,13 @@ class _FinishQuestionManagerState extends State<FinishQuestionManager> {
         ),
         child: Column(
           children: [
-            customListTile(context, 'Point', 130, 'Question', 800, 'Answer', 'Explanation', 240),
+            customListTile(context, columns: [
+              (const Text('Point', textAlign: TextAlign.center), widthRatios[0]),
+              (const Text('Question'), widthRatios[1]),
+              (const Text('Answer'), widthRatios[2]),
+              (const Text('Explanation'), widthRatios[3]),
+              (const Text(''), widthRatios[4]),
+            ]),
             Flexible(
               child: Material(
                 borderRadius: BorderRadius.circular(10),
@@ -270,24 +291,34 @@ class _FinishQuestionManagerState extends State<FinishQuestionManager> {
 
                     return customListTile(
                       context,
-                      '${q.value.point}',
-                      130,
-                      q.value.question,
-                      800,
-                      q.value.answer,
-                      q.value.explanation,
-                      290,
-                      bottomBorder: !(index == filtered.length - 1),
+                      columns: [
+                        (Text('${q.$2.point}', textAlign: TextAlign.center), widthRatios[0]),
+                        (Text(q.$2.question), widthRatios[1]),
+                        (Text(q.$2.answer), widthRatios[2]),
+                        (Text(q.$2.explanation), widthRatios[3]),
+                        (
+                          IconButton(
+                            icon: const Icon(Icons.delete),
+                            onPressed: () async {
+                              selectedMatch!.questions.removeAt(q.$1);
+                              await updateQuestions(selectedMatch!);
+                              logger.i('Removed finish question (p=${q.$2.point})');
+                              setState(() {});
+                            },
+                          ),
+                          widthRatios[4],
+                        )
+                      ],
                       onTap: () async {
                         final newQ =
                             await Navigator.of(context).push<FinishQuestion>(DialogRoute<FinishQuestion>(
                           context: context,
                           barrierDismissible: false,
                           barrierLabel: '',
-                          builder: (_) => FinishEditorDialog(question: q.value),
+                          builder: (_) => FinishEditorDialog(question: q.$2),
                         ));
                         if (newQ != null) {
-                          selectedMatch!.questions[q.key] = newQ;
+                          selectedMatch!.questions[q.$1] = newQ;
                           await updateQuestions(selectedMatch!);
                         }
                         setState(() {});

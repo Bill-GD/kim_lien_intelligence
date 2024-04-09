@@ -25,10 +25,8 @@ class _StartQuestionManagerState extends State<StartQuestionManager> {
   void initState() {
     super.initState();
     logger.i('Start question manager init');
-    storageHandler!.readFromFile(storageHandler!.matchSaveFile).then((value) async {
-      if (value.isNotEmpty) {
-        matchNames = (jsonDecode(value) as Iterable).map((e) => e['name'] as String).toList();
-      }
+    getMatchNames().then((value) async {
+      if (value.isNotEmpty) matchNames = value;
       setState(() => isLoading = false);
       await removeDeletedMatchQuestions();
     });
@@ -298,16 +296,18 @@ class _StartQuestionManagerState extends State<StartQuestionManager> {
   }
 
   Widget questionList() {
-    List<MapEntry<MapEntry<int, int>, StartQuestion>> filtered = [];
+    List<(int, int, StartQuestion)> filtered = [];
     if (selectedMatch != null) {
       selectedMatch!.questions.forEach((pos, qL) {
         for (int i = 0; i < qL.length; i++) {
           if (sortType != null && qL[i].subject != sortType) continue;
           if (sortPlayerPos >= 0 && pos != sortPlayerPos) continue;
-          filtered.add(MapEntry(MapEntry(pos, i), qL[i]));
+          filtered.add((i, pos, qL[i]));
         }
       });
     }
+
+    List<double> widthRatios = [0.07, 0.1, 0.4, 0.1, 0.02];
 
     return Flexible(
       child: Container(
@@ -318,7 +318,13 @@ class _StartQuestionManagerState extends State<StartQuestionManager> {
         ),
         child: Column(
           children: [
-            customListTile(context, 'Thí sinh', 130, 'Subject', 150, 'Question', 'Answer', 290),
+            customListTile(context, columns: [
+              (const Text('Thí sinh', textAlign: TextAlign.center), widthRatios[0]),
+              (const Text('Subject'), widthRatios[1]),
+              (const Text('Question', textAlign: TextAlign.left), widthRatios[2]),
+              (const Text('Answer', textAlign: TextAlign.right), widthRatios[3]),
+              (const Text('', textAlign: TextAlign.right), widthRatios[4]),
+            ]),
             Flexible(
               child: Material(
                 borderRadius: BorderRadius.circular(10),
@@ -329,24 +335,35 @@ class _StartQuestionManagerState extends State<StartQuestionManager> {
 
                     return customListTile(
                       context,
-                      '${q.key.key + 1}',
-                      130,
-                      StartQuestion.mapTypeDisplay(q.value.subject),
-                      150,
-                      q.value.question,
-                      q.value.answer,
-                      290,
-                      bottomBorder: !(index == filtered.length - 1),
+                      columns: [
+                        (Text('${q.$2 + 1}', textAlign: TextAlign.center), widthRatios[0]),
+                        (Text(StartQuestion.mapTypeDisplay(q.$3.subject)), widthRatios[1]),
+                        (Text(q.$3.question, textAlign: TextAlign.left), widthRatios[2]),
+                        (Text(q.$3.answer, textAlign: TextAlign.right), widthRatios[3]),
+                        (
+                          IconButton(
+                            icon: const Icon(Icons.delete),
+                            onPressed: () async {
+                              selectedMatch!.questions[q.$2]?.removeAt(q.$1);
+                              await updateQuestions(selectedMatch!);
+                              logger.i('Removed question: pos=${q.$2}, idx=${q.$1}');
+                              setState(() {});
+                              return;
+                            },
+                          ),
+                          widthRatios[4],
+                        )
+                      ],
                       onTap: () async {
                         final newQ =
                             await Navigator.of(context).push<StartQuestion>(DialogRoute<StartQuestion>(
                           context: context,
                           barrierDismissible: false,
                           barrierLabel: '',
-                          builder: (_) => StartEditorDialog(question: q.value),
+                          builder: (_) => StartEditorDialog(question: q.$3),
                         ));
                         if (newQ != null) {
-                          selectedMatch!.questions[q.key.key]![q.key.value] = newQ;
+                          selectedMatch!.questions[q.$2]![q.$1] = newQ;
                           await updateQuestions(selectedMatch!);
                         }
                         setState(() {});

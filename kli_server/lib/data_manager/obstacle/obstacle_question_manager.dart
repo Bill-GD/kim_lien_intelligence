@@ -26,10 +26,8 @@ class _ObstacleQuestionManagerState extends State<ObstacleQuestionManager> {
   void initState() {
     super.initState();
     logger.i('Start question manager init');
-    storageHandler!.readFromFile(storageHandler!.matchSaveFile).then((value) async {
-      if (value.isNotEmpty) {
-        matchNames = (jsonDecode(value) as Iterable).map((e) => e['name'] as String).toList();
-      }
+    getMatchNames().then((value) async {
+      if (value.isNotEmpty) matchNames = value;
       setState(() => isLoading = false);
       await removeDeletedMatchQuestions();
     });

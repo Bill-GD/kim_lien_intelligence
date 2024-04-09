@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -34,6 +35,15 @@ Future<void> initStorageHandler() async {
   String parentFolder = rawDir.substring(0, rawDir.length - 1).replaceAll('\\', '/');
 
   storageHandler = await StorageHandler.init(parentFolder);
+}
+
+Future<List<String>> getMatchNames() async {
+  List<String> matchNames = [];
+  String value = await storageHandler!.readFromFile(storageHandler!.matchSaveFile);
+  if (value.isNotEmpty) {
+    matchNames = (jsonDecode(value) as Iterable).map((e) => e['name'] as String).toList();
+  }
+  return matchNames;
 }
 
 Widget button(BuildContext context, final String label,
@@ -74,16 +84,12 @@ Widget matchSelector(List<String> matchNames, void Function(String?) onSelected)
   );
 }
 
+/// A custom ListTile with variable column count and an optional delete button.
+///
+/// The columns are defined by a pair ```(content: Widget, width: double)```.
 Widget customListTile(
-  BuildContext context,
-  String col1,
-  double width1,
-  String col2,
-  double width2,
-  String col3,
-  String col4,
-  double width4, {
-  bool bottomBorder = true,
+  BuildContext context, {
+  required List<(Widget, double)> columns,
   void Function()? onTap,
 }) {
   return MouseRegion(
@@ -91,53 +97,28 @@ Widget customListTile(
     child: InkWell(
       onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.only(right: 24, top: 24, bottom: 24),
-        decoration: bottomBorder
-            ? BoxDecoration(
-                border: Border(
-                  bottom: BorderSide(width: 2, color: Theme.of(context).colorScheme.onBackground),
-                ),
-              )
-            : null,
+        padding: const EdgeInsets.only(left: 16, right: 24, top: 24, bottom: 24),
+        alignment: Alignment.center,
+        decoration: BoxDecoration(
+          border: Border(
+            bottom: BorderSide(width: 2, color: Theme.of(context).colorScheme.onBackground),
+          ),
+        ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Container(
-              constraints: BoxConstraints(minWidth: width1, maxWidth: width1),
-              child: Text(
-                col1,
-                textAlign: TextAlign.center,
-                style: const TextStyle(fontSize: fontSizeMedium),
+            for (final (child, ratio) in columns)
+              SizedBox(
+                width: MediaQuery.of(context).size.width * ratio.clamp(0, 1),
+                child: child is Text ? _applyFontSize(child) : child,
               ),
-            ),
-            Container(
-              constraints: BoxConstraints(minWidth: width2, maxWidth: width2),
-              child: Text(
-                col2,
-                // textAlign: TextAlign.center,
-                style: const TextStyle(fontSize: fontSizeMedium),
-              ),
-            ),
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: Text(
-                  col3,
-                  style: const TextStyle(fontSize: fontSizeMedium),
-                ),
-              ),
-            ),
-            Container(
-              constraints: BoxConstraints(minWidth: width4, maxWidth: width4),
-              child: Text(
-                col4,
-                textAlign: TextAlign.right,
-                style: const TextStyle(fontSize: fontSizeMedium),
-              ),
-            ),
           ],
         ),
       ),
     ),
   );
+}
+
+Text _applyFontSize(Text t) {
+  return Text('${t.data}', textAlign: t.textAlign, style: const TextStyle(fontSize: fontSizeMedium));
 }

@@ -24,10 +24,8 @@ class _ExtraQuestionManagerState extends State<ExtraQuestionManager> {
   void initState() {
     super.initState();
     logger.i('Start question manager init');
-    storageHandler!.readFromFile(storageHandler!.matchSaveFile).then((value) async {
-      if (value.isNotEmpty) {
-        matchNames = (jsonDecode(value) as Iterable).map((e) => e['name'] as String).toList();
-      }
+    getMatchNames().then((value) async {
+      if (value.isNotEmpty) matchNames = value;
       setState(() => isLoading = false);
       await removeDeletedMatchQuestions();
     });
@@ -137,6 +135,24 @@ class _ExtraQuestionManagerState extends State<ExtraQuestionManager> {
           }),
           button(
             context,
+            'Add New Question',
+            enableCondition: selectedMatchIndex >= 0,
+            onPressed: () async {
+              final newQ = await Navigator.of(context).push<ExtraQuestion>(DialogRoute<ExtraQuestion>(
+                context: context,
+                barrierDismissible: false,
+                barrierLabel: '',
+                builder: (_) => const ExtraEditorDialog(),
+              ));
+              if (newQ != null) {
+                selectedMatch!.questions.add(newQ);
+                await updateQuestions(selectedMatch!);
+              }
+              setState(() {});
+            },
+          ),
+          button(
+            context,
             'Import Questions',
             enableCondition: selectedMatchIndex >= 0,
             onPressed: () async {
@@ -210,6 +226,8 @@ class _ExtraQuestionManagerState extends State<ExtraQuestionManager> {
   }
 
   Widget questionList() {
+    List<double> widthRatios = [0.4, 0.1, 0.05];
+
     return Flexible(
       child: Container(
         margin: const EdgeInsets.symmetric(vertical: 32, horizontal: 96),
@@ -219,7 +237,11 @@ class _ExtraQuestionManagerState extends State<ExtraQuestionManager> {
         ),
         child: Column(
           children: [
-            customListTile(context, '', 0, '', 0, 'Question', 'Answer', 400),
+            customListTile(context, columns: [
+              (const Text('Question'), widthRatios[0]),
+              (const Text('Answer'), widthRatios[1]),
+              (const Text(''), widthRatios[2]),
+            ]),
             Flexible(
               child: Material(
                 borderRadius: BorderRadius.circular(10),
@@ -230,14 +252,22 @@ class _ExtraQuestionManagerState extends State<ExtraQuestionManager> {
 
                     return customListTile(
                       context,
-                      '',
-                      0,
-                      '',
-                      0,
-                      q.question,
-                      q.answer,
-                      400,
-                      bottomBorder: !(index == selectedMatch!.questions.length - 1),
+                      columns: [
+                        (Text(q.question), widthRatios[0]),
+                        (Text(q.answer), widthRatios[1]),
+                        (
+                          IconButton(
+                            icon: const Icon(Icons.delete),
+                            onPressed: () async {
+                              selectedMatch!.questions.removeAt(index);
+                              await updateQuestions(selectedMatch!);
+                              logger.i('Deleted extra question of ${selectedMatch!.match}');
+                              setState(() {});
+                            },
+                          ),
+                          widthRatios[2]
+                        )
+                      ],
                       onTap: () async {
                         final newQ =
                             await Navigator.of(context).push<ExtraQuestion>(DialogRoute<ExtraQuestion>(
