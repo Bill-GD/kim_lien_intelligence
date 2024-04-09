@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:audio_video_progress_bar/audio_video_progress_bar.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:kli_utils/kli_utils.dart';
@@ -165,52 +166,42 @@ class _FinishEditorDialogState extends State<FinishEditorDialog> {
                     constraints: const BoxConstraints(maxHeight: 400, maxWidth: 710),
                     child: widget.question.mediaPath.isEmpty
                         ? const Center(child: Text('No Video'))
-                        : ColoredBox(
-                            color: Colors.black38,
-                            child: Stack(
-                              children: [
-                                VideoPlayer(vidController),
-                                Positioned(
-                                  bottom: 0,
-                                  child: Row(
+                        : Stack(
+                            alignment: Alignment.bottomCenter,
+                            children: [
+                              VideoPlayer(vidController),
+                              ValueListenableBuilder(
+                                valueListenable: vidController,
+                                builder: (_, v, __) {
+                                  return Row(
                                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                     children: [
-                                      ValueListenableBuilder(
-                                        valueListenable: vidController,
-                                        builder: (_, v, ___) => IconButton(
-                                          icon: Icon(v.isPlaying ? Icons.pause : Icons.play_arrow_rounded),
-                                          onPressed: () {
-                                            v.isPlaying ? vidController.pause() : vidController.play();
-                                          },
+                                      IconButton(
+                                        icon: Icon(
+                                          v.isPlaying ? Icons.pause : Icons.play_arrow_rounded,
                                         ),
+                                        onPressed: () {
+                                          v.isPlaying ? vidController.pause() : vidController.play();
+                                        },
                                       ),
-                                      ValueListenableBuilder(
-                                        valueListenable: vidController,
-                                        builder: ((_, __, ___) {
-                                          int min = vidController.value.position.inMinutes;
-                                          int sec = (vidController.value.position.inSeconds % 60);
-                                          return Text(
-                                            "${min.toString().padLeft(2, '0')}:${sec.toString().padLeft(2, '0')}",
-                                          );
-                                        }),
-                                      ),
-                                      ValueListenableBuilder(
-                                        valueListenable: vidController,
-                                        builder: (_, __, ___) => Slider(
-                                          value: vidController.value.position.inMilliseconds * 1.0,
-                                          min: 0,
-                                          max: vidController.value.duration.inMilliseconds * 1.0,
-                                          onChanged: (_) {},
-                                          onChangeEnd: (value) {
-                                            vidController.seekTo(Duration(milliseconds: value.toInt()));
-                                          },
+                                      Flexible(
+                                        child: Padding(
+                                          padding: const EdgeInsets.only(right: 8.0),
+                                          child: ProgressBar(
+                                            progress: v.position,
+                                            total: v.duration,
+                                            timeLabelLocation: TimeLabelLocation.sides,
+                                            onSeek: (value) {
+                                              vidController.seekTo(value);
+                                            },
+                                          ),
                                         ),
                                       ),
                                     ],
-                                  ),
-                                ),
-                              ],
-                            ),
+                                  );
+                                },
+                              ),
+                            ],
                           ),
                   ),
                   Row(

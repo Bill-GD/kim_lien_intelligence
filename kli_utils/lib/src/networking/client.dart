@@ -25,7 +25,7 @@ class KLIClient {
     logMessageController.add(MapEntry(LogType.info, 'Trying to connect to: $ip'));
 
     final s = KLIClient(await Socket.connect(ip, port).timeout(
-      const Duration(seconds: 3),
+      3.seconds,
       onTimeout: () {
         throw TimeoutException('Timeout when trying to connect to $ip');
       },

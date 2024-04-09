@@ -39,6 +39,7 @@ dependencies:
   window_manager: ^0.3.8
   video_player: ^2.5.1
   video_player_win: ^2.0.0
+  audio_video_progress_bar: ^2.0.2
   kli_utils:
     path: D:/Code/Flutter/kim_lien_intelligence/kli_utils
 
