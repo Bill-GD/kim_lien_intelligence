@@ -4,10 +4,7 @@ class FinishMatch {
   String match;
   List<FinishQuestion> questions;
 
-  FinishMatch({
-    required this.match,
-    required this.questions,
-  });
+  FinishMatch({required this.match, required this.questions});
 
   Map<String, dynamic> toJson() => {
         'match': match,

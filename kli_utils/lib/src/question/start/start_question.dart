@@ -1,11 +1,11 @@
 enum QuestionSubject { math, phys, chem, bio, literature, history, geo, english, sport, art, general }
 
 class StartQuestion {
-  QuestionSubject subject;
-  String question;
-  String answer;
+  final QuestionSubject subject;
+  final String question;
+  final String answer;
 
-  StartQuestion(this.subject, this.question, this.answer);
+  const StartQuestion(this.subject, this.question, this.answer);
 
   Map<String, dynamic> toJson() => {
         'subject': subject.name,

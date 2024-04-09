@@ -1,11 +1,11 @@
 class FinishQuestion {
-  int point;
-  String question;
-  String answer;
-  String explanation;
-  String mediaPath;
+  final int point;
+  final String question;
+  final String answer;
+  final String explanation;
+  final String mediaPath;
 
-  FinishQuestion({
+  const FinishQuestion({
     required this.point,
     required this.question,
     required this.answer,

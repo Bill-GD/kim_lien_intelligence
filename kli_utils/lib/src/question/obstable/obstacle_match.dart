@@ -26,7 +26,7 @@ class ObstacleMatch {
         'charCount': charCount,
       };
 
-  static ObstacleMatch fromJson(Map<String, dynamic> json) => ObstacleMatch(
+  factory ObstacleMatch.fromJson(Map<String, dynamic> json) => ObstacleMatch(
         match: json['match'],
         keyword: json['keyword'],
         hintQuestions: (json['hintQuestions'] as List).map((e) => ObstacleQuestion.fromJson(e)).toList(),

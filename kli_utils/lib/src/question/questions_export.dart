@@ -5,4 +5,5 @@ export 'obstable/obstacle_match.dart';
 export 'acceleration_question.dart';
 export 'finish/finish_question.dart';
 export 'finish/finish_match.dart';
-export 'extra_question.dart';
+export 'extra/extra_question.dart';
+export 'extra/extra_match.dart';

@@ -119,7 +119,7 @@ class _MatchManagerState extends State<MatchManager> {
           ),
           button(
             context,
-            'Remove Match',
+            'Remove Match${currentMatchIndex < 0 ? '' : ': ${matches[currentMatchIndex].name}'}',
             enableCondition: currentMatchIndex >= 0,
             onPressed: () async {
               showDialog<bool>(

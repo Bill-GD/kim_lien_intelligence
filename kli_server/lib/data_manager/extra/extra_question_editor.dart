@@ -3,15 +3,15 @@ import 'package:kli_utils/kli_utils.dart';
 
 import '../../global.dart';
 
-class ObstacleEditorDialog extends StatefulWidget {
-  final ObstacleQuestion question;
-  const ObstacleEditorDialog({super.key, required this.question});
+class ExtraEditorDialog extends StatefulWidget {
+  final ExtraQuestion question;
+  const ExtraEditorDialog({super.key, required this.question});
 
   @override
-  State<ObstacleEditorDialog> createState() => _ObstacleEditorDialogState();
+  State<ExtraEditorDialog> createState() => _ExtraEditorDialogState();
 }
 
-class _ObstacleEditorDialogState extends State<ObstacleEditorDialog> {
+class _ExtraEditorDialogState extends State<ExtraEditorDialog> {
   final _questionController = TextEditingController();
   final _answerController = TextEditingController();
   String? _qErrorText, _aErrorText;
@@ -37,12 +37,9 @@ class _ObstacleEditorDialogState extends State<ObstacleEditorDialog> {
       backgroundColor: Colors.transparent,
       body: AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        titlePadding: const EdgeInsets.symmetric(vertical: 40, horizontal: 256),
+        titlePadding: const EdgeInsets.symmetric(vertical: 10),
+        title: const Text(''),
         contentPadding: const EdgeInsets.only(bottom: 32, left: 60, right: 60),
-        title: Text(
-          widget.question.id < 4 ? 'Question 0${widget.question.id + 1}' : 'Middle',
-          textAlign: TextAlign.center,
-        ),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -115,14 +112,12 @@ class _ObstacleEditorDialogState extends State<ObstacleEditorDialog> {
                 Navigator.of(context).pop();
                 return;
               }
-              final newQ = ObstacleQuestion(
-                widget.question.id,
-                _questionController.text,
-                _answerController.text,
-                _answerController.text.replaceAll(' ', '').length,
+              final newQ = ExtraQuestion(
+                question: _questionController.text,
+                answer: _answerController.text,
               );
 
-              logger.i('Modified obstacle question: ${newQ.id}');
+              logger.i('Modified extra question');
               Navigator.of(context).pop(newQ);
             },
             child: const Text('Done', style: TextStyle(fontSize: fontSizeMedium)),

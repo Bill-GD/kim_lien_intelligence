@@ -138,7 +138,7 @@ class _StartEditorDialogState extends State<StartEditorDialog> {
                 _answerController.text,
               );
 
-              logger.i('Modified question: ${newQ.subject.name}');
+              logger.i('Modified start question: ${newQ.subject.name}');
               Navigator.of(context).pop(newQ);
             },
             child: const Text('Done', style: TextStyle(fontSize: fontSizeMedium)),

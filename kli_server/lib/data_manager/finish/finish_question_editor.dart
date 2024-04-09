@@ -20,25 +20,27 @@ class _FinishEditorDialogState extends State<FinishEditorDialog> {
   final questionController = TextEditingController(),
       answerController = TextEditingController(),
       explanationController = TextEditingController();
+  String newMediaPath = '';
   String? qErrorText, aErrorText;
 
-  late final VideoPlayerController vidController;
+  late VideoPlayerController vidController;
 
   String fullVideoPath = '';
-  bool changedMedia = false, videoFound = false;
+  bool videoFound = false, vidControlInit = false;
   int selectedPointValue = -1;
 
   @override
   void initState() {
     super.initState();
     logger.i('Opened finish question editor');
-    if (widget.question.mediaPath.isNotEmpty) {
-      changeVideoSource(widget.question.mediaPath);
-    }
     questionController.text = widget.question.question;
     answerController.text = widget.question.answer;
     explanationController.text = widget.question.explanation;
     selectedPointValue = widget.question.point;
+    newMediaPath = widget.question.mediaPath;
+
+    if (newMediaPath.isNotEmpty) changeVideoSource(newMediaPath);
+
     setState(() {});
   }
 
@@ -57,9 +59,12 @@ class _FinishEditorDialogState extends State<FinishEditorDialog> {
 
     if (!f.existsSync()) return;
 
+    if (vidControlInit) vidController.dispose();
+
     videoFound = true;
     vidController = VideoPlayerController.file(f);
     await vidController.initialize();
+    vidControlInit = true;
   }
 
   @override
@@ -171,10 +176,10 @@ class _FinishEditorDialogState extends State<FinishEditorDialog> {
                       border: Border.all(width: 1, color: Theme.of(context).colorScheme.onBackground),
                     ),
                     constraints: const BoxConstraints(maxHeight: 400, maxWidth: 710),
-                    child: widget.question.mediaPath.isEmpty || !videoFound
+                    child: newMediaPath.isEmpty || !videoFound
                         ? Center(
                             child: Text(
-                            widget.question.mediaPath.isEmpty ? 'No Video' : 'Video $fullVideoPath not found',
+                            newMediaPath.isEmpty ? 'No Video' : 'Video $fullVideoPath not found',
                           ))
                         : Stack(
                             alignment: Alignment.bottomCenter,
@@ -187,16 +192,14 @@ class _FinishEditorDialogState extends State<FinishEditorDialog> {
                                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                     children: [
                                       IconButton(
-                                        icon: Icon(
-                                          v.isPlaying ? Icons.pause : Icons.play_arrow_rounded,
-                                        ),
+                                        icon: Icon(v.isPlaying ? Icons.pause : Icons.play_arrow_rounded),
                                         onPressed: () {
                                           v.isPlaying ? vidController.pause() : vidController.play();
                                         },
                                       ),
                                       Flexible(
                                         child: Padding(
-                                          padding: const EdgeInsets.only(right: 8.0),
+                                          padding: const EdgeInsets.only(right: 8),
                                           child: ProgressBar(
                                             progress: v.position,
                                             total: v.duration,
@@ -231,10 +234,9 @@ class _FinishEditorDialogState extends State<FinishEditorDialog> {
 
                           if (result != null) {
                             final p = result.files.single.path!;
-                            widget.question.mediaPath = storageHandler!.getRelative(p);
-                            await changeVideoSource(widget.question.mediaPath);
-                            logger.i('Chose ${widget.question.mediaPath}');
-                            changedMedia = true;
+                            newMediaPath = storageHandler!.getRelative(p);
+                            await changeVideoSource(newMediaPath);
+                            logger.i('Chose $newMediaPath');
                             setState(() {});
                           }
                         },
@@ -244,8 +246,7 @@ class _FinishEditorDialogState extends State<FinishEditorDialog> {
                         onPressed: () {
                           logger.i('Removing video');
 
-                          widget.question.mediaPath = '';
-                          changedMedia = true;
+                          newMediaPath = '';
                           setState(() {});
                         },
                       ),
@@ -273,7 +274,7 @@ class _FinishEditorDialogState extends State<FinishEditorDialog> {
                   answerController.text != widget.question.answer ||
                   explanationController.text != widget.question.explanation ||
                   selectedPointValue != widget.question.point ||
-                  changedMedia;
+                  newMediaPath != widget.question.mediaPath;
 
               if (!hasChanged) {
                 logger.i('No change, exiting');
@@ -285,7 +286,7 @@ class _FinishEditorDialogState extends State<FinishEditorDialog> {
                 question: questionController.text,
                 answer: answerController.text,
                 explanation: explanationController.text,
-                mediaPath: widget.question.mediaPath,
+                mediaPath: newMediaPath,
               );
 
               logger.i('Modified finish question');
