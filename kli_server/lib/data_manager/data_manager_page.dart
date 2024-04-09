@@ -56,83 +56,91 @@ class _DataManagerPageState extends State<DataManagerPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.transparent,
-      body: Row(
-        children: [
-          SideNavigationBar(
-            selectedIndex: _selectedPage,
-            expandable: false,
-            header: SideNavigationBarHeader(
-              image: BackButton(
-                onPressed: () {
-                  logger.i('Exiting data manager...');
-                  Navigator.of(context).pop();
-                },
-              ),
-              title: const Padding(
-                padding: EdgeInsets.symmetric(vertical: 30),
-                child: Text(
-                  'Data Manager',
-                  style: TextStyle(
-                    fontSize: fontSizeLarge,
-                    fontWeight: FontWeight.bold,
+      body: Container(
+        decoration: const BoxDecoration(
+          image: DecorationImage(
+            image: AssetImage('assets/images/ttkl_background.png'),
+            fit: BoxFit.fill,
+            opacity: 0.8,
+          ),
+        ),
+        child: Row(
+          children: [
+            SideNavigationBar(
+              selectedIndex: _selectedPage,
+              // expandable: false,
+              header: SideNavigationBarHeader(
+                image: BackButton(
+                  onPressed: () {
+                    logger.i('Exiting data manager...');
+                    Navigator.of(context).pop();
+                  },
+                ),
+                title: const Padding(
+                  padding: EdgeInsets.symmetric(vertical: 30),
+                  child: Text(
+                    'Data Manager',
+                    style: TextStyle(
+                      fontSize: fontSizeLarge,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
+                subtitle: const SizedBox.shrink(),
               ),
-              subtitle: const SizedBox.shrink(),
-            ),
-            items: const [
-              SideNavigationBarItem(
-                icon: Icons.settings_rounded,
-                label: 'Match',
-              ),
-              SideNavigationBarItem(
-                icon: Icons.start_rounded,
-                label: 'Start',
-              ),
-              SideNavigationBarItem(
-                icon: FontAwesomeIcons.roadBarrier,
-                label: 'Obstacle',
-              ),
-              SideNavigationBarItem(
-                icon: Icons.local_fire_department_rounded,
-                label: 'Acceleration',
-              ),
-              SideNavigationBarItem(
-                icon: FontAwesomeIcons.flagCheckered,
-                label: 'Finish',
-              ),
-              SideNavigationBarItem(
-                icon: Icons.add_box_rounded,
-                label: 'Extra',
-              ),
-            ],
-            onTap: (newIndex) {
-              setState(() {
-                _selectedPage = newIndex;
-                logger.i('Selecting ${_contentPages[newIndex].runtimeType}');
-              });
-            },
-            theme: SideNavigationBarTheme(
-              itemTheme: SideNavigationBarItemTheme(
-                selectedItemColor: Theme.of(context).colorScheme.primary,
-                labelTextStyle: const TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: fontSizeMSmall,
-                  height: 2,
+              items: const [
+                SideNavigationBarItem(
+                  icon: Icons.settings_rounded,
+                  label: 'Match',
                 ),
+                SideNavigationBarItem(
+                  icon: Icons.start_rounded,
+                  label: 'Start',
+                ),
+                SideNavigationBarItem(
+                  icon: FontAwesomeIcons.roadBarrier,
+                  label: 'Obstacle',
+                ),
+                SideNavigationBarItem(
+                  icon: Icons.local_fire_department_rounded,
+                  label: 'Acceleration',
+                ),
+                SideNavigationBarItem(
+                  icon: FontAwesomeIcons.flagCheckered,
+                  label: 'Finish',
+                ),
+                SideNavigationBarItem(
+                  icon: Icons.add_box_rounded,
+                  label: 'Extra',
+                ),
+              ],
+              onTap: (newIndex) {
+                setState(() {
+                  _selectedPage = newIndex;
+                  logger.i('Selecting ${_contentPages[newIndex].runtimeType}');
+                });
+              },
+              theme: SideNavigationBarTheme(
+                itemTheme: SideNavigationBarItemTheme(
+                  selectedItemColor: Theme.of(context).colorScheme.primary,
+                  labelTextStyle: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: fontSizeMSmall,
+                    height: 2,
+                  ),
+                ),
+                // backgroundColor: Theme.of(context).colorScheme.background,
+                togglerTheme: SideNavigationBarTogglerTheme.standard(),
+                dividerTheme: SideNavigationBarDividerTheme.standard(),
               ),
-              backgroundColor: Theme.of(context).colorScheme.background,
-              togglerTheme: SideNavigationBarTogglerTheme.standard(),
-              dividerTheme: SideNavigationBarDividerTheme.standard(),
             ),
-          ),
-          Expanded(
-            child: _isLoading
-                ? const Center(child: CircularProgressIndicator())
-                : _contentPages.elementAt(_selectedPage),
-          ),
-        ],
+            Expanded(
+              child: _isLoading
+                  ? const Center(child: CircularProgressIndicator())
+                  : _contentPages.elementAt(_selectedPage),
+            ),
+          ],
+        ),
       ),
     );
   }

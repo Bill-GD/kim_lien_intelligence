@@ -36,12 +36,14 @@ Future<void> initStorageHandler() async {
   storageHandler = await StorageHandler.init(parentFolder);
 }
 
-Widget button(BuildContext context, final String label, void Function()? onPressed) {
+Widget button(BuildContext context, final String label,
+    {required bool enableCondition, void Function()? onPressed}) {
   return OutlinedButton(
-    style: const ButtonStyle(
-      padding: MaterialStatePropertyAll<EdgeInsets>(EdgeInsets.symmetric(vertical: 25, horizontal: 15)),
+    style: ButtonStyle(
+      backgroundColor: MaterialStatePropertyAll<Color>(Theme.of(context).colorScheme.background),
+      padding: const MaterialStatePropertyAll<EdgeInsets>(EdgeInsets.symmetric(vertical: 25, horizontal: 15)),
     ),
-    onPressed: onPressed,
+    onPressed: enableCondition && onPressed != null ? onPressed : null,
     child: Text(label, style: const TextStyle(fontSize: fontSizeMedium)),
   );
 }
@@ -49,11 +51,26 @@ Widget button(BuildContext context, final String label, void Function()? onPress
 AppBar managerAppBar(BuildContext context, String title) {
   return AppBar(
     title: Text(title),
+    backgroundColor: Colors.transparent,
     surfaceTintColor: Theme.of(context).colorScheme.background,
     automaticallyImplyLeading: false,
     titleTextStyle: const TextStyle(fontSize: fontSizeXL),
     centerTitle: true,
     toolbarHeight: kToolbarHeight * 1.1,
+  );
+}
+
+Widget matchSelector(List<String> matchNames, void Function(String?) onSelected) {
+  return DropdownMenu(
+    label: const Text('Match'),
+    dropdownMenuEntries: [
+      for (var i = 0; i < matchNames.length; i++)
+        DropdownMenuEntry(
+          value: matchNames[i],
+          label: matchNames[i],
+        )
+    ],
+    onSelected: onSelected,
   );
 }
 

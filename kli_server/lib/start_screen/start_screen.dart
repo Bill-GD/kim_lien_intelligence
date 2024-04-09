@@ -107,16 +107,21 @@ class _StartPageState extends State<StartPage> {
                   }),
                   Center(
                     child: [
-                      ElevatedButton(
+                      button(
+                        context,
+                        'Open Data Manager',
+                        enableCondition: true,
                         onPressed: () {
                           logger.i('Opening Data Manager page...');
                           Navigator.of(context).push(
                             MaterialPageRoute(builder: (context) => const DataManagerPage()),
                           );
                         },
-                        child: const Text('Open Data Manager', style: TextStyle(fontSize: fontSizeLarge)),
                       ),
-                      ElevatedButton(
+                      button(
+                        context,
+                        'Open Server Setup',
+                        enableCondition: true,
                         onPressed: () async {
                           logger.i('Opening Server Setup page...');
                           await Navigator.of(context).push(
@@ -124,7 +129,6 @@ class _StartPageState extends State<StartPage> {
                           );
                           await KLIServer.stop();
                         },
-                        child: const Text('Open Server Setup', style: TextStyle(fontSize: fontSizeLarge)),
                       ),
                       // Help screen
                       const Text('To be implemented'),

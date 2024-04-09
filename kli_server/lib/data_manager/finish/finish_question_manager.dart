@@ -123,6 +123,7 @@ class _FinishQuestionManagerState extends State<FinishQuestionManager> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: managerAppBar(context, 'Finish Question Manager'),
+      backgroundColor: Colors.transparent,
       body: isLoading
           ? const Center(child: CircularProgressIndicator())
           : Column(
@@ -141,22 +142,12 @@ class _FinishQuestionManagerState extends State<FinishQuestionManager> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
-          DropdownMenu(
-            label: const Text('Match'),
-            dropdownMenuEntries: [
-              for (var i = 0; i < matchNames.length; i++)
-                DropdownMenuEntry(
-                  value: matchNames[i],
-                  label: matchNames[i],
-                )
-            ],
-            onSelected: (value) async {
-              selectedMatchIndex = matchNames.indexOf(value!);
-              logger.i('Selected match: ${matchNames[selectedMatchIndex]}');
-              await loadMatchQuestions(matchNames[selectedMatchIndex]);
-              setState(() {});
-            },
-          ),
+          matchSelector(matchNames, (value) async {
+            selectedMatchIndex = matchNames.indexOf(value!);
+            logger.i('Selected match: ${matchNames[selectedMatchIndex]}');
+            await loadMatchQuestions(matchNames[selectedMatchIndex]);
+            setState(() {});
+          }),
           // sort point
           DropdownMenu(
             label: const Text('Filter position'),
@@ -179,73 +170,71 @@ class _FinishQuestionManagerState extends State<FinishQuestionManager> {
           button(
             context,
             'Import Questions',
-            selectedMatchIndex < 0
-                ? null
-                : () async {
-                    logger.i('Import new questions (.xlsx)');
+            enableCondition: selectedMatchIndex < 0,
+            onPressed: () async {
+              logger.i('Import new questions (.xlsx)');
 
-                    final result = await FilePicker.platform.pickFiles(
-                      dialogTitle: 'Select File',
-                      initialDirectory: storageHandler!.newDataDir.replaceAll('/', '\\'),
-                      type: FileType.custom,
-                      allowedExtensions: ['xlsx'],
-                    );
+              final result = await FilePicker.platform.pickFiles(
+                dialogTitle: 'Select File',
+                initialDirectory: storageHandler!.newDataDir.replaceAll('/', '\\'),
+                type: FileType.custom,
+                allowedExtensions: ['xlsx'],
+              );
 
-                    if (result != null) {
-                      final p = result.files.single.path!;
-                      logger.i(
-                        'Chose ${storageHandler!.getRelative(p)} for match ${matchNames[selectedMatchIndex]}',
-                      );
-                      await getNewQuestion(p);
-                      await saveNewQuestions();
-                      setState(() {});
-                      return;
-                    }
-                    logger.i('No file selected');
-                  },
+              if (result != null) {
+                final p = result.files.single.path!;
+                logger.i(
+                  'Chose ${storageHandler!.getRelative(p)} for match ${matchNames[selectedMatchIndex]}',
+                );
+                await getNewQuestion(p);
+                await saveNewQuestions();
+                setState(() {});
+                return;
+              }
+              logger.i('No file selected');
+            },
           ),
           button(
             context,
             'Remove Questions',
-            selectedMatchIndex < 0
-                ? null
-                : () async {
-                    showDialog<bool>(
-                      context: context,
-                      builder: (BuildContext context) {
-                        return AlertDialog(
-                          title: const Text('Confirm Delete'),
-                          content: Text(
-                            'Are you sure you want to delete questions for match: ${matchNames[selectedMatchIndex]}?',
-                          ),
-                          actionsAlignment: MainAxisAlignment.spaceEvenly,
-                          actions: <Widget>[
-                            TextButton(
-                              child: const Text('Yes', style: TextStyle(fontSize: fontSizeMedium)),
-                              onPressed: () {
-                                Navigator.pop(context, true);
-                              },
-                            ),
-                            TextButton(
-                              child: const Text('No', style: TextStyle(fontSize: fontSizeMedium)),
-                              onPressed: () {
-                                Navigator.pop(context, false);
-                              },
-                            ),
-                          ],
-                        );
-                      },
-                    ).then((value) async {
-                      if (value != true) return;
-                      showToastMessage(
-                        context,
-                        'Removed questions for match: ${matchNames[selectedMatchIndex]}',
-                      );
-                      await removeMatch(selectedMatch!);
-                      selectedMatch = null;
-                      setState(() {});
-                    });
-                  },
+            enableCondition: selectedMatchIndex < 0,
+            onPressed: () async {
+              showDialog<bool>(
+                context: context,
+                builder: (BuildContext context) {
+                  return AlertDialog(
+                    title: const Text('Confirm Delete'),
+                    content: Text(
+                      'Are you sure you want to delete questions for match: ${matchNames[selectedMatchIndex]}?',
+                    ),
+                    actionsAlignment: MainAxisAlignment.spaceEvenly,
+                    actions: <Widget>[
+                      TextButton(
+                        child: const Text('Yes', style: TextStyle(fontSize: fontSizeMedium)),
+                        onPressed: () {
+                          Navigator.pop(context, true);
+                        },
+                      ),
+                      TextButton(
+                        child: const Text('No', style: TextStyle(fontSize: fontSizeMedium)),
+                        onPressed: () {
+                          Navigator.pop(context, false);
+                        },
+                      ),
+                    ],
+                  );
+                },
+              ).then((value) async {
+                if (value != true) return;
+                showToastMessage(
+                  context,
+                  'Removed questions for match: ${matchNames[selectedMatchIndex]}',
+                );
+                await removeMatch(selectedMatch!);
+                selectedMatch = null;
+                setState(() {});
+              });
+            },
           ),
         ],
       ),
@@ -273,7 +262,7 @@ class _FinishQuestionManagerState extends State<FinishQuestionManager> {
             customListTile(context, 'Point', 130, 'Question', 800, 'Answer', 'Explanation', 240),
             Flexible(
               child: Material(
-                borderRadius: BorderRadius.circular(20),
+                borderRadius: BorderRadius.circular(10),
                 child: ListView.builder(
                   itemCount: filtered.length,
                   itemBuilder: (_, index) {

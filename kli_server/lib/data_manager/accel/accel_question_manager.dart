@@ -15,6 +15,7 @@ class _AccelQuestionManagerState extends State<AccelQuestionManager> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: managerAppBar(context, 'Acceleration Question Manager'),
+      backgroundColor: Colors.transparent,
       body: const Center(),
     );
   }
