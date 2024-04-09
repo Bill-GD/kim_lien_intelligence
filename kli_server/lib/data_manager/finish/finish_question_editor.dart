@@ -24,7 +24,8 @@ class _FinishEditorDialogState extends State<FinishEditorDialog> {
 
   late final VideoPlayerController vidController;
 
-  bool changedMedia = false;
+  String fullVideoPath = '';
+  bool changedMedia = false, videoFound = false;
   int selectedPointValue = -1;
 
   @override
@@ -51,7 +52,13 @@ class _FinishEditorDialogState extends State<FinishEditorDialog> {
   }
 
   Future<void> changeVideoSource(String relativePath) async {
-    vidController = VideoPlayerController.file(File(storageHandler!.parentFolder + relativePath));
+    fullVideoPath = '${storageHandler!.parentFolder}\\$relativePath';
+    final f = File(fullVideoPath);
+
+    if (!f.existsSync()) return;
+
+    videoFound = true;
+    vidController = VideoPlayerController.file(f);
     await vidController.initialize();
   }
 
@@ -164,8 +171,11 @@ class _FinishEditorDialogState extends State<FinishEditorDialog> {
                       border: Border.all(width: 1, color: Theme.of(context).colorScheme.onBackground),
                     ),
                     constraints: const BoxConstraints(maxHeight: 400, maxWidth: 710),
-                    child: widget.question.mediaPath.isEmpty
-                        ? const Center(child: Text('No Video'))
+                    child: widget.question.mediaPath.isEmpty || !videoFound
+                        ? Center(
+                            child: Text(
+                            widget.question.mediaPath.isEmpty ? 'No Video' : 'Video $fullVideoPath not found',
+                          ))
                         : Stack(
                             alignment: Alignment.bottomCenter,
                             children: [

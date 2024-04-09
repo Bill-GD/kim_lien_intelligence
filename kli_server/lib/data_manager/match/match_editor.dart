@@ -159,6 +159,12 @@ class _MatchEditorDialogState extends State<MatchEditorDialog> {
   }
 
   Widget playerWidget(int index) {
+    bool imageFound = false;
+    String fullPath = '';
+    if (_imagePaths[index].isNotEmpty) {
+      fullPath = '${storageHandler!.parentFolder}\\${_imagePaths[index]}';
+      imageFound = File(fullPath).existsSync();
+    }
     return Expanded(
       child: Container(
         margin: const EdgeInsets.symmetric(horizontal: 32),
@@ -189,16 +195,13 @@ class _MatchEditorDialogState extends State<MatchEditorDialog> {
                 border: Border.all(width: 1, color: Theme.of(context).colorScheme.onBackground),
               ),
               constraints: const BoxConstraints(maxHeight: 400, maxWidth: 300, minHeight: 1, minWidth: 260),
-              child: _imagePaths[index].isEmpty
+              child: _imagePaths[index].isEmpty || !imageFound
                   ? Container(
                       margin: const EdgeInsets.symmetric(horizontal: 20),
                       alignment: Alignment.center,
-                      child: const Text('No Image'),
+                      child: Text(_imagePaths[index].isEmpty ? 'No Image' : 'Image $fullPath not found'),
                     )
-                  : Image.file(
-                      File('${storageHandler!.parentFolder}\\${_imagePaths[index]}'),
-                      fit: BoxFit.contain,
-                    ),
+                  : Image.file(File(fullPath), fit: BoxFit.contain),
             ),
             ElevatedButton(
               child: const Text('Select Image'),

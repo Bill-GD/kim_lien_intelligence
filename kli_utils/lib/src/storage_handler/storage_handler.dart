@@ -34,6 +34,7 @@ class StorageHandler {
     logMessageController.add(const MapEntry(LogType.info, 'StorageHandler init'));
 
     final sh = StorageHandler(prefixPath.replaceAll('/', '\\'));
+    logMessageController.add(MapEntry(LogType.info, sh.parentFolder));
 
     await sh.createFileEntity(sh.mediaDir, StorageType.dir);
     await sh.createFileEntity(sh.newDataDir, StorageType.dir);
@@ -171,6 +172,6 @@ class StorageHandler {
   }
 
   String getRelative(String abs) {
-    return abs.replaceAll(_parentFolder, '').replaceAll('\\', '/');
+    return abs.replaceAll(_parentFolder, '').substring(1);
   }
 }

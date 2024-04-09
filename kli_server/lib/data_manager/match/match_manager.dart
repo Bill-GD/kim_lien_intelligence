@@ -234,32 +234,38 @@ class _MatchManagerState extends State<MatchManager> {
       padding: const EdgeInsets.symmetric(vertical: 40),
       itemBuilder: (_, index) {
         final p = matches[currentMatchIndex].playerList;
+
+        String fullImagePath = '${storageHandler!.parentFolder}\\${p[index]?.imagePath}';
+
+        bool hasPlayer = p[index] != null, imageFound = false;
+        if (hasPlayer) {
+          imageFound = File(fullImagePath).existsSync();
+        }
         return Container(
           margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-          child: p[index] == null
-              ? GridTile(
-                  child: Container(
-                    decoration: BoxDecoration(
-                      border: Border.all(width: 1, color: Theme.of(context).colorScheme.onBackground),
-                    ),
-                    alignment: Alignment.center,
-                    child: const Text('No player'),
-                  ),
-                )
-              : GridTile(
-                  footer: Text(
+          child: GridTile(
+            footer: hasPlayer
+                ? Text(
                     '${p[index]?.name}',
                     style: const TextStyle(fontSize: fontSizeSmall, fontWeight: FontWeight.bold),
                     textAlign: TextAlign.center,
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.only(bottom: 35),
-                    child: Image.file(
-                      File('${storageHandler!.parentFolder}\\${p[index]?.imagePath}'),
-                      fit: BoxFit.cover,
+                  )
+                : null,
+            child: !hasPlayer || !imageFound
+                ? Container(
+                    margin: const EdgeInsets.only(bottom: 35),
+                    decoration: BoxDecoration(
+                      border: Border.all(width: 1, color: Theme.of(context).colorScheme.onBackground),
+                      color: Theme.of(context).colorScheme.background,
                     ),
+                    alignment: Alignment.center,
+                    child: Text(!hasPlayer ? 'No player' : 'Image at $fullImagePath not found'),
+                  )
+                : Padding(
+                    padding: const EdgeInsets.only(bottom: 35),
+                    child: Image.file(File(fullImagePath), fit: BoxFit.cover),
                   ),
-                ),
+          ),
         );
       },
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2),

@@ -230,6 +230,13 @@ class _ObstacleQuestionManagerState extends State<ObstacleQuestionManager> {
   }
 
   Widget questionList() {
+    bool imageFound = false;
+    String fullImagePath = '';
+    if (selectedMatchIndex >= 0) {
+      fullImagePath = '${storageHandler!.parentFolder}\\${selectedMatch!.imagePath}';
+      imageFound = File(fullImagePath).existsSync();
+    }
+
     return Flexible(
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
@@ -349,13 +356,20 @@ class _ObstacleQuestionManagerState extends State<ObstacleQuestionManager> {
                       border: Border.all(width: 1, color: Theme.of(context).colorScheme.onBackground),
                     ),
                     constraints: const BoxConstraints(maxHeight: 400, maxWidth: 600),
-                    child: selectedMatch == null || selectedMatch!.imagePath.isEmpty
+                    child: selectedMatch == null || selectedMatch!.imagePath.isEmpty || !imageFound
                         ? Material(
                             child: Center(
-                                child: Text(selectedMatchIndex < 0 ? 'No match selected' : 'No Image')),
+                              child: Text(
+                                selectedMatchIndex < 0
+                                    ? 'No match selected'
+                                    : !imageFound
+                                        ? 'Image $fullImagePath not found'
+                                        : 'No Image',
+                              ),
+                            ),
                           )
                         : Image.file(
-                            File('${storageHandler!.parentFolder}\\${selectedMatch!.imagePath}'),
+                            File(fullImagePath),
                             fit: BoxFit.contain,
                           ),
                   ),
