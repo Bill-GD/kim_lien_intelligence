@@ -99,7 +99,7 @@ class _ObstacleQuestionManagerState extends State<ObstacleQuestionManager> {
       setState(() {});
       logger.i('Loaded Obstacle (${selectedMatch!.keyword}) of $match');
     } on StateError {
-      selectedMatch = null;
+      logger.i('No match found: $match');
     }
   }
 
@@ -148,6 +148,14 @@ class _ObstacleQuestionManagerState extends State<ObstacleQuestionManager> {
           matchSelector(matchNames, (value) async {
             selectedMatchIndex = matchNames.indexOf(value!);
             logger.i('Selected match: ${matchNames[selectedMatchIndex]}');
+            selectedMatch ??= ObstacleMatch(
+              match: matchNames[selectedMatchIndex],
+              keyword: '',
+              imagePath: '',
+              charCount: 0,
+              explanation: '',
+              hintQuestions: List<ObstacleQuestion?>.filled(5, null),
+            );
             await loadMatchQuestions(matchNames[selectedMatchIndex]);
             setState(() {});
           }),
@@ -212,12 +220,16 @@ class _ObstacleQuestionManagerState extends State<ObstacleQuestionManager> {
                 },
               ).then((value) async {
                 if (value != true) return;
-                showToastMessage(
-                  context,
-                  'Removed questions for match: ${matchNames[selectedMatchIndex]}',
-                );
+                showToastMessage(context, 'Removed questions for match: ${matchNames[selectedMatchIndex]}');
                 await removeMatch(selectedMatch!);
-                selectedMatch = null;
+                selectedMatch = ObstacleMatch(
+                  match: matchNames[selectedMatchIndex],
+                  keyword: '',
+                  imagePath: '',
+                  charCount: 0,
+                  explanation: '',
+                  hintQuestions: List<ObstacleQuestion?>.filled(5, null),
+                );
                 setState(() {});
               });
             },
@@ -230,7 +242,7 @@ class _ObstacleQuestionManagerState extends State<ObstacleQuestionManager> {
   Widget questionList() {
     bool imageFound = false;
     String fullImagePath = '';
-    if (selectedMatchIndex >= 0) {
+    if (selectedMatch != null) {
       fullImagePath = '${storageHandler!.parentFolder}\\${selectedMatch!.imagePath}';
       imageFound = File(fullImagePath).existsSync();
     }
@@ -264,17 +276,19 @@ class _ObstacleQuestionManagerState extends State<ObstacleQuestionManager> {
                       itemCount: 5,
                       separatorBuilder: (_, index) => const SizedBox(height: 20),
                       itemBuilder: (_, index) {
+                        final q = selectedMatch?.hintQuestions[index];
+
                         return ListTile(
                           leading: Text("${index + 1}"),
                           tileColor: Theme.of(context).colorScheme.background,
                           leadingAndTrailingTextStyle: const TextStyle(fontSize: fontSizeMedium),
                           title: Text(
-                            '${selectedMatch?.hintQuestions[index].question}',
+                            q?.question ?? '',
                             style: const TextStyle(fontSize: fontSizeMedium),
                           ),
-                          subtitle: Text('${selectedMatch?.hintQuestions[index].charCount} kí tự'),
+                          subtitle: Text('${q?.charCount ?? 0} kí tự'),
                           subtitleTextStyle: const TextStyle(fontSize: fontSizeSmall),
-                          trailing: Text('${selectedMatch?.hintQuestions[index].answer}'),
+                          trailing: Text(q?.answer ?? ''),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(10),
                             side: BorderSide(
@@ -282,23 +296,19 @@ class _ObstacleQuestionManagerState extends State<ObstacleQuestionManager> {
                               color: Theme.of(context).colorScheme.onBackground,
                             ),
                           ),
-                          onTap: selectedMatch == null
-                              ? null
-                              : () async {
-                                  final nQ = await Navigator.of(context).push<ObstacleQuestion>(
-                                    DialogRoute<ObstacleQuestion>(
-                                      context: context,
-                                      builder: (_) => ObstacleEditorDialog(
-                                        question: selectedMatch!.hintQuestions[index],
-                                      ),
-                                    ),
-                                  );
+                          onTap: () async {
+                            final nQ = await Navigator.of(context).push<ObstacleQuestion>(
+                              DialogRoute<ObstacleQuestion>(
+                                context: context,
+                                builder: (_) => ObstacleEditorDialog(question: q, index: index),
+                              ),
+                            );
 
-                                  if (nQ == null) return;
-                                  selectedMatch!.hintQuestions[index] = nQ;
-                                  await updateQuestions(selectedMatch!);
-                                  setState(() {});
-                                },
+                            if (nQ == null) return;
+                            selectedMatch!.hintQuestions[index] = nQ;
+                            await updateQuestions(selectedMatch!);
+                            setState(() {});
+                          },
                         );
                       },
                     ),
@@ -325,7 +335,7 @@ class _ObstacleQuestionManagerState extends State<ObstacleQuestionManager> {
                               padding: const EdgeInsets.symmetric(horizontal: 16),
                               child: TextField(
                                 style: const TextStyle(fontSize: fontSizeMedium),
-                                controller: obstacleController..text = '${selectedMatch?.keyword}',
+                                controller: obstacleController..text = selectedMatch?.keyword ?? '',
                                 maxLines: 5,
                                 minLines: 1,
                                 decoration: InputDecoration(
@@ -354,22 +364,18 @@ class _ObstacleQuestionManagerState extends State<ObstacleQuestionManager> {
                       border: Border.all(width: 1, color: Theme.of(context).colorScheme.onBackground),
                     ),
                     constraints: const BoxConstraints(maxHeight: 400, maxWidth: 600),
-                    child: selectedMatch == null || selectedMatch!.imagePath.isEmpty || !imageFound
-                        ? Material(
+                    child: selectedMatchIndex >= 0 && fullImagePath.isNotEmpty && imageFound
+                        ? Image.file(File(fullImagePath), fit: BoxFit.contain)
+                        : Material(
                             child: Center(
-                              child: Text(
-                                selectedMatchIndex < 0
-                                    ? 'No match selected'
-                                    : !imageFound
-                                        ? 'Image $fullImagePath not found'
-                                        : 'No Image',
-                              ),
+                            child: Text(
+                              selectedMatchIndex < 0
+                                  ? 'No match selected'
+                                  : selectedMatch!.imagePath.isEmpty
+                                      ? 'No image'
+                                      : 'Image $fullImagePath not found',
                             ),
-                          )
-                        : Image.file(
-                            File(fullImagePath),
-                            fit: BoxFit.contain,
-                          ),
+                          )),
                   ),
                   if (selectedMatchIndex < 0)
                     const SizedBox.shrink()

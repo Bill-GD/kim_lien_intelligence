@@ -3,7 +3,7 @@ import 'obstacle_question.dart';
 class ObstacleMatch {
   String match;
   String keyword;
-  List<ObstacleQuestion> hintQuestions;
+  List<ObstacleQuestion?> hintQuestions;
   String imagePath;
   String explanation;
   int charCount;
@@ -20,7 +20,7 @@ class ObstacleMatch {
   Map<String, dynamic> toJson() => {
         'match': match,
         'keyword': keyword,
-        'hintQuestions': hintQuestions.map((e) => e.toJson()).toList(),
+        'hintQuestions': hintQuestions.map((e) => e?.toJson()).toList(),
         'imagePath': imagePath,
         'explanation': explanation,
         'charCount': charCount,
@@ -29,7 +29,9 @@ class ObstacleMatch {
   factory ObstacleMatch.fromJson(Map<String, dynamic> json) => ObstacleMatch(
         match: json['match'],
         keyword: json['keyword'],
-        hintQuestions: (json['hintQuestions'] as List).map((e) => ObstacleQuestion.fromJson(e)).toList(),
+        hintQuestions: (json['hintQuestions'] as List)
+            .map((e) => e == null ? null : ObstacleQuestion.fromJson(e))
+            .toList(),
         imagePath: json['imagePath'],
         explanation: json['explanation'],
         charCount: json['charCount'],

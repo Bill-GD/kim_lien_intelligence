@@ -135,7 +135,7 @@ class _ExtraQuestionManagerState extends State<ExtraQuestionManager> {
           }),
           button(
             context,
-            'Add New Question',
+            'Add Question',
             enableCondition: selectedMatchIndex >= 0,
             onPressed: () async {
               final newQ = await Navigator.of(context).push<ExtraQuestion>(DialogRoute<ExtraQuestion>(

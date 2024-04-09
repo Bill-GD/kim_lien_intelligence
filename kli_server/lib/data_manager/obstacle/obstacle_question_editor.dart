@@ -4,8 +4,9 @@ import 'package:kli_utils/kli_utils.dart';
 import '../../global.dart';
 
 class ObstacleEditorDialog extends StatefulWidget {
-  final ObstacleQuestion question;
-  const ObstacleEditorDialog({super.key, required this.question});
+  final ObstacleQuestion? question;
+  final int index;
+  const ObstacleEditorDialog({super.key, this.question, required this.index});
 
   @override
   State<ObstacleEditorDialog> createState() => _ObstacleEditorDialogState();
@@ -20,8 +21,10 @@ class _ObstacleEditorDialogState extends State<ObstacleEditorDialog> {
   void initState() {
     super.initState();
     logger.i('Opened obstacle question editor');
-    _questionController.text = widget.question.question;
-    _answerController.text = widget.question.answer;
+    if (widget.question != null) {
+      _questionController.text = widget.question!.question;
+      _answerController.text = widget.question!.answer;
+    }
   }
 
   @override
@@ -40,7 +43,7 @@ class _ObstacleEditorDialogState extends State<ObstacleEditorDialog> {
         titlePadding: const EdgeInsets.symmetric(vertical: 40, horizontal: 256),
         contentPadding: const EdgeInsets.only(bottom: 32, left: 60, right: 60),
         title: Text(
-          widget.question.id < 4 ? 'Question 0${widget.question.id + 1}' : 'Middle',
+          widget.index < 4 ? 'Question 0${widget.index + 1}' : 'Middle',
           textAlign: TextAlign.center,
         ),
         content: Column(
@@ -107,8 +110,8 @@ class _ObstacleEditorDialogState extends State<ObstacleEditorDialog> {
                 return;
               }
 
-              bool hasChanged = _questionController.text != widget.question.question ||
-                  _answerController.text != widget.question.answer;
+              bool hasChanged = widget.question == null ? true : _questionController.text != widget.question!.question ||
+                  _answerController.text != widget.question!.answer;
 
               if (!hasChanged) {
                 logger.i('No change, exiting');
@@ -116,7 +119,7 @@ class _ObstacleEditorDialogState extends State<ObstacleEditorDialog> {
                 return;
               }
               final newQ = ObstacleQuestion(
-                widget.question.id,
+                widget.index,
                 _questionController.text,
                 _answerController.text,
                 _answerController.text.replaceAll(' ', '').length,
