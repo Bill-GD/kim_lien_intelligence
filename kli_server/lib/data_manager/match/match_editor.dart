@@ -33,7 +33,7 @@ class _MatchEditorDialogState extends State<MatchEditorDialog> {
     super.initState();
     _disableDone = _setNewMatch = widget.match == null;
     logger.i(
-      'Match editor: ${_setNewMatch ? ' New' : '${widget.match?.name}'}',
+      'Match editor: ${_setNewMatch ? 'New' : '${widget.match?.name}'}',
     );
     if (_setNewMatch) return;
 

@@ -148,7 +148,7 @@ class _AccelEditorDialogState extends State<AccelEditorDialog> {
                 imagePaths: createNew ? [] : widget.question!.imagePaths,
               );
 
-              logger.i('${createNew ? 'Created' : 'Modified'} extra question');
+              logger.i('${createNew ? 'Created' : 'Modified'} accel question');
               Navigator.of(context).pop(newQ);
             },
             child: const Text('Done', style: TextStyle(fontSize: fontSizeMedium)),

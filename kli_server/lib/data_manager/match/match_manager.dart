@@ -176,6 +176,7 @@ class _MatchManagerState extends State<MatchManager> {
                   ? Container(
                       decoration: BoxDecoration(
                         border: Border.all(width: 1, color: Theme.of(context).colorScheme.onBackground),
+                        color: Theme.of(context).colorScheme.background,
                       ),
                       alignment: Alignment.center,
                       child: const Text('No match'),

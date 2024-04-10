@@ -164,7 +164,6 @@ class _ObstacleQuestionManagerState extends State<ObstacleQuestionManager> {
           matchSelector(matchNames, (value) async {
             selectedMatchIndex = matchNames.indexOf(value!);
             logger.i('Selected match: ${matchNames[selectedMatchIndex]}');
-
             await loadMatchQuestions(matchNames[selectedMatchIndex]);
             setState(() {});
           }),
@@ -293,19 +292,13 @@ class _ObstacleQuestionManagerState extends State<ObstacleQuestionManager> {
                   leading: Text("${index + 1}"),
                   tileColor: Theme.of(context).colorScheme.background,
                   leadingAndTrailingTextStyle: const TextStyle(fontSize: fontSizeMedium),
-                  title: Text(
-                    q?.question ?? '',
-                    style: const TextStyle(fontSize: fontSizeMedium),
-                  ),
+                  title: Text(q?.question ?? '', style: const TextStyle(fontSize: fontSizeMedium)),
                   subtitle: Text('${q?.charCount ?? 0} kí tự'),
                   subtitleTextStyle: const TextStyle(fontSize: fontSizeSmall),
                   trailing: Text(q?.answer ?? ''),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10),
-                    side: BorderSide(
-                      width: 2,
-                      color: Theme.of(context).colorScheme.onBackground,
-                    ),
+                    side: BorderSide(width: 2, color: Theme.of(context).colorScheme.onBackground),
                   ),
                   onTap: () async {
                     final nQ = await Navigator.of(context).push<ObstacleQuestion>(

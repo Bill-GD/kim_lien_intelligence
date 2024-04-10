@@ -137,6 +137,7 @@ class _StartQuestionManagerState extends State<StartQuestionManager> {
         children: [
           matchSelector(matchNames, (value) async {
             selectedMatchIndex = matchNames.indexOf(value!);
+            selectedMatch.match = value;
             logger.i('Selected match: ${matchNames[selectedMatchIndex]}');
             await loadMatchQuestions(matchNames[selectedMatchIndex]);
             setState(() {});
@@ -192,7 +193,12 @@ class _StartQuestionManagerState extends State<StartQuestionManager> {
                 builder: (_) => const StartEditorDialog(question: null, playerPos: -1),
               ));
               if (ret case (final newP, final newQ)?) {
-                selectedMatch.questions[newP]!.add(newQ);
+                final qList = selectedMatch.questions[newP];
+                if (qList == null) {
+                  selectedMatch.questions[newP] = [newQ];
+                } else {
+                  qList.add(newQ);
+                }
                 await updateQuestions(selectedMatch);
               }
               setState(() {});

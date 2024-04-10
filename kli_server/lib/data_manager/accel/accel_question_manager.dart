@@ -394,9 +394,9 @@ class _AccelQuestionManagerState extends State<AccelQuestionManager> {
                           ? 'No match selected'
                           : selectedQuestionIndex < 0
                               ? 'No question selected'
-                              : !imageFound
-                                  ? 'Image $fullImagePath not found'
-                                  : 'No image selected'),
+                              : selectedQuestion.imagePaths.isEmpty
+                                  ? 'No image selected'
+                                  : 'Image $fullImagePath not found'),
                     ),
                   )
                 : Image.file(File(fullImagePath)),
