@@ -19,13 +19,21 @@ class _ObstacleQuestionManagerState extends State<ObstacleQuestionManager> {
   bool isLoading = true;
   List<String> matchNames = [];
   int selectedMatchIndex = -1;
-  ObstacleMatch? selectedMatch;
+  late ObstacleMatch selectedMatch;
   final obstacleController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
     logger.i('Obstacle question manager init');
+    selectedMatch = ObstacleMatch(
+      match: '',
+      charCount: 0,
+      explanation: '',
+      hintQuestions: List<ObstacleQuestion?>.filled(5, null),
+      imagePath: '',
+      keyword: '',
+    );
     getMatchNames().then((value) async {
       if (value.isNotEmpty) matchNames = value;
       setState(() => isLoading = false);
@@ -71,14 +79,14 @@ class _ObstacleQuestionManagerState extends State<ObstacleQuestionManager> {
       explanation: sheet[5].values.elementAt(4),
       hintQuestions: qL,
     );
-    logger.i('Loaded ${selectedMatch!.match} (${selectedMatch!.keyword})');
+    logger.i('Loaded ${selectedMatch.match} (${selectedMatch.keyword})');
   }
 
   Future<void> saveNewQuestions() async {
     logger.i('Saving new questions of match: ${matchNames[selectedMatchIndex]}');
     final saved = await getAllSavedQuestions();
-    saved.removeWhere((e) => e.match == selectedMatch!.match);
-    saved.add(selectedMatch!);
+    saved.removeWhere((e) => e.match == selectedMatch.match);
+    saved.add(selectedMatch);
     await overwriteSave(saved);
   }
 
@@ -97,9 +105,9 @@ class _ObstacleQuestionManagerState extends State<ObstacleQuestionManager> {
     try {
       selectedMatch = saved.firstWhere((e) => e.match == match);
       setState(() {});
-      logger.i('Loaded Obstacle (${selectedMatch!.keyword}) of $match');
+      logger.i('Loaded Obstacle (${selectedMatch.keyword}) of $match');
     } on StateError {
-      logger.i('No match found: $match, creating empty match');
+      logger.i('Obstacle match $match not found, temp empty match created');
       selectedMatch = ObstacleMatch(
         match: matchNames[selectedMatchIndex],
         keyword: '',
@@ -222,7 +230,7 @@ class _ObstacleQuestionManagerState extends State<ObstacleQuestionManager> {
               ).then((value) async {
                 if (value != true) return;
                 showToastMessage(context, 'Removed questions for match: ${matchNames[selectedMatchIndex]}');
-                await removeMatch(selectedMatch!);
+                await removeMatch(selectedMatch);
                 selectedMatch = ObstacleMatch(
                   match: matchNames[selectedMatchIndex],
                   keyword: '',
@@ -243,10 +251,8 @@ class _ObstacleQuestionManagerState extends State<ObstacleQuestionManager> {
   Widget questionList() {
     bool imageFound = false;
     String fullImagePath = '';
-    if (selectedMatch != null) {
-      fullImagePath = '${storageHandler!.parentFolder}\\${selectedMatch!.imagePath}';
-      imageFound = File(fullImagePath).existsSync();
-    }
+    fullImagePath = '${storageHandler!.parentFolder}\\${selectedMatch.imagePath}';
+    imageFound = File(fullImagePath).existsSync();
 
     return Flexible(
       child: Padding(
@@ -277,7 +283,7 @@ class _ObstacleQuestionManagerState extends State<ObstacleQuestionManager> {
                       itemCount: 5,
                       separatorBuilder: (_, index) => const SizedBox(height: 20),
                       itemBuilder: (_, index) {
-                        final q = selectedMatch?.hintQuestions[index];
+                        final q = selectedMatch.hintQuestions[index];
 
                         return ListTile(
                           leading: Text("${index + 1}"),
@@ -306,8 +312,8 @@ class _ObstacleQuestionManagerState extends State<ObstacleQuestionManager> {
                             );
 
                             if (nQ == null) return;
-                            selectedMatch!.hintQuestions[index] = nQ;
-                            await updateQuestions(selectedMatch!);
+                            selectedMatch.hintQuestions[index] = nQ;
+                            await updateQuestions(selectedMatch);
                             setState(() {});
                           },
                         );
@@ -336,7 +342,7 @@ class _ObstacleQuestionManagerState extends State<ObstacleQuestionManager> {
                               padding: const EdgeInsets.symmetric(horizontal: 16),
                               child: TextField(
                                 style: const TextStyle(fontSize: fontSizeMedium),
-                                controller: obstacleController..text = selectedMatch?.keyword ?? '',
+                                controller: obstacleController..text = selectedMatch.keyword,
                                 maxLines: 5,
                                 minLines: 1,
                                 decoration: InputDecoration(
@@ -351,11 +357,11 @@ class _ObstacleQuestionManagerState extends State<ObstacleQuestionManager> {
                             ),
                           ),
                           button(context, 'Save', enableCondition: true, onPressed: () async {
-                            selectedMatch!.keyword = obstacleController.text;
-                            selectedMatch!.charCount = obstacleController.text.replaceAll(' ', '').length;
+                            selectedMatch.keyword = obstacleController.text;
+                            selectedMatch.charCount = obstacleController.text.replaceAll(' ', '').length;
                             logger.i('Modified keyword of match: ${matchNames[selectedMatchIndex]}');
                             showToastMessage(context, 'Saved');
-                            await updateQuestions(selectedMatch!);
+                            await updateQuestions(selectedMatch);
                           }),
                         ],
                       ),
@@ -372,7 +378,7 @@ class _ObstacleQuestionManagerState extends State<ObstacleQuestionManager> {
                             child: Text(
                               selectedMatchIndex < 0
                                   ? 'No match selected'
-                                  : selectedMatch!.imagePath.isEmpty
+                                  : selectedMatch.imagePath.isEmpty
                                       ? 'No image'
                                       : 'Image $fullImagePath not found',
                             ),
@@ -395,9 +401,9 @@ class _ObstacleQuestionManagerState extends State<ObstacleQuestionManager> {
 
                         if (result != null) {
                           final p = result.files.single.path!;
-                          selectedMatch!.imagePath = storageHandler!.getRelative(p);
-                          await updateQuestions(selectedMatch!);
-                          logger.i('Chose ${selectedMatch!.imagePath}');
+                          selectedMatch.imagePath = storageHandler!.getRelative(p);
+                          await updateQuestions(selectedMatch);
+                          logger.i('Chose ${selectedMatch.imagePath}');
                           setState(() {});
                         }
                       },

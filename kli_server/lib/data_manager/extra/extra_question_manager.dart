@@ -18,12 +18,13 @@ class _ExtraQuestionManagerState extends State<ExtraQuestionManager> {
   bool isLoading = true;
   List<String> matchNames = [];
   int selectedMatchIndex = -1;
-  ExtraMatch? selectedMatch;
+  late ExtraMatch selectedMatch;
 
   @override
   void initState() {
     super.initState();
     logger.i('Extra question manager init');
+    selectedMatch = ExtraMatch(match: '', questions: []);
     getMatchNames().then((value) async {
       if (value.isNotEmpty) matchNames = value;
       setState(() => isLoading = false);
@@ -53,14 +54,14 @@ class _ExtraQuestionManagerState extends State<ExtraQuestionManager> {
       }
     }
     selectedMatch = ExtraMatch(match: matchNames[selectedMatchIndex], questions: allQ);
-    logger.i('Loaded ${selectedMatch!.questions.length} questions from excel');
+    logger.i('Loaded ${selectedMatch.questions.length} questions from excel');
   }
 
   Future<void> saveNewQuestions() async {
     logger.i('Saving new questions of match: ${matchNames[selectedMatchIndex]}');
     final saved = await getAllSavedQuestions();
-    saved.removeWhere((e) => e.match == selectedMatch!.match);
-    saved.add(selectedMatch!);
+    saved.removeWhere((e) => e.match == selectedMatch.match);
+    saved.add(selectedMatch);
     await overwriteSave(saved);
   }
 
@@ -79,9 +80,10 @@ class _ExtraQuestionManagerState extends State<ExtraQuestionManager> {
     try {
       selectedMatch = saved.firstWhere((e) => e.match == match);
       setState(() {});
-      logger.i('Loaded Extra questions of match ${selectedMatch!.match}');
+      logger.i('Loaded ${selectedMatch.questions.length} extra questions of match ${selectedMatch.match}');
     } on StateError {
-      selectedMatch = null;
+      logger.i('Extra match $match not found, temp empty match created');
+      selectedMatch = ExtraMatch(match: match, questions: []);
     }
   }
 
@@ -145,8 +147,8 @@ class _ExtraQuestionManagerState extends State<ExtraQuestionManager> {
                 builder: (_) => const ExtraEditorDialog(),
               ));
               if (newQ != null) {
-                selectedMatch!.questions.add(newQ);
-                await updateQuestions(selectedMatch!);
+                selectedMatch.questions.add(newQ);
+                await updateQuestions(selectedMatch);
               }
               setState(() {});
             },
@@ -214,8 +216,8 @@ class _ExtraQuestionManagerState extends State<ExtraQuestionManager> {
                   context,
                   'Removed questions for match: ${matchNames[selectedMatchIndex]}',
                 );
-                await removeMatch(selectedMatch!);
-                selectedMatch = null;
+                await removeMatch(selectedMatch);
+                selectedMatch = ExtraMatch(match: '', questions: []);
                 setState(() {});
               });
             },
@@ -246,9 +248,9 @@ class _ExtraQuestionManagerState extends State<ExtraQuestionManager> {
               child: Material(
                 borderRadius: BorderRadius.circular(10),
                 child: ListView.builder(
-                  itemCount: selectedMatch?.questions.length ?? 0,
+                  itemCount: selectedMatch.questions.length,
                   itemBuilder: (_, index) {
-                    final q = selectedMatch!.questions[index];
+                    final q = selectedMatch.questions[index];
 
                     return customListTile(
                       context,
@@ -259,9 +261,9 @@ class _ExtraQuestionManagerState extends State<ExtraQuestionManager> {
                           IconButton(
                             icon: const Icon(Icons.delete),
                             onPressed: () async {
-                              selectedMatch!.questions.removeAt(index);
-                              await updateQuestions(selectedMatch!);
-                              logger.i('Deleted extra question of ${selectedMatch!.match}');
+                              selectedMatch.questions.removeAt(index);
+                              await updateQuestions(selectedMatch);
+                              logger.i('Deleted extra question of ${selectedMatch.match}');
                               setState(() {});
                             },
                           ),
@@ -277,8 +279,8 @@ class _ExtraQuestionManagerState extends State<ExtraQuestionManager> {
                           builder: (_) => ExtraEditorDialog(question: q),
                         ));
                         if (newQ != null) {
-                          selectedMatch!.questions[index] = newQ;
-                          await updateQuestions(selectedMatch!);
+                          selectedMatch.questions[index] = newQ;
+                          await updateQuestions(selectedMatch);
                         }
                         setState(() {});
                       },

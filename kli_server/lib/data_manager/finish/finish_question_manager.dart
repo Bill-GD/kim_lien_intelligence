@@ -18,13 +18,14 @@ class _FinishQuestionManagerState extends State<FinishQuestionManager> {
   bool isLoading = true;
   List<String> matchNames = [];
   int selectedMatchIndex = -1, sortPoint = -1;
-  FinishMatch? selectedMatch;
+  late FinishMatch selectedMatch;
   final obstacleController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
     logger.i('Finish question manager init');
+    selectedMatch = FinishMatch(match: '', questions: []);
     getMatchNames().then((value) async {
       if (value.isNotEmpty) matchNames = value;
       setState(() => isLoading = false);
@@ -66,14 +67,14 @@ class _FinishQuestionManagerState extends State<FinishQuestionManager> {
     }
 
     selectedMatch = FinishMatch(match: matchNames[selectedMatchIndex], questions: questions);
-    logger.i('Loaded ${selectedMatch!.match}');
+    logger.i('Loaded ${selectedMatch.match}');
   }
 
   Future<void> saveNewQuestions() async {
     logger.i('Saving new questions of match: ${matchNames[selectedMatchIndex]}');
     final saved = await getAllSavedQuestions();
-    saved.removeWhere((e) => e.match == selectedMatch!.match);
-    saved.add(selectedMatch!);
+    saved.removeWhere((e) => e.match == selectedMatch.match);
+    saved.add(selectedMatch);
     await overwriteSave(saved);
   }
 
@@ -92,9 +93,10 @@ class _FinishQuestionManagerState extends State<FinishQuestionManager> {
     try {
       selectedMatch = saved.firstWhere((e) => e.match == match);
       setState(() {});
-      logger.i('Loaded Finish questions of ${selectedMatch!.match}');
+      logger.i('Loaded ${selectedMatch.questions.length} finish questions of ${selectedMatch.match}');
     } on StateError {
-      selectedMatch = null;
+      logger.i('Finish match $match not found, temp empty match created');
+      selectedMatch = FinishMatch(match: match, questions: []);
     }
   }
 
@@ -177,8 +179,8 @@ class _FinishQuestionManagerState extends State<FinishQuestionManager> {
                 builder: (_) => const FinishEditorDialog(),
               ));
               if (newQ != null) {
-                selectedMatch!.questions.add(newQ);
-                await updateQuestions(selectedMatch!);
+                selectedMatch.questions.add(newQ);
+                await updateQuestions(selectedMatch);
               }
               setState(() {});
             },
@@ -243,8 +245,8 @@ class _FinishQuestionManagerState extends State<FinishQuestionManager> {
               ).then((value) async {
                 if (value != true) return;
                 showToastMessage(context, 'Removed questions for match: ${matchNames[selectedMatchIndex]}');
-                await removeMatch(selectedMatch!);
-                selectedMatch = null;
+                await removeMatch(selectedMatch);
+                selectedMatch = FinishMatch(match: '', questions: []);
                 setState(() {});
               });
             },
@@ -256,11 +258,9 @@ class _FinishQuestionManagerState extends State<FinishQuestionManager> {
 
   Widget questionList() {
     List<(int, FinishQuestion)> filtered = [];
-    if (selectedMatch != null) {
-      for (int i = 0; i < selectedMatch!.questions.length; i++) {
-        if (sortPoint > 0 && selectedMatch!.questions[i].point != sortPoint) continue;
-        filtered.add((i, selectedMatch!.questions[i]));
-      }
+    for (int i = 0; i < selectedMatch.questions.length; i++) {
+      if (sortPoint > 0 && selectedMatch.questions[i].point != sortPoint) continue;
+      filtered.add((i, selectedMatch.questions[i]));
     }
 
     List<double> widthRatios = [0.035, 0.4, 0.1, 0.15, 0.03];
@@ -300,8 +300,8 @@ class _FinishQuestionManagerState extends State<FinishQuestionManager> {
                           IconButton(
                             icon: const Icon(Icons.delete),
                             onPressed: () async {
-                              selectedMatch!.questions.removeAt(q.$1);
-                              await updateQuestions(selectedMatch!);
+                              selectedMatch.questions.removeAt(q.$1);
+                              await updateQuestions(selectedMatch);
                               logger.i('Removed finish question (p=${q.$2.point})');
                               setState(() {});
                             },
@@ -319,8 +319,8 @@ class _FinishQuestionManagerState extends State<FinishQuestionManager> {
                         );
 
                         if (newQ != null) {
-                          selectedMatch!.questions[q.$1] = newQ;
-                          await updateQuestions(selectedMatch!);
+                          selectedMatch.questions[q.$1] = newQ;
+                          await updateQuestions(selectedMatch);
                         }
                         setState(() {});
                       },

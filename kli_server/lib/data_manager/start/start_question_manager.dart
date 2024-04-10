@@ -17,7 +17,7 @@ class StartQuestionManager extends StatefulWidget {
 class _StartQuestionManagerState extends State<StartQuestionManager> {
   bool isLoading = true;
   List<String> matchNames = [];
-  StartMatch? selectedMatch;
+  late StartMatch selectedMatch;
   int selectedMatchIndex = -1, sortPlayerPos = -1;
   QuestionSubject? sortType;
 
@@ -25,6 +25,7 @@ class _StartQuestionManagerState extends State<StartQuestionManager> {
   void initState() {
     super.initState();
     logger.i('Start question manager init');
+    selectedMatch = StartMatch(match: '', questions: {});
     getMatchNames().then((value) async {
       if (value.isNotEmpty) matchNames = value;
       setState(() => isLoading = false);
@@ -59,14 +60,14 @@ class _StartQuestionManagerState extends State<StartQuestionManager> {
       idx++;
     }
     selectedMatch = StartMatch(match: matchNames[selectedMatchIndex], questions: allQ);
-    logger.i('Loaded ${selectedMatch!.questionCount} questions from excel');
+    logger.i('Loaded ${selectedMatch.questionCount} questions from excel');
   }
 
   Future<void> saveNewQuestions() async {
     logger.i('Saving new questions of match: ${matchNames[selectedMatchIndex]}');
     final saved = await getAllSavedQuestions();
-    saved.removeWhere((e) => e.match == selectedMatch!.match);
-    saved.add(selectedMatch!);
+    saved.removeWhere((e) => e.match == selectedMatch.match);
+    saved.add(selectedMatch);
     await overwriteSave(saved);
   }
 
@@ -85,9 +86,10 @@ class _StartQuestionManagerState extends State<StartQuestionManager> {
     try {
       selectedMatch = saved.firstWhere((e) => e.match == match);
       setState(() {});
-      logger.i('Loaded ${selectedMatch!.questionCount} questions of match ${selectedMatch!.match}');
+      logger.i('Loaded ${selectedMatch.questionCount} start questions of match ${selectedMatch.match}');
     } on StateError {
-      selectedMatch = null;
+      logger.i('Start match $match not found, temp empty match created');
+      selectedMatch = StartMatch(match: match, questions: {});
     }
   }
 
@@ -187,11 +189,11 @@ class _StartQuestionManagerState extends State<StartQuestionManager> {
                 context: context,
                 barrierDismissible: false,
                 barrierLabel: '',
-                builder: (_) => StartEditorDialog(question: null, playerPos: -1),
+                builder: (_) => const StartEditorDialog(question: null, playerPos: -1),
               ));
               if (ret case (final newP, final newQ)?) {
-                selectedMatch!.questions[newP]!.add(newQ);
-                await updateQuestions(selectedMatch!);
+                selectedMatch.questions[newP]!.add(newQ);
+                await updateQuestions(selectedMatch);
               }
               setState(() {});
             },
@@ -300,8 +302,8 @@ class _StartQuestionManagerState extends State<StartQuestionManager> {
               ).then((value) async {
                 if (value != true) return;
                 showToastMessage(context, 'Removed questions for match: ${matchNames[selectedMatchIndex]}');
-                await removeMatch(selectedMatch!);
-                selectedMatch = null;
+                await removeMatch(selectedMatch);
+                selectedMatch = StartMatch(match: matchNames[selectedMatchIndex], questions: {});
                 setState(() {});
               });
             },
@@ -313,15 +315,13 @@ class _StartQuestionManagerState extends State<StartQuestionManager> {
 
   Widget questionList() {
     List<(int, int, StartQuestion)> filtered = [];
-    if (selectedMatch != null) {
-      selectedMatch!.questions.forEach((pos, qL) {
-        for (int i = 0; i < qL.length; i++) {
-          if (sortType != null && qL[i].subject != sortType) continue;
-          if (sortPlayerPos >= 0 && pos != sortPlayerPos) continue;
-          filtered.add((i, pos, qL[i]));
-        }
-      });
-    }
+    selectedMatch.questions.forEach((pos, qL) {
+      for (int i = 0; i < qL.length; i++) {
+        if (sortType != null && qL[i].subject != sortType) continue;
+        if (sortPlayerPos >= 0 && pos != sortPlayerPos) continue;
+        filtered.add((i, pos, qL[i]));
+      }
+    });
 
     List<double> widthRatios = [0.07, 0.1, 0.4, 0.1, 0.02];
 
@@ -360,8 +360,8 @@ class _StartQuestionManagerState extends State<StartQuestionManager> {
                           IconButton(
                             icon: const Icon(Icons.delete),
                             onPressed: () async {
-                              selectedMatch!.questions[q.$2]?.removeAt(q.$1);
-                              await updateQuestions(selectedMatch!);
+                              selectedMatch.questions[q.$2]?.removeAt(q.$1);
+                              await updateQuestions(selectedMatch);
                               logger.i('Removed question: pos=${q.$2}, idx=${q.$1}');
                               setState(() {});
                               return;
@@ -380,12 +380,12 @@ class _StartQuestionManagerState extends State<StartQuestionManager> {
                         ));
                         if (ret case (final newP, final newQ)?) {
                           if (newP == q.$2) {
-                            selectedMatch!.questions[q.$2]![q.$1] = newQ;
+                            selectedMatch.questions[q.$2]![q.$1] = newQ;
                           } else {
-                            selectedMatch!.questions[q.$2]!.removeAt(q.$1);
-                            selectedMatch!.questions[newP]!.add(newQ);
+                            selectedMatch.questions[q.$2]!.removeAt(q.$1);
+                            selectedMatch.questions[newP]!.add(newQ);
                           }
-                          await updateQuestions(selectedMatch!);
+                          await updateQuestions(selectedMatch);
                         }
                         setState(() {});
                       },
