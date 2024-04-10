@@ -25,7 +25,7 @@ class _ObstacleQuestionManagerState extends State<ObstacleQuestionManager> {
   @override
   void initState() {
     super.initState();
-    logger.i('Start question manager init');
+    logger.i('Obstacle question manager init');
     getMatchNames().then((value) async {
       if (value.isNotEmpty) matchNames = value;
       setState(() => isLoading = false);
@@ -99,7 +99,15 @@ class _ObstacleQuestionManagerState extends State<ObstacleQuestionManager> {
       setState(() {});
       logger.i('Loaded Obstacle (${selectedMatch!.keyword}) of $match');
     } on StateError {
-      logger.i('No match found: $match');
+      logger.i('No match found: $match, creating empty match');
+      selectedMatch = ObstacleMatch(
+        match: matchNames[selectedMatchIndex],
+        keyword: '',
+        imagePath: '',
+        charCount: 0,
+        explanation: '',
+        hintQuestions: List<ObstacleQuestion?>.filled(5, null),
+      );
     }
   }
 
@@ -148,14 +156,7 @@ class _ObstacleQuestionManagerState extends State<ObstacleQuestionManager> {
           matchSelector(matchNames, (value) async {
             selectedMatchIndex = matchNames.indexOf(value!);
             logger.i('Selected match: ${matchNames[selectedMatchIndex]}');
-            selectedMatch ??= ObstacleMatch(
-              match: matchNames[selectedMatchIndex],
-              keyword: '',
-              imagePath: '',
-              charCount: 0,
-              explanation: '',
-              hintQuestions: List<ObstacleQuestion?>.filled(5, null),
-            );
+
             await loadMatchQuestions(matchNames[selectedMatchIndex]);
             setState(() {});
           }),

@@ -23,7 +23,7 @@ class _ExtraQuestionManagerState extends State<ExtraQuestionManager> {
   @override
   void initState() {
     super.initState();
-    logger.i('Start question manager init');
+    logger.i('Extra question manager init');
     getMatchNames().then((value) async {
       if (value.isNotEmpty) matchNames = value;
       setState(() => isLoading = false);
@@ -226,7 +226,7 @@ class _ExtraQuestionManagerState extends State<ExtraQuestionManager> {
   }
 
   Widget questionList() {
-    List<double> widthRatios = [0.4, 0.1, 0.05];
+    List<double> widthRatios = [0.4, 0.25, 0.03];
 
     return Flexible(
       child: Container(

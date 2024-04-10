@@ -4,32 +4,42 @@ import 'package:kli_utils/kli_utils.dart';
 import '../../global.dart';
 
 class StartEditorDialog extends StatefulWidget {
-  final StartQuestion question;
-  const StartEditorDialog({super.key, required this.question});
+  final StartQuestion? question;
+  final int playerPos;
+  const StartEditorDialog({super.key, required this.question, required this.playerPos});
 
   @override
   State<StartEditorDialog> createState() => _StartEditorDialogState();
 }
 
 class _StartEditorDialogState extends State<StartEditorDialog> {
-  final _questionController = TextEditingController();
-  final _answerController = TextEditingController();
-  late QuestionSubject _type;
-  String? _qErrorText, _aErrorText;
+  final questionController = TextEditingController();
+  final answerController = TextEditingController();
+  late QuestionSubject type;
+  int pos = -1;
+
+  String? qErrorText, aErrorText;
 
   @override
   void initState() {
     super.initState();
     logger.i('Opened start question editor');
-    _questionController.text = widget.question.question;
-    _answerController.text = widget.question.answer;
-    _type = widget.question.subject;
+    if (widget.question != null) {
+      logger.i('Modify start question');
+      questionController.text = widget.question!.question;
+      answerController.text = widget.question!.answer;
+      type = widget.question!.subject;
+      pos = widget.playerPos;
+    } else {
+      logger.i('Add new start question');
+      type = QuestionSubject.math;
+    }
   }
 
   @override
   void dispose() {
-    _questionController.dispose();
-    _answerController.dispose();
+    questionController.dispose();
+    answerController.dispose();
     super.dispose();
   }
 
@@ -39,24 +49,43 @@ class _StartEditorDialogState extends State<StartEditorDialog> {
       backgroundColor: Colors.transparent,
       body: AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        titlePadding: const EdgeInsets.symmetric(vertical: 32, horizontal: 256),
-        title: Center(
-          child: DropdownMenu(
-            label: const Text('Type'),
-            textStyle: const TextStyle(fontSize: fontSizeMSmall),
-            initialSelection: _type,
-            dropdownMenuEntries: [
-              for (final s in QuestionSubject.values)
-                DropdownMenuEntry(
-                  value: s,
-                  label: StartQuestion.mapTypeDisplay(s),
-                )
-            ],
-            onSelected: (value) async {
-              _type = value!;
-              setState(() {});
-            },
-          ),
+        titlePadding: const EdgeInsets.symmetric(vertical: 32),
+        title: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            DropdownMenu(
+              label: const Text('Pos'),
+              textStyle: const TextStyle(fontSize: fontSizeMSmall),
+              initialSelection: pos,
+              dropdownMenuEntries: [
+                for (var i = 1; i < 5; i++)
+                  DropdownMenuEntry(
+                    value: i - 1,
+                    label: '$i',
+                  )
+              ],
+              onSelected: (value) async {
+                pos = value!;
+                setState(() {});
+              },
+            ),
+            DropdownMenu(
+              label: const Text('Type'),
+              textStyle: const TextStyle(fontSize: fontSizeMSmall),
+              initialSelection: type,
+              dropdownMenuEntries: [
+                for (final s in QuestionSubject.values)
+                  DropdownMenuEntry(
+                    value: s,
+                    label: StartQuestion.mapTypeDisplay(s),
+                  )
+              ],
+              onSelected: (value) async {
+                type = value!;
+                setState(() {});
+              },
+            ),
+          ],
         ),
         contentPadding: const EdgeInsets.only(bottom: 40, left: 60, right: 60),
         content: Column(
@@ -67,13 +96,13 @@ class _StartEditorDialogState extends State<StartEditorDialog> {
               style: const TextStyle(fontSize: fontSizeMedium),
               onChanged: (value) {
                 if (value.isEmpty) {
-                  _qErrorText = 'Can\'t be empty';
+                  qErrorText = 'Can\'t be empty';
                   setState(() {});
                   return;
                 }
-                setState(() => _qErrorText = null);
+                setState(() => qErrorText = null);
               },
-              controller: _questionController,
+              controller: questionController,
               maxLines: 5,
               minLines: 1,
               decoration: InputDecoration(
@@ -82,7 +111,7 @@ class _StartEditorDialogState extends State<StartEditorDialog> {
                   fontWeight: FontWeight.w600,
                   color: Theme.of(context).colorScheme.primary,
                 ),
-                errorText: _qErrorText,
+                errorText: qErrorText,
                 border: const OutlineInputBorder(),
               ),
             ),
@@ -91,20 +120,20 @@ class _StartEditorDialogState extends State<StartEditorDialog> {
               style: const TextStyle(fontSize: fontSizeMedium),
               onChanged: (value) {
                 if (value.isEmpty) {
-                  _aErrorText = 'Can\'t be empty';
+                  aErrorText = 'Can\'t be empty';
                   setState(() {});
                   return;
                 }
-                setState(() => _aErrorText = null);
+                setState(() => aErrorText = null);
               },
-              controller: _answerController,
+              controller: answerController,
               decoration: InputDecoration(
                 labelText: 'Answer',
                 labelStyle: TextStyle(
                   fontWeight: FontWeight.w600,
                   color: Theme.of(context).colorScheme.primary,
                 ),
-                errorText: _aErrorText,
+                errorText: aErrorText,
                 border: const OutlineInputBorder(),
               ),
             ),
@@ -114,32 +143,42 @@ class _StartEditorDialogState extends State<StartEditorDialog> {
         actions: <Widget>[
           TextButton(
             onPressed: () {
-              if (_questionController.text.isEmpty) {
+              if (questionController.text.isEmpty) {
                 showToastMessage(context, 'Question can\'t be empty');
                 return;
               }
-              if (_answerController.text.isEmpty) {
+              if (answerController.text.isEmpty) {
                 showToastMessage(context, 'Answer can\'t be empty');
                 return;
               }
+              if (pos < 0) {
+                showToastMessage(context, 'Position can\'t be empty');
+                return;
+              }
 
-              bool hasChanged = _questionController.text != widget.question.question ||
-                  _answerController.text != widget.question.answer ||
-                  _type != widget.question.subject;
+              bool hasChanged = widget.question == null
+                  ? true
+                  : questionController.text != widget.question!.question ||
+                      answerController.text != widget.question!.answer ||
+                      type != widget.question!.subject ||
+                      pos != widget.playerPos;
 
               if (!hasChanged) {
                 logger.i('No change, exiting');
                 Navigator.of(context).pop();
                 return;
               }
+
               final newQ = StartQuestion(
-                _type,
-                _questionController.text,
-                _answerController.text,
+                type,
+                questionController.text,
+                answerController.text,
               );
 
-              logger.i('Modified start question: ${newQ.subject.name}');
-              Navigator.of(context).pop(newQ);
+              logger.i(
+                '${widget.question == null ? 'Created' : 'Modified'} start question: ${newQ.subject.name}',
+              );
+              Navigator.of(context).pop((pos, newQ));
             },
             child: const Text('Done', style: TextStyle(fontSize: fontSizeMedium)),
           ),

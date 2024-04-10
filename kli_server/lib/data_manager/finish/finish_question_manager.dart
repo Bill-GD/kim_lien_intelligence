@@ -263,7 +263,7 @@ class _FinishQuestionManagerState extends State<FinishQuestionManager> {
       }
     }
 
-    List<double> widthRatios = [0.035, 0.4, 0.1, 0.1, 0.03];
+    List<double> widthRatios = [0.035, 0.4, 0.1, 0.15, 0.03];
 
     return Flexible(
       child: Container(
@@ -310,13 +310,14 @@ class _FinishQuestionManagerState extends State<FinishQuestionManager> {
                         )
                       ],
                       onTap: () async {
-                        final newQ =
-                            await Navigator.of(context).push<FinishQuestion>(DialogRoute<FinishQuestion>(
-                          context: context,
-                          barrierDismissible: false,
-                          barrierLabel: '',
-                          builder: (_) => FinishEditorDialog(question: q.$2),
-                        ));
+                        final newQ = await Navigator.of(context).push<FinishQuestion>(
+                          DialogRoute<FinishQuestion>(
+                              context: context,
+                              barrierDismissible: false,
+                              barrierLabel: '',
+                              builder: (_) => FinishEditorDialog(question: q.$2)),
+                        );
+
                         if (newQ != null) {
                           selectedMatch!.questions[q.$1] = newQ;
                           await updateQuestions(selectedMatch!);

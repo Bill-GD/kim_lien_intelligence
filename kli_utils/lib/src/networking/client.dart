@@ -36,7 +36,7 @@ class KLIClient {
     s._socket!.write(KLISocketMessage(clientID, clientID, KLIMessageType.sendID));
     logMessageController.add((LogType.info, 'Sent ID ($clientID) to server'));
 
-    s._socket!.listen(s.handleIncomingMessage);
+    s._socket.listen(s.handleIncomingMessage);
 
     return s;
   }

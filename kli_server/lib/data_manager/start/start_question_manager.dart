@@ -179,6 +179,25 @@ class _StartQuestionManagerState extends State<StartQuestionManager> {
           ),
           button(
             context,
+            'Add Question',
+            enableCondition: selectedMatchIndex >= 0,
+            onPressed: () async {
+              final ret =
+                  await Navigator.of(context).push<(int, StartQuestion)>(DialogRoute<(int, StartQuestion)>(
+                context: context,
+                barrierDismissible: false,
+                barrierLabel: '',
+                builder: (_) => StartEditorDialog(question: null, playerPos: -1),
+              ));
+              if (ret case (final newP, final newQ)?) {
+                selectedMatch!.questions[newP]!.add(newQ);
+                await updateQuestions(selectedMatch!);
+              }
+              setState(() {});
+            },
+          ),
+          button(
+            context,
             'Import Questions',
             enableCondition: selectedMatchIndex >= 0,
             onPressed: () async {
@@ -204,50 +223,50 @@ class _StartQuestionManagerState extends State<StartQuestionManager> {
               logger.i('No file selected');
             },
           ),
-          button(
-            context,
-            'Export Excel',
-            enableCondition: selectedMatchIndex >= 0,
-            onPressed: () async {
-              String fileName =
-                  'KĐ_${matchNames[selectedMatchIndex]}_${DateTime.now().toString().split('.').first.replaceAll(RegExp('[:-]'), '_')}.xlsx';
-              logger.i('Exporting ${matchNames[selectedMatchIndex]} start questions to $fileName');
+          // button(
+          //   context,
+          //   'Export Excel',
+          //   enableCondition: selectedMatchIndex >= 0,
+          //   onPressed: () async {
+          //     String fileName =
+          //         'KĐ_${matchNames[selectedMatchIndex]}_${DateTime.now().toString().split('.').first.replaceAll(RegExp('[:-]'), '_')}.xlsx';
+          //     logger.i('Exporting ${matchNames[selectedMatchIndex]} start questions to $fileName');
 
-              final data = (jsonDecode(
-                await storageHandler!.readFromFile(storageHandler!.startSaveFile),
-              ) as List)
-                  .map((e) => StartMatch.fromJson(e))
-                  .toList();
+          //     final data = (jsonDecode(
+          //       await storageHandler!.readFromFile(storageHandler!.startSaveFile),
+          //     ) as List)
+          //         .map((e) => StartMatch.fromJson(e))
+          //         .toList();
 
-              final newData = <String, List>{};
+          //     final newData = <String, List>{};
 
-              int idx = 0;
-              for (final m in data) {
-                for (final qL in m.questions.entries) {
-                  final kName = 'Thí sinh ${qL.key + 1}';
-                  final qMap = qL.value.map((q) {
-                    idx++;
-                    return {
-                      'STT': '$idx',
-                      'Loại câu hỏi': StartQuestion.mapTypeDisplay(q.subject),
-                      'Nội dung': q.question,
-                      'Đáp án': q.answer,
-                    };
-                  }).toList();
+          //     int idx = 0;
+          //     for (final m in data) {
+          //       for (final qL in m.questions.entries) {
+          //         final kName = 'Thí sinh ${qL.key + 1}';
+          //         final qMap = qL.value.map((q) {
+          //           idx++;
+          //           return {
+          //             'STT': '$idx',
+          //             'Loại câu hỏi': StartQuestion.mapTypeDisplay(q.subject),
+          //             'Nội dung': q.question,
+          //             'Đáp án': q.answer,
+          //           };
+          //         }).toList();
 
-                  newData[kName] = qMap;
-                }
-              }
+          //         newData[kName] = qMap;
+          //       }
+          //     }
 
-              await storageHandler!.writeToExcel(fileName, newData);
-              if (mounted) {
-                showToastMessage(
-                  context,
-                  'Saved to ${storageHandler!.getRelative(storageHandler!.excelOutput)}/$fileName',
-                );
-              }
-            },
-          ),
+          //     await storageHandler!.writeToExcel(fileName, newData);
+          //     if (mounted) {
+          //       showToastMessage(
+          //         context,
+          //         'Saved to ${storageHandler!.getRelative(storageHandler!.excelOutput)}/$fileName',
+          //       );
+          //     }
+          //   },
+          // ),
           button(
             context,
             'Remove Questions',
@@ -280,10 +299,7 @@ class _StartQuestionManagerState extends State<StartQuestionManager> {
                 },
               ).then((value) async {
                 if (value != true) return;
-                showToastMessage(
-                  context,
-                  'Removed questions for match: ${matchNames[selectedMatchIndex]}',
-                );
+                showToastMessage(context, 'Removed questions for match: ${matchNames[selectedMatchIndex]}');
                 await removeMatch(selectedMatch!);
                 selectedMatch = null;
                 setState(() {});
@@ -355,15 +371,20 @@ class _StartQuestionManagerState extends State<StartQuestionManager> {
                         )
                       ],
                       onTap: () async {
-                        final newQ =
-                            await Navigator.of(context).push<StartQuestion>(DialogRoute<StartQuestion>(
+                        final ret = await Navigator.of(context)
+                            .push<(int, StartQuestion)>(DialogRoute<(int, StartQuestion)>(
                           context: context,
                           barrierDismissible: false,
                           barrierLabel: '',
-                          builder: (_) => StartEditorDialog(question: q.$3),
+                          builder: (_) => StartEditorDialog(question: q.$3, playerPos: q.$2),
                         ));
-                        if (newQ != null) {
-                          selectedMatch!.questions[q.$2]![q.$1] = newQ;
+                        if (ret case (final newP, final newQ)?) {
+                          if (newP == q.$2) {
+                            selectedMatch!.questions[q.$2]![q.$1] = newQ;
+                          } else {
+                            selectedMatch!.questions[q.$2]!.removeAt(q.$1);
+                            selectedMatch!.questions[newP]!.add(newQ);
+                          }
                           await updateQuestions(selectedMatch!);
                         }
                         setState(() {});
