@@ -37,5 +37,5 @@ class StartQuestion {
 
   static String mapTypeDisplay(QuestionSubject t) => _map[t]!;
 
-  static QuestionSubject mapType(String v) => _map.entries.firstWhere((e) => e.value == v).key;
+  static QuestionSubject mapTypeValue(String v) => _map.entries.firstWhere((e) => e.value == v).key;
 }

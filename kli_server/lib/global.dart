@@ -46,15 +46,20 @@ Future<List<String>> getMatchNames() async {
   return matchNames;
 }
 
-Widget button(BuildContext context, final String label,
-    {required bool enableCondition, void Function()? onPressed}) {
+Widget button(
+  BuildContext context,
+  final String label, {
+  double fontSize = fontSizeMedium,
+  required bool enableCondition,
+  void Function()? onPressed,
+}) {
   return OutlinedButton(
     style: ButtonStyle(
       backgroundColor: MaterialStatePropertyAll<Color>(Theme.of(context).colorScheme.background),
-      padding: const MaterialStatePropertyAll<EdgeInsets>(EdgeInsets.symmetric(vertical: 25, horizontal: 15)),
+      padding: const MaterialStatePropertyAll<EdgeInsets>(EdgeInsets.symmetric(vertical: 20, horizontal: 15)),
     ),
     onPressed: enableCondition && onPressed != null ? onPressed : null,
-    child: Text(label, style: const TextStyle(fontSize: fontSizeMedium)),
+    child: Text(label, style: TextStyle(fontSize: fontSize)),
   );
 }
 

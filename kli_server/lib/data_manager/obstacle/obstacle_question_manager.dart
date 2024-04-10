@@ -149,7 +149,7 @@ class _ObstacleQuestionManagerState extends State<ObstacleQuestionManager> {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 managementButtons(),
-                questionList(),
+                matchContent(),
               ],
             ),
     );
@@ -248,12 +248,7 @@ class _ObstacleQuestionManagerState extends State<ObstacleQuestionManager> {
     );
   }
 
-  Widget questionList() {
-    bool imageFound = false;
-    String fullImagePath = '';
-    fullImagePath = '${storageHandler!.parentFolder}\\${selectedMatch.imagePath}';
-    imageFound = File(fullImagePath).existsSync();
-
+  Widget matchContent() {
     return Flexible(
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
@@ -261,159 +256,171 @@ class _ObstacleQuestionManagerState extends State<ObstacleQuestionManager> {
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Flexible(
-              child: Column(
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: 16),
-                    child: Text('Questions', style: Theme.of(context).textTheme.titleLarge),
-                  ),
-                  if (selectedMatchIndex < 0)
-                    Container(
-                      alignment: Alignment.center,
-                      decoration: BoxDecoration(
-                        border: Border.all(width: 1, color: Theme.of(context).colorScheme.onBackground),
-                      ),
-                      constraints: const BoxConstraints(maxHeight: 400, maxWidth: 600),
-                      child: const Material(child: Center(child: Text('No match selected'))),
-                    )
-                  else
-                    ListView.separated(
-                      shrinkWrap: true,
-                      itemCount: 5,
-                      separatorBuilder: (_, index) => const SizedBox(height: 20),
-                      itemBuilder: (_, index) {
-                        final q = selectedMatch.hintQuestions[index];
-
-                        return ListTile(
-                          leading: Text("${index + 1}"),
-                          tileColor: Theme.of(context).colorScheme.background,
-                          leadingAndTrailingTextStyle: const TextStyle(fontSize: fontSizeMedium),
-                          title: Text(
-                            q?.question ?? '',
-                            style: const TextStyle(fontSize: fontSizeMedium),
-                          ),
-                          subtitle: Text('${q?.charCount ?? 0} kí tự'),
-                          subtitleTextStyle: const TextStyle(fontSize: fontSizeSmall),
-                          trailing: Text(q?.answer ?? ''),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10),
-                            side: BorderSide(
-                              width: 2,
-                              color: Theme.of(context).colorScheme.onBackground,
-                            ),
-                          ),
-                          onTap: () async {
-                            final nQ = await Navigator.of(context).push<ObstacleQuestion>(
-                              DialogRoute<ObstacleQuestion>(
-                                context: context,
-                                builder: (_) => ObstacleEditorDialog(question: q, index: index),
-                              ),
-                            );
-
-                            if (nQ == null) return;
-                            selectedMatch.hintQuestions[index] = nQ;
-                            await updateQuestions(selectedMatch);
-                            setState(() {});
-                          },
-                        );
-                      },
-                    ),
-                ],
-              ),
-            ),
-            Flexible(
-              child: Column(
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: 16),
-                    child: Text('Chướng ngại vật', style: Theme.of(context).textTheme.titleLarge),
-                  ),
-                  if (selectedMatchIndex < 0)
-                    const SizedBox.shrink()
-                  else
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 128, vertical: 32),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceAround,
-                        children: [
-                          Flexible(
-                            child: Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 16),
-                              child: TextField(
-                                style: const TextStyle(fontSize: fontSizeMedium),
-                                controller: obstacleController..text = selectedMatch.keyword,
-                                maxLines: 5,
-                                minLines: 1,
-                                decoration: InputDecoration(
-                                  labelText: 'Đáp án',
-                                  labelStyle: TextStyle(
-                                    fontWeight: FontWeight.w600,
-                                    color: Theme.of(context).colorScheme.primary,
-                                  ),
-                                  border: const OutlineInputBorder(),
-                                ),
-                              ),
-                            ),
-                          ),
-                          button(context, 'Save', enableCondition: true, onPressed: () async {
-                            selectedMatch.keyword = obstacleController.text;
-                            selectedMatch.charCount = obstacleController.text.replaceAll(' ', '').length;
-                            logger.i('Modified keyword of match: ${matchNames[selectedMatchIndex]}');
-                            showToastMessage(context, 'Saved');
-                            await updateQuestions(selectedMatch);
-                          }),
-                        ],
-                      ),
-                    ),
-                  Container(
-                    decoration: BoxDecoration(
-                      border: Border.all(width: 1, color: Theme.of(context).colorScheme.onBackground),
-                    ),
-                    constraints: const BoxConstraints(maxHeight: 400, maxWidth: 600),
-                    child: selectedMatchIndex >= 0 && fullImagePath.isNotEmpty && imageFound
-                        ? Image.file(File(fullImagePath), fit: BoxFit.contain)
-                        : Material(
-                            child: Center(
-                            child: Text(
-                              selectedMatchIndex < 0
-                                  ? 'No match selected'
-                                  : selectedMatch.imagePath.isEmpty
-                                      ? 'No image'
-                                      : 'Image $fullImagePath not found',
-                            ),
-                          )),
-                  ),
-                  if (selectedMatchIndex < 0)
-                    const SizedBox.shrink()
-                  else
-                    ElevatedButton(
-                      child: const Text('Select Image'),
-                      onPressed: () async {
-                        logger.i(
-                          'Selecting image at ${storageHandler!.getRelative(storageHandler!.mediaDir)}',
-                        );
-                        final result = await FilePicker.platform.pickFiles(
-                          dialogTitle: 'Select image',
-                          initialDirectory: storageHandler!.mediaDir.replaceAll('/', '\\'),
-                          type: FileType.image,
-                        );
-
-                        if (result != null) {
-                          final p = result.files.single.path!;
-                          selectedMatch.imagePath = storageHandler!.getRelative(p);
-                          await updateQuestions(selectedMatch);
-                          logger.i('Chose ${selectedMatch.imagePath}');
-                          setState(() {});
-                        }
-                      },
-                    ),
-                  // ],
-                ],
-              ),
-            ),
+            questionList(),
+            obstaclePreview(),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget questionList() {
+    return Flexible(
+      child: Column(
+        children: [
+          const Padding(
+            padding: EdgeInsets.only(bottom: 16),
+            child: Text('Questions', style: TextStyle(fontSize: fontSizeMedium)),
+          ),
+          if (selectedMatchIndex < 0)
+            Container(
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                border: Border.all(width: 1, color: Theme.of(context).colorScheme.onBackground),
+              ),
+              constraints: const BoxConstraints(maxHeight: 400, maxWidth: 600),
+              child: const Material(child: Center(child: Text('No match selected'))),
+            )
+          else
+            ListView.separated(
+              shrinkWrap: true,
+              itemCount: 5,
+              separatorBuilder: (_, index) => const SizedBox(height: 20),
+              itemBuilder: (_, index) {
+                final q = selectedMatch.hintQuestions[index];
+
+                return ListTile(
+                  leading: Text("${index + 1}"),
+                  tileColor: Theme.of(context).colorScheme.background,
+                  leadingAndTrailingTextStyle: const TextStyle(fontSize: fontSizeMedium),
+                  title: Text(
+                    q?.question ?? '',
+                    style: const TextStyle(fontSize: fontSizeMedium),
+                  ),
+                  subtitle: Text('${q?.charCount ?? 0} kí tự'),
+                  subtitleTextStyle: const TextStyle(fontSize: fontSizeSmall),
+                  trailing: Text(q?.answer ?? ''),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    side: BorderSide(
+                      width: 2,
+                      color: Theme.of(context).colorScheme.onBackground,
+                    ),
+                  ),
+                  onTap: () async {
+                    final nQ = await Navigator.of(context).push<ObstacleQuestion>(
+                      DialogRoute<ObstacleQuestion>(
+                        context: context,
+                        builder: (_) => ObstacleEditorDialog(question: q, index: index),
+                      ),
+                    );
+
+                    if (nQ == null) return;
+                    selectedMatch.hintQuestions[index] = nQ;
+                    await updateQuestions(selectedMatch);
+                    setState(() {});
+                  },
+                );
+              },
+            ),
+        ],
+      ),
+    );
+  }
+
+  Widget obstaclePreview() {
+    bool imageFound = false;
+    String fullImagePath = '';
+    fullImagePath = '${storageHandler!.parentFolder}\\${selectedMatch.imagePath}';
+    imageFound = File(fullImagePath).existsSync();
+
+    return Flexible(
+      child: Column(
+        children: [
+          const Padding(
+            padding: EdgeInsets.only(bottom: 16),
+            child: Text('Chướng ngại vật', style: TextStyle(fontSize: fontSizeMedium)),
+          ),
+          if (selectedMatchIndex < 0)
+            const SizedBox.shrink()
+          else
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 128, vertical: 32),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  Flexible(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      child: TextField(
+                        style: const TextStyle(fontSize: fontSizeMedium),
+                        controller: obstacleController..text = selectedMatch.keyword,
+                        maxLines: 5,
+                        minLines: 1,
+                        decoration: InputDecoration(
+                          labelText: 'Đáp án',
+                          labelStyle: TextStyle(
+                            fontWeight: FontWeight.w600,
+                            color: Theme.of(context).colorScheme.primary,
+                          ),
+                          border: const OutlineInputBorder(),
+                        ),
+                      ),
+                    ),
+                  ),
+                  button(context, 'Save', enableCondition: true, onPressed: () async {
+                    selectedMatch.keyword = obstacleController.text;
+                    selectedMatch.charCount = obstacleController.text.replaceAll(' ', '').length;
+                    logger.i('Modified keyword of match: ${matchNames[selectedMatchIndex]}');
+                    showToastMessage(context, 'Saved');
+                    await updateQuestions(selectedMatch);
+                  }),
+                ],
+              ),
+            ),
+          Container(
+            decoration: BoxDecoration(
+              border: Border.all(width: 1, color: Theme.of(context).colorScheme.onBackground),
+            ),
+            constraints: const BoxConstraints(maxHeight: 400, maxWidth: 600),
+            child: selectedMatchIndex >= 0 && fullImagePath.isNotEmpty && imageFound
+                ? Image.file(File(fullImagePath), fit: BoxFit.contain)
+                : Material(
+                    child: Center(
+                    child: Text(
+                      selectedMatchIndex < 0
+                          ? 'No match selected'
+                          : selectedMatch.imagePath.isEmpty
+                              ? 'No image'
+                              : 'Image $fullImagePath not found',
+                    ),
+                  )),
+          ),
+          if (selectedMatchIndex < 0)
+            const SizedBox.shrink()
+          else
+            ElevatedButton(
+              child: const Text('Select Image'),
+              onPressed: () async {
+                logger.i(
+                  'Selecting image at ${storageHandler!.getRelative(storageHandler!.mediaDir)}',
+                );
+                final result = await FilePicker.platform.pickFiles(
+                  dialogTitle: 'Select image',
+                  initialDirectory: storageHandler!.mediaDir.replaceAll('/', '\\'),
+                  type: FileType.image,
+                );
+
+                if (result != null) {
+                  final p = result.files.single.path!;
+                  selectedMatch.imagePath = storageHandler!.getRelative(p);
+                  await updateQuestions(selectedMatch);
+                  logger.i('Chose ${selectedMatch.imagePath}');
+                  setState(() {});
+                }
+              },
+            ),
+        ],
       ),
     );
   }

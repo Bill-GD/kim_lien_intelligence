@@ -53,7 +53,7 @@ class _StartQuestionManagerState extends State<StartQuestionManager> {
 
       for (final r in (data[name] as List<Map>)) {
         final v = r.values;
-        final q = StartQuestion(StartQuestion.mapType(v.elementAt(1)), v.elementAt(2), v.elementAt(3));
+        final q = StartQuestion(StartQuestion.mapTypeValue(v.elementAt(1)), v.elementAt(2), v.elementAt(3));
         questions.add(q);
       }
       allQ.putIfAbsent(idx, () => questions);
