@@ -56,7 +56,7 @@ class _ObstacleQuestionManagerState extends State<ObstacleQuestionManager> {
   }
 
   Future<void> getNewQuestion(String path) async {
-    Map<String, List> data = await storageHandler!.readFromExcel(path, 5);
+    Map<String, List> data = await storageHandler!.readFromExcel(path, 5, 1);
 
     logger.i('Extracting data from excel');
     final sheet = data.values.first;

@@ -52,7 +52,7 @@ class _AccelEditorDialogState extends State<AccelEditorDialog> {
       backgroundColor: Colors.transparent,
       body: AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        titlePadding: const EdgeInsets.symmetric(vertical: 30),
+        titlePadding: const EdgeInsets.symmetric(vertical: 15),
         title: const Text(''),
         contentPadding: const EdgeInsets.only(bottom: 32, left: 60, right: 60),
         content: Column(

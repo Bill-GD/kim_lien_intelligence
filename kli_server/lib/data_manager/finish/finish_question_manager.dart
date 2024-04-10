@@ -48,7 +48,7 @@ class _FinishQuestionManagerState extends State<FinishQuestionManager> {
   }
 
   Future<void> getNewQuestion(String path) async {
-    Map<String, List> data = await storageHandler!.readFromExcel(path, 4);
+    Map<String, List> data = await storageHandler!.readFromExcel(path, 4, 3);
 
     logger.i('Extracting data from excel');
 

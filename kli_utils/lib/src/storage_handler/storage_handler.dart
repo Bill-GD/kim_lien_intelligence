@@ -51,19 +51,26 @@ class StorageHandler {
   }
 
   /// Return: ```{tableName: [rows]}```
-  Future readFromExcel(String path, int maxColumnCount) async {
+  Future readFromExcel(String path, int maxColumnCount, int maxSheetCount) async {
     logMessageController.add((LogType.info, 'Reading Excel from ${getRelative(path)}'));
 
     final bytes = await File(path).readAsBytes();
     final excel = Excel.decodeBytes(bytes);
-    return excelToJson(excel, maxColumnCount);
+    return excelToJson(excel, maxColumnCount, maxSheetCount);
   }
 
-  Future<Map<String, List<Map<String, dynamic>>>> excelToJson(Excel excel, int maxColumnCount) async {
+  Future<Map<String, List<Map<String, dynamic>>>> excelToJson(
+      Excel excel, int maxColumnCount, int maxSheetCount) async {
     logMessageController.add(const (LogType.info, 'Format: Excel -> Json'));
     final res = <String, List<Map<String, dynamic>>>{};
 
+    int sIdx = 1;
     for (final tableName in excel.tables.keys) {
+      if (sIdx > maxSheetCount) {
+        logMessageController.add((LogType.info, 'Max sheet count reached, break'));
+        break;
+      }
+
       final allRows = excel.tables[tableName]!.rows;
 
       // attribute name
@@ -103,6 +110,7 @@ class StorageHandler {
         records.add(rec);
       }
       res[tableName] = records;
+      sIdx++;
     }
     return res;
   }

@@ -113,6 +113,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.7.10"
+  dedent:
+    dependency: "direct main"
+    description:
+      name: dedent
+      sha256: "47e7ecff91190d1aa81166b9ba1f9d531d4e021e8596f887256551e61c21b700"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.2"
   equatable:
     dependency: transitive
     description:
@@ -407,6 +415,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.7.4"
+  quiver:
+    dependency: transitive
+    description:
+      name: quiver
+      sha256: b1c1ac5ce6688d77f65f3375a9abb9319b3cb32486bdc7a1e0fdf004d7ba4e47
+      url: "https://pub.dev"
+    source: hosted
+    version: "3.2.1"
   screen_retriever:
     dependency: transitive
     description:

@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:kli_server/start_screen/help_screen.dart';
 import 'package:kli_utils/kli_utils.dart';
 import 'package:side_navigation/side_navigation.dart';
 
@@ -80,9 +81,8 @@ class _StartPageState extends State<StartPage> {
                 ),
               ],
               onTap: (newIndex) {
-                setState(() {
-                  _sidebarIndex = newIndex;
-                });
+                if (newIndex == 2) logger.i('Accessing help page');
+                setState(() => _sidebarIndex = newIndex);
               },
               theme: SideNavigationBarTheme(
                 itemTheme: SideNavigationBarItemTheme(
@@ -131,7 +131,7 @@ class _StartPageState extends State<StartPage> {
                         },
                       ),
                       // Help screen
-                      const Text('To be implemented'),
+                      const HelpScreen(),
                     ].elementAt(_sidebarIndex),
                   ),
                 ],
