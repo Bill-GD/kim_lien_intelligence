@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'dart:io';
 
 import 'package:file_picker/file_picker.dart';
@@ -35,14 +34,6 @@ class _AccelQuestionManagerState extends State<AccelQuestionManager> {
     });
   }
 
-  Future<List<AccelMatch>> getAllSavedQuestions() async {
-    logger.i('Getting all saved questions');
-    final saved = await storageHandler!.readFromFile(storageHandler!.accelSaveFile);
-    if (saved.isEmpty) return [];
-    final q = (jsonDecode(saved) as List).map((e) => AccelMatch.fromJson(e)).toList();
-    return q;
-  }
-
   Future<void> getNewQuestion(String path) async {
     Map<String, List> data = await storageHandler!.readFromExcel(path, 5, 1);
 
@@ -67,22 +58,31 @@ class _AccelQuestionManagerState extends State<AccelQuestionManager> {
 
   Future<void> saveNewQuestions() async {
     logger.i('Saving new questions of match: ${matchNames[selectedMatchIndex]}');
-    final saved = await getAllSavedQuestions();
+    final saved = await DataManager.getAllSavedQuestions<AccelMatch>(
+      AccelMatch.fromJson,
+      storageHandler!.accelSaveFile,
+    );
     saved.removeWhere((e) => e.match == selectedMatch.match);
     saved.add(selectedMatch);
-    await overwriteSave(saved);
+    await DataManager.overwriteSave(saved, storageHandler!.accelSaveFile);
   }
 
   Future<void> updateQuestions(AccelMatch aMatch) async {
     logger.i('Updating questions of match: ${matchNames[selectedMatchIndex]}');
-    final saved = await getAllSavedQuestions();
+    final saved = await DataManager.getAllSavedQuestions<AccelMatch>(
+      AccelMatch.fromJson,
+      storageHandler!.accelSaveFile,
+    );
     saved.removeWhere((e) => e.match == aMatch.match);
     saved.add(aMatch);
-    await overwriteSave(saved);
+    await DataManager.overwriteSave(saved, storageHandler!.accelSaveFile);
   }
 
   Future<void> loadMatchQuestions(String match) async {
-    final saved = await getAllSavedQuestions();
+    final saved = await DataManager.getAllSavedQuestions<AccelMatch>(
+      AccelMatch.fromJson,
+      storageHandler!.accelSaveFile,
+    );
     if (saved.isEmpty) return;
 
     try {
@@ -97,21 +97,22 @@ class _AccelQuestionManagerState extends State<AccelQuestionManager> {
 
   Future<void> removeDeletedMatchQuestions() async {
     logger.i('Removing questions of deleted matches');
-    var saved = await getAllSavedQuestions();
+    var saved = await DataManager.getAllSavedQuestions<AccelMatch>(
+      AccelMatch.fromJson,
+      storageHandler!.accelSaveFile,
+    );
     saved = saved.where((e) => matchNames.contains(e.match)).toList();
-    await overwriteSave(saved);
+    await DataManager.overwriteSave(saved, storageHandler!.accelSaveFile);
   }
 
   Future<void> removeMatch(AccelMatch aMatch) async {
     logger.i('Removing questions of match: ${matchNames[selectedMatchIndex]}');
-    var saved = await getAllSavedQuestions();
+    var saved = await DataManager.getAllSavedQuestions<AccelMatch>(
+      AccelMatch.fromJson,
+      storageHandler!.accelSaveFile,
+    );
     saved.removeWhere((e) => e.match == aMatch.match);
-    await overwriteSave(saved);
-  }
-
-  Future<void> overwriteSave(List<AccelMatch> q) async {
-    logger.i('Overwriting save');
-    await storageHandler!.writeToFile(storageHandler!.accelSaveFile, jsonEncode(q));
+    await DataManager.overwriteSave(saved, storageHandler!.accelSaveFile);
   }
 
   @override

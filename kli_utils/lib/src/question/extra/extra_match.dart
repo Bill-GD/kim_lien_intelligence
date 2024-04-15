@@ -1,6 +1,8 @@
+import '../../global_export.dart';
 import 'extra_question.dart';
 
-class ExtraMatch {
+class ExtraMatch implements BaseMatch {
+  @override
   String match;
   List<ExtraQuestion> questions;
 

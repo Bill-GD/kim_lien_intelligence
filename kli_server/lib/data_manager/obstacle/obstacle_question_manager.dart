@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'dart:io';
 
 import 'package:file_picker/file_picker.dart';
@@ -47,14 +46,6 @@ class _ObstacleQuestionManagerState extends State<ObstacleQuestionManager> {
     super.dispose();
   }
 
-  Future<List<ObstacleMatch>> getAllSavedQuestions() async {
-    logger.i('Getting all saved questions');
-    final saved = await storageHandler!.readFromFile(storageHandler!.obstacleSaveFile);
-    if (saved.isEmpty) return [];
-    final q = (jsonDecode(saved) as List).map((e) => ObstacleMatch.fromJson(e)).toList();
-    return q;
-  }
-
   Future<void> getNewQuestion(String path) async {
     Map<String, List> data = await storageHandler!.readFromExcel(path, 5, 1);
 
@@ -84,22 +75,31 @@ class _ObstacleQuestionManagerState extends State<ObstacleQuestionManager> {
 
   Future<void> saveNewQuestions() async {
     logger.i('Saving new questions of match: ${matchNames[selectedMatchIndex]}');
-    final saved = await getAllSavedQuestions();
+    final saved = await DataManager.getAllSavedQuestions<ObstacleMatch>(
+      ObstacleMatch.fromJson,
+      storageHandler!.obstacleSaveFile,
+    );
     saved.removeWhere((e) => e.match == selectedMatch.match);
     saved.add(selectedMatch);
-    await overwriteSave(saved);
+    await DataManager.overwriteSave(saved, storageHandler!.obstacleSaveFile);
   }
 
   Future<void> updateQuestions(ObstacleMatch oMatch) async {
     logger.i('Updating questions of match: ${matchNames[selectedMatchIndex]}');
-    final saved = await getAllSavedQuestions();
+    final saved = await DataManager.getAllSavedQuestions<ObstacleMatch>(
+      ObstacleMatch.fromJson,
+      storageHandler!.obstacleSaveFile,
+    );
     saved.removeWhere((e) => e.match == oMatch.match);
     saved.add(oMatch);
-    await overwriteSave(saved);
+    await DataManager.overwriteSave(saved, storageHandler!.obstacleSaveFile);
   }
 
   Future<void> loadMatchQuestions(String match) async {
-    final saved = await getAllSavedQuestions();
+    final saved = await DataManager.getAllSavedQuestions<ObstacleMatch>(
+      ObstacleMatch.fromJson,
+      storageHandler!.obstacleSaveFile,
+    );
     if (saved.isEmpty) return;
 
     try {
@@ -121,21 +121,22 @@ class _ObstacleQuestionManagerState extends State<ObstacleQuestionManager> {
 
   Future<void> removeDeletedMatchQuestions() async {
     logger.i('Removing questions of deleted matches');
-    var saved = await getAllSavedQuestions();
+    var saved = await DataManager.getAllSavedQuestions<ObstacleMatch>(
+      ObstacleMatch.fromJson,
+      storageHandler!.obstacleSaveFile,
+    );
     saved = saved.where((e) => matchNames.contains(e.match)).toList();
-    await overwriteSave(saved);
+    await DataManager.overwriteSave(saved, storageHandler!.obstacleSaveFile);
   }
 
   Future<void> removeMatch(ObstacleMatch oMatch) async {
     logger.i('Removing questions of match: ${matchNames[selectedMatchIndex]}');
-    var saved = await getAllSavedQuestions();
+    var saved = await DataManager.getAllSavedQuestions<ObstacleMatch>(
+      ObstacleMatch.fromJson,
+      storageHandler!.obstacleSaveFile,
+    );
     saved.removeWhere((e) => e.match == oMatch.match);
-    await overwriteSave(saved);
-  }
-
-  Future<void> overwriteSave(List<ObstacleMatch> q) async {
-    logger.i('Overwriting save');
-    await storageHandler!.writeToFile(storageHandler!.obstacleSaveFile, jsonEncode(q));
+    await DataManager.overwriteSave(saved, storageHandler!.obstacleSaveFile);
   }
 
   @override

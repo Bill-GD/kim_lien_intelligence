@@ -5,6 +5,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:kli_server/start_screen/help_screen.dart';
 import 'package:kli_utils/kli_utils.dart';
 import 'package:side_navigation/side_navigation.dart';
+import 'package:window_manager/window_manager.dart';
 
 import '../data_manager/data_manager_page.dart';
 import '../global.dart';
@@ -21,16 +22,43 @@ class StartPage extends StatefulWidget {
   State<StartPage> createState() => _StartPageState();
 }
 
-class _StartPageState extends State<StartPage> {
+class _StartPageState extends State<StartPage> with WindowListener {
   int _sidebarIndex = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    windowManager.addListener(this);
+  }
+
+  @override
+  void dispose() {
+    windowManager.removeListener(this);
+    super.dispose();
+  }
+
+  @override
+  void onWindowFocus() {
+    setState(() {});
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      extendBodyBehindAppBar: true,
+      appBar: AppBar(
+        actions: [
+          CloseButton(onPressed: () {
+            logger.i('[${DateTime.now()}] Exiting app');
+            exit(0);
+          }),
+        ],
+        forceMaterialTransparency: true,
+      ),
       body: Container(
         decoration: const BoxDecoration(
           image: DecorationImage(
-            image: AssetImage('assets/images/ttkl_background.png'),
+            image: AssetImage('assets/images/ttkl_bg_new.png'),
             fit: BoxFit.fill,
             opacity: 0.8,
           ),
@@ -60,7 +88,7 @@ class _StartPageState extends State<StartPage> {
               ),
               footer: SideNavigationBarFooter(
                 label: Text(
-                  'v${packageInfo.version}',
+                  'v${packageInfo.version}.${packageInfo.buildNumber}',
                   style: TextStyle(color: Theme.of(context).colorScheme.secondary.withOpacity(0.8)),
                 ),
               ),
@@ -87,43 +115,34 @@ class _StartPageState extends State<StartPage> {
               ),
             ),
             Expanded(
-              child: Stack(
-                alignment: Alignment.topRight,
-                children: [
-                  CloseButton(onPressed: () {
-                    logger.i('[${DateTime.now()}] Exiting app');
-                    exit(0);
-                  }),
-                  Center(
-                    child: [
-                      // Help screen
-                      const HelpScreen(),
-                      button(
-                        context,
-                        'Open Data Manager',
-                        enableCondition: true,
-                        onPressed: () {
-                          logger.i('Opening Data Manager page...');
-                          Navigator.of(context).push(
-                            MaterialPageRoute(builder: (context) => const DataManagerPage()),
-                          );
-                        },
-                      ),
-                      button(
-                        context,
-                        'Open Server Setup',
-                        enableCondition: true,
-                        onPressed: () async {
-                          logger.i('Opening Server Setup page...');
-                          await Navigator.of(context).push(
-                            MaterialPageRoute(builder: (context) => const ServerSetupPage()),
-                          );
-                          await KLIServer.stop();
-                        },
-                      ),
-                    ].elementAt(_sidebarIndex),
+              child: Center(
+                child: [
+                  // Help screen
+                  const HelpScreen(),
+                  button(
+                    context,
+                    'Open Data Manager',
+                    enableCondition: true,
+                    onPressed: () {
+                      logger.i('Opening Data Manager page...');
+                      Navigator.of(context).push(
+                        MaterialPageRoute(builder: (context) => const DataManagerPage()),
+                      );
+                    },
                   ),
-                ],
+                  button(
+                    context,
+                    'Open Server Setup',
+                    enableCondition: true,
+                    onPressed: () async {
+                      logger.i('Opening Server Setup page...');
+                      await Navigator.of(context).push(
+                        MaterialPageRoute(builder: (context) => const ServerSetupPage()),
+                      );
+                      await KLIServer.stop();
+                    },
+                  ),
+                ].elementAt(_sidebarIndex),
               ),
             ),
           ],

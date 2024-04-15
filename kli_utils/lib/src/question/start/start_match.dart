@@ -1,6 +1,8 @@
+import '../../global_export.dart';
 import 'start_question.dart';
 
-class StartMatch {
+class StartMatch implements BaseMatch {
+  @override
   String match;
   Map<int, List<StartQuestion>> questions;
 

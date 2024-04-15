@@ -25,11 +25,12 @@ void main() async {
 
   if (!kIsWeb && (Platform.isLinux || Platform.isMacOS || Platform.isWindows)) {
     await windowManager.ensureInitialized();
+    await windowManager.hide();
   }
-  windowManager.waitUntilReadyToShow(null, () async {
+  await windowManager.waitUntilReadyToShow(null, () async {
+    await windowManager.setFullScreen(true);
     await windowManager.show();
     await windowManager.focus();
-    await WindowManager.instance.setFullScreen(true);
   });
 
   runApp(const KliServerApp());

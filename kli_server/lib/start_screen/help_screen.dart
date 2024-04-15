@@ -2,8 +2,6 @@ import 'package:dedent/dedent.dart';
 import 'package:flutter/material.dart';
 import 'package:kli_utils/kli_utils.dart';
 
-import '../global.dart';
-
 class HelpScreen extends StatefulWidget {
   const HelpScreen({super.key});
 
@@ -34,7 +32,6 @@ class _HelpScreenState extends State<HelpScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: managerAppBar(context, 'Help'),
       backgroundColor: Colors.transparent,
       body: Column(
         mainAxisAlignment: MainAxisAlignment.center,

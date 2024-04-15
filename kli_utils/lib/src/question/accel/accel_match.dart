@@ -1,6 +1,8 @@
+import '../../global_export.dart';
 import 'accel_question.dart';
 
-class AccelMatch {
+class AccelMatch implements BaseMatch {
+  @override
   String match;
   List<AccelQuestion?> questions;
 

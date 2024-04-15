@@ -1,6 +1,8 @@
+import '../../global_export.dart';
 import 'obstacle_question.dart';
 
-class ObstacleMatch {
+class ObstacleMatch implements BaseMatch {
+  @override
   String match;
   String keyword;
   List<ObstacleQuestion?> hintQuestions;

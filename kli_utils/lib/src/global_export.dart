@@ -19,3 +19,10 @@ const double fontSizeLarge = 32;
 const double fontSizeMedium = 24;
 const double fontSizeMSmall = 20;
 const double fontSizeSmall = 16;
+
+abstract class BaseMatch {
+  String match;
+  BaseMatch(this.match);
+
+  static fromJson(Map<String, dynamic> json) {}
+}

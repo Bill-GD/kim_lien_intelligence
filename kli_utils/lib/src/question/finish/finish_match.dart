@@ -1,6 +1,8 @@
+import '../../global_export.dart';
 import 'finish_question.dart';
 
-class FinishMatch {
+class FinishMatch implements BaseMatch {
+  @override
   String match;
   List<FinishQuestion> questions;
 

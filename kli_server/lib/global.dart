@@ -91,7 +91,7 @@ Widget matchSelector(List<String> matchNames, void Function(String?) onSelected)
 
 /// A custom ListTile with variable column count and an optional delete button.
 ///
-/// The columns are defined by a pair ```(content: Widget, width: double)```.
+/// The columns are defined by a pair/record ```(content: Widget, widthRatio: double)```.
 Widget customListTile(
   BuildContext context, {
   required List<(Widget, double)> columns,
@@ -126,4 +126,27 @@ Widget customListTile(
 
 Text _applyFontSize(Text t) {
   return Text('${t.data}', textAlign: t.textAlign, style: const TextStyle(fontSize: fontSizeMedium));
+}
+
+class DataManager {
+  static Future<List<T>> getAllSavedQuestions<T extends BaseMatch>(
+    T Function(Map<String, dynamic>) func,
+    String filePath,
+  ) async {
+    logger.i('Getting all saved questions');
+    final saved = await storageHandler!.readFromFile(filePath);
+    if (saved.isEmpty) return <T>[];
+    List<T> q = [];
+    try {
+      q = (jsonDecode(saved) as List).map((e) => func(e)).toList();
+    } on Exception catch (e) {
+      logger.e(e);
+    }
+    return q;
+  }
+
+  static Future<void> overwriteSave<T>(List<T> q, String filePath) async {
+    logger.i('Overwriting save');
+    await storageHandler!.writeToFile(filePath, jsonEncode(q));
+  }
 }
