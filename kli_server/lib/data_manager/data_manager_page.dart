@@ -80,45 +80,22 @@ class _DataManagerPageState extends State<DataManagerPage> {
                   padding: EdgeInsets.symmetric(vertical: 30),
                   child: Text(
                     'Data Manager',
-                    style: TextStyle(
-                      fontSize: fontSizeLarge,
-                      fontWeight: FontWeight.bold,
-                    ),
+                    style: TextStyle(fontSize: fontSizeLarge, fontWeight: FontWeight.bold),
                   ),
                 ),
                 subtitle: const SizedBox.shrink(),
               ),
               items: const [
-                SideNavigationBarItem(
-                  icon: Icons.settings_rounded,
-                  label: 'Match',
-                ),
-                SideNavigationBarItem(
-                  icon: Icons.start_rounded,
-                  label: 'Start',
-                ),
-                SideNavigationBarItem(
-                  icon: FontAwesomeIcons.roadBarrier,
-                  label: 'Obstacle',
-                ),
-                SideNavigationBarItem(
-                  icon: Icons.local_fire_department_rounded,
-                  label: 'Acceleration',
-                ),
-                SideNavigationBarItem(
-                  icon: FontAwesomeIcons.flagCheckered,
-                  label: 'Finish',
-                ),
-                SideNavigationBarItem(
-                  icon: Icons.add_box_rounded,
-                  label: 'Extra',
-                ),
+                SideNavigationBarItem(label: 'Match', icon: Icons.settings_rounded),
+                SideNavigationBarItem(label: 'Start', icon: Icons.start_rounded),
+                SideNavigationBarItem(label: 'Obstacle', icon: FontAwesomeIcons.roadBarrier),
+                SideNavigationBarItem(label: 'Acceleration', icon: Icons.local_fire_department_rounded),
+                SideNavigationBarItem(label: 'Finish', icon: FontAwesomeIcons.flagCheckered),
+                SideNavigationBarItem(label: 'Extra', icon: Icons.add_box_rounded),
               ],
               onTap: (newIndex) {
-                setState(() {
-                  _selectedPage = newIndex;
-                  logger.i('Selecting ${_contentPages[newIndex].runtimeType}');
-                });
+                setState(() => _selectedPage = newIndex);
+                logger.i('Selecting ${_contentPages[newIndex].runtimeType}');
               },
               theme: SideNavigationBarTheme(
                 itemTheme: SideNavigationBarItemTheme(
@@ -129,7 +106,6 @@ class _DataManagerPageState extends State<DataManagerPage> {
                     height: 2,
                   ),
                 ),
-                // backgroundColor: Theme.of(context).colorScheme.background,
                 togglerTheme: SideNavigationBarTogglerTheme.standard(),
                 dividerTheme: SideNavigationBarDividerTheme.standard(),
               ),

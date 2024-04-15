@@ -18,7 +18,7 @@ void initLogger(String logPath) {
     filter: Filter(),
     output: FileOutput(file: File(storageHandler!.logFile), overrideExisting: true),
   );
-  logger.i('Logger init');
+  logger.i('[${DateTime.now()}] Logger init');
 }
 
 late final PackageInfo packageInfo;

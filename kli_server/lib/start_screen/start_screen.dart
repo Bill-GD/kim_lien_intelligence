@@ -61,24 +61,13 @@ class _StartPageState extends State<StartPage> {
               footer: SideNavigationBarFooter(
                 label: Text(
                   'v${packageInfo.version}',
-                  style: TextStyle(
-                    color: Theme.of(context).colorScheme.secondary.withOpacity(0.8),
-                  ),
+                  style: TextStyle(color: Theme.of(context).colorScheme.secondary.withOpacity(0.8)),
                 ),
               ),
               items: const [
-                SideNavigationBarItem(
-                  icon: FontAwesomeIcons.database,
-                  label: 'Data Manager',
-                ),
-                SideNavigationBarItem(
-                  icon: FontAwesomeIcons.server,
-                  label: 'Server Setup',
-                ),
-                SideNavigationBarItem(
-                  icon: FontAwesomeIcons.circleQuestion,
-                  label: 'Instruction',
-                ),
+                SideNavigationBarItem(label: 'Instruction', icon: FontAwesomeIcons.circleQuestion),
+                SideNavigationBarItem(label: 'Data Manager', icon: FontAwesomeIcons.database),
+                SideNavigationBarItem(label: 'Server Setup', icon: FontAwesomeIcons.server),
               ],
               onTap: (newIndex) {
                 if (newIndex == 2) logger.i('Accessing help page');
@@ -102,11 +91,13 @@ class _StartPageState extends State<StartPage> {
                 alignment: Alignment.topRight,
                 children: [
                   CloseButton(onPressed: () {
-                    logger.i('Exiting app');
+                    logger.i('[${DateTime.now()}] Exiting app');
                     exit(0);
                   }),
                   Center(
                     child: [
+                      // Help screen
+                      const HelpScreen(),
                       button(
                         context,
                         'Open Data Manager',
@@ -130,8 +121,6 @@ class _StartPageState extends State<StartPage> {
                           await KLIServer.stop();
                         },
                       ),
-                      // Help screen
-                      const HelpScreen(),
                     ].elementAt(_sidebarIndex),
                   ),
                 ],
