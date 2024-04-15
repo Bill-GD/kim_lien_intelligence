@@ -185,41 +185,19 @@ class _ExtraQuestionManagerState extends State<ExtraQuestionManager> {
             'Remove Questions',
             enableCondition: selectedMatchIndex >= 0,
             onPressed: () async {
-              showDialog<bool>(
-                context: context,
-                builder: (BuildContext context) {
-                  return AlertDialog(
-                    title: const Text('Confirm Delete'),
-                    content: Text(
-                      'Are you sure you want to delete questions for match: ${matchNames[selectedMatchIndex]}?',
-                    ),
-                    actionsAlignment: MainAxisAlignment.spaceEvenly,
-                    actions: <Widget>[
-                      TextButton(
-                        child: const Text('Yes', style: TextStyle(fontSize: fontSizeMedium)),
-                        onPressed: () {
-                          Navigator.pop(context, true);
-                        },
-                      ),
-                      TextButton(
-                        child: const Text('No', style: TextStyle(fontSize: fontSizeMedium)),
-                        onPressed: () {
-                          Navigator.pop(context, false);
-                        },
-                      ),
-                    ],
-                  );
-                },
-              ).then((value) async {
-                if (value != true) return;
-                showToastMessage(
-                  context,
-                  'Removed questions for match: ${matchNames[selectedMatchIndex]}',
-                );
+              final ret = await confirmDeleteDialog(
+                context,
+                'Are you sure you want to delete questions for match: ${matchNames[selectedMatchIndex]}?',
+                'Removed all extra questions for match: ${matchNames[selectedMatchIndex]}',
+              );
+              if (ret == true) {
+                if (mounted) {
+                  showToastMessage(context, 'Removed questions for match: ${matchNames[selectedMatchIndex]}');
+                }
                 await removeMatch(selectedMatch);
                 selectedMatch = ExtraMatch(match: '', questions: []);
                 setState(() {});
-              });
+              }
             },
           ),
         ],
@@ -261,10 +239,17 @@ class _ExtraQuestionManagerState extends State<ExtraQuestionManager> {
                           IconButton(
                             icon: const Icon(Icons.delete),
                             onPressed: () async {
-                              selectedMatch.questions.removeAt(index);
-                              await updateQuestions(selectedMatch);
-                              logger.i('Deleted extra question of ${selectedMatch.match}');
-                              setState(() {});
+                              final ret = await confirmDeleteDialog(
+                                context,
+                                'Do you want to delete this question?\n"${q.question}"',
+                                'Removed an extra question',
+                              );
+                              if (ret == true) {
+                                selectedMatch.questions.removeAt(index);
+                                await updateQuestions(selectedMatch);
+                                logger.i('Deleted extra question of ${selectedMatch.match}');
+                                setState(() {});
+                              }
                             },
                           ),
                           widthRatios[2]

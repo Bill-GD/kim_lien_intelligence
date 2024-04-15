@@ -196,41 +196,24 @@ class _AccelQuestionManagerState extends State<AccelQuestionManager> {
             'Remove Questions',
             enableCondition: selectedMatchIndex >= 0,
             onPressed: () async {
-              showDialog<bool>(
-                context: context,
-                builder: (BuildContext context) {
-                  return AlertDialog(
-                    title: const Text('Confirm Delete'),
-                    content: Text(
-                      'Are you sure you want to delete questions for match: ${matchNames[selectedMatchIndex]}?',
-                    ),
-                    actionsAlignment: MainAxisAlignment.spaceEvenly,
-                    actions: <Widget>[
-                      TextButton(
-                        child: const Text('Yes', style: TextStyle(fontSize: fontSizeMedium)),
-                        onPressed: () {
-                          Navigator.pop(context, true);
-                        },
-                      ),
-                      TextButton(
-                        child: const Text('No', style: TextStyle(fontSize: fontSizeMedium)),
-                        onPressed: () {
-                          Navigator.pop(context, false);
-                        },
-                      ),
-                    ],
-                  );
-                },
-              ).then((value) async {
-                if (value != true) return;
-                showToastMessage(context, 'Removed questions for match: ${matchNames[selectedMatchIndex]}');
+              final ret = await confirmDeleteDialog(
+                context,
+                'Are you sure you want to delete questions for match: ${matchNames[selectedMatchIndex]}?',
+                'Removed all accel questions for match: ${matchNames[selectedMatchIndex]}',
+              );
+              if (ret == true) {
+                if (mounted) {
+                  showToastMessage(context, 'Removed questions for match: ${matchNames[selectedMatchIndex]}');
+                }
                 await removeMatch(selectedMatch);
-                selectedMatch =
-                    AccelMatch(match: matchNames[selectedMatchIndex], questions: List.filled(4, null));
+                selectedMatch = AccelMatch(
+                  match: matchNames[selectedMatchIndex],
+                  questions: List.filled(4, null),
+                );
                 selectedQuestionIndex = -1;
                 selectedImageIndex = -1;
                 setState(() {});
-              });
+              }
             },
           ),
         ],

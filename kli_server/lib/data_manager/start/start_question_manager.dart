@@ -270,38 +270,19 @@ class _StartQuestionManagerState extends State<StartQuestionManager> {
             'Remove Questions',
             enableCondition: selectedMatchIndex >= 0,
             onPressed: () async {
-              showDialog<bool>(
-                context: context,
-                builder: (BuildContext context) {
-                  return AlertDialog(
-                    title: const Text('Confirm Delete'),
-                    content: Text(
-                      'Are you sure you want to delete questions for match: ${matchNames[selectedMatchIndex]}?',
-                    ),
-                    actionsAlignment: MainAxisAlignment.spaceEvenly,
-                    actions: <Widget>[
-                      TextButton(
-                        child: const Text('Yes', style: TextStyle(fontSize: fontSizeMedium)),
-                        onPressed: () {
-                          Navigator.pop(context, true);
-                        },
-                      ),
-                      TextButton(
-                        child: const Text('No', style: TextStyle(fontSize: fontSizeMedium)),
-                        onPressed: () {
-                          Navigator.pop(context, false);
-                        },
-                      ),
-                    ],
-                  );
-                },
-              ).then((value) async {
-                if (value != true) return;
-                showToastMessage(context, 'Removed questions for match: ${matchNames[selectedMatchIndex]}');
+              final ret = await confirmDeleteDialog(
+                context,
+                'Are you sure you want to delete questions for match: ${matchNames[selectedMatchIndex]}?',
+                'Removed all start questions for match: ${matchNames[selectedMatchIndex]}',
+              );
+              if (ret == true) {
+                if (mounted) {
+                  showToastMessage(context, 'Removed questions for match: ${matchNames[selectedMatchIndex]}');
+                }
                 await removeMatch(selectedMatch);
                 selectedMatch = StartMatch(match: matchNames[selectedMatchIndex], questions: {});
                 setState(() {});
-              });
+              }
             },
           ),
         ],
@@ -356,11 +337,16 @@ class _StartQuestionManagerState extends State<StartQuestionManager> {
                           IconButton(
                             icon: const Icon(Icons.delete),
                             onPressed: () async {
-                              selectedMatch.questions[q.$2]?.removeAt(q.$1);
-                              await updateQuestions(selectedMatch);
-                              logger.i('Removed question: pos=${q.$2}, idx=${q.$1}');
-                              setState(() {});
-                              return;
+                              final ret = await confirmDeleteDialog(
+                                context,
+                                'Do you want to delete this question?\n"${q.$3.question}"',
+                                'Removed start question: pos=${q.$2}, idx=${q.$1}',
+                              );
+                              if (ret == true) {
+                                selectedMatch.questions[q.$2]?.removeAt(q.$1);
+                                await updateQuestions(selectedMatch);
+                                setState(() {});
+                              }
                             },
                           ),
                           widthRatios[4],

@@ -23,6 +23,4 @@ const double fontSizeSmall = 16;
 abstract class BaseMatch {
   String match;
   BaseMatch(this.match);
-
-  static fromJson(Map<String, dynamic> json) {}
 }

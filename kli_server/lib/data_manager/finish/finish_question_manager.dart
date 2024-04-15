@@ -217,38 +217,19 @@ class _FinishQuestionManagerState extends State<FinishQuestionManager> {
             'Remove Questions',
             enableCondition: selectedMatchIndex >= 0,
             onPressed: () async {
-              showDialog<bool>(
-                context: context,
-                builder: (BuildContext context) {
-                  return AlertDialog(
-                    title: const Text('Confirm Delete'),
-                    content: Text(
-                      'Are you sure you want to delete questions for match: ${matchNames[selectedMatchIndex]}?',
-                    ),
-                    actionsAlignment: MainAxisAlignment.spaceEvenly,
-                    actions: <Widget>[
-                      TextButton(
-                        child: const Text('Yes', style: TextStyle(fontSize: fontSizeMedium)),
-                        onPressed: () {
-                          Navigator.pop(context, true);
-                        },
-                      ),
-                      TextButton(
-                        child: const Text('No', style: TextStyle(fontSize: fontSizeMedium)),
-                        onPressed: () {
-                          Navigator.pop(context, false);
-                        },
-                      ),
-                    ],
-                  );
-                },
-              ).then((value) async {
-                if (value != true) return;
-                showToastMessage(context, 'Removed questions for match: ${matchNames[selectedMatchIndex]}');
+              final value = await confirmDeleteDialog(
+                context,
+                'Are you sure you want to delete questions for match: ${matchNames[selectedMatchIndex]}?',
+                'Removed all finish questions for match: ${matchNames[selectedMatchIndex]}',
+              );
+              if (value == true) {
+                if (mounted) {
+                  showToastMessage(context, 'Removed questions for match: ${matchNames[selectedMatchIndex]}');
+                }
                 await removeMatch(selectedMatch);
                 selectedMatch = FinishMatch(match: '', questions: []);
                 setState(() {});
-              });
+              }
             },
           ),
         ],
@@ -300,10 +281,16 @@ class _FinishQuestionManagerState extends State<FinishQuestionManager> {
                           IconButton(
                             icon: const Icon(Icons.delete),
                             onPressed: () async {
-                              selectedMatch.questions.removeAt(q.$1);
-                              await updateQuestions(selectedMatch);
-                              logger.i('Removed finish question (p=${q.$2.point})');
-                              setState(() {});
+                              final ret = await confirmDeleteDialog(
+                                context,
+                                'Do you want to delete this question?\n"${q.$2.question}"',
+                                'Removed finish question (p=${q.$2.point})',
+                              );
+                              if (ret == true) {
+                                selectedMatch.questions.removeAt(q.$1);
+                                await updateQuestions(selectedMatch);
+                                setState(() {});
+                              }
                             },
                           ),
                           widthRatios[4],
