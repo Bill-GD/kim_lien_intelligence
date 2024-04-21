@@ -12,11 +12,11 @@ class ExtraEditorDialog extends StatefulWidget {
 }
 
 class _ExtraEditorDialogState extends State<ExtraEditorDialog> {
-  final _questionController = TextEditingController();
-  final _answerController = TextEditingController();
-  String? _qErrorText, _aErrorText;
+  final questionController = TextEditingController();
+  final answerController = TextEditingController();
+  String? qErrorText, aErrorText;
 
-  bool createNew = false;
+  bool createNew = false, disableDone = true;
 
   @override
   void initState() {
@@ -24,20 +24,21 @@ class _ExtraEditorDialogState extends State<ExtraEditorDialog> {
     logger.i('Opened obstacle question editor');
     if (widget.question != null) {
       logger.i('Modify extra question');
-      _questionController.text = widget.question!.question;
-      _answerController.text = widget.question!.answer;
+      questionController.text = widget.question!.question;
+      answerController.text = widget.question!.answer;
     } else {
       logger.i('Add new extra question');
       createNew = true;
-      _questionController.text = '';
-      _answerController.text = '';
+      questionController.text = '';
+      answerController.text = '';
     }
+    disableDone = questionController.text.isEmpty || answerController.text.isEmpty;
   }
 
   @override
   void dispose() {
-    _questionController.dispose();
-    _answerController.dispose();
+    questionController.dispose();
+    answerController.dispose();
     super.dispose();
   }
 
@@ -57,14 +58,15 @@ class _ExtraEditorDialogState extends State<ExtraEditorDialog> {
             TextField(
               style: const TextStyle(fontSize: fontSizeMedium),
               onChanged: (value) {
+                disableDone = questionController.text.isEmpty || answerController.text.isEmpty;
                 if (value.isEmpty) {
-                  _qErrorText = 'Không được trống';
+                  qErrorText = 'Không được trống';
                   setState(() {});
                   return;
                 }
-                setState(() => _qErrorText = null);
+                setState(() => qErrorText = null);
               },
-              controller: _questionController,
+              controller: questionController,
               maxLines: 5,
               minLines: 1,
               decoration: InputDecoration(
@@ -73,7 +75,7 @@ class _ExtraEditorDialogState extends State<ExtraEditorDialog> {
                   fontWeight: FontWeight.w600,
                   color: Theme.of(context).colorScheme.primary,
                 ),
-                errorText: _qErrorText,
+                errorText: qErrorText,
                 border: const OutlineInputBorder(),
               ),
             ),
@@ -81,21 +83,22 @@ class _ExtraEditorDialogState extends State<ExtraEditorDialog> {
             TextField(
               style: const TextStyle(fontSize: fontSizeMedium),
               onChanged: (value) {
+                disableDone = questionController.text.isEmpty || answerController.text.isEmpty;
                 if (value.isEmpty) {
-                  _aErrorText = 'Không được trống';
+                  aErrorText = 'Không được trống';
                   setState(() {});
                   return;
                 }
-                setState(() => _aErrorText = null);
+                setState(() => aErrorText = null);
               },
-              controller: _answerController,
+              controller: answerController,
               decoration: InputDecoration(
                 labelText: 'Đáp án',
                 labelStyle: TextStyle(
                   fontWeight: FontWeight.w600,
                   color: Theme.of(context).colorScheme.primary,
                 ),
-                errorText: _aErrorText,
+                errorText: aErrorText,
                 border: const OutlineInputBorder(),
               ),
             ),
@@ -104,34 +107,27 @@ class _ExtraEditorDialogState extends State<ExtraEditorDialog> {
         actionsAlignment: MainAxisAlignment.spaceAround,
         actions: <Widget>[
           TextButton(
-            onPressed: () {
-              if (_questionController.text.isEmpty) {
-                showToastMessage(context, 'Question can\'t be empty');
-                return;
-              }
-              if (_answerController.text.isEmpty) {
-                showToastMessage(context, 'Answer can\'t be empty');
-                return;
-              }
+            onPressed: disableDone
+                ? null
+                : () {
+                    bool hasChanged = createNew
+                        ? true
+                        : questionController.text != widget.question!.question ||
+                            answerController.text != widget.question!.answer;
 
-              bool hasChanged = createNew
-                  ? true
-                  : _questionController.text != widget.question!.question ||
-                      _answerController.text != widget.question!.answer;
+                    if (!hasChanged) {
+                      logger.i('No change, exiting');
+                      Navigator.of(context).pop();
+                      return;
+                    }
+                    final newQ = ExtraQuestion(
+                      question: questionController.text,
+                      answer: answerController.text,
+                    );
 
-              if (!hasChanged) {
-                logger.i('No change, exiting');
-                Navigator.of(context).pop();
-                return;
-              }
-              final newQ = ExtraQuestion(
-                question: _questionController.text,
-                answer: _answerController.text,
-              );
-
-              logger.i('${createNew ? 'Created' : 'Modified'} extra question');
-              Navigator.of(context).pop(newQ);
-            },
+                    logger.i('${createNew ? 'Created' : 'Modified'} extra question');
+                    Navigator.of(context).pop(newQ);
+                  },
             child: const Text('Hoàn tất', style: TextStyle(fontSize: fontSizeMedium)),
           ),
           TextButton(

@@ -18,7 +18,7 @@ class _AccelEditorDialogState extends State<AccelEditorDialog> {
   AccelQuestionType type = AccelQuestionType.none;
   String? qErrorText, aErrorText;
 
-  bool createNew = false;
+  bool createNew = false, disableDone = true;
 
   @override
   void initState() {
@@ -30,6 +30,7 @@ class _AccelEditorDialogState extends State<AccelEditorDialog> {
       answerController.text = widget.question!.answer;
       explanationController.text = widget.question!.explanation;
       type = widget.question!.type;
+      disableDone = questionController.text.isEmpty || answerController.text.isEmpty;
     } else {
       logger.i('Add new accel question');
       createNew = true;
@@ -63,6 +64,7 @@ class _AccelEditorDialogState extends State<AccelEditorDialog> {
             TextField(
               style: const TextStyle(fontSize: fontSizeMedium),
               onChanged: (value) {
+                disableDone = questionController.text.isEmpty || answerController.text.isEmpty;
                 if (value.isEmpty) {
                   qErrorText = 'Không được trống';
                   setState(() {});
@@ -85,6 +87,7 @@ class _AccelEditorDialogState extends State<AccelEditorDialog> {
             TextField(
               style: const TextStyle(fontSize: fontSizeMedium),
               onChanged: (value) {
+                disableDone = questionController.text.isEmpty || answerController.text.isEmpty;
                 if (value.isEmpty) {
                   aErrorText = 'Không được trống';
                   setState(() {});
@@ -107,6 +110,8 @@ class _AccelEditorDialogState extends State<AccelEditorDialog> {
             TextField(
               style: const TextStyle(fontSize: fontSizeMedium),
               controller: explanationController,
+              maxLines: 3,
+              minLines: 1,
               decoration: InputDecoration(
                 labelText: 'Giải thích',
                 labelStyle: TextStyle(
@@ -121,39 +126,32 @@ class _AccelEditorDialogState extends State<AccelEditorDialog> {
         actionsAlignment: MainAxisAlignment.spaceAround,
         actions: <Widget>[
           TextButton(
-            onPressed: () {
-              if (questionController.text.isEmpty) {
-                showToastMessage(context, 'Question can\'t be empty');
-                return;
-              }
-              if (answerController.text.isEmpty) {
-                showToastMessage(context, 'Answer can\'t be empty');
-                return;
-              }
+            onPressed: disableDone
+                ? null
+                : () {
+                    bool hasChanged = createNew
+                        ? true
+                        : questionController.text != widget.question!.question ||
+                            answerController.text != widget.question!.answer ||
+                            explanationController.text != widget.question!.explanation ||
+                            type != widget.question!.type;
 
-              bool hasChanged = createNew
-                  ? true
-                  : questionController.text != widget.question!.question ||
-                      answerController.text != widget.question!.answer ||
-                      explanationController.text != widget.question!.explanation ||
-                      type != widget.question!.type;
+                    if (!hasChanged) {
+                      logger.i('No change, exiting');
+                      Navigator.of(context).pop();
+                      return;
+                    }
+                    final newQ = AccelQuestion(
+                      type: type,
+                      question: questionController.text,
+                      answer: answerController.text,
+                      explanation: explanationController.text,
+                      imagePaths: createNew ? [] : widget.question!.imagePaths,
+                    );
 
-              if (!hasChanged) {
-                logger.i('No change, exiting');
-                Navigator.of(context).pop();
-                return;
-              }
-              final newQ = AccelQuestion(
-                type: type,
-                question: questionController.text,
-                answer: answerController.text,
-                explanation: explanationController.text,
-                imagePaths: createNew ? [] : widget.question!.imagePaths,
-              );
-
-              logger.i('${createNew ? 'Created' : 'Modified'} accel question');
-              Navigator.of(context).pop(newQ);
-            },
+                    logger.i('${createNew ? 'Created' : 'Modified'} accel question');
+                    Navigator.of(context).pop(newQ);
+                  },
             child: const Text('Hoàn tất', style: TextStyle(fontSize: fontSizeMedium)),
           ),
           TextButton(

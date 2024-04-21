@@ -167,7 +167,7 @@ class _AccelQuestionManagerState extends State<AccelQuestionManager> {
           ),
           button(
             context,
-            'Nhập file câu hỏi',
+            'Nhập từ file',
             enableCondition: selectedMatchIndex >= 0,
             onPressed: () async {
               logger.i('Import new questions (.xlsx)');

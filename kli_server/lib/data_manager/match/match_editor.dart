@@ -23,22 +23,22 @@ class _MatchEditorDialogState extends State<MatchEditorDialog> {
     TextEditingController(),
     TextEditingController(),
   ];
-  final _imagePaths = List<String>.filled(4, '');
+  final imagePaths = List<String>.filled(4, '');
 
-  String _matchNameError = '';
-  bool _disableDone = true, _setNewMatch = false;
+  String matchNameError = '';
+  bool disableDone = true, setNewMatch = false;
 
   @override
   void initState() {
     super.initState();
-    _disableDone = _setNewMatch = widget.match == null;
-    logger.i('Match editor: ${_setNewMatch ? 'New' : '${widget.match?.name}'}');
-    if (_setNewMatch) return;
+    disableDone = setNewMatch = widget.match == null;
+    logger.i('Match editor: ${setNewMatch ? 'New' : '${widget.match?.name}'}');
+    if (setNewMatch) return;
 
     _matchNameController.text = widget.match!.name;
     for (int i = 0; i < widget.match!.playerList.length; i++) {
       _playerNameControllers[i].text = widget.match!.playerList[i]?.name ?? '';
-      _imagePaths[i] = widget.match!.playerList[i]?.imagePath ?? '';
+      imagePaths[i] = widget.match!.playerList[i]?.imagePath ?? '';
     }
   }
 
@@ -60,20 +60,20 @@ class _MatchEditorDialogState extends State<MatchEditorDialog> {
         title: TextField(
           onChanged: (value) {
             if (value.isEmpty) {
-              _matchNameError = 'Không được trống';
-              _disableDone = true;
+              matchNameError = 'Không được trống';
+              disableDone = true;
               setState(() {});
               return;
             }
             if (value != widget.match?.name && widget.matchNames.contains(value)) {
-              _matchNameError = 'Bị trùng tên';
-              _disableDone = true;
+              matchNameError = 'Bị trùng tên';
+              disableDone = true;
               setState(() {});
               return;
             }
             setState(() {
-              _matchNameError = '';
-              _disableDone = false;
+              matchNameError = '';
+              disableDone = false;
             });
           },
           controller: _matchNameController,
@@ -83,7 +83,7 @@ class _MatchEditorDialogState extends State<MatchEditorDialog> {
               fontWeight: FontWeight.w600,
               color: Theme.of(context).colorScheme.primary,
             ),
-            errorText: _matchNameError.isEmpty ? null : _matchNameError,
+            errorText: matchNameError.isEmpty ? null : matchNameError,
             border: const OutlineInputBorder(),
           ),
         ),
@@ -101,7 +101,7 @@ class _MatchEditorDialogState extends State<MatchEditorDialog> {
         actionsAlignment: MainAxisAlignment.spaceAround,
         actions: <Widget>[
           TextButton(
-            onPressed: _disableDone
+            onPressed: disableDone
                 ? null
                 : () {
                     if (_matchNameController.text.isEmpty) {
@@ -110,14 +110,14 @@ class _MatchEditorDialogState extends State<MatchEditorDialog> {
                     }
 
                     for (var e in _playerNameControllers) {
-                      if (e.value.text.isNotEmpty && _imagePaths[_playerNameControllers.indexOf(e)].isEmpty) {
+                      if (e.value.text.isNotEmpty && imagePaths[_playerNameControllers.indexOf(e)].isEmpty) {
                         showToastMessage(
                           context,
                           'Hãy chọn ảnh cho thí sinh ${_playerNameControllers.indexOf(e) + 1}',
                         );
                         return;
                       }
-                      if (e.value.text.isEmpty && _imagePaths[_playerNameControllers.indexOf(e)].isNotEmpty) {
+                      if (e.value.text.isEmpty && imagePaths[_playerNameControllers.indexOf(e)].isNotEmpty) {
                         showToastMessage(
                           context,
                           'Tên thí sinh ${_playerNameControllers.indexOf(e) + 1} không được trống',
@@ -131,11 +131,11 @@ class _MatchEditorDialogState extends State<MatchEditorDialog> {
                       _playerNameControllers.map((c) {
                         return c.text.isEmpty
                             ? null
-                            : KLIPlayer(c.text, _imagePaths[_playerNameControllers.indexOf(c)]);
+                            : KLIPlayer(c.text, imagePaths[_playerNameControllers.indexOf(c)]);
                       }).toList(),
                     );
 
-                    logger.i('${_setNewMatch ? 'New' : 'Modified'} match: ${newMatch.name}');
+                    logger.i('${setNewMatch ? 'New' : 'Modified'} match: ${newMatch.name}');
 
                     Navigator.of(context).pop(newMatch);
                   },
@@ -159,8 +159,8 @@ class _MatchEditorDialogState extends State<MatchEditorDialog> {
   Widget playerWidget(int index) {
     bool imageFound = false;
     String fullPath = '';
-    if (_imagePaths[index].isNotEmpty) {
-      fullPath = '${storageHandler!.parentFolder}\\${_imagePaths[index]}';
+    if (imagePaths[index].isNotEmpty) {
+      fullPath = '${storageHandler!.parentFolder}\\${imagePaths[index]}';
       imageFound = File(fullPath).existsSync();
     }
     return Expanded(
@@ -193,11 +193,11 @@ class _MatchEditorDialogState extends State<MatchEditorDialog> {
                 border: Border.all(width: 1, color: Theme.of(context).colorScheme.onBackground),
               ),
               constraints: const BoxConstraints(maxHeight: 400, maxWidth: 300, minHeight: 1, minWidth: 260),
-              child: _imagePaths[index].isEmpty || !imageFound
+              child: imagePaths[index].isEmpty || !imageFound
                   ? Container(
                       margin: const EdgeInsets.symmetric(horizontal: 20),
                       alignment: Alignment.center,
-                      child: Text(_imagePaths[index].isEmpty ? 'Không có ảnh' : 'Không thấy ảnh $fullPath'),
+                      child: Text(imagePaths[index].isEmpty ? 'Không có ảnh' : 'Không thấy ảnh $fullPath'),
                     )
                   : Image.file(File(fullPath), fit: BoxFit.contain),
             ),
@@ -213,8 +213,8 @@ class _MatchEditorDialogState extends State<MatchEditorDialog> {
 
                 if (result != null) {
                   final p = result.files.single.path!;
-                  _imagePaths[index] = storageHandler!.getRelative(p);
-                  logger.i('Chose ${_imagePaths[index]} for player ${index + 1}');
+                  imagePaths[index] = storageHandler!.getRelative(p);
+                  logger.i('Chose ${imagePaths[index]} for player ${index + 1}');
                   setState(() {});
                 }
               },

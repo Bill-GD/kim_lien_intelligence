@@ -20,6 +20,8 @@ class _StartEditorDialogState extends State<StartEditorDialog> {
 
   String? qErrorText, aErrorText;
 
+  bool disableDone = true;
+
   @override
   void initState() {
     super.initState();
@@ -30,6 +32,7 @@ class _StartEditorDialogState extends State<StartEditorDialog> {
       answerController.text = widget.question!.answer;
       type = widget.question!.subject;
       pos = widget.playerPos;
+      disableDone = questionController.text.isEmpty || answerController.text.isEmpty || pos < 0;
     } else {
       logger.i('Add new start question');
       type = StartQuestionSubject.math;
@@ -50,44 +53,48 @@ class _StartEditorDialogState extends State<StartEditorDialog> {
       body: AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         titlePadding: const EdgeInsets.symmetric(vertical: 32),
-        title: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            DropdownMenu(
-              label: const Text('Vị trí'),
-              textStyle: const TextStyle(fontSize: fontSizeMSmall),
-              initialSelection: pos,
-              dropdownMenuEntries: [
-                for (var i = 1; i < 5; i++)
-                  DropdownMenuEntry(
-                    value: i - 1,
-                    label: '$i',
-                  )
-              ],
-              onSelected: (value) async {
-                pos = value!;
-                setState(() {});
-              },
-            ),
-            DropdownMenu(
-              label: const Text('Lĩnh vực'),
-              textStyle: const TextStyle(fontSize: fontSizeMSmall),
-              initialSelection: type,
-              dropdownMenuEntries: [
-                for (final s in StartQuestionSubject.values)
-                  DropdownMenuEntry(
-                    value: s,
-                    label: StartQuestion.mapTypeDisplay(s),
-                  )
-              ],
-              onSelected: (value) async {
-                type = value!;
-                setState(() {});
-              },
-            ),
-          ],
+        title: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 32),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              DropdownMenu(
+                label: const Text('Vị trí'),
+                textStyle: const TextStyle(fontSize: fontSizeMSmall),
+                initialSelection: pos,
+                dropdownMenuEntries: [
+                  for (var i = 1; i < 5; i++)
+                    DropdownMenuEntry(
+                      value: i - 1,
+                      label: '$i',
+                    )
+                ],
+                onSelected: (value) async {
+                  pos = value!;
+                  disableDone = questionController.text.isEmpty || answerController.text.isEmpty || pos < 0;
+                  setState(() {});
+                },
+              ),
+              DropdownMenu(
+                label: const Text('Lĩnh vực'),
+                textStyle: const TextStyle(fontSize: fontSizeMSmall),
+                initialSelection: type,
+                dropdownMenuEntries: [
+                  for (final s in StartQuestionSubject.values)
+                    DropdownMenuEntry(
+                      value: s,
+                      label: StartQuestion.mapTypeDisplay(s),
+                    )
+                ],
+                onSelected: (value) async {
+                  type = value!;
+                  setState(() {});
+                },
+              ),
+            ],
+          ),
         ),
-        contentPadding: const EdgeInsets.only(bottom: 40, left: 60, right: 60),
+        contentPadding: const EdgeInsets.only(bottom: 40, left: 32, right: 32),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -95,6 +102,7 @@ class _StartEditorDialogState extends State<StartEditorDialog> {
             TextField(
               style: const TextStyle(fontSize: fontSizeMedium),
               onChanged: (value) {
+                disableDone = questionController.text.isEmpty || answerController.text.isEmpty || pos < 0;
                 if (value.isEmpty) {
                   qErrorText = 'Không được trống';
                   setState(() {});
@@ -119,6 +127,7 @@ class _StartEditorDialogState extends State<StartEditorDialog> {
             TextField(
               style: const TextStyle(fontSize: fontSizeMedium),
               onChanged: (value) {
+                disableDone = questionController.text.isEmpty || answerController.text.isEmpty || pos < 0;
                 if (value.isEmpty) {
                   aErrorText = 'Không được trống';
                   setState(() {});
@@ -142,44 +151,33 @@ class _StartEditorDialogState extends State<StartEditorDialog> {
         actionsAlignment: MainAxisAlignment.spaceAround,
         actions: <Widget>[
           TextButton(
-            onPressed: () {
-              if (questionController.text.isEmpty) {
-                showToastMessage(context, 'Câu hỏi không được trống');
-                return;
-              }
-              if (answerController.text.isEmpty) {
-                showToastMessage(context, 'Đáp án không được trống');
-                return;
-              }
-              if (pos < 0) {
-                showToastMessage(context, 'Vị trí không được trống');
-                return;
-              }
+            onPressed: disableDone
+                ? null
+                : () {
+                    bool hasChanged = widget.question == null
+                        ? true
+                        : questionController.text != widget.question!.question ||
+                            answerController.text != widget.question!.answer ||
+                            type != widget.question!.subject ||
+                            pos != widget.playerPos;
 
-              bool hasChanged = widget.question == null
-                  ? true
-                  : questionController.text != widget.question!.question ||
-                      answerController.text != widget.question!.answer ||
-                      type != widget.question!.subject ||
-                      pos != widget.playerPos;
+                    if (!hasChanged) {
+                      logger.i('No change, exiting');
+                      Navigator.of(context).pop();
+                      return;
+                    }
 
-              if (!hasChanged) {
-                logger.i('No change, exiting');
-                Navigator.of(context).pop();
-                return;
-              }
+                    final newQ = StartQuestion(
+                      type,
+                      questionController.text,
+                      answerController.text,
+                    );
 
-              final newQ = StartQuestion(
-                type,
-                questionController.text,
-                answerController.text,
-              );
-
-              logger.i(
-                '${widget.question == null ? 'Created' : 'Modified'} start question: ${newQ.subject.name}',
-              );
-              Navigator.of(context).pop((pos, newQ));
-            },
+                    logger.i(
+                      '${widget.question == null ? 'Created' : 'Modified'} start question: ${newQ.subject.name}',
+                    );
+                    Navigator.of(context).pop((pos, newQ));
+                  },
             child: const Text('Hoàn tất', style: TextStyle(fontSize: fontSizeMedium)),
           ),
           TextButton(

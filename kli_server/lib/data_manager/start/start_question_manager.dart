@@ -194,7 +194,7 @@ class _StartQuestionManagerState extends State<StartQuestionManager> {
           ),
           button(
             context,
-            'Nhập file câu hỏi',
+            'Nhập từ file',
             enableCondition: selectedMatchIndex >= 0,
             onPressed: () async {
               logger.i('Import new questions (.xlsx)');
@@ -269,7 +269,8 @@ class _StartQuestionManagerState extends State<StartQuestionManager> {
             onPressed: () async {
               await confirmDialog(
                 context,
-                message: 'Bạn có muốn xóa tất cả câu hỏi khởi động của trận: ${matchNames[selectedMatchIndex]}?',
+                message:
+                    'Bạn có muốn xóa tất cả câu hỏi khởi động của trận: ${matchNames[selectedMatchIndex]}?',
                 acceptLogMessage: 'Removed all start questions for match: ${matchNames[selectedMatchIndex]}',
                 onAccept: () async {
                   if (mounted) showToastMessage(context, 'Đã xóa (trận: ${matchNames[selectedMatchIndex]})');

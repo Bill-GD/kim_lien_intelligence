@@ -28,7 +28,7 @@ class _FinishEditorDialogState extends State<FinishEditorDialog> {
   String fullVideoPath = '';
   bool videoFound = false, vidControlInit = false;
   int selectedPointValue = -1;
-  bool createNew = false;
+  bool createNew = false, disableDone = true;
 
   @override
   void initState() {
@@ -48,6 +48,7 @@ class _FinishEditorDialogState extends State<FinishEditorDialog> {
       selectedPointValue = widget.question!.point;
       newMediaPath = widget.question!.mediaPath;
     }
+    disableDone = questionController.text.isEmpty || answerController.text.isEmpty || selectedPointValue < 0;
 
     if (newMediaPath.isNotEmpty) changeVideoSource(newMediaPath);
 
@@ -98,6 +99,9 @@ class _FinishEditorDialogState extends State<FinishEditorDialog> {
             ],
             onSelected: (value) async {
               selectedPointValue = value!;
+              disableDone = questionController.text.isEmpty || //
+                  answerController.text.isEmpty ||
+                  selectedPointValue < 0;
               setState(() {});
             },
           ),
@@ -115,6 +119,9 @@ class _FinishEditorDialogState extends State<FinishEditorDialog> {
                   TextField(
                     style: const TextStyle(fontSize: fontSizeMedium),
                     onChanged: (value) {
+                      disableDone = questionController.text.isEmpty ||
+                          answerController.text.isEmpty ||
+                          selectedPointValue < 0;
                       if (value.isEmpty) {
                         qErrorText = 'Không được trống';
                         setState(() {});
@@ -139,6 +146,9 @@ class _FinishEditorDialogState extends State<FinishEditorDialog> {
                   TextField(
                     style: const TextStyle(fontSize: fontSizeMedium),
                     onChanged: (value) {
+                      disableDone = questionController.text.isEmpty ||
+                          answerController.text.isEmpty ||
+                          selectedPointValue < 0;
                       if (value.isEmpty) {
                         aErrorText = 'Không được trống';
                         setState(() {});
@@ -269,44 +279,33 @@ class _FinishEditorDialogState extends State<FinishEditorDialog> {
         actionsAlignment: MainAxisAlignment.spaceAround,
         actions: <Widget>[
           TextButton(
-            onPressed: () {
-              if (questionController.text.isEmpty) {
-                showToastMessage(context, 'Question can\'t be empty');
-                return;
-              }
-              if (answerController.text.isEmpty) {
-                showToastMessage(context, 'Answer can\'t be empty');
-                return;
-              }
-              if (selectedPointValue < 0) {
-                showToastMessage(context, 'Point value not chosen');
-                return;
-              }
+            onPressed: disableDone
+                ? null
+                : () {
+                    bool hasChanged = createNew
+                        ? true
+                        : questionController.text != widget.question!.question ||
+                            answerController.text != widget.question!.answer ||
+                            explanationController.text != widget.question!.explanation ||
+                            selectedPointValue != widget.question!.point ||
+                            newMediaPath != widget.question!.mediaPath;
 
-              bool hasChanged = createNew
-                  ? true
-                  : questionController.text != widget.question!.question ||
-                      answerController.text != widget.question!.answer ||
-                      explanationController.text != widget.question!.explanation ||
-                      selectedPointValue != widget.question!.point ||
-                      newMediaPath != widget.question!.mediaPath;
+                    if (!hasChanged) {
+                      logger.i('No change, exiting');
+                      Navigator.of(context).pop();
+                      return;
+                    }
+                    final newQ = FinishQuestion(
+                      point: selectedPointValue,
+                      question: questionController.text,
+                      answer: answerController.text,
+                      explanation: explanationController.text,
+                      mediaPath: newMediaPath,
+                    );
 
-              if (!hasChanged) {
-                logger.i('No change, exiting');
-                Navigator.of(context).pop();
-                return;
-              }
-              final newQ = FinishQuestion(
-                point: selectedPointValue,
-                question: questionController.text,
-                answer: answerController.text,
-                explanation: explanationController.text,
-                mediaPath: newMediaPath,
-              );
-
-              logger.i('${createNew ? 'Created' : 'Modified'} finish question');
-              Navigator.of(context).pop(newQ);
-            },
+                    logger.i('${createNew ? 'Created' : 'Modified'} finish question');
+                    Navigator.of(context).pop(newQ);
+                  },
             child: const Text('Hoàn tất', style: TextStyle(fontSize: fontSizeMedium)),
           ),
           TextButton(
