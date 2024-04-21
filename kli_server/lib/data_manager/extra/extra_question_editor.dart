@@ -58,7 +58,7 @@ class _ExtraEditorDialogState extends State<ExtraEditorDialog> {
               style: const TextStyle(fontSize: fontSizeMedium),
               onChanged: (value) {
                 if (value.isEmpty) {
-                  _qErrorText = 'Can\'t be empty';
+                  _qErrorText = 'Không được trống';
                   setState(() {});
                   return;
                 }
@@ -68,7 +68,7 @@ class _ExtraEditorDialogState extends State<ExtraEditorDialog> {
               maxLines: 5,
               minLines: 1,
               decoration: InputDecoration(
-                labelText: 'Question',
+                labelText: 'Câu hỏi',
                 labelStyle: TextStyle(
                   fontWeight: FontWeight.w600,
                   color: Theme.of(context).colorScheme.primary,
@@ -82,7 +82,7 @@ class _ExtraEditorDialogState extends State<ExtraEditorDialog> {
               style: const TextStyle(fontSize: fontSizeMedium),
               onChanged: (value) {
                 if (value.isEmpty) {
-                  _aErrorText = 'Can\'t be empty';
+                  _aErrorText = 'Không được trống';
                   setState(() {});
                   return;
                 }
@@ -90,7 +90,7 @@ class _ExtraEditorDialogState extends State<ExtraEditorDialog> {
               },
               controller: _answerController,
               decoration: InputDecoration(
-                labelText: 'Answer',
+                labelText: 'Đáp án',
                 labelStyle: TextStyle(
                   fontWeight: FontWeight.w600,
                   color: Theme.of(context).colorScheme.primary,
@@ -132,11 +132,11 @@ class _ExtraEditorDialogState extends State<ExtraEditorDialog> {
               logger.i('${createNew ? 'Created' : 'Modified'} extra question');
               Navigator.of(context).pop(newQ);
             },
-            child: const Text('Done', style: TextStyle(fontSize: fontSizeMedium)),
+            child: const Text('Hoàn tất', style: TextStyle(fontSize: fontSizeMedium)),
           ),
           TextButton(
             child: Text(
-              'Cancel',
+              'Hủy',
               style: TextStyle(fontSize: fontSizeMedium, color: Theme.of(context).colorScheme.error),
             ),
             onPressed: () {

@@ -107,7 +107,7 @@ class _ExtraQuestionManagerState extends State<ExtraQuestionManager> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: managerAppBar(context, 'Extra Question Manager'),
+      appBar: managerAppBar(context, 'Quản lý câu hỏi phụ'),
       backgroundColor: Colors.transparent,
       body: isLoading
           ? const Center(child: CircularProgressIndicator())
@@ -135,7 +135,7 @@ class _ExtraQuestionManagerState extends State<ExtraQuestionManager> {
           }),
           button(
             context,
-            'Add Question',
+            'Thêm câu hỏi',
             enableCondition: selectedMatchIndex >= 0,
             onPressed: () async {
               final newQ = await Navigator.of(context).push<ExtraQuestion>(DialogRoute<ExtraQuestion>(
@@ -153,7 +153,7 @@ class _ExtraQuestionManagerState extends State<ExtraQuestionManager> {
           ),
           button(
             context,
-            'Import Questions',
+            'Nhập từ file',
             enableCondition: selectedMatchIndex >= 0,
             onPressed: () async {
               logger.i('Import new questions (.xlsx)');
@@ -180,24 +180,23 @@ class _ExtraQuestionManagerState extends State<ExtraQuestionManager> {
           ),
           button(
             context,
-            'Remove Questions',
+            'Xóa câu hỏi',
             enableCondition: selectedMatchIndex >= 0,
             onPressed: () async {
-              final ret = await confirmDeleteDialog(
+              await confirmDialog(
                 context,
-                'Are you sure you want to delete questions for match: ${matchNames[selectedMatchIndex]}?',
-                'Removed all extra questions for match: ${matchNames[selectedMatchIndex]}',
+                message: 'Bạn có muốn xóa tất cả câu hỏi phụ của trận: ${matchNames[selectedMatchIndex]}?',
+                acceptLogMessage: 'Removed all extra questions for match: ${matchNames[selectedMatchIndex]}',
+                onAccept: () async {
+                  if (mounted) {
+                    showToastMessage(context, 'Đã xóa (match: ${matchNames[selectedMatchIndex]})');
+                  }
+                  // logPanelController!.addText('Removed questions (match: ${matchNames[selectedMatchIndex]})');
+                  await removeMatch(selectedMatch);
+                  selectedMatch = ExtraMatch(match: '', questions: []);
+                  setState(() {});
+                },
               );
-
-              if (ret != true) return;
-
-              if (mounted) {
-                showToastMessage(context, 'Removed questions (match: ${matchNames[selectedMatchIndex]})');
-              }
-              // logPanelController!.addText('Removed questions (match: ${matchNames[selectedMatchIndex]})');
-              await removeMatch(selectedMatch);
-              selectedMatch = ExtraMatch(match: '', questions: []);
-              setState(() {});
             },
           ),
         ],
@@ -218,8 +217,8 @@ class _ExtraQuestionManagerState extends State<ExtraQuestionManager> {
         child: Column(
           children: [
             customListTile(context, columns: [
-              (const Text('Question'), widthRatios[0]),
-              (const Text('Answer'), widthRatios[1]),
+              (const Text('Câu hỏi'), widthRatios[0]),
+              (const Text('Đáp án'), widthRatios[1]),
               (const Text(''), widthRatios[2]),
             ]),
             Flexible(
@@ -239,17 +238,17 @@ class _ExtraQuestionManagerState extends State<ExtraQuestionManager> {
                           IconButton(
                             icon: const Icon(Icons.delete),
                             onPressed: () async {
-                              final ret = await confirmDeleteDialog(
+                              await confirmDialog(
                                 context,
-                                'Do you want to delete this question?\n"${q.question}"',
-                                'Removed an extra question',
+                                message: 'Bạn có muốn xóa câu hỏi này?\n"${q.question}"',
+                                acceptLogMessage: 'Removed an extra question',
+                                onAccept: () async {
+                                  selectedMatch.questions.removeAt(index);
+                                  await updateQuestions(selectedMatch);
+                                  logger.i('Deleted extra question of ${selectedMatch.match}');
+                                  setState(() {});
+                                },
                               );
-                              if (ret == true) {
-                                selectedMatch.questions.removeAt(index);
-                                await updateQuestions(selectedMatch);
-                                logger.i('Deleted extra question of ${selectedMatch.match}');
-                                setState(() {});
-                              }
                             },
                           ),
                           widthRatios[2]

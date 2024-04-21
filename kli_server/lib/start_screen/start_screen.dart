@@ -95,8 +95,8 @@ class _StartPageState extends State<StartPage> with WindowListener {
                 ),
               ),
               items: const [
-                SideNavigationBarItem(label: 'Instruction', icon: FontAwesomeIcons.circleQuestion),
-                SideNavigationBarItem(label: 'Data Manager', icon: FontAwesomeIcons.database),
+                SideNavigationBarItem(label: 'Hướng dẫn', icon: FontAwesomeIcons.circleQuestion),
+                SideNavigationBarItem(label: 'Quản lý dữ liệu', icon: FontAwesomeIcons.database),
                 SideNavigationBarItem(label: 'Server Setup', icon: FontAwesomeIcons.server),
                 SideNavigationBarItem(label: 'Log', icon: FontAwesomeIcons.solidFile),
               ],
@@ -124,7 +124,7 @@ class _StartPageState extends State<StartPage> with WindowListener {
                   const HelpScreen(),
                   button(
                     context,
-                    'Open Data Manager',
+                    'Mở phần quản lý dữ liệu',
                     onPressed: () {
                       logger.i('Opening Data Manager page...');
                       Navigator.of(context).push(

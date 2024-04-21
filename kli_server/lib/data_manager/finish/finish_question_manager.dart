@@ -120,7 +120,7 @@ class _FinishQuestionManagerState extends State<FinishQuestionManager> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: managerAppBar(context, 'Finish Question Manager'),
+      appBar: managerAppBar(context, 'Quản lý câu hỏi về đích'),
       backgroundColor: Colors.transparent,
       body: isLoading
           ? const Center(child: CircularProgressIndicator())
@@ -148,11 +148,11 @@ class _FinishQuestionManagerState extends State<FinishQuestionManager> {
           }),
           // sort point
           DropdownMenu(
-            label: const Text('Filter point'),
+            label: const Text('Lọc điểm'),
             initialSelection: -1,
             enabled: selectedMatchIndex >= 0,
             dropdownMenuEntries: [
-              const DropdownMenuEntry(value: -1, label: 'All'),
+              const DropdownMenuEntry(value: -1, label: 'Tất cả'),
               for (var i = 1; i <= 3; i++)
                 DropdownMenuEntry(
                   value: i * 10,
@@ -167,7 +167,7 @@ class _FinishQuestionManagerState extends State<FinishQuestionManager> {
           ),
           button(
             context,
-            'Add Question',
+            'Thêm câu hỏi',
             enableCondition: selectedMatchIndex >= 0,
             onPressed: () async {
               final newQ = await Navigator.of(context).push<FinishQuestion>(DialogRoute<FinishQuestion>(
@@ -185,7 +185,7 @@ class _FinishQuestionManagerState extends State<FinishQuestionManager> {
           ),
           button(
             context,
-            'Import Questions',
+            'Nhập từ file',
             enableCondition: selectedMatchIndex >= 0,
             onPressed: () async {
               logger.i('Import new questions (.xlsx)');
@@ -212,24 +212,24 @@ class _FinishQuestionManagerState extends State<FinishQuestionManager> {
           ),
           button(
             context,
-            'Remove Questions',
+            'Xóa câu hỏi',
             enableCondition: selectedMatchIndex >= 0,
             onPressed: () async {
-              final value = await confirmDeleteDialog(
+              await confirmDialog(
                 context,
-                'Are you sure you want to delete questions for match: ${matchNames[selectedMatchIndex]}?',
-                'Removed all finish questions for match: ${matchNames[selectedMatchIndex]}',
+                message:
+                    'Bạn có muốn xóa tất cả câu hỏi về đích của trận: ${matchNames[selectedMatchIndex]}?',
+                acceptLogMessage: 'Removed all finish questions for match: ${matchNames[selectedMatchIndex]}',
+                onAccept: () async {
+                  if (mounted) {
+                    showToastMessage(context, 'Đã xóa (match: ${matchNames[selectedMatchIndex]})');
+                  }
+                  // logPanelController!.addText('Removed questions (match: ${matchNames[selectedMatchIndex]})');
+                  await removeMatch(selectedMatch);
+                  selectedMatch = FinishMatch(match: '', questions: []);
+                  setState(() {});
+                },
               );
-
-              if (value != true) return;
-
-              if (mounted) {
-                showToastMessage(context, 'Removed questions (match: ${matchNames[selectedMatchIndex]})');
-              }
-              // logPanelController!.addText('Removed questions (match: ${matchNames[selectedMatchIndex]})');
-              await removeMatch(selectedMatch);
-              selectedMatch = FinishMatch(match: '', questions: []);
-              setState(() {});
             },
           ),
         ],
@@ -256,10 +256,10 @@ class _FinishQuestionManagerState extends State<FinishQuestionManager> {
         child: Column(
           children: [
             customListTile(context, columns: [
-              (const Text('Point', textAlign: TextAlign.center), widthRatios[0]),
-              (const Text('Question'), widthRatios[1]),
-              (const Text('Answer'), widthRatios[2]),
-              (const Text('Explanation'), widthRatios[3]),
+              (const Text('Điểm', textAlign: TextAlign.center), widthRatios[0]),
+              (const Text('Câu hỏi'), widthRatios[1]),
+              (const Text('Đáp án'), widthRatios[2]),
+              (const Text('Giải thích'), widthRatios[3]),
               (const Text(''), widthRatios[4]),
             ]),
             Flexible(
@@ -281,16 +281,16 @@ class _FinishQuestionManagerState extends State<FinishQuestionManager> {
                           IconButton(
                             icon: const Icon(Icons.delete),
                             onPressed: () async {
-                              final ret = await confirmDeleteDialog(
+                              await confirmDialog(
                                 context,
-                                'Do you want to delete this question?\n"${q.$2.question}"',
-                                'Removed finish question (p=${q.$2.point})',
+                                message: 'Bạn có muốn xóa câu hỏi này?\n"${q.$2.question}"',
+                                acceptLogMessage: 'Removed finish question (p=${q.$2.point})',
+                                onAccept: () async {
+                                  selectedMatch.questions.removeAt(q.$1);
+                                  await updateQuestions(selectedMatch);
+                                  setState(() {});
+                                },
                               );
-                              if (ret == true) {
-                                selectedMatch.questions.removeAt(q.$1);
-                                await updateQuestions(selectedMatch);
-                                setState(() {});
-                              }
                             },
                           ),
                           widthRatios[4],

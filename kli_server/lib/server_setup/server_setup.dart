@@ -53,10 +53,11 @@ class _ServerSetupPageState extends State<ServerSetupPage> {
           Navigator.pop(context);
           return;
         }
-        showBackDialog(
+        confirmDialog(
           context,
-          'Are you sure you want to exit?\nThe server will close.',
-          'Leaving Server Setup page...',
+          message: 'Bạn có chắc bạn muốn thoát?\nServer sẽ tự động đóng.',
+          acceptLogMessage: 'Leaving Server Setup page...',
+          onAccept: () => Navigator.pop(context),
         );
       },
       child: Scaffold(

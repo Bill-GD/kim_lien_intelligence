@@ -32,9 +32,7 @@ class _MatchEditorDialogState extends State<MatchEditorDialog> {
   void initState() {
     super.initState();
     _disableDone = _setNewMatch = widget.match == null;
-    logger.i(
-      'Match editor: ${_setNewMatch ? 'New' : '${widget.match?.name}'}',
-    );
+    logger.i('Match editor: ${_setNewMatch ? 'New' : '${widget.match?.name}'}');
     if (_setNewMatch) return;
 
     _matchNameController.text = widget.match!.name;
@@ -62,13 +60,13 @@ class _MatchEditorDialogState extends State<MatchEditorDialog> {
         title: TextField(
           onChanged: (value) {
             if (value.isEmpty) {
-              _matchNameError = 'Can\'t be empty';
+              _matchNameError = 'Không được trống';
               _disableDone = true;
               setState(() {});
               return;
             }
             if (value != widget.match?.name && widget.matchNames.contains(value)) {
-              _matchNameError = 'Already exists';
+              _matchNameError = 'Bị trùng tên';
               _disableDone = true;
               setState(() {});
               return;
@@ -80,7 +78,7 @@ class _MatchEditorDialogState extends State<MatchEditorDialog> {
           },
           controller: _matchNameController,
           decoration: InputDecoration(
-            labelText: 'Match Name',
+            labelText: 'Tên trận đấu',
             labelStyle: TextStyle(
               fontWeight: FontWeight.w600,
               color: Theme.of(context).colorScheme.primary,
@@ -107,7 +105,7 @@ class _MatchEditorDialogState extends State<MatchEditorDialog> {
                 ? null
                 : () {
                     if (_matchNameController.text.isEmpty) {
-                      showToastMessage(context, 'Match name can\'t be empty');
+                      showToastMessage(context, 'Tên trận không được trống');
                       return;
                     }
 
@@ -115,14 +113,14 @@ class _MatchEditorDialogState extends State<MatchEditorDialog> {
                       if (e.value.text.isNotEmpty && _imagePaths[_playerNameControllers.indexOf(e)].isEmpty) {
                         showToastMessage(
                           context,
-                          'Please select an image for player ${_playerNameControllers.indexOf(e) + 1}',
+                          'Hãy chọn ảnh cho thí sinh ${_playerNameControllers.indexOf(e) + 1}',
                         );
                         return;
                       }
                       if (e.value.text.isEmpty && _imagePaths[_playerNameControllers.indexOf(e)].isNotEmpty) {
                         showToastMessage(
                           context,
-                          'Player ${_playerNameControllers.indexOf(e) + 1} name can\'t be empty',
+                          'Tên thí sinh ${_playerNameControllers.indexOf(e) + 1} không được trống',
                         );
                         return;
                       }
@@ -141,11 +139,11 @@ class _MatchEditorDialogState extends State<MatchEditorDialog> {
 
                     Navigator.of(context).pop(newMatch);
                   },
-            child: const Text('Done', style: TextStyle(fontSize: fontSizeMedium)),
+            child: const Text('Hoàn tất', style: TextStyle(fontSize: fontSizeMedium)),
           ),
           TextButton(
             child: Text(
-              'Cancel',
+              'Hủy',
               style: TextStyle(fontSize: fontSizeMedium, color: Theme.of(context).colorScheme.error),
             ),
             onPressed: () {
@@ -171,7 +169,7 @@ class _MatchEditorDialogState extends State<MatchEditorDialog> {
         child: Column(
           children: [
             Text(
-              'Player ${index + 1}',
+              'Thí sinh ${index + 1}',
               textAlign: TextAlign.center,
               style: const TextStyle(fontSize: fontSizeMedium),
             ),
@@ -180,7 +178,7 @@ class _MatchEditorDialogState extends State<MatchEditorDialog> {
               child: TextField(
                 controller: _playerNameControllers[index],
                 decoration: InputDecoration(
-                  labelText: 'Name',
+                  labelText: 'Tên',
                   labelStyle: TextStyle(
                     fontWeight: FontWeight.w600,
                     color: Theme.of(context).colorScheme.primary,
@@ -199,12 +197,12 @@ class _MatchEditorDialogState extends State<MatchEditorDialog> {
                   ? Container(
                       margin: const EdgeInsets.symmetric(horizontal: 20),
                       alignment: Alignment.center,
-                      child: Text(_imagePaths[index].isEmpty ? 'No Image' : 'Image $fullPath not found'),
+                      child: Text(_imagePaths[index].isEmpty ? 'Không có ảnh' : 'Không thấy ảnh $fullPath'),
                     )
                   : Image.file(File(fullPath), fit: BoxFit.contain),
             ),
             ElevatedButton(
-              child: const Text('Select Image'),
+              child: const Text('Chọn ảnh'),
               onPressed: () async {
                 logger.i('Selecting image at ${storageHandler!.getRelative(storageHandler!.mediaDir)}');
                 final result = await FilePicker.platform.pickFiles(

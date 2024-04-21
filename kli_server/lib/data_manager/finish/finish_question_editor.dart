@@ -86,7 +86,7 @@ class _FinishEditorDialogState extends State<FinishEditorDialog> {
         titlePadding: const EdgeInsets.symmetric(vertical: 32),
         title: Center(
           child: DropdownMenu(
-            label: const Text('Point'),
+            label: const Text('Điểm'),
             textStyle: const TextStyle(fontSize: fontSizeMSmall),
             initialSelection: selectedPointValue,
             dropdownMenuEntries: [
@@ -116,7 +116,7 @@ class _FinishEditorDialogState extends State<FinishEditorDialog> {
                     style: const TextStyle(fontSize: fontSizeMedium),
                     onChanged: (value) {
                       if (value.isEmpty) {
-                        qErrorText = 'Can\'t be empty';
+                        qErrorText = 'Không được trống';
                         setState(() {});
                         return;
                       }
@@ -126,7 +126,7 @@ class _FinishEditorDialogState extends State<FinishEditorDialog> {
                     maxLines: 5,
                     minLines: 1,
                     decoration: InputDecoration(
-                      labelText: 'Question',
+                      labelText: 'Câu hỏi',
                       labelStyle: TextStyle(
                         fontWeight: FontWeight.w600,
                         color: Theme.of(context).colorScheme.primary,
@@ -140,7 +140,7 @@ class _FinishEditorDialogState extends State<FinishEditorDialog> {
                     style: const TextStyle(fontSize: fontSizeMedium),
                     onChanged: (value) {
                       if (value.isEmpty) {
-                        aErrorText = 'Can\'t be empty';
+                        aErrorText = 'Không được trống';
                         setState(() {});
                         return;
                       }
@@ -148,7 +148,7 @@ class _FinishEditorDialogState extends State<FinishEditorDialog> {
                     },
                     controller: answerController,
                     decoration: InputDecoration(
-                      labelText: 'Answer',
+                      labelText: 'Đáp án',
                       labelStyle: TextStyle(
                         fontWeight: FontWeight.w600,
                         color: Theme.of(context).colorScheme.primary,
@@ -162,7 +162,7 @@ class _FinishEditorDialogState extends State<FinishEditorDialog> {
                     style: const TextStyle(fontSize: fontSizeMedium),
                     controller: explanationController,
                     decoration: InputDecoration(
-                      labelText: 'Explanation',
+                      labelText: 'Giải thích',
                       labelStyle: TextStyle(
                         fontWeight: FontWeight.w600,
                         color: Theme.of(context).colorScheme.primary,
@@ -189,7 +189,7 @@ class _FinishEditorDialogState extends State<FinishEditorDialog> {
                     child: newMediaPath.isEmpty || !videoFound
                         ? Center(
                             child: Text(
-                            newMediaPath.isEmpty ? 'No Video' : 'Video $fullVideoPath not found',
+                            newMediaPath.isEmpty ? 'Không có video' : 'Không tìm thấy video $fullVideoPath',
                           ))
                         : Stack(
                             alignment: Alignment.bottomCenter,
@@ -231,7 +231,7 @@ class _FinishEditorDialogState extends State<FinishEditorDialog> {
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
                       ElevatedButton(
-                        child: const Text('Select Video'),
+                        child: const Text('Chọn Video'),
                         onPressed: () async {
                           logger.i(
                             'Selecting video at ${storageHandler!.getRelative(storageHandler!.mediaDir)}',
@@ -252,10 +252,9 @@ class _FinishEditorDialogState extends State<FinishEditorDialog> {
                         },
                       ),
                       ElevatedButton(
-                        child: const Text('Remove Video'),
+                        child: const Text('Xóa Video'),
                         onPressed: () {
                           logger.i('Removing video');
-
                           newMediaPath = '';
                           setState(() {});
                         },
@@ -308,11 +307,11 @@ class _FinishEditorDialogState extends State<FinishEditorDialog> {
               logger.i('${createNew ? 'Created' : 'Modified'} finish question');
               Navigator.of(context).pop(newQ);
             },
-            child: const Text('Done', style: TextStyle(fontSize: fontSizeMedium)),
+            child: const Text('Hoàn tất', style: TextStyle(fontSize: fontSizeMedium)),
           ),
           TextButton(
             child: Text(
-              'Cancel',
+              'Hủy',
               style: TextStyle(fontSize: fontSizeMedium, color: Theme.of(context).colorScheme.error),
             ),
             onPressed: () {

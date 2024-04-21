@@ -43,7 +43,7 @@ class _ObstacleEditorDialogState extends State<ObstacleEditorDialog> {
         titlePadding: const EdgeInsets.symmetric(vertical: 40, horizontal: 256),
         contentPadding: const EdgeInsets.only(bottom: 32, left: 60, right: 60),
         title: Text(
-          widget.index < 4 ? 'Question 0${widget.index + 1}' : 'Middle',
+          widget.index < 4 ? 'Hàng ngang ${widget.index + 1}' : 'Trung tâm',
           textAlign: TextAlign.center,
         ),
         content: Column(
@@ -54,7 +54,7 @@ class _ObstacleEditorDialogState extends State<ObstacleEditorDialog> {
               style: const TextStyle(fontSize: fontSizeMedium),
               onChanged: (value) {
                 if (value.isEmpty) {
-                  _qErrorText = 'Can\'t be empty';
+                  _qErrorText = 'Không được trống';
                   setState(() {});
                   return;
                 }
@@ -64,7 +64,7 @@ class _ObstacleEditorDialogState extends State<ObstacleEditorDialog> {
               maxLines: 5,
               minLines: 1,
               decoration: InputDecoration(
-                labelText: 'Question',
+                labelText: 'Câu hỏi',
                 labelStyle: TextStyle(
                   fontWeight: FontWeight.w600,
                   color: Theme.of(context).colorScheme.primary,
@@ -78,7 +78,7 @@ class _ObstacleEditorDialogState extends State<ObstacleEditorDialog> {
               style: const TextStyle(fontSize: fontSizeMedium),
               onChanged: (value) {
                 if (value.isEmpty) {
-                  _aErrorText = 'Can\'t be empty';
+                  _aErrorText = 'Không được trống';
                   setState(() {});
                   return;
                 }
@@ -86,7 +86,7 @@ class _ObstacleEditorDialogState extends State<ObstacleEditorDialog> {
               },
               controller: _answerController,
               decoration: InputDecoration(
-                labelText: 'Answer',
+                labelText: 'Đáp án',
                 labelStyle: TextStyle(
                   fontWeight: FontWeight.w600,
                   color: Theme.of(context).colorScheme.primary,
@@ -110,8 +110,10 @@ class _ObstacleEditorDialogState extends State<ObstacleEditorDialog> {
                 return;
               }
 
-              bool hasChanged = widget.question == null ? true : _questionController.text != widget.question!.question ||
-                  _answerController.text != widget.question!.answer;
+              bool hasChanged = widget.question == null
+                  ? true
+                  : _questionController.text != widget.question!.question ||
+                      _answerController.text != widget.question!.answer;
 
               if (!hasChanged) {
                 logger.i('No change, exiting');
@@ -128,11 +130,11 @@ class _ObstacleEditorDialogState extends State<ObstacleEditorDialog> {
               logger.i('Modified obstacle question: ${newQ.id}');
               Navigator.of(context).pop(newQ);
             },
-            child: const Text('Done', style: TextStyle(fontSize: fontSizeMedium)),
+            child: const Text('Hoàn tất', style: TextStyle(fontSize: fontSizeMedium)),
           ),
           TextButton(
             child: Text(
-              'Cancel',
+              'Hủy',
               style: TextStyle(fontSize: fontSizeMedium, color: Theme.of(context).colorScheme.error),
             ),
             onPressed: () {

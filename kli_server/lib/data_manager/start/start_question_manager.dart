@@ -17,7 +17,7 @@ class _StartQuestionManagerState extends State<StartQuestionManager> {
   List<String> matchNames = [];
   late StartMatch selectedMatch;
   int selectedMatchIndex = -1, sortPlayerPos = -1;
-  QuestionSubject? sortType;
+  StartQuestionSubject? sortType;
 
   @override
   void initState() {
@@ -103,7 +103,7 @@ class _StartQuestionManagerState extends State<StartQuestionManager> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: managerAppBar(context, 'Start Question Manager'),
+      appBar: managerAppBar(context, 'Quản lý câu hỏi khởi động'),
       backgroundColor: Colors.transparent,
       body: isLoading
           ? const Center(child: CircularProgressIndicator())
@@ -132,11 +132,11 @@ class _StartQuestionManagerState extends State<StartQuestionManager> {
           }),
           // sort player pos
           DropdownMenu(
-            label: const Text('Filter position'),
+            label: const Text('Lọc vị trí'),
             initialSelection: -1,
             enabled: selectedMatchIndex >= 0,
             dropdownMenuEntries: [
-              const DropdownMenuEntry(value: -1, label: 'All'),
+              const DropdownMenuEntry(value: -1, label: 'Tất cả'),
               for (var i = 0; i < 4; i++)
                 DropdownMenuEntry(
                   value: i,
@@ -151,12 +151,12 @@ class _StartQuestionManagerState extends State<StartQuestionManager> {
           ),
           // sort subject
           DropdownMenu(
-            label: const Text('Filter subject'),
+            label: const Text('Lọc lĩnh vực'),
             initialSelection: null,
             enabled: selectedMatchIndex >= 0,
             dropdownMenuEntries: [
-              const DropdownMenuEntry(value: null, label: 'All'),
-              for (final s in QuestionSubject.values)
+              const DropdownMenuEntry(value: null, label: 'Tất cả'),
+              for (final s in StartQuestionSubject.values)
                 DropdownMenuEntry(
                   value: s,
                   label: StartQuestion.mapTypeDisplay(s),
@@ -170,7 +170,7 @@ class _StartQuestionManagerState extends State<StartQuestionManager> {
           ),
           button(
             context,
-            'Add Question',
+            'Thêm câu hỏi',
             enableCondition: selectedMatchIndex >= 0,
             onPressed: () async {
               final ret =
@@ -194,7 +194,7 @@ class _StartQuestionManagerState extends State<StartQuestionManager> {
           ),
           button(
             context,
-            'Import Questions',
+            'Nhập file câu hỏi',
             enableCondition: selectedMatchIndex >= 0,
             onPressed: () async {
               logger.i('Import new questions (.xlsx)');
@@ -264,23 +264,22 @@ class _StartQuestionManagerState extends State<StartQuestionManager> {
           // ),
           button(
             context,
-            'Remove Questions',
+            'Xóa câu hỏi',
             enableCondition: selectedMatchIndex >= 0,
             onPressed: () async {
-              final ret = await confirmDeleteDialog(
+              await confirmDialog(
                 context,
-                'Are you sure you want to delete questions for match: ${matchNames[selectedMatchIndex]}?',
-                'Removed all start questions for match: ${matchNames[selectedMatchIndex]}',
+                message: 'Bạn có muốn xóa tất cả câu hỏi khởi động của trận: ${matchNames[selectedMatchIndex]}?',
+                acceptLogMessage: 'Removed all start questions for match: ${matchNames[selectedMatchIndex]}',
+                onAccept: () async {
+                  if (mounted) showToastMessage(context, 'Đã xóa (trận: ${matchNames[selectedMatchIndex]})');
+
+                  // logPanelController!.addText('Removed questions (match: ${matchNames[selectedMatchIndex]})');
+                  await removeMatch(selectedMatch);
+                  selectedMatch = StartMatch(match: matchNames[selectedMatchIndex], questions: {});
+                  setState(() {});
+                },
               );
-              if (ret == true) {
-                if (mounted) {
-                  showToastMessage(context, 'Removed questions (match: ${matchNames[selectedMatchIndex]})');
-                }
-                // logPanelController!.addText('Removed questions (match: ${matchNames[selectedMatchIndex]})');
-                await removeMatch(selectedMatch);
-                selectedMatch = StartMatch(match: matchNames[selectedMatchIndex], questions: {});
-                setState(() {});
-              }
             },
           ),
         ],
@@ -311,9 +310,9 @@ class _StartQuestionManagerState extends State<StartQuestionManager> {
           children: [
             customListTile(context, columns: [
               (const Text('Thí sinh', textAlign: TextAlign.center), widthRatios[0]),
-              (const Text('Subject'), widthRatios[1]),
-              (const Text('Question', textAlign: TextAlign.left), widthRatios[2]),
-              (const Text('Answer', textAlign: TextAlign.right), widthRatios[3]),
+              (const Text('Lĩnh vực'), widthRatios[1]),
+              (const Text('Câu hỏi', textAlign: TextAlign.left), widthRatios[2]),
+              (const Text('Đáp án', textAlign: TextAlign.right), widthRatios[3]),
               (const Text('', textAlign: TextAlign.right), widthRatios[4]),
             ]),
             Flexible(
@@ -335,16 +334,16 @@ class _StartQuestionManagerState extends State<StartQuestionManager> {
                           IconButton(
                             icon: const Icon(Icons.delete),
                             onPressed: () async {
-                              final ret = await confirmDeleteDialog(
+                              await confirmDialog(
                                 context,
-                                'Do you want to delete this question?\n"${q.$3.question}"',
-                                'Removed start question: pos=${q.$2}, idx=${q.$1}',
+                                message: 'Bạn có muốn xóa câu hỏi này?\n"${q.$3.question}"',
+                                acceptLogMessage: 'Removed start question: pos=${q.$2}, idx=${q.$1}',
+                                onAccept: () async {
+                                  selectedMatch.questions[q.$2]?.removeAt(q.$1);
+                                  await updateQuestions(selectedMatch);
+                                  setState(() {});
+                                },
                               );
-                              if (ret == true) {
-                                selectedMatch.questions[q.$2]?.removeAt(q.$1);
-                                await updateQuestions(selectedMatch);
-                                setState(() {});
-                              }
                             },
                           ),
                           widthRatios[4],

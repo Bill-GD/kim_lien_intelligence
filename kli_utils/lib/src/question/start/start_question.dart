@@ -1,7 +1,7 @@
-enum QuestionSubject { math, phys, chem, bio, literature, history, geo, english, sport, art, general }
+enum StartQuestionSubject { math, phys, chem, bio, literature, history, geo, english, sport, art, general }
 
 class StartQuestion {
-  final QuestionSubject subject;
+  final StartQuestionSubject subject;
   final String question;
   final String answer;
 
@@ -15,27 +15,27 @@ class StartQuestion {
 
   factory StartQuestion.fromJson(Map<String, dynamic> json) {
     return StartQuestion(
-      QuestionSubject.values.byName(json['subject']),
+      StartQuestionSubject.values.byName(json['subject']),
       json['question'],
       json['answer'],
     );
   }
 
   static final _map = {
-    QuestionSubject.math: 'Toán',
-    QuestionSubject.phys: 'Vật lý',
-    QuestionSubject.chem: 'Hóa học',
-    QuestionSubject.bio: 'Sinh học',
-    QuestionSubject.literature: 'Văn học',
-    QuestionSubject.history: 'Lịch sử',
-    QuestionSubject.geo: 'Địa lý',
-    QuestionSubject.english: 'Tiếng Anh',
-    QuestionSubject.sport: 'Thể thao',
-    QuestionSubject.art: 'Nghệ thuật',
-    QuestionSubject.general: 'HBC',
+    StartQuestionSubject.math: 'Toán',
+    StartQuestionSubject.phys: 'Vật lý',
+    StartQuestionSubject.chem: 'Hóa học',
+    StartQuestionSubject.bio: 'Sinh học',
+    StartQuestionSubject.literature: 'Văn học',
+    StartQuestionSubject.history: 'Lịch sử',
+    StartQuestionSubject.geo: 'Địa lý',
+    StartQuestionSubject.english: 'Tiếng Anh',
+    StartQuestionSubject.sport: 'Thể thao',
+    StartQuestionSubject.art: 'Nghệ thuật',
+    StartQuestionSubject.general: 'HBC',
   };
 
-  static String mapTypeDisplay(QuestionSubject t) => _map[t]!;
+  static String mapTypeDisplay(StartQuestionSubject t) => _map[t]!;
 
-  static QuestionSubject mapTypeValue(String v) => _map.entries.firstWhere((e) => e.value == v).key;
+  static StartQuestionSubject mapTypeValue(String v) => _map.entries.firstWhere((e) => e.value == v).key;
 }

@@ -41,7 +41,7 @@ class _MatchManagerState extends State<MatchManager> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: managerAppBar(context, 'Match Manager'),
+      appBar: managerAppBar(context, 'Quản lý trận đấu'),
       backgroundColor: Colors.transparent,
       body: isLoading
           ? const Center(child: CircularProgressIndicator())
@@ -74,7 +74,7 @@ class _MatchManagerState extends State<MatchManager> {
         children: [
           button(
             context,
-            'Add Match',
+            'Thêm trận',
             onPressed: () async {
               final newMatch = await Navigator.of(context).push<KLIMatch>(
                 DialogRoute<KLIMatch>(
@@ -89,14 +89,14 @@ class _MatchManagerState extends State<MatchManager> {
                 matches.add(newMatch);
                 await overwriteSave();
                 // logPanelController!.addText('Added match: ${newMatch.name}');
-                if (mounted) showToastMessage(context, 'Added match: ${newMatch.name}');
+                if (mounted) showToastMessage(context, 'Đã thêm trận: ${newMatch.name}');
                 setState(() {});
               }
             },
           ),
           button(
             context,
-            'Modify Match${currentMatchIndex < 0 ? '' : ': ${matches[currentMatchIndex].name}'}',
+            'Sửa trận${currentMatchIndex < 0 ? '' : ': ${matches[currentMatchIndex].name}'}',
             enableCondition: currentMatchIndex >= 0,
             onPressed: () async {
               final newMatch = await Navigator.of(context).push<KLIMatch>(
@@ -120,27 +120,28 @@ class _MatchManagerState extends State<MatchManager> {
           ),
           button(
             context,
-            'Remove Match${currentMatchIndex < 0 ? '' : ': ${matches[currentMatchIndex].name}'}',
+            'Xóa trận${currentMatchIndex < 0 ? '' : ': ${matches[currentMatchIndex].name}'}',
             enableCondition: currentMatchIndex >= 0,
             onPressed: () async {
               showDialog<bool>(
                 context: context,
                 builder: (BuildContext context) {
                   return AlertDialog(
-                    title: const Text('Confirm Delete'),
+                    title: const Text('Xác nhận xóa', textAlign: TextAlign.center),
                     content: Text(
-                      'Are you sure you want to delete match: ${matches[currentMatchIndex].name}?',
+                      'Bạn có chắc chắn muốn xóa trận sau: ${matches[currentMatchIndex].name}?',
+                      style: const TextStyle(fontSize: fontSizeMedium),
                     ),
                     actionsAlignment: MainAxisAlignment.spaceEvenly,
                     actions: <Widget>[
                       TextButton(
-                        child: const Text('Yes', style: TextStyle(fontSize: fontSizeMedium)),
+                        child: const Text('Có', style: TextStyle(fontSize: fontSizeMedium)),
                         onPressed: () {
                           Navigator.pop(context, true);
                         },
                       ),
                       TextButton(
-                        child: const Text('No', style: TextStyle(fontSize: fontSizeMedium)),
+                        child: const Text('Không', style: TextStyle(fontSize: fontSizeMedium)),
                         onPressed: () {
                           Navigator.pop(context, false);
                         },
@@ -151,7 +152,7 @@ class _MatchManagerState extends State<MatchManager> {
               ).then((value) async {
                 if (value != true) return;
                 logger.i('Removed match: ${matches[currentMatchIndex].name}');
-                if (mounted) showToastMessage(context, 'Removed match: ${matches[currentMatchIndex].name}');
+                if (mounted) showToastMessage(context, 'Đã xóa trận: ${matches[currentMatchIndex].name}');
                 // logPanelController!.addText('Removed match: ${matches[currentMatchIndex].name}');
                 matches.removeAt(currentMatchIndex);
                 await overwriteSave();
@@ -172,7 +173,7 @@ class _MatchManagerState extends State<MatchManager> {
           children: [
             Padding(
               padding: const EdgeInsets.only(bottom: 30),
-              child: Text('Matches', style: Theme.of(context).textTheme.titleLarge),
+              child: Text('Danh sách trận đấu', style: Theme.of(context).textTheme.titleLarge),
             ),
             Flexible(
               child: matches.isEmpty
@@ -182,7 +183,7 @@ class _MatchManagerState extends State<MatchManager> {
                         color: Theme.of(context).colorScheme.background,
                       ),
                       alignment: Alignment.center,
-                      child: const Text('No match'),
+                      child: const Text('Không có trận'),
                     )
                   : ListView.separated(
                       itemCount: matches.length,
@@ -214,7 +215,7 @@ class _MatchManagerState extends State<MatchManager> {
           children: [
             Padding(
               padding: const EdgeInsets.only(bottom: 30),
-              child: Text('Players', style: Theme.of(context).textTheme.titleLarge),
+              child: Text('Danh sách thí sinh', style: Theme.of(context).textTheme.titleLarge),
             ),
             Flexible(
               child: currentMatchIndex < 0
@@ -222,7 +223,7 @@ class _MatchManagerState extends State<MatchManager> {
                       decoration: BoxDecoration(
                         border: Border.all(width: 1, color: Theme.of(context).colorScheme.onBackground),
                       ),
-                      child: const Material(child: Center(child: Text('No match selected'))),
+                      child: const Material(child: Center(child: Text('Chưa chọn trận đấu'))),
                     )
                   : playerGrid(),
             ),
@@ -263,7 +264,7 @@ class _MatchManagerState extends State<MatchManager> {
                       color: Theme.of(context).colorScheme.background,
                     ),
                     alignment: Alignment.center,
-                    child: Text(!hasPlayer ? 'No player' : 'Image at $fullImagePath not found'),
+                    child: Text(!hasPlayer ? 'Không có thí sinh' : 'Không tìm thấy ảnh tại $fullImagePath'),
                   )
                 : Padding(
                     padding: const EdgeInsets.only(bottom: 35),

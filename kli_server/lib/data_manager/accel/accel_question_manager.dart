@@ -26,7 +26,8 @@ class _AccelQuestionManagerState extends State<AccelQuestionManager> {
     super.initState();
     logger.i('Accel question manager init');
     selectedMatch = AccelMatch(match: '', questions: List.filled(4, null));
-    selectedQuestion = AccelQuestion(question: '', answer: '', explanation: '', imagePaths: []);
+    selectedQuestion = AccelQuestion(
+        type: AccelQuestionType.none, question: '', answer: '', explanation: '', imagePaths: []);
     getMatchNames().then((value) async {
       if (value.isNotEmpty) matchNames = value;
       setState(() => isLoading = false);
@@ -38,13 +39,15 @@ class _AccelQuestionManagerState extends State<AccelQuestionManager> {
     Map<String, List> data = await storageHandler!.readFromExcel(path, 4, 1);
 
     final List<AccelQuestion> allQ = [];
+
     for (var name in data.keys) {
       for (final r in (data[name] as List<Map>)) {
         final v = r.values;
         final q = AccelQuestion(
+          type: AccelQuestionType.none,
           question: v.elementAt(1),
           answer: v.elementAt(2),
-          explanation: v.elementAt(3),
+          explanation: v.elementAt(3) == 'null' ? '' : v.elementAt(3),
           imagePaths: [],
         );
         allQ.add(q);
@@ -116,7 +119,7 @@ class _AccelQuestionManagerState extends State<AccelQuestionManager> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: managerAppBar(context, 'Acceleration Question Manager'),
+      appBar: managerAppBar(context, 'Quản lý câu hỏi tăng tốc'),
       backgroundColor: Colors.transparent,
       body: isLoading
           ? const Center(child: CircularProgressIndicator())
@@ -146,7 +149,7 @@ class _AccelQuestionManagerState extends State<AccelQuestionManager> {
           }),
           button(
             context,
-            'Edit Question${selectedQuestionIndex >= 0 ? ' ${selectedQuestionIndex + 1}' : ''}',
+            'Sửa câu hỏi${selectedQuestionIndex >= 0 ? ' ${selectedQuestionIndex + 1}' : ''}',
             enableCondition: selectedQuestionIndex >= 0,
             onPressed: () async {
               final newQ = await Navigator.of(context).push<AccelQuestion>(DialogRoute<AccelQuestion>(
@@ -164,7 +167,7 @@ class _AccelQuestionManagerState extends State<AccelQuestionManager> {
           ),
           button(
             context,
-            'Import Questions',
+            'Nhập file câu hỏi',
             enableCondition: selectedMatchIndex >= 0,
             onPressed: () async {
               logger.i('Import new questions (.xlsx)');
@@ -193,28 +196,29 @@ class _AccelQuestionManagerState extends State<AccelQuestionManager> {
           ),
           button(
             context,
-            'Remove Questions',
+            'Xóa câu hỏi',
             enableCondition: selectedMatchIndex >= 0,
             onPressed: () async {
-              final ret = await confirmDeleteDialog(
+              await confirmDialog(
                 context,
-                'Are you sure you want to delete questions for match: ${matchNames[selectedMatchIndex]}?',
-                'Removed all accel questions for match: ${matchNames[selectedMatchIndex]}',
+                message:
+                    'Bạn có muốn xóa tất cả câu hỏi tăng tốc của trận: ${matchNames[selectedMatchIndex]}?',
+                acceptLogMessage: 'Removed all accel questions for match: ${matchNames[selectedMatchIndex]}',
+                onAccept: () async {
+                  if (mounted) {
+                    showToastMessage(context, 'Đã xóa (match: ${matchNames[selectedMatchIndex]})');
+                  }
+                  // logPanelController!.addText('Removed questions (match: ${matchNames[selectedMatchIndex]})');
+                  await removeMatch(selectedMatch);
+                  selectedMatch = AccelMatch(
+                    match: matchNames[selectedMatchIndex],
+                    questions: List.filled(4, null),
+                  );
+                  selectedQuestionIndex = -1;
+                  selectedImageIndex = -1;
+                  setState(() {});
+                },
               );
-              if (ret != true) return;
-
-              if (mounted) {
-                showToastMessage(context, 'Removed questions (match: ${matchNames[selectedMatchIndex]})');
-              }
-              // logPanelController!.addText('Removed questions (match: ${matchNames[selectedMatchIndex]})');
-              await removeMatch(selectedMatch);
-              selectedMatch = AccelMatch(
-                match: matchNames[selectedMatchIndex],
-                questions: List.filled(4, null),
-              );
-              selectedQuestionIndex = -1;
-              selectedImageIndex = -1;
-              setState(() {});
             },
           ),
         ],
@@ -244,7 +248,7 @@ class _AccelQuestionManagerState extends State<AccelQuestionManager> {
         children: [
           const Padding(
             padding: EdgeInsets.only(top: 32, bottom: 64),
-            child: Text('Questions', style: TextStyle(fontSize: fontSizeLarge)),
+            child: Text('Danh sách câu hỏi', style: TextStyle(fontSize: fontSizeLarge)),
           ),
           if (selectedMatchIndex < 0)
             Container(
@@ -253,7 +257,7 @@ class _AccelQuestionManagerState extends State<AccelQuestionManager> {
                 border: Border.all(width: 1, color: Theme.of(context).colorScheme.onBackground),
               ),
               constraints: const BoxConstraints(maxHeight: 400, maxWidth: 700),
-              child: const Material(child: Center(child: Text('No match selected'))),
+              child: const Material(child: Center(child: Text('Chưa chọn trận đấu'))),
             )
           else
             ListView.separated(
@@ -271,8 +275,8 @@ class _AccelQuestionManagerState extends State<AccelQuestionManager> {
                     q?.question ?? '',
                     style: const TextStyle(fontSize: fontSizeMedium),
                   ),
-                  // subtitle: Text(q?.type != null ? AccelQuestion.mapTypeDisplay(q!.type) : ''),
-                  // subtitleTextStyle: const TextStyle(fontSize: fontSizeSmall),
+                  subtitle: Text(q?.type != null ? 'Loại: ${AccelQuestion.mapTypeDisplay(q!.type)}' : ''),
+                  subtitleTextStyle: const TextStyle(fontSize: fontSizeSmall),
                   trailing: Text(q?.answer ?? ''),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10),
@@ -285,8 +289,13 @@ class _AccelQuestionManagerState extends State<AccelQuestionManager> {
                     selectedQuestionIndex = index;
                     if (q == null) {
                       logger.i('Selected question is null, creating new question');
-                      selectedQuestion =
-                          AccelQuestion(question: '', answer: '', explanation: '', imagePaths: []);
+                      selectedQuestion = AccelQuestion(
+                        type: AccelQuestionType.none,
+                        question: '',
+                        answer: '',
+                        explanation: '',
+                        imagePaths: [],
+                      );
                       selectedMatch.questions[index] = selectedQuestion;
                       await updateQuestions(selectedMatch);
                     } else {
@@ -316,39 +325,39 @@ class _AccelQuestionManagerState extends State<AccelQuestionManager> {
         children: [
           const Padding(
             padding: EdgeInsets.only(top: 32, bottom: 16),
-            child: Text('Images', style: TextStyle(fontSize: fontSizeLarge)),
+            child: Text('Ảnh', style: TextStyle(fontSize: fontSizeLarge)),
           ),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
               button(
                 context,
-                'Add Image',
+                'Thêm ảnh',
                 enableCondition: selectedQuestionIndex >= 0,
                 fontSize: fontSizeSmall,
                 onPressed: () async {
-                  logger.i(
-                    'Selecting image at ${storageHandler!.getRelative(storageHandler!.mediaDir)}',
-                  );
+                  logger.i('Selecting image at ${storageHandler!.getRelative(storageHandler!.mediaDir)}');
                   final result = await FilePicker.platform.pickFiles(
-                    dialogTitle: 'Select image',
+                    dialogTitle: 'Select Image',
                     initialDirectory: storageHandler!.mediaDir.replaceAll('/', '\\'),
                     type: FileType.image,
                   );
 
-                  if (result != null) {
-                    final p = result.files.single.path!;
-                    selectedQuestion.imagePaths.add(storageHandler!.getRelative(p));
-                    if (selectedImageIndex < 0) selectedImageIndex = 0;
-                    await updateQuestions(selectedMatch);
-                    logger.i('Chose ${storageHandler!.getRelative(p)}');
-                    setState(() {});
-                  }
+                  if (result == null) return;
+
+                  final p = result.files.single.path!;
+                  selectedQuestion.imagePaths.add(storageHandler!.getRelative(p));
+                  selectedQuestion.type =
+                      AccelQuestion.getTypeFromImageCount(selectedQuestion.imagePaths.length);
+                  if (selectedImageIndex < 0) selectedImageIndex = 0;
+                  await updateQuestions(selectedMatch);
+                  logger.i('Chose ${storageHandler!.getRelative(p)}');
+                  setState(() {});
                 },
               ),
               button(
                 context,
-                'Remove Image: $selectedImageIndex',
+                'Xóa ảnh: $selectedImageIndex',
                 enableCondition: selectedQuestionIndex >= 0 && selectedImageIndex >= 0,
                 fontSize: fontSizeSmall,
                 onPressed: () async {
@@ -359,6 +368,8 @@ class _AccelQuestionManagerState extends State<AccelQuestionManager> {
                   } else {
                     selectedImageIndex = -1;
                   }
+                  selectedQuestion.type =
+                      AccelQuestion.getTypeFromImageCount(selectedQuestion.imagePaths.length);
                   await updateQuestions(selectedMatch);
                   setState(() {});
                 },
@@ -376,12 +387,12 @@ class _AccelQuestionManagerState extends State<AccelQuestionManager> {
                 ? Material(
                     child: Center(
                       child: Text(selectedMatchIndex < 0
-                          ? 'No match selected'
+                          ? 'Chưa chọn trận đấu'
                           : selectedQuestionIndex < 0
-                              ? 'No question selected'
+                              ? 'Chưa chọn câu hỏi'
                               : selectedQuestion.imagePaths.isEmpty
-                                  ? 'No image selected'
-                                  : 'Image $fullImagePath not found'),
+                                  ? 'Không có ảnh'
+                                  : 'Không tìm thấy ảnh $fullImagePath'),
                     ),
                   )
                 : Image.file(File(fullImagePath)),
@@ -402,9 +413,7 @@ class _AccelQuestionManagerState extends State<AccelQuestionManager> {
                 icon: const Icon(Icons.arrow_forward_ios_rounded),
                 onPressed:
                     selectedQuestionIndex >= 0 && selectedImageIndex < selectedQuestion.imagePaths.length - 1
-                        ? () {
-                            setState(() => selectedImageIndex++);
-                          }
+                        ? () => setState(() => selectedImageIndex++)
                         : null,
               )
             ],

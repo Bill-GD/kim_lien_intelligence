@@ -15,7 +15,7 @@ class StartEditorDialog extends StatefulWidget {
 class _StartEditorDialogState extends State<StartEditorDialog> {
   final questionController = TextEditingController();
   final answerController = TextEditingController();
-  late QuestionSubject type;
+  late StartQuestionSubject type;
   int pos = -1;
 
   String? qErrorText, aErrorText;
@@ -32,7 +32,7 @@ class _StartEditorDialogState extends State<StartEditorDialog> {
       pos = widget.playerPos;
     } else {
       logger.i('Add new start question');
-      type = QuestionSubject.math;
+      type = StartQuestionSubject.math;
     }
   }
 
@@ -54,7 +54,7 @@ class _StartEditorDialogState extends State<StartEditorDialog> {
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
             DropdownMenu(
-              label: const Text('Pos'),
+              label: const Text('Vị trí'),
               textStyle: const TextStyle(fontSize: fontSizeMSmall),
               initialSelection: pos,
               dropdownMenuEntries: [
@@ -70,11 +70,11 @@ class _StartEditorDialogState extends State<StartEditorDialog> {
               },
             ),
             DropdownMenu(
-              label: const Text('Type'),
+              label: const Text('Lĩnh vực'),
               textStyle: const TextStyle(fontSize: fontSizeMSmall),
               initialSelection: type,
               dropdownMenuEntries: [
-                for (final s in QuestionSubject.values)
+                for (final s in StartQuestionSubject.values)
                   DropdownMenuEntry(
                     value: s,
                     label: StartQuestion.mapTypeDisplay(s),
@@ -96,7 +96,7 @@ class _StartEditorDialogState extends State<StartEditorDialog> {
               style: const TextStyle(fontSize: fontSizeMedium),
               onChanged: (value) {
                 if (value.isEmpty) {
-                  qErrorText = 'Can\'t be empty';
+                  qErrorText = 'Không được trống';
                   setState(() {});
                   return;
                 }
@@ -106,7 +106,7 @@ class _StartEditorDialogState extends State<StartEditorDialog> {
               maxLines: 5,
               minLines: 1,
               decoration: InputDecoration(
-                labelText: 'Question',
+                labelText: 'Câu hỏi',
                 labelStyle: TextStyle(
                   fontWeight: FontWeight.w600,
                   color: Theme.of(context).colorScheme.primary,
@@ -120,7 +120,7 @@ class _StartEditorDialogState extends State<StartEditorDialog> {
               style: const TextStyle(fontSize: fontSizeMedium),
               onChanged: (value) {
                 if (value.isEmpty) {
-                  aErrorText = 'Can\'t be empty';
+                  aErrorText = 'Không được trống';
                   setState(() {});
                   return;
                 }
@@ -128,7 +128,7 @@ class _StartEditorDialogState extends State<StartEditorDialog> {
               },
               controller: answerController,
               decoration: InputDecoration(
-                labelText: 'Answer',
+                labelText: 'Đáp án',
                 labelStyle: TextStyle(
                   fontWeight: FontWeight.w600,
                   color: Theme.of(context).colorScheme.primary,
@@ -144,15 +144,15 @@ class _StartEditorDialogState extends State<StartEditorDialog> {
           TextButton(
             onPressed: () {
               if (questionController.text.isEmpty) {
-                showToastMessage(context, 'Question can\'t be empty');
+                showToastMessage(context, 'Câu hỏi không được trống');
                 return;
               }
               if (answerController.text.isEmpty) {
-                showToastMessage(context, 'Answer can\'t be empty');
+                showToastMessage(context, 'Đáp án không được trống');
                 return;
               }
               if (pos < 0) {
-                showToastMessage(context, 'Position can\'t be empty');
+                showToastMessage(context, 'Vị trí không được trống');
                 return;
               }
 
@@ -180,11 +180,11 @@ class _StartEditorDialogState extends State<StartEditorDialog> {
               );
               Navigator.of(context).pop((pos, newQ));
             },
-            child: const Text('Done', style: TextStyle(fontSize: fontSizeMedium)),
+            child: const Text('Hoàn tất', style: TextStyle(fontSize: fontSizeMedium)),
           ),
           TextButton(
             child: Text(
-              'Cancel',
+              'Hủy',
               style: TextStyle(fontSize: fontSizeMedium, color: Theme.of(context).colorScheme.error),
             ),
             onPressed: () {

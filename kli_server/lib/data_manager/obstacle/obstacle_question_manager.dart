@@ -141,7 +141,7 @@ class _ObstacleQuestionManagerState extends State<ObstacleQuestionManager> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: managerAppBar(context, 'Obstacle Question Manager'),
+      appBar: managerAppBar(context, 'Quản lý câu hỏi chướng ngại vật'),
       backgroundColor: Colors.transparent,
       body: isLoading
           ? const Center(child: CircularProgressIndicator())
@@ -169,7 +169,7 @@ class _ObstacleQuestionManagerState extends State<ObstacleQuestionManager> {
           }),
           button(
             context,
-            'Import Questions',
+            'Nhập file câu hỏi',
             enableCondition: selectedMatchIndex >= 0,
             onPressed: () async {
               logger.i('Import new questions (.xlsx)');
@@ -193,35 +193,32 @@ class _ObstacleQuestionManagerState extends State<ObstacleQuestionManager> {
               setState(() {});
             },
           ),
-          Tooltip(
-            message: 'Not available yet',
-            child: button(context, 'Export Excel', enableCondition: false),
-          ),
+          // button(context, 'Export Excel', enableCondition: false),
           button(
             context,
-            'Remove Questions',
+            'Xóa câu hỏi',
             enableCondition: selectedMatchIndex >= 0,
             onPressed: () async {
-              final ret = await confirmDeleteDialog(
+              await confirmDialog(
                 context,
-                'Are you sure you want to delete questions for match: ${matchNames[selectedMatchIndex]}?',
-                'Removed all obstacle questions for match: ${matchNames[selectedMatchIndex]}',
-              );
-              if (ret != true) return;
+                message: 'Bạn có muốn xóa tất cả hàng ngang của trận: ${matchNames[selectedMatchIndex]}?',
+                acceptLogMessage:
+                    'Removed all obstacle questions for match: ${matchNames[selectedMatchIndex]}',
+                onAccept: () async {
+                  if (mounted) showToastMessage(context, 'Đã xóa (match: ${matchNames[selectedMatchIndex]})');
 
-              if (mounted) {
-                showToastMessage(context, 'Removed questions (match: ${matchNames[selectedMatchIndex]})');
-              }
-              await removeMatch(selectedMatch);
-              selectedMatch = ObstacleMatch(
-                match: matchNames[selectedMatchIndex],
-                keyword: '',
-                imagePath: '',
-                charCount: 0,
-                explanation: '',
-                hintQuestions: List<ObstacleQuestion?>.filled(5, null),
+                  await removeMatch(selectedMatch);
+                  selectedMatch = ObstacleMatch(
+                    match: matchNames[selectedMatchIndex],
+                    keyword: '',
+                    imagePath: '',
+                    charCount: 0,
+                    explanation: '',
+                    hintQuestions: List<ObstacleQuestion?>.filled(5, null),
+                  );
+                  setState(() {});
+                },
               );
-              setState(() {});
             },
           ),
         ],
@@ -251,7 +248,7 @@ class _ObstacleQuestionManagerState extends State<ObstacleQuestionManager> {
         children: [
           const Padding(
             padding: EdgeInsets.only(bottom: 16),
-            child: Text('Questions', style: TextStyle(fontSize: fontSizeMedium)),
+            child: Text('Danh sách câu hỏi', style: TextStyle(fontSize: fontSizeMedium)),
           ),
           if (selectedMatchIndex < 0)
             Container(
@@ -260,7 +257,7 @@ class _ObstacleQuestionManagerState extends State<ObstacleQuestionManager> {
                 border: Border.all(width: 1, color: Theme.of(context).colorScheme.onBackground),
               ),
               constraints: const BoxConstraints(maxHeight: 400, maxWidth: 600),
-              child: const Material(child: Center(child: Text('No match selected'))),
+              child: const Material(child: Center(child: Text('Chưa chọn trận đấu'))),
             )
           else
             ListView.separated(
@@ -343,11 +340,11 @@ class _ObstacleQuestionManagerState extends State<ObstacleQuestionManager> {
                       ),
                     ),
                   ),
-                  button(context, 'Save', onPressed: () async {
+                  button(context, 'Lưu CNV', onPressed: () async {
                     selectedMatch.keyword = obstacleController.text;
                     selectedMatch.charCount = obstacleController.text.replaceAll(' ', '').length;
                     logger.i('Modified keyword of match: ${matchNames[selectedMatchIndex]}');
-                    showToastMessage(context, 'Saved');
+                    showToastMessage(context, 'Đã lưu CNV');
                     await updateQuestions(selectedMatch);
                   }),
                 ],
@@ -364,10 +361,10 @@ class _ObstacleQuestionManagerState extends State<ObstacleQuestionManager> {
                     child: Center(
                     child: Text(
                       selectedMatchIndex < 0
-                          ? 'No match selected'
+                          ? 'Chưa chọn trận đấu'
                           : selectedMatch.imagePath.isEmpty
-                              ? 'No image'
-                              : 'Image $fullImagePath not found',
+                              ? 'Không có ảnh'
+                              : 'Không tìm thấy ảnh $fullImagePath',
                     ),
                   )),
           ),
@@ -375,11 +372,9 @@ class _ObstacleQuestionManagerState extends State<ObstacleQuestionManager> {
             const SizedBox.shrink()
           else
             ElevatedButton(
-              child: const Text('Select Image'),
+              child: const Text('Chọn ảnh'),
               onPressed: () async {
-                logger.i(
-                  'Selecting image at ${storageHandler!.getRelative(storageHandler!.mediaDir)}',
-                );
+                logger.i('Selecting image at ${storageHandler!.getRelative(storageHandler!.mediaDir)}');
                 final result = await FilePicker.platform.pickFiles(
                   dialogTitle: 'Select image',
                   initialDirectory: storageHandler!.mediaDir.replaceAll('/', '\\'),

@@ -84,7 +84,7 @@ AppBar managerAppBar(BuildContext context, String title) {
 
 Widget matchSelector(List<String> matchNames, void Function(String?) onSelected) {
   return DropdownMenu(
-    label: const Text('Match'),
+    label: const Text('Trận đấu'),
     dropdownMenuEntries: [
       for (var i = 0; i < matchNames.length; i++)
         DropdownMenuEntry(

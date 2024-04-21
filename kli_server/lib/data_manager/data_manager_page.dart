@@ -84,8 +84,8 @@ class _DataManagerPageState extends State<DataManagerPage> {
                 title: const Padding(
                   padding: EdgeInsets.symmetric(vertical: 30),
                   child: Text(
-                    'Data Manager',
-                    style: TextStyle(fontSize: fontSizeLarge, fontWeight: FontWeight.bold),
+                    'Quản lý dữ liệu',
+                    style: TextStyle(fontSize: fontSizeLarge + 1, fontWeight: FontWeight.bold),
                   ),
                 ),
                 subtitle: const SizedBox.shrink(),
@@ -97,7 +97,7 @@ class _DataManagerPageState extends State<DataManagerPage> {
                     color: Theme.of(context).colorScheme.background,
                     border: Border.all(width: 1, color: Theme.of(context).colorScheme.onBackground),
                   ),
-                  constraints: const BoxConstraints(maxHeight: 550),
+                  constraints: const BoxConstraints(maxHeight: 450),
                   child: TextFormField(
                     style: TextStyle(
                       fontSize: fontSizeSmall,
@@ -110,12 +110,12 @@ class _DataManagerPageState extends State<DataManagerPage> {
                 ),
               ),
               items: const [
-                SideNavigationBarItem(label: 'Match', icon: Icons.settings_rounded),
-                SideNavigationBarItem(label: 'Start', icon: Icons.start_rounded),
-                SideNavigationBarItem(label: 'Obstacle', icon: FontAwesomeIcons.roadBarrier),
-                SideNavigationBarItem(label: 'Acceleration', icon: Icons.local_fire_department_rounded),
-                SideNavigationBarItem(label: 'Finish', icon: FontAwesomeIcons.flagCheckered),
-                SideNavigationBarItem(label: 'Extra', icon: Icons.add_box_rounded),
+                SideNavigationBarItem(label: 'Trận đấu', icon: Icons.settings_rounded),
+                SideNavigationBarItem(label: 'Khởi động', icon: Icons.start_rounded),
+                SideNavigationBarItem(label: 'Vượt chướng ngại vật', icon: FontAwesomeIcons.roadBarrier),
+                SideNavigationBarItem(label: 'Tăng tốc', icon: Icons.local_fire_department_rounded),
+                SideNavigationBarItem(label: 'Về đích', icon: FontAwesomeIcons.flagCheckered),
+                SideNavigationBarItem(label: 'Câu hỏi phụ', icon: Icons.add_box_rounded),
               ],
               onTap: (newIndex) {
                 setState(() => selectedPage = newIndex);

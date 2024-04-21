@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
 import '../global.dart';
@@ -9,59 +11,36 @@ void showToastMessage(BuildContext context, String message) {
   );
 }
 
-void showBackDialog(BuildContext context, String message, String acceptLogMessage) {
-  showDialog<void>(
-    context: context,
-    builder: (BuildContext context) {
-      return AlertDialog(
-        title: const Text('Are you sure?', textAlign: TextAlign.center),
-        titleTextStyle: const TextStyle(fontSize: fontSizeMedium),
-        content: Text(message, textAlign: TextAlign.center),
-        contentTextStyle: const TextStyle(fontSize: fontSizeMedium),
-        actionsAlignment: MainAxisAlignment.center,
-        actions: <Widget>[
-          TextButton(
-            child: const Text('Yes', style: TextStyle(fontSize: fontSizeMSmall)),
-            onPressed: () {
-              logMessageController.add((LogType.info, acceptLogMessage));
-              Navigator.pop(context);
-              Navigator.pop(context);
-            },
-          ),
-          TextButton(
-            child: const Text('No', style: TextStyle(fontSize: fontSizeMSmall)),
-            onPressed: () {
-              Navigator.pop(context);
-            },
-          ),
-        ],
-      );
-    },
-  );
-}
-
-Future<bool?> confirmDeleteDialog(BuildContext context, String message, String acceptLogMessage) async {
+Future<bool?> confirmDialog(
+  BuildContext context, {
+  required String message,
+  required String acceptLogMessage,
+  required void Function() onAccept,
+  void Function()? onCancel,
+}) async {
   return await showDialog<bool>(
     context: context,
     builder: (BuildContext context) {
       return AlertDialog(
         icon: Icon(Icons.warning_rounded, color: Colors.redAccent.shade200),
-        title: const Text('Are you sure?', textAlign: TextAlign.center),
+        title: const Text('Xác nhận', textAlign: TextAlign.center),
         titleTextStyle: const TextStyle(fontSize: fontSizeMedium),
         content: Text(message, textAlign: TextAlign.center),
         contentTextStyle: const TextStyle(fontSize: fontSizeMSmall),
         actionsAlignment: MainAxisAlignment.center,
         actions: <Widget>[
           TextButton(
-            child: const Text('Yes', style: TextStyle(fontSize: fontSizeMSmall)),
+            child: const Text('Có', style: TextStyle(fontSize: fontSizeMSmall)),
             onPressed: () {
               logMessageController.add((LogType.info, acceptLogMessage));
+              onAccept();
               Navigator.pop(context, true);
             },
           ),
           TextButton(
-            child: const Text('No', style: TextStyle(fontSize: fontSizeMSmall)),
+            child: const Text('Không', style: TextStyle(fontSize: fontSizeMSmall)),
             onPressed: () {
+              if (onCancel != null) onCancel();
               Navigator.pop(context, false);
             },
           ),

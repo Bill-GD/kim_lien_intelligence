@@ -15,7 +15,7 @@ class _AccelEditorDialogState extends State<AccelEditorDialog> {
   final questionController = TextEditingController(),
       answerController = TextEditingController(),
       explanationController = TextEditingController();
-
+  AccelQuestionType type = AccelQuestionType.none;
   String? qErrorText, aErrorText;
 
   bool createNew = false;
@@ -29,6 +29,7 @@ class _AccelEditorDialogState extends State<AccelEditorDialog> {
       questionController.text = widget.question!.question;
       answerController.text = widget.question!.answer;
       explanationController.text = widget.question!.explanation;
+      type = widget.question!.type;
     } else {
       logger.i('Add new accel question');
       createNew = true;
@@ -63,7 +64,7 @@ class _AccelEditorDialogState extends State<AccelEditorDialog> {
               style: const TextStyle(fontSize: fontSizeMedium),
               onChanged: (value) {
                 if (value.isEmpty) {
-                  qErrorText = 'Can\'t be empty';
+                  qErrorText = 'Không được trống';
                   setState(() {});
                   return;
                 }
@@ -71,7 +72,7 @@ class _AccelEditorDialogState extends State<AccelEditorDialog> {
               },
               controller: questionController,
               decoration: InputDecoration(
-                labelText: 'Question',
+                labelText: 'Câu hỏi',
                 labelStyle: TextStyle(
                   fontWeight: FontWeight.w600,
                   color: Theme.of(context).colorScheme.primary,
@@ -85,7 +86,7 @@ class _AccelEditorDialogState extends State<AccelEditorDialog> {
               style: const TextStyle(fontSize: fontSizeMedium),
               onChanged: (value) {
                 if (value.isEmpty) {
-                  aErrorText = 'Can\'t be empty';
+                  aErrorText = 'Không được trống';
                   setState(() {});
                   return;
                 }
@@ -93,7 +94,7 @@ class _AccelEditorDialogState extends State<AccelEditorDialog> {
               },
               controller: answerController,
               decoration: InputDecoration(
-                labelText: 'Answer',
+                labelText: 'Đáp án',
                 labelStyle: TextStyle(
                   fontWeight: FontWeight.w600,
                   color: Theme.of(context).colorScheme.primary,
@@ -107,7 +108,7 @@ class _AccelEditorDialogState extends State<AccelEditorDialog> {
               style: const TextStyle(fontSize: fontSizeMedium),
               controller: explanationController,
               decoration: InputDecoration(
-                labelText: 'Explanation',
+                labelText: 'Giải thích',
                 labelStyle: TextStyle(
                   fontWeight: FontWeight.w600,
                   color: Theme.of(context).colorScheme.primary,
@@ -134,7 +135,8 @@ class _AccelEditorDialogState extends State<AccelEditorDialog> {
                   ? true
                   : questionController.text != widget.question!.question ||
                       answerController.text != widget.question!.answer ||
-                      explanationController.text != widget.question!.explanation;
+                      explanationController.text != widget.question!.explanation ||
+                      type != widget.question!.type;
 
               if (!hasChanged) {
                 logger.i('No change, exiting');
@@ -142,6 +144,7 @@ class _AccelEditorDialogState extends State<AccelEditorDialog> {
                 return;
               }
               final newQ = AccelQuestion(
+                type: type,
                 question: questionController.text,
                 answer: answerController.text,
                 explanation: explanationController.text,
@@ -151,11 +154,11 @@ class _AccelEditorDialogState extends State<AccelEditorDialog> {
               logger.i('${createNew ? 'Created' : 'Modified'} accel question');
               Navigator.of(context).pop(newQ);
             },
-            child: const Text('Done', style: TextStyle(fontSize: fontSizeMedium)),
+            child: const Text('Hoàn tất', style: TextStyle(fontSize: fontSizeMedium)),
           ),
           TextButton(
             child: Text(
-              'Cancel',
+              'Hủy',
               style: TextStyle(fontSize: fontSizeMedium, color: Theme.of(context).colorScheme.error),
             ),
             onPressed: () {

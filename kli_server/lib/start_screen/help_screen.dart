@@ -45,12 +45,12 @@ class _HelpScreenState extends State<HelpScreen> {
             children: [
               button(
                 context,
-                'Open app folder',
+                'Mở thư mục chứa phần mềm',
                 onPressed: () async {
                   await launchUrl(Uri.parse(storageHandler!.parentFolder));
                 },
               ),
-              button(context, 'Open Instruction File'),
+              button(context, 'Mở file thông tin chi tiết'),
             ],
           ),
           Row(
@@ -72,7 +72,7 @@ class _HelpScreenState extends State<HelpScreen> {
         children: [
           const Padding(
             padding: EdgeInsets.only(bottom: 16),
-            child: Text('Sections', style: TextStyle(fontSize: fontSizeMedium)),
+            child: Text('Các mục', style: TextStyle(fontSize: fontSizeMedium)),
           ),
           Container(
             constraints: const BoxConstraints(maxWidth: 250),
@@ -109,7 +109,7 @@ class _HelpScreenState extends State<HelpScreen> {
           Padding(
             padding: const EdgeInsets.only(bottom: 16),
             child: Text(
-              selectedSectionIndex < 0 ? 'Details' : sectionNames[selectedSectionIndex],
+              selectedSectionIndex < 0 ? 'Thông tin' : sectionNames[selectedSectionIndex],
               style: const TextStyle(fontSize: fontSizeMedium),
             ),
           ),
@@ -217,6 +217,7 @@ class _HelpScreenState extends State<HelpScreen> {
     Phía bên trái là các câu hỏi 1 - 4. Bấm vào câu hỏi để xem hình ảnh, bấm tiếp nút Edit để sửa câu hỏi.
     
     Bên phải là các hình ảnh gợi ý. Bấm 'Add' để thêm hình ảnh vào cuối, 'Remove' để xóa hình ảnh hiện tại. Sử dụng mũi tên phía dưới để chuyển ảnh.
+    Loại câu hỏi sẽ được xác định tự động dựa vào số hình ảnh. Câu hỏi chưa có hình ảnh là 'Không xác định', 1 ảnh là 'IQ', 2 ảnh là 'Sắp xếp', 3+ ảnh là 'Chuỗi hình ảnh'.
 
     Để nhập câu hỏi từ Excel cần lưu ý:
       - Chỉ lấy sheet đầu tiên.
