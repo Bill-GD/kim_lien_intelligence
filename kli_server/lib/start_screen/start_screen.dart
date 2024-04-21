@@ -148,9 +148,7 @@ class _StartPageState extends State<StartPage> with WindowListener {
                     'Open Log File',
                     onPressed: () async {
                       logger.i('Opening log...');
-                      await initStorageHandler();
                       await launchUrl(Uri.parse(storageHandler!.logFile));
-                      storageHandler = null;
                     },
                   ),
                 ].elementAt(_sidebarIndex),

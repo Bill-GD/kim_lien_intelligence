@@ -89,7 +89,6 @@ class _MatchManagerState extends State<MatchManager> {
                 matches.add(newMatch);
                 await overwriteSave();
                 // logPanelController!.addText('Added match: ${newMatch.name}');
-                if (mounted) showToastMessage(context, 'Đã thêm trận: ${newMatch.name}');
                 setState(() {});
               }
             },
@@ -112,8 +111,13 @@ class _MatchManagerState extends State<MatchManager> {
               );
 
               if (newMatch != null) {
+                String oldName = matches[currentMatchIndex].name;
+                bool changedName = newMatch.name != oldName;
                 matches[currentMatchIndex] = newMatch;
                 await overwriteSave();
+                if (changedName) {
+                  await DataManager.updateAllQuestionMatchName(oldName: oldName, newName: newMatch.name);
+                }
                 setState(() {});
               }
             },
@@ -123,41 +127,18 @@ class _MatchManagerState extends State<MatchManager> {
             'Xóa trận${currentMatchIndex < 0 ? '' : ': ${matches[currentMatchIndex].name}'}',
             enableCondition: currentMatchIndex >= 0,
             onPressed: () async {
-              showDialog<bool>(
-                context: context,
-                builder: (BuildContext context) {
-                  return AlertDialog(
-                    title: const Text('Xác nhận xóa', textAlign: TextAlign.center),
-                    content: Text(
-                      'Bạn có chắc chắn muốn xóa trận sau: ${matches[currentMatchIndex].name}?',
-                      style: const TextStyle(fontSize: fontSizeMedium),
-                    ),
-                    actionsAlignment: MainAxisAlignment.spaceEvenly,
-                    actions: <Widget>[
-                      TextButton(
-                        child: const Text('Có', style: TextStyle(fontSize: fontSizeMedium)),
-                        onPressed: () {
-                          Navigator.pop(context, true);
-                        },
-                      ),
-                      TextButton(
-                        child: const Text('Không', style: TextStyle(fontSize: fontSizeMedium)),
-                        onPressed: () {
-                          Navigator.pop(context, false);
-                        },
-                      ),
-                    ],
-                  );
+              await confirmDialog(
+                context,
+                message: 'Bạn có muốn xóa trận: ${matches[currentMatchIndex].name}?',
+                acceptLogMessage: 'Removed match: ${matches[currentMatchIndex].name}',
+                onAccept: () async {
+                  if (mounted) showToastMessage(context, 'Đã xóa trận: ${matches[currentMatchIndex].name}');
+                  // logPanelController!.addText('Removed match: ${matches[currentMatchIndex].name}');
+                  matches.removeAt(currentMatchIndex);
+                  await overwriteSave();
+                  setState(() => currentMatchIndex = -1);
                 },
-              ).then((value) async {
-                if (value != true) return;
-                logger.i('Removed match: ${matches[currentMatchIndex].name}');
-                if (mounted) showToastMessage(context, 'Đã xóa trận: ${matches[currentMatchIndex].name}');
-                // logPanelController!.addText('Removed match: ${matches[currentMatchIndex].name}');
-                matches.removeAt(currentMatchIndex);
-                await overwriteSave();
-                setState(() => currentMatchIndex = -1);
-              });
+              );
             },
           ),
         ],

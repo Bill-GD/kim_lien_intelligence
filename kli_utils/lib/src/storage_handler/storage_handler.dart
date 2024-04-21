@@ -18,8 +18,8 @@ class StorageHandler {
 
   String get mediaDir => '$_userDataDir\\Media';
   String get newDataDir => '$_userDataDir\\NewData';
-  String get saveDataDir => '$_userDataDir\\SavedData';
 
+  String get saveDataDir => '$_userDataDir\\SavedData';
   String get matchSaveFile => '$saveDataDir\\match.txt';
   String get startSaveFile => '$saveDataDir\\start.txt';
   String get obstacleSaveFile => '$saveDataDir\\obstacle.txt';
@@ -36,18 +36,46 @@ class StorageHandler {
     final sh = StorageHandler(prefixPath.replaceAll('/', '\\'));
     logMessageController.add((LogType.info, 'Parent folder: ${sh.parentFolder}'));
 
-    await sh.createFileEntity(sh.mediaDir, StorageType.dir);
-    await sh.createFileEntity(sh.newDataDir, StorageType.dir);
-    // await sh.createFileEntity(sh.excelOutput, StorageType.dir);
-    await sh.createFileEntity(sh.logFile, StorageType.file);
-    await sh.createFileEntity(sh.matchSaveFile, StorageType.file);
-    await sh.createFileEntity(sh.startSaveFile, StorageType.file);
-    await sh.createFileEntity(sh.obstacleSaveFile, StorageType.file);
-    await sh.createFileEntity(sh.accelSaveFile, StorageType.file);
-    await sh.createFileEntity(sh.finishSaveFile, StorageType.file);
-    await sh.createFileEntity(sh.extraSaveFile, StorageType.file);
+    await Future.wait([
+      sh.logFile,
+      // sh.excelOutput,
+      sh.mediaDir,
+      sh.newDataDir,
+      sh.matchSaveFile,
+      sh.startSaveFile,
+      sh.obstacleSaveFile,
+      sh.accelSaveFile,
+      sh.finishSaveFile,
+      sh.extraSaveFile,
+    ].map(sh.createFileEntity));
 
     return sh;
+  }
+
+  Future<void> checkSaveDataDir() async {
+    for (final file in [
+      logFile,
+      // excelOutput,
+      mediaDir,
+      newDataDir,
+      matchSaveFile,
+      startSaveFile,
+      obstacleSaveFile,
+      accelSaveFile,
+      finishSaveFile,
+      extraSaveFile,
+    ]) {
+      if (FileSystemEntity.isDirectorySync(file)) {
+        if (Directory(file).existsSync()) {
+          logMessageController.add((LogType.info, '${getRelative(file)} found'));
+        }
+        return;
+      }
+
+      if (File(file).existsSync()) {
+        logMessageController.add((LogType.info, '${getRelative(file)} found'));
+      }
+    }
   }
 
   /// Return: ```{tableName: [rows]}```
@@ -168,19 +196,15 @@ class StorageHandler {
     await File(path).writeAsString(data);
   }
 
-  Future<void> createFileEntity(String path, StorageType type) async {
+  Future<void> createFileEntity(String path) async {
     try {
       final FileSystemEntity f;
 
-      if (type == StorageType.file) {
-        f = File(path);
-      } else {
-        f = Directory(path);
-      }
+      f = FileSystemEntity.isDirectorySync(path) ? Directory(path) : File(path);
+
       if (f.existsSync()) return;
 
       await (f is File ? f.create(recursive: true) : (f as Directory).create(recursive: true));
-      logMessageController.add((LogType.info, 'Created: ${getRelative(path)}'));
     } on PathExistsException {
       return;
     }

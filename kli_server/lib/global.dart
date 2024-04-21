@@ -140,7 +140,7 @@ class DataManager {
     T Function(Map<String, dynamic>) func,
     String filePath,
   ) async {
-    logger.i('Getting all saved questions');
+    logger.i('Getting all saved $T questions');
     final saved = await storageHandler!.readFromFile(filePath);
     if (saved.isEmpty) return <T>[];
     List<T> q = [];
@@ -150,6 +150,40 @@ class DataManager {
       logger.e(e);
     }
     return q;
+  }
+
+  static Future<void> updateAllQuestionMatchName({required String oldName, required String newName}) async {
+    logger
+        .i('Match name update detected. Updating match name of all questions (\'$oldName\' -> \'$newName\')');
+
+    List<(Type, String)> typeToFileMap = [
+      (StartMatch, storageHandler!.startSaveFile),
+      (ObstacleMatch, storageHandler!.obstacleSaveFile),
+      (AccelMatch, storageHandler!.accelSaveFile),
+      (FinishMatch, storageHandler!.finishSaveFile),
+      (ExtraMatch, storageHandler!.extraSaveFile),
+    ];
+
+    typeToFileMap.forEach((v) async {
+      final (type, file) = v;
+      List<BaseMatch> q = [];
+      if (type == StartMatch) {
+        q = await getAllSavedQuestions<StartMatch>(StartMatch.fromJson, file);
+      } else if (type == ObstacleMatch) {
+        q = await getAllSavedQuestions<ObstacleMatch>(ObstacleMatch.fromJson, file);
+      } else if (type == AccelMatch) {
+        q = await getAllSavedQuestions<AccelMatch>(AccelMatch.fromJson, file);
+      } else if (type == FinishMatch) {
+        q = await getAllSavedQuestions<FinishMatch>(FinishMatch.fromJson, file);
+      } else if (type == ExtraMatch) {
+        q = await getAllSavedQuestions<ExtraMatch>(ExtraMatch.fromJson, file);
+      }
+      for (var e in q) {
+        if (e.match == oldName) e.match = newName;
+      }
+      await overwriteSave(q, file);
+      logger.i('$type: Done');
+    });
   }
 
   static Future<void> overwriteSave<T>(List<T> q, String filePath) async {

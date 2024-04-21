@@ -15,13 +15,15 @@ void main() async {
 
   await initStorageHandler();
   initLogger(storageHandler!.logFile);
-  await initPackageInfo();
-  
+
   logMessageStream.listen((m) {
     if (m.$1 == LogType.info) logger.i(m.$2);
     if (m.$1 == LogType.warn) logger.w(m.$2);
     if (m.$1 == LogType.error) logger.e(m.$2);
   });
+
+  await storageHandler!.checkSaveDataDir();
+  await initPackageInfo();
 
   if (!kIsWeb && (Platform.isLinux || Platform.isMacOS || Platform.isWindows)) {
     await windowManager.ensureInitialized();
