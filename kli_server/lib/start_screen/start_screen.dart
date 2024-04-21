@@ -2,14 +2,15 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:kli_server/start_screen/help_screen.dart';
 import 'package:kli_utils/kli_utils.dart';
 import 'package:side_navigation/side_navigation.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:window_manager/window_manager.dart';
 
 import '../data_manager/data_manager_page.dart';
 import '../global.dart';
 import '../server_setup/server_setup.dart';
+import 'help_screen.dart';
 
 // This page shows 2 options:
 // - Manage Data
@@ -49,7 +50,8 @@ class _StartPageState extends State<StartPage> with WindowListener {
       appBar: AppBar(
         actions: [
           CloseButton(onPressed: () {
-            logger.i('[${DateTime.now()}] Exiting app');
+            logger.i('Exiting app');
+            storageHandler = null;
             exit(0);
           }),
         ],
@@ -96,6 +98,7 @@ class _StartPageState extends State<StartPage> with WindowListener {
                 SideNavigationBarItem(label: 'Instruction', icon: FontAwesomeIcons.circleQuestion),
                 SideNavigationBarItem(label: 'Data Manager', icon: FontAwesomeIcons.database),
                 SideNavigationBarItem(label: 'Server Setup', icon: FontAwesomeIcons.server),
+                SideNavigationBarItem(label: 'Log', icon: FontAwesomeIcons.solidFile),
               ],
               onTap: (newIndex) {
                 if (newIndex == 2) logger.i('Accessing help page');
@@ -122,7 +125,6 @@ class _StartPageState extends State<StartPage> with WindowListener {
                   button(
                     context,
                     'Open Data Manager',
-                    enableCondition: true,
                     onPressed: () {
                       logger.i('Opening Data Manager page...');
                       Navigator.of(context).push(
@@ -133,13 +135,22 @@ class _StartPageState extends State<StartPage> with WindowListener {
                   button(
                     context,
                     'Open Server Setup',
-                    enableCondition: true,
                     onPressed: () async {
                       logger.i('Opening Server Setup page...');
                       await Navigator.of(context).push(
                         MaterialPageRoute(builder: (context) => const ServerSetupPage()),
                       );
                       await KLIServer.stop();
+                    },
+                  ),
+                  button(
+                    context,
+                    'Open Log File',
+                    onPressed: () async {
+                      logger.i('Opening log...');
+                      await initStorageHandler();
+                      await launchUrl(Uri.parse(storageHandler!.logFile));
+                      storageHandler = null;
                     },
                   ),
                 ].elementAt(_sidebarIndex),

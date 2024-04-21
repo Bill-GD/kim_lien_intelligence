@@ -10,22 +10,22 @@ enum StorageType { file, dir }
 class StorageHandler {
   // these are relative to exe path
   final String _parentFolder;
-  String get parentFolder => _parentFolder;
   final String _userDataDir;
+  String get parentFolder => _parentFolder;
 
   String get logFile => '$_userDataDir\\log.txt';
   String get excelOutput => '$_userDataDir\\ExcelExport';
 
   String get mediaDir => '$_userDataDir\\Media';
   String get newDataDir => '$_userDataDir\\NewData';
-  String get questionDir => '$_userDataDir\\Questions';
+  String get saveDataDir => '$_userDataDir\\SavedData';
 
-  String get matchSaveFile => '$_userDataDir\\match.txt';
-  String get startSaveFile => '$questionDir\\start.txt';
-  String get obstacleSaveFile => '$questionDir\\obstacle.txt';
-  String get accelSaveFile => '$questionDir\\accel.txt';
-  String get finishSaveFile => '$questionDir\\finish.txt';
-  String get extraSaveFile => '$questionDir\\extra.txt';
+  String get matchSaveFile => '$saveDataDir\\match.txt';
+  String get startSaveFile => '$saveDataDir\\start.txt';
+  String get obstacleSaveFile => '$saveDataDir\\obstacle.txt';
+  String get accelSaveFile => '$saveDataDir\\accel.txt';
+  String get finishSaveFile => '$saveDataDir\\finish.txt';
+  String get extraSaveFile => '$saveDataDir\\extra.txt';
 
   /// Use [StorageHandler.init] to create an instance instead.
   StorageHandler(this._parentFolder) : _userDataDir = '$_parentFolder\\UserData';
@@ -34,11 +34,11 @@ class StorageHandler {
     logMessageController.add(const (LogType.info, 'StorageHandler init'));
 
     final sh = StorageHandler(prefixPath.replaceAll('/', '\\'));
-    logMessageController.add((LogType.info, sh.parentFolder));
+    logMessageController.add((LogType.info, 'Parent folder: ${sh.parentFolder}'));
 
     await sh.createFileEntity(sh.mediaDir, StorageType.dir);
     await sh.createFileEntity(sh.newDataDir, StorageType.dir);
-    await sh.createFileEntity(sh.excelOutput, StorageType.dir);
+    // await sh.createFileEntity(sh.excelOutput, StorageType.dir);
     await sh.createFileEntity(sh.logFile, StorageType.file);
     await sh.createFileEntity(sh.matchSaveFile, StorageType.file);
     await sh.createFileEntity(sh.startSaveFile, StorageType.file);
@@ -51,16 +51,23 @@ class StorageHandler {
   }
 
   /// Return: ```{tableName: [rows]}```
-  Future readFromExcel(String path, int maxColumnCount, int maxSheetCount) async {
+  Future<Map<String, List<Map<String, dynamic>>>> readFromExcel(
+    String path,
+    int maxColumnCount,
+    int maxSheetCount,
+  ) async {
     logMessageController.add((LogType.info, 'Reading Excel from ${getRelative(path)}'));
 
     final bytes = await File(path).readAsBytes();
     final excel = Excel.decodeBytes(bytes);
-    return excelToJson(excel, maxColumnCount, maxSheetCount);
+    return _excelToJson(excel, maxColumnCount, maxSheetCount);
   }
 
-  Future<Map<String, List<Map<String, dynamic>>>> excelToJson(
-      Excel excel, int maxColumnCount, int maxSheetCount) async {
+  Future<Map<String, List<Map<String, dynamic>>>> _excelToJson(
+    Excel excel,
+    int maxColumnCount,
+    int maxSheetCount,
+  ) async {
     logMessageController.add(const (LogType.info, 'Format: Excel -> Json'));
     final res = <String, List<Map<String, dynamic>>>{};
 

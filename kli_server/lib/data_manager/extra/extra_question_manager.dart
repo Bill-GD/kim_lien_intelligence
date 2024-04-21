@@ -1,9 +1,9 @@
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
-import 'package:kli_server/data_manager/extra/extra_question_editor.dart';
 import 'package:kli_utils/kli_utils.dart';
 
 import '../../global.dart';
+import 'extra_question_editor.dart';
 
 class ExtraQuestionManager extends StatefulWidget {
   const ExtraQuestionManager({super.key});
@@ -32,8 +32,6 @@ class _ExtraQuestionManagerState extends State<ExtraQuestionManager> {
 
   Future<void> getNewQuestion(String path) async {
     Map<String, List> data = await storageHandler!.readFromExcel(path, 3, 1);
-
-    logger.i('Extracting data from excel');
 
     final List<ExtraQuestion> allQ = [];
     for (var name in data.keys) {
@@ -167,17 +165,17 @@ class _ExtraQuestionManagerState extends State<ExtraQuestionManager> {
                 allowedExtensions: ['xlsx'],
               );
 
-              if (result != null) {
-                final p = result.files.single.path!;
-                logger.i(
-                  'Chose ${storageHandler!.getRelative(p)} for match ${matchNames[selectedMatchIndex]}',
-                );
-                await getNewQuestion(p);
-                await saveNewQuestions();
-                setState(() {});
+              if (result == null) {
+                logger.i('No file selected');
                 return;
               }
-              logger.i('No file selected');
+
+              final p = result.files.single.path!;
+              logger.i('Import: ${storageHandler!.getRelative(p)}, match: ${matchNames[selectedMatchIndex]}');
+              logPanelController!.addText('Imported from ${storageHandler!.getRelative(p)}');
+              await getNewQuestion(p);
+              await saveNewQuestions();
+              setState(() {});
             },
           ),
           button(
@@ -190,14 +188,16 @@ class _ExtraQuestionManagerState extends State<ExtraQuestionManager> {
                 'Are you sure you want to delete questions for match: ${matchNames[selectedMatchIndex]}?',
                 'Removed all extra questions for match: ${matchNames[selectedMatchIndex]}',
               );
-              if (ret == true) {
-                if (mounted) {
-                  showToastMessage(context, 'Removed questions for match: ${matchNames[selectedMatchIndex]}');
-                }
-                await removeMatch(selectedMatch);
-                selectedMatch = ExtraMatch(match: '', questions: []);
-                setState(() {});
+
+              if (ret != true) return;
+
+              if (mounted) {
+                showToastMessage(context, 'Removed questions (match: ${matchNames[selectedMatchIndex]})');
               }
+              // logPanelController!.addText('Removed questions (match: ${matchNames[selectedMatchIndex]})');
+              await removeMatch(selectedMatch);
+              selectedMatch = ExtraMatch(match: '', questions: []);
+              setState(() {});
             },
           ),
         ],

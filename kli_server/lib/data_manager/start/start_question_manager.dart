@@ -34,14 +34,12 @@ class _StartQuestionManagerState extends State<StartQuestionManager> {
   Future<void> getNewQuestion(String path) async {
     Map<String, List> data = await storageHandler!.readFromExcel(path, 4, 4);
 
-    logger.i('Extracting data from excel');
-
     final Map<int, List<StartQuestion>> allQ = {};
     int idx = 0;
-    for (var name in data.keys) {
+    for (var sheet in data.keys) {
       final List<StartQuestion> questions = [];
 
-      for (final r in (data[name] as List<Map>)) {
+      for (final r in (data[sheet] as List<Map>)) {
         final v = r.values;
         final q = StartQuestion(StartQuestion.mapTypeValue(v.elementAt(1)), v.elementAt(2), v.elementAt(3));
         questions.add(q);
@@ -208,17 +206,16 @@ class _StartQuestionManagerState extends State<StartQuestionManager> {
                 allowedExtensions: ['xlsx'],
               );
 
-              if (result != null) {
-                final p = result.files.single.path!;
-                logger.i(
-                  'Chose ${storageHandler!.getRelative(p)} for match ${matchNames[selectedMatchIndex]}',
-                );
-                await getNewQuestion(p);
-                await saveNewQuestions();
-                setState(() {});
+              if (result == null) {
+                logger.i('No file selected');
                 return;
               }
-              logger.i('No file selected');
+
+              final p = result.files.single.path!;
+              logger.i('Import: ${storageHandler!.getRelative(p)}, match: ${matchNames[selectedMatchIndex]}');
+              await getNewQuestion(p);
+              await saveNewQuestions();
+              setState(() {});
             },
           ),
           // button(
@@ -277,8 +274,9 @@ class _StartQuestionManagerState extends State<StartQuestionManager> {
               );
               if (ret == true) {
                 if (mounted) {
-                  showToastMessage(context, 'Removed questions for match: ${matchNames[selectedMatchIndex]}');
+                  showToastMessage(context, 'Removed questions (match: ${matchNames[selectedMatchIndex]})');
                 }
+                // logPanelController!.addText('Removed questions (match: ${matchNames[selectedMatchIndex]})');
                 await removeMatch(selectedMatch);
                 selectedMatch = StartMatch(match: matchNames[selectedMatchIndex], questions: {});
                 setState(() {});

@@ -1,3 +1,5 @@
+import 'package:flutter/material.dart';
+
 import 'global.dart';
 
 enum LogType { info, warn, error }
@@ -12,6 +14,15 @@ extension NumDurationExtensions on num {
   Duration get minutes => (this * 1000 * 1000 * 60).microseconds;
   Duration get hours => (this * 1000 * 1000 * 60 * 60).microseconds;
   Duration get days => (this * 1000 * 1000 * 60 * 60 * 24).microseconds;
+}
+
+extension AddText on TextEditingController {
+  void addText(String text) {
+    value = value.copyWith(
+      text: '${value.text}${value.text.isEmpty ? '' : '\n'}$text',
+      selection: TextSelection.collapsed(offset: value.text.length),
+    );
+  }
 }
 
 const double fontSizeXL = 48;

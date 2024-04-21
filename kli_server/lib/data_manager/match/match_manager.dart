@@ -75,7 +75,6 @@ class _MatchManagerState extends State<MatchManager> {
           button(
             context,
             'Add Match',
-            enableCondition: true,
             onPressed: () async {
               final newMatch = await Navigator.of(context).push<KLIMatch>(
                 DialogRoute<KLIMatch>(
@@ -89,6 +88,8 @@ class _MatchManagerState extends State<MatchManager> {
               if (newMatch != null) {
                 matches.add(newMatch);
                 await overwriteSave();
+                // logPanelController!.addText('Added match: ${newMatch.name}');
+                if (mounted) showToastMessage(context, 'Added match: ${newMatch.name}');
                 setState(() {});
               }
             },
@@ -149,7 +150,9 @@ class _MatchManagerState extends State<MatchManager> {
                 },
               ).then((value) async {
                 if (value != true) return;
-                logger.i('Remove match: ${matches[currentMatchIndex].name}');
+                logger.i('Removed match: ${matches[currentMatchIndex].name}');
+                if (mounted) showToastMessage(context, 'Removed match: ${matches[currentMatchIndex].name}');
+                // logPanelController!.addText('Removed match: ${matches[currentMatchIndex].name}');
                 matches.removeAt(currentMatchIndex);
                 await overwriteSave();
                 setState(() => currentMatchIndex = -1);

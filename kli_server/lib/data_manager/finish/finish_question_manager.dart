@@ -40,8 +40,6 @@ class _FinishQuestionManagerState extends State<FinishQuestionManager> {
   Future<void> getNewQuestion(String path) async {
     Map<String, List> data = await storageHandler!.readFromExcel(path, 4, 3);
 
-    logger.i('Extracting data from excel');
-
     final List<FinishQuestion> questions = [];
     for (int i = 0; i < data.keys.length; i++) {
       for (final r in (data[data.keys.elementAt(i)] as List<Map>)) {
@@ -199,17 +197,17 @@ class _FinishQuestionManagerState extends State<FinishQuestionManager> {
                 allowedExtensions: ['xlsx'],
               );
 
-              if (result != null) {
-                final p = result.files.single.path!;
-                logger.i(
-                  'Chose ${storageHandler!.getRelative(p)} for match ${matchNames[selectedMatchIndex]}',
-                );
-                await getNewQuestion(p);
-                await saveNewQuestions();
-                setState(() {});
+              if (result == null) {
+                logger.i('No file selected');
                 return;
               }
-              logger.i('No file selected');
+
+              final p = result.files.single.path!;
+              logger.i('Import: ${storageHandler!.getRelative(p)}, match: ${matchNames[selectedMatchIndex]}');
+              logPanelController!.addText('Imported from ${storageHandler!.getRelative(p)}');
+              await getNewQuestion(p);
+              await saveNewQuestions();
+              setState(() {});
             },
           ),
           button(
@@ -222,14 +220,16 @@ class _FinishQuestionManagerState extends State<FinishQuestionManager> {
                 'Are you sure you want to delete questions for match: ${matchNames[selectedMatchIndex]}?',
                 'Removed all finish questions for match: ${matchNames[selectedMatchIndex]}',
               );
-              if (value == true) {
-                if (mounted) {
-                  showToastMessage(context, 'Removed questions for match: ${matchNames[selectedMatchIndex]}');
-                }
-                await removeMatch(selectedMatch);
-                selectedMatch = FinishMatch(match: '', questions: []);
-                setState(() {});
+
+              if (value != true) return;
+
+              if (mounted) {
+                showToastMessage(context, 'Removed questions (match: ${matchNames[selectedMatchIndex]})');
               }
+              // logPanelController!.addText('Removed questions (match: ${matchNames[selectedMatchIndex]})');
+              await removeMatch(selectedMatch);
+              selectedMatch = FinishMatch(match: '', questions: []);
+              setState(() {});
             },
           ),
         ],

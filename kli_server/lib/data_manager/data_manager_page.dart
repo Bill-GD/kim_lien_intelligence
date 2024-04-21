@@ -24,32 +24,37 @@ class DataManagerPage extends StatefulWidget {
 }
 
 class _DataManagerPageState extends State<DataManagerPage> {
-  bool _isLoading = true;
+  bool isLoading = true;
 
-  int _selectedPage = 0;
-  late final List<Widget> _contentPages;
+  int selectedPage = 0;
+  late final List<Widget> contentPages;
 
   @override
   void initState() {
     super.initState();
+    logPanelController = TextEditingController()
+      ..addListener(() {
+        setState(() {});
+      });
 
-    initStorageHandler().whenComplete(() {
-      _contentPages = [
-        const MatchManager(),
-        const StartQuestionManager(),
-        const ObstacleQuestionManager(),
-        const AccelQuestionManager(),
-        const FinishQuestionManager(),
-        const ExtraQuestionManager(),
-      ];
-      setState(() => _isLoading = false);
-    });
+    // initStorageHandler().whenComplete(() {
+    contentPages = [
+      const MatchManager(),
+      const StartQuestionManager(),
+      const ObstacleQuestionManager(),
+      const AccelQuestionManager(),
+      const FinishQuestionManager(),
+      const ExtraQuestionManager(),
+    ];
+    setState(() => isLoading = false);
+    // });
   }
 
   @override
   void dispose() {
-    logger.i('Disposing storage handler...');
-    storageHandler = null;
+    // logger.i('Disposing storage handler...');
+    // storageHandler = null;
+    logPanelController!.dispose();
     super.dispose();
   }
 
@@ -67,8 +72,8 @@ class _DataManagerPageState extends State<DataManagerPage> {
         child: Row(
           children: [
             SideNavigationBar(
-              selectedIndex: _selectedPage,
-              // expandable: false,
+              selectedIndex: selectedPage,
+              expandable: false,
               header: SideNavigationBarHeader(
                 image: BackButton(
                   onPressed: () {
@@ -85,6 +90,25 @@ class _DataManagerPageState extends State<DataManagerPage> {
                 ),
                 subtitle: const SizedBox.shrink(),
               ),
+              footer: SideNavigationBarFooter(
+                label: Container(
+                  padding: const EdgeInsets.only(left: 8),
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).colorScheme.background,
+                    border: Border.all(width: 1, color: Theme.of(context).colorScheme.onBackground),
+                  ),
+                  constraints: const BoxConstraints(maxHeight: 550),
+                  child: TextFormField(
+                    style: TextStyle(
+                      fontSize: fontSizeSmall,
+                      color: Theme.of(context).colorScheme.onBackground,
+                    ),
+                    maxLines: 40,
+                    readOnly: true,
+                    controller: logPanelController,
+                  ),
+                ),
+              ),
               items: const [
                 SideNavigationBarItem(label: 'Match', icon: Icons.settings_rounded),
                 SideNavigationBarItem(label: 'Start', icon: Icons.start_rounded),
@@ -94,8 +118,8 @@ class _DataManagerPageState extends State<DataManagerPage> {
                 SideNavigationBarItem(label: 'Extra', icon: Icons.add_box_rounded),
               ],
               onTap: (newIndex) {
-                setState(() => _selectedPage = newIndex);
-                logger.i('Selecting ${_contentPages[newIndex].runtimeType}');
+                setState(() => selectedPage = newIndex);
+                logger.i('Selecting ${contentPages[newIndex].runtimeType}');
               },
               theme: SideNavigationBarTheme(
                 itemTheme: SideNavigationBarItemTheme(
@@ -111,9 +135,9 @@ class _DataManagerPageState extends State<DataManagerPage> {
               ),
             ),
             Expanded(
-              child: _isLoading
+              child: isLoading
                   ? const Center(child: CircularProgressIndicator())
-                  : _contentPages.elementAt(_selectedPage),
+                  : contentPages.elementAt(selectedPage),
             ),
           ],
         ),

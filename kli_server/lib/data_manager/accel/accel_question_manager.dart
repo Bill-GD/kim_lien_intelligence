@@ -35,9 +35,7 @@ class _AccelQuestionManagerState extends State<AccelQuestionManager> {
   }
 
   Future<void> getNewQuestion(String path) async {
-    Map<String, List> data = await storageHandler!.readFromExcel(path, 5, 1);
-
-    logger.i('Extracting data from excel');
+    Map<String, List> data = await storageHandler!.readFromExcel(path, 4, 1);
 
     final List<AccelQuestion> allQ = [];
     for (var name in data.keys) {
@@ -178,17 +176,19 @@ class _AccelQuestionManagerState extends State<AccelQuestionManager> {
                 allowedExtensions: ['xlsx'],
               );
 
-              if (result != null) {
-                final p = result.files.single.path!;
-                logger.i('Chose ${storageHandler!.getRelative(p)} for match ${selectedMatch.match}');
-                await getNewQuestion(p);
-                await saveNewQuestions();
-                selectedQuestionIndex = -1;
-                selectedImageIndex = -1;
-                setState(() {});
+              if (result == null) {
+                logger.i('No file selected');
                 return;
               }
-              logger.i('No file selected');
+
+              final p = result.files.single.path!;
+              logPanelController!.addText('Imported from ${storageHandler!.getRelative(p)}');
+              logger.i('Import: ${storageHandler!.getRelative(p)}, match: ${matchNames[selectedMatchIndex]}');
+              await getNewQuestion(p);
+              await saveNewQuestions();
+              selectedQuestionIndex = -1;
+              selectedImageIndex = -1;
+              setState(() {});
             },
           ),
           button(
@@ -201,19 +201,20 @@ class _AccelQuestionManagerState extends State<AccelQuestionManager> {
                 'Are you sure you want to delete questions for match: ${matchNames[selectedMatchIndex]}?',
                 'Removed all accel questions for match: ${matchNames[selectedMatchIndex]}',
               );
-              if (ret == true) {
-                if (mounted) {
-                  showToastMessage(context, 'Removed questions for match: ${matchNames[selectedMatchIndex]}');
-                }
-                await removeMatch(selectedMatch);
-                selectedMatch = AccelMatch(
-                  match: matchNames[selectedMatchIndex],
-                  questions: List.filled(4, null),
-                );
-                selectedQuestionIndex = -1;
-                selectedImageIndex = -1;
-                setState(() {});
+              if (ret != true) return;
+
+              if (mounted) {
+                showToastMessage(context, 'Removed questions (match: ${matchNames[selectedMatchIndex]})');
               }
+              // logPanelController!.addText('Removed questions (match: ${matchNames[selectedMatchIndex]})');
+              await removeMatch(selectedMatch);
+              selectedMatch = AccelMatch(
+                match: matchNames[selectedMatchIndex],
+                questions: List.filled(4, null),
+              );
+              selectedQuestionIndex = -1;
+              selectedImageIndex = -1;
+              setState(() {});
             },
           ),
         ],

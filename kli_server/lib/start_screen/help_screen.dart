@@ -1,6 +1,9 @@
 import 'package:dedent/dedent.dart';
 import 'package:flutter/material.dart';
 import 'package:kli_utils/kli_utils.dart';
+import 'package:url_launcher/url_launcher.dart';
+
+import '../global.dart';
 
 class HelpScreen extends StatefulWidget {
   const HelpScreen({super.key});
@@ -34,8 +37,22 @@ class _HelpScreenState extends State<HelpScreen> {
     return Scaffold(
       backgroundColor: Colors.transparent,
       body: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              button(
+                context,
+                'Open app folder',
+                onPressed: () async {
+                  await launchUrl(Uri.parse(storageHandler!.parentFolder));
+                },
+              ),
+              button(context, 'Open Instruction File'),
+            ],
+          ),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             crossAxisAlignment: CrossAxisAlignment.center,
@@ -127,23 +144,23 @@ class _HelpScreenState extends State<HelpScreen> {
     '''
     Phần mềm chia thành 2 phần chính: phần quản lý trận đấu, câu hỏi và host & điều khiển trận đấu đang diễn ra.
 
-    Sau khi mở, phần mềm sẽ tự động tạo thư mục UserData (cùng thư mục cha với phần mềm). Thư mục UserData sử dụng để chứa các file liên quan đến phần mềm như: file lưu thông tin trận đấu, câu hỏi, log, hình ảnh, video...
+    Đây là hướng dẫn nhanh, để xem thông tin và hướng dẫn chi tiết, bấm nút mở file hướng dẫn phía trên.
 
-    Các file như trên nên cho vào thư mục UserData để dễ dàng kiểm soát. Các file hình ảnh (ảnh thí sinh, ảnh phần thi, video về đích...) nên để trong thư mục UserData/Media.
-
-    Ngoài ra, tất cả các câu hỏi của các phần thi đều có thể nhập vào bằng file Excel (.xlsx). Các file này nên để trong thư mục UserData/NewData.
+    Sau khi mở, phần mềm sẽ tự động tạo thư mục UserData (cùng thư mục cha với phần mềm). Thư mục UserData bao gồm 3 thư mục Media, NewData, SavedData và file "log.txt".
+      - UserData/Media: nên dùng để chứa các video, hình ảnh liên quan đến trận đấu (ảnh thí sinh, CNV, video về đích)
+      - UserData/NewData: nên dùng để chứa các file excel (.xlsx) để có thể nhập cùng lúc nhiều câu hỏi cho 1 trận đấu
+      - UserData/SavedData: nơi phần mềm lưu các trận đấu và câu hỏi
+      - log.txt: file lưu các thao tác, tác vụ phần mềm thực hiện, có thể xem file để phát hiện lỗi khi sử dụng phần mềm
     
-    Các file Excel cũng cần có định dạng nhất định, nếu sai thì dữ liệu sẽ không được đọc đúng cách, dẫn đến lỗi. Tổng quan như sau (chi tiết định dạng ở các phần thi):
-      - Nội dung file Excel không được Merge các dòng (mỗi câu hỏi chỉ được 1 dòng).
-      - Dữ liệu bắt đầu ở ô A1, không được để trống hàng, cột.
+    Đối với các file Excel, cần có định dạng nhất định, nếu sai thì dữ liệu sẽ không được đọc đúng cách, dẫn đến lỗi. Tổng quan như sau (định dạng chi tiết phụ thuộc vào các phần thi):
+      - Dữ liệu bắt đầu ở ô A1
+      - Các hàng không được gộp (merge) với nhau (mỗi câu hỏi chỉ được 1 hàng).
       - Không có các hàng, cột trống ở giữa các câu hỏi (nếu có câu hỏi ở hàng 2 và 4 thì bắt buộc phải có ở hàng 3, nếu trống sẽ mất câu hỏi hàng 4)
       - Các cột cần xếp đúng thứ tự như định dạng.
 
-    Ở trang chính (trang hiện tại) có danh sách các phần của phần mềm: quản lý dữ liệu, tạo server, hướng dẫn (trang hiện tại). Khi mở trang quản lý dữ liệu sẽ có nút để mở phần quản lý dữ liệu trên màn hình.
+    Ở phần bên trái của trang chính (trang hiện tại) có danh sách các phần của phần mềm: hướng dẫn (trang hiện tại), quản lý dữ liệu, tạo server. Khi mở trang quản lý dữ liệu sẽ có nút để mở phần quản lý dữ liệu trên màn hình.
 
-    Trang quản lý dữ liệu cũng có danh sách nằm ở bên trái hiển thị các trang quản lý các phần thi khác nhau. Chuyển đến từng trang để quản lý phần thi tương ứng.
-    
-    Nếu có vấn đề có thể xem UserData/log.txt để biết thêm chi tiết.''',
+    Trang quản lý dữ liệu cũng có danh sách nằm ở bên trái hiển thị các trang quản lý các phần thi khác nhau. Chuyển đến từng trang để quản lý phần tương ứng.''',
     '''
     Quản lý trận đấu.
     
@@ -165,8 +182,9 @@ class _HelpScreenState extends State<HelpScreen> {
     Để sửa câu hỏi thì cần bấm vào câu hỏi tương ứng ở trong danh sách. Để xóa câu hỏi thì bấm hình thùng rác ở phía bên phải của câu hỏi.
 
     Để nhập câu hỏi từ Excel (xlsx) cần lưu ý:
-      - Có 4 sheet, mỗi sheet là danh sách câu hỏi của 1 thí sinh, theo thứ tự 1 - 4
-      - Hàng đầu tiên là tiêu đề cột (Câu hỏi, Lĩnh vực, STT...)
+      - Chỉ lấy 4 sheet, mỗi sheet là danh sách câu hỏi của 1 thí sinh, theo thứ tự 1 - 4
+      - Hàng đầu tiên là tiêu đề cột (STT, Lĩnh vực, Câu hỏi, Đáp án), các hàng sau là câu hỏi
+      - Cột 1 là STT câu hỏi
       - Cột 2 (B) là lĩnh vực: Toán, Vật lý, Hóa học, Sinh học, Văn học, Lịch sử, Địa lý, Tiếng Anh, Thể thao, Nghệ thuật, HBC
       - Tên các lĩnh vực cần đúng như trên.
       - Cột 3 (C) & 4 (D) là Câu hỏi & Đáp án.
@@ -184,11 +202,13 @@ class _HelpScreenState extends State<HelpScreen> {
 
     Để nhập câu hỏi từ Excel cần lưu ý:
       - Chỉ lấy sheet đầu tiên.
-      - Hàng đầu tiên là tiêu đề cột.
+      - Hàng 1 là tiêu đề cột
+      - Hàng 2 - 6 là các câu hỏi, hàng 7 là CNV.
+      - Cột 1 là STT câu hỏi
       - Cột 2 (B) là số kí tự
       - Cột 3 (C) & 4 (D) là Câu hỏi & Đáp án.
-      - Hàng 1 - 6 là các câu hỏi, hàng 7 là CNV.
-      - Hàng 7, cột 5 (E) là giải thích cho CNV.''',
+      - Cột 5 (E) là giải thích.
+      - Các cột sau không đọc.''',
     '''
     Quản lý câu hỏi tăng tốc.
     
@@ -200,9 +220,11 @@ class _HelpScreenState extends State<HelpScreen> {
 
     Để nhập câu hỏi từ Excel cần lưu ý:
       - Chỉ lấy sheet đầu tiên.
-      - Hàng đầu tiên là tiêu đề cột.
+      - Hàng đầu tiên là tiêu đề cột, các hàng sau là câu hỏi
+      - Cột 1 là STT câu hỏi
       - Cột 2 (B) & 3 (C) là Câu hỏi & Đáp án.
-      - Cột 4 (D) là giải thích.''',
+      - Cột 4 (D) là giải thích.
+      - Các cột sau không đọc.''',
     '''
     Quản lý câu hỏi về đích.
     
@@ -212,10 +234,12 @@ class _HelpScreenState extends State<HelpScreen> {
     Để sửa hãy bấm vào câu hỏi.
     
     Để nhập câu hỏi từ Excel cần lưu ý:
-      - Chỉ lấy sheet đầu tiên.
-      - Hàng đầu tiên là tiêu đề cột.
+      - Chỉ lấy 3 sheet, thứ tự sheet: 10, 20, 30 điểm
+      - Hàng đầu tiên là tiêu đề cột, các hàng sau là câu hỏi
+      - Cột 1 là STT câu hỏi
       - Cột 2 (B) & 3 (C) là Câu hỏi & Đáp án.
-      - Cột 4 (D) là giải thích.''',
+      - Cột 4 (D) là giải thích.
+      - Các cột sau không đọc.''',
     '''
     Quản lý câu hỏi phụ.
     
@@ -227,8 +251,10 @@ class _HelpScreenState extends State<HelpScreen> {
 
     Để nhập câu hỏi từ Excel cần lưu ý:
       - Chỉ lấy sheet đầu tiên.
-      - Hàng đầu tiên là tiêu đề cột.
-      - Cột 2 (B) & 3 (C) là Câu hỏi & Đáp án.''',
+      - Hàng đầu tiên là tiêu đề cột, các hàng sau là câu hỏi
+      - Cột 1 là STT câu hỏi
+      - Cột 2 (B) & 3 (C) là Câu hỏi & Đáp án.
+      - Các cột sau không đọc.''',
     '''Phần Server chưa được hoàn thành'''
   ];
 }

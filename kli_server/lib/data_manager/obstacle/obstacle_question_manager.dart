@@ -49,7 +49,6 @@ class _ObstacleQuestionManagerState extends State<ObstacleQuestionManager> {
   Future<void> getNewQuestion(String path) async {
     Map<String, List> data = await storageHandler!.readFromExcel(path, 5, 1);
 
-    logger.i('Extracting data from excel');
     final sheet = data.values.first;
 
     List<ObstacleQuestion> qL = [];
@@ -182,21 +181,22 @@ class _ObstacleQuestionManagerState extends State<ObstacleQuestionManager> {
                 allowedExtensions: ['xlsx'],
               );
 
-              if (result != null) {
-                final p = result.files.single.path!;
-                logger.i(
-                  'Chose ${storageHandler!.getRelative(p)} for match ${matchNames[selectedMatchIndex]}',
-                );
-                await getNewQuestion(p);
-                await saveNewQuestions();
-                setState(() {});
+              if (result == null) {
+                logger.i('No file selected');
                 return;
               }
-              logger.i('No file selected');
+
+              final p = result.files.single.path!;
+              logger.i('Import: ${storageHandler!.getRelative(p)}, match: ${matchNames[selectedMatchIndex]}');
+              await getNewQuestion(p);
+              await saveNewQuestions();
+              setState(() {});
             },
           ),
           Tooltip(
-              message: 'Not available yet', child: button(context, 'Export Excel', enableCondition: false)),
+            message: 'Not available yet',
+            child: button(context, 'Export Excel', enableCondition: false),
+          ),
           button(
             context,
             'Remove Questions',
@@ -207,21 +207,21 @@ class _ObstacleQuestionManagerState extends State<ObstacleQuestionManager> {
                 'Are you sure you want to delete questions for match: ${matchNames[selectedMatchIndex]}?',
                 'Removed all obstacle questions for match: ${matchNames[selectedMatchIndex]}',
               );
-              if (ret == true) {
-                if (mounted) {
-                  showToastMessage(context, 'Removed questions for match: ${matchNames[selectedMatchIndex]}');
-                }
-                await removeMatch(selectedMatch);
-                selectedMatch = ObstacleMatch(
-                  match: matchNames[selectedMatchIndex],
-                  keyword: '',
-                  imagePath: '',
-                  charCount: 0,
-                  explanation: '',
-                  hintQuestions: List<ObstacleQuestion?>.filled(5, null),
-                );
-                setState(() {});
+              if (ret != true) return;
+
+              if (mounted) {
+                showToastMessage(context, 'Removed questions (match: ${matchNames[selectedMatchIndex]})');
               }
+              await removeMatch(selectedMatch);
+              selectedMatch = ObstacleMatch(
+                match: matchNames[selectedMatchIndex],
+                keyword: '',
+                imagePath: '',
+                charCount: 0,
+                explanation: '',
+                hintQuestions: List<ObstacleQuestion?>.filled(5, null),
+              );
+              setState(() {});
             },
           ),
         ],
@@ -343,7 +343,7 @@ class _ObstacleQuestionManagerState extends State<ObstacleQuestionManager> {
                       ),
                     ),
                   ),
-                  button(context, 'Save', enableCondition: true, onPressed: () async {
+                  button(context, 'Save', onPressed: () async {
                     selectedMatch.keyword = obstacleController.text;
                     selectedMatch.charCount = obstacleController.text.replaceAll(' ', '').length;
                     logger.i('Modified keyword of match: ${matchNames[selectedMatchIndex]}');

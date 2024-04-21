@@ -6,6 +6,8 @@ import 'package:kli_utils/kli_utils.dart';
 import 'package:logger/logger.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
+TextEditingController? logPanelController;
+
 class Filter extends LogFilter {
   @override
   bool shouldLog(LogEvent event) => true;
@@ -14,11 +16,11 @@ class Filter extends LogFilter {
 late final Logger logger;
 void initLogger(String logPath) {
   logger = Logger(
-    printer: SimplePrinter(colors: false),
+    printer: SimplePrinter(colors: false, printTime: true),
     filter: Filter(),
     output: FileOutput(file: File(storageHandler!.logFile), overrideExisting: true),
   );
-  logger.i('[${DateTime.now()}] Logger init');
+  logger.i('Logger init');
 }
 
 late final PackageInfo packageInfo;
@@ -50,10 +52,11 @@ Widget button(
   BuildContext context,
   final String label, {
   double fontSize = fontSizeMedium,
-  required bool enableCondition,
+  bool enableCondition = true,
   void Function()? onPressed,
+  String disabledLabel = 'Disabled',
 }) {
-  return OutlinedButton(
+  final mainButton = OutlinedButton(
     style: ButtonStyle(
       backgroundColor: MaterialStatePropertyAll<Color>(Theme.of(context).colorScheme.background),
       padding: const MaterialStatePropertyAll<EdgeInsets>(EdgeInsets.symmetric(vertical: 20, horizontal: 15)),
@@ -61,6 +64,10 @@ Widget button(
     onPressed: enableCondition && onPressed != null ? onPressed : null,
     child: Text(label, style: TextStyle(fontSize: fontSize)),
   );
+
+  return enableCondition && onPressed != null
+      ? mainButton
+      : Tooltip(message: disabledLabel, child: mainButton);
 }
 
 AppBar managerAppBar(BuildContext context, String title) {

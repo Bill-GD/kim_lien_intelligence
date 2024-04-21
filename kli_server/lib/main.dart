@@ -15,8 +15,8 @@ void main() async {
 
   await initStorageHandler();
   initLogger(storageHandler!.logFile);
-  storageHandler = null;
   await initPackageInfo();
+  
   logMessageStream.listen((m) {
     if (m.$1 == LogType.info) logger.i(m.$2);
     if (m.$1 == LogType.warn) logger.w(m.$2);
