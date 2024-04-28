@@ -72,7 +72,7 @@ class _HelpScreenState extends State<HelpScreen> {
         children: [
           const Padding(
             padding: EdgeInsets.only(bottom: 16),
-            child: Text('Các mục', style: TextStyle(fontSize: fontSizeMedium)),
+            child: Text('Các phần', style: TextStyle(fontSize: fontSizeMedium)),
           ),
           Container(
             constraints: const BoxConstraints(maxWidth: 250),
@@ -132,7 +132,7 @@ class _HelpScreenState extends State<HelpScreen> {
                   )
                 : const Material(
                     child: Center(
-                    child: Text('No section selected'),
+                    child: Text('Chưa chọn phần'),
                   )),
           ),
         ],
