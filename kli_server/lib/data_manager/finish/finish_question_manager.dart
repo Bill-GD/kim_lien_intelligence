@@ -1,8 +1,8 @@
-import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:kli_utils/kli_utils.dart';
 
 import '../../global.dart';
+import '../import_dialog.dart';
 import 'finish_question_editor.dart';
 
 class FinishQuestionManager extends StatefulWidget {
@@ -37,9 +37,7 @@ class _FinishQuestionManagerState extends State<FinishQuestionManager> {
     super.dispose();
   }
 
-  Future<void> getNewQuestion(String path) async {
-    Map<String, List> data = await storageHandler!.readFromExcel(path, 4, 3);
-
+  Future<void> getNewQuestion(Map<String, dynamic> data) async {
     final List<FinishQuestion> questions = [];
     for (int i = 0; i < data.keys.length; i++) {
       for (final r in (data[data.keys.elementAt(i)] as List<Map>)) {
@@ -188,24 +186,22 @@ class _FinishQuestionManagerState extends State<FinishQuestionManager> {
             'Nhập từ file',
             enableCondition: selectedMatchIndex >= 0,
             onPressed: () async {
-              logger.i('Import new questions (.xlsx)');
+              Map<String, dynamic>? data =
+                  await Navigator.of(context).push<Map<String, dynamic>>(DialogRoute<Map<String, dynamic>>(
+                context: context,
+                barrierDismissible: false,
+                barrierLabel: '',
+                builder: (_) => ImportQuestionDialog(
+                  matchName: matchNames[selectedMatchIndex],
+                  maxColumnCount: 4,
+                  maxSheetCount: 3,
+                  columnWidths: const [50, 500, 150, 400, 200],
+                ),
+              ));
 
-              final result = await FilePicker.platform.pickFiles(
-                dialogTitle: 'Select File',
-                initialDirectory: storageHandler!.newDataDir.replaceAll('/', '\\'),
-                type: FileType.custom,
-                allowedExtensions: ['xlsx'],
-              );
+              if (data == null) return;
 
-              if (result == null) {
-                logger.i('No file selected');
-                return;
-              }
-
-              final p = result.files.single.path!;
-              logger.i('Import: ${storageHandler!.getRelative(p)}, match: ${matchNames[selectedMatchIndex]}');
-              logPanelController!.addText('Imported from ${storageHandler!.getRelative(p)}');
-              await getNewQuestion(p);
+              await getNewQuestion(data);
               await saveNewQuestions();
               setState(() {});
             },

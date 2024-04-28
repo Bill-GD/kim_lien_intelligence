@@ -6,7 +6,7 @@ import 'package:kli_utils/kli_utils.dart';
 import 'package:logger/logger.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
-TextEditingController? logPanelController;
+// TextEditingController? logPanelController;
 
 class Filter extends LogFilter {
   @override
@@ -164,8 +164,7 @@ class DataManager {
       (ExtraMatch, storageHandler!.extraSaveFile),
     ];
 
-    typeToFileMap.forEach((v) async {
-      final (type, file) = v;
+    for (final (type, file) in typeToFileMap) {
       List<BaseMatch> q = [];
       if (type == StartMatch) {
         q = await getAllSavedQuestions<StartMatch>(StartMatch.fromJson, file);
@@ -183,7 +182,7 @@ class DataManager {
       }
       await overwriteSave(q, file);
       logger.i('$type: Done');
-    });
+    }
   }
 
   static Future<void> overwriteSave<T>(List<T> q, String filePath) async {

@@ -157,6 +157,8 @@ class _HelpScreenState extends State<HelpScreen> {
       - Các hàng không được gộp (merge) với nhau (mỗi câu hỏi chỉ được 1 hàng).
       - Không có các hàng, cột trống ở giữa các câu hỏi (nếu có câu hỏi ở hàng 2 và 4 thì bắt buộc phải có ở hàng 3, nếu trống sẽ mất câu hỏi hàng 4)
       - Các cột cần xếp đúng thứ tự như định dạng.
+    
+    Khi chọn việc nhập câu hỏi từ file Excel, phần mềm sẽ hiển thị giao diện xem trước nội dung sẽ nhập vào. Nếu nội dung khác dự kiến, hãy bấm 'Hủy', ngược lại bấm 'Hoàn tất'.
 
     Ở phần bên trái của trang chính (trang hiện tại) có danh sách các phần của phần mềm: hướng dẫn (trang hiện tại), quản lý dữ liệu, tạo server. Khi mở trang quản lý dữ liệu sẽ có nút để mở phần quản lý dữ liệu trên màn hình.
 

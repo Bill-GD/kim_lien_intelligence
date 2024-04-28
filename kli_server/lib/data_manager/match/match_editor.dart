@@ -211,12 +211,12 @@ class _MatchEditorDialogState extends State<MatchEditorDialog> {
                   type: FileType.image,
                 );
 
-                if (result != null) {
-                  final p = result.files.single.path!;
-                  imagePaths[index] = storageHandler!.getRelative(p);
-                  logger.i('Chose ${imagePaths[index]} for player ${index + 1}');
-                  setState(() {});
-                }
+                if (result == null) return;
+                
+                final p = result.files.single.path!;
+                imagePaths[index] = storageHandler!.getRelative(p);
+                logger.i('Chose ${imagePaths[index]} for player ${index + 1}');
+                setState(() {});
               },
             ),
           ],

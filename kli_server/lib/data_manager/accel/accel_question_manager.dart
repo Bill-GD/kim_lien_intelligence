@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:kli_utils/kli_utils.dart';
 
 import '../../global.dart';
+import '../import_dialog.dart';
 import 'accel_question_editor.dart';
 
 class AccelQuestionManager extends StatefulWidget {
@@ -35,23 +36,21 @@ class _AccelQuestionManagerState extends State<AccelQuestionManager> {
     });
   }
 
-  Future<void> getNewQuestion(String path) async {
-    Map<String, List> data = await storageHandler!.readFromExcel(path, 4, 1);
-
+  Future<void> getNewQuestion(Map<String, dynamic> data) async {
     final List<AccelQuestion> allQ = [];
 
-    for (var name in data.keys) {
-      for (final r in (data[name] as List<Map>)) {
-        final v = r.values;
-        final q = AccelQuestion(
-          type: AccelQuestionType.none,
-          question: v.elementAt(1),
-          answer: v.elementAt(2),
-          explanation: v.elementAt(3) == 'null' ? '' : v.elementAt(3),
-          imagePaths: [],
-        );
-        allQ.add(q);
-      }
+    final sheet = data.values.first;
+
+    for (final r in (sheet as List<Map>)) {
+      final v = r.values;
+      final q = AccelQuestion(
+        type: AccelQuestionType.none,
+        question: v.elementAt(1),
+        answer: v.elementAt(2),
+        explanation: v.elementAt(3) == 'null' ? '' : v.elementAt(3),
+        imagePaths: [],
+      );
+      allQ.add(q);
     }
     selectedMatch = AccelMatch(match: matchNames[selectedMatchIndex], questions: allQ);
     logger.i('Loaded ${selectedMatch.questions.length} questions from excel');
@@ -170,24 +169,22 @@ class _AccelQuestionManagerState extends State<AccelQuestionManager> {
             'Nhập từ file',
             enableCondition: selectedMatchIndex >= 0,
             onPressed: () async {
-              logger.i('Import new questions (.xlsx)');
+              Map<String, dynamic>? data =
+                  await Navigator.of(context).push<Map<String, dynamic>>(DialogRoute<Map<String, dynamic>>(
+                context: context,
+                barrierDismissible: false,
+                barrierLabel: '',
+                builder: (_) => ImportQuestionDialog(
+                  matchName: matchNames[selectedMatchIndex],
+                  maxColumnCount: 4,
+                  maxSheetCount: 1,
+                  columnWidths: const [100, 400, 150, 400, 200],
+                ),
+              ));
 
-              final result = await FilePicker.platform.pickFiles(
-                dialogTitle: 'Select File',
-                initialDirectory: storageHandler!.newDataDir.replaceAll('/', '\\'),
-                type: FileType.custom,
-                allowedExtensions: ['xlsx'],
-              );
+              if (data == null) return;
 
-              if (result == null) {
-                logger.i('No file selected');
-                return;
-              }
-
-              final p = result.files.single.path!;
-              logPanelController!.addText('Imported from ${storageHandler!.getRelative(p)}');
-              logger.i('Import: ${storageHandler!.getRelative(p)}, match: ${matchNames[selectedMatchIndex]}');
-              await getNewQuestion(p);
+              await getNewQuestion(data);
               await saveNewQuestions();
               selectedQuestionIndex = -1;
               selectedImageIndex = -1;
@@ -208,7 +205,6 @@ class _AccelQuestionManagerState extends State<AccelQuestionManager> {
                   if (mounted) {
                     showToastMessage(context, 'Đã xóa (match: ${matchNames[selectedMatchIndex]})');
                   }
-                  // logPanelController!.addText('Removed questions (match: ${matchNames[selectedMatchIndex]})');
                   await removeMatch(selectedMatch);
                   selectedMatch = AccelMatch(
                     match: matchNames[selectedMatchIndex],

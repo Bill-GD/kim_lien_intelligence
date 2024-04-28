@@ -1,8 +1,8 @@
-import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:kli_utils/kli_utils.dart';
 
 import '../../global.dart';
+import '../import_dialog.dart';
 import 'extra_question_editor.dart';
 
 class ExtraQuestionManager extends StatefulWidget {
@@ -30,17 +30,16 @@ class _ExtraQuestionManagerState extends State<ExtraQuestionManager> {
     });
   }
 
-  Future<void> getNewQuestion(String path) async {
-    Map<String, List> data = await storageHandler!.readFromExcel(path, 3, 1);
-
+  Future<void> getNewQuestion(Map<String, dynamic> data) async {
     final List<ExtraQuestion> allQ = [];
-    for (var name in data.keys) {
-      for (final r in (data[name] as List<Map>)) {
-        final v = r.values;
-        final q = ExtraQuestion(question: v.elementAt(1), answer: v.elementAt(2));
-        allQ.add(q);
-      }
+    final sheet = data.values.first;
+
+    for (final r in (sheet as List<Map>)) {
+      final v = r.values;
+      final q = ExtraQuestion(question: v.elementAt(1), answer: v.elementAt(2));
+      allQ.add(q);
     }
+
     selectedMatch = ExtraMatch(match: matchNames[selectedMatchIndex], questions: allQ);
     logger.i('Loaded ${selectedMatch.questions.length} questions from excel');
   }
@@ -156,24 +155,22 @@ class _ExtraQuestionManagerState extends State<ExtraQuestionManager> {
             'Nhập từ file',
             enableCondition: selectedMatchIndex >= 0,
             onPressed: () async {
-              logger.i('Import new questions (.xlsx)');
+              Map<String, dynamic>? data =
+                  await Navigator.of(context).push<Map<String, dynamic>>(DialogRoute<Map<String, dynamic>>(
+                context: context,
+                barrierDismissible: false,
+                barrierLabel: '',
+                builder: (_) => ImportQuestionDialog(
+                  matchName: matchNames[selectedMatchIndex],
+                  maxColumnCount: 3,
+                  maxSheetCount: 1,
+                  columnWidths: const [100, 500, 250, 200, 200],
+                ),
+              ));
 
-              final result = await FilePicker.platform.pickFiles(
-                dialogTitle: 'Select File',
-                initialDirectory: storageHandler!.newDataDir.replaceAll('/', '\\'),
-                type: FileType.custom,
-                allowedExtensions: ['xlsx'],
-              );
+              if (data == null) return;
 
-              if (result == null) {
-                logger.i('No file selected');
-                return;
-              }
-
-              final p = result.files.single.path!;
-              logger.i('Import: ${storageHandler!.getRelative(p)}, match: ${matchNames[selectedMatchIndex]}');
-              logPanelController!.addText('Imported from ${storageHandler!.getRelative(p)}');
-              await getNewQuestion(p);
+              await getNewQuestion(data);
               await saveNewQuestions();
               setState(() {});
             },

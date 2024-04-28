@@ -3,36 +3,32 @@ import 'package:kli_utils/kli_utils.dart';
 
 import '../../global.dart';
 
-class ObstacleQuestionEditorDialog extends StatefulWidget {
-  final ObstacleQuestion? question;
-  final int index;
-  const ObstacleQuestionEditorDialog({super.key, this.question, required this.index});
+class ObstacleEditor extends StatefulWidget {
+  final String keyword, explanation;
+  const ObstacleEditor({super.key, required this.keyword, required this.explanation});
 
   @override
-  State<ObstacleQuestionEditorDialog> createState() => _ObstacleQuestionEditorDialogState();
+  State<ObstacleEditor> createState() => _ObstacleeEditorDialogState();
 }
 
-class _ObstacleQuestionEditorDialogState extends State<ObstacleQuestionEditorDialog> {
-  final questionController = TextEditingController();
-  final answerController = TextEditingController();
-  String? qErrorText, aErrorText;
+class _ObstacleeEditorDialogState extends State<ObstacleEditor> {
+  final keywordController = TextEditingController(), explanationController = TextEditingController();
+  String? kErrorText, eErrorText;
   bool disableDone = true;
 
   @override
   void initState() {
     super.initState();
-    logger.i('Opened obstacle question editor');
-    if (widget.question != null) {
-      disableDone = questionController.text.isEmpty || answerController.text.isEmpty;
-      questionController.text = widget.question!.question;
-      answerController.text = widget.question!.answer;
-    }
+    logger.i('Opened obstacle editor');
+    disableDone = keywordController.text.isEmpty || explanationController.text.isEmpty;
+    keywordController.text = widget.keyword;
+    explanationController.text = widget.explanation;
   }
 
   @override
   void dispose() {
-    questionController.dispose();
-    answerController.dispose();
+    keywordController.dispose();
+    explanationController.dispose();
     super.dispose();
   }
 
@@ -44,10 +40,7 @@ class _ObstacleQuestionEditorDialogState extends State<ObstacleQuestionEditorDia
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         titlePadding: const EdgeInsets.symmetric(vertical: 40, horizontal: 256),
         contentPadding: const EdgeInsets.only(bottom: 32, left: 60, right: 60),
-        title: Text(
-          widget.index < 4 ? 'Hàng ngang ${widget.index + 1}' : 'Trung tâm',
-          textAlign: TextAlign.center,
-        ),
+        title: const Text('Chướng ngại vật', textAlign: TextAlign.center),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -55,24 +48,22 @@ class _ObstacleQuestionEditorDialogState extends State<ObstacleQuestionEditorDia
             TextField(
               style: const TextStyle(fontSize: fontSizeMedium),
               onChanged: (value) {
-                disableDone = questionController.text.isEmpty || answerController.text.isEmpty;
+                disableDone = keywordController.text.isEmpty || explanationController.text.isEmpty;
                 if (value.isEmpty) {
-                  qErrorText = 'Không được trống';
+                  kErrorText = 'Không được trống';
                   setState(() {});
                   return;
                 }
-                setState(() => qErrorText = null);
+                setState(() => kErrorText = null);
               },
-              controller: questionController,
-              maxLines: 5,
-              minLines: 1,
+              controller: keywordController,
               decoration: InputDecoration(
-                labelText: 'Câu hỏi',
+                labelText: 'Keyword',
                 labelStyle: TextStyle(
                   fontWeight: FontWeight.w600,
                   color: Theme.of(context).colorScheme.primary,
                 ),
-                errorText: qErrorText,
+                errorText: kErrorText,
                 border: const OutlineInputBorder(),
               ),
             ),
@@ -80,22 +71,24 @@ class _ObstacleQuestionEditorDialogState extends State<ObstacleQuestionEditorDia
             TextField(
               style: const TextStyle(fontSize: fontSizeMedium),
               onChanged: (value) {
-                disableDone = questionController.text.isEmpty || answerController.text.isEmpty;
+                disableDone = keywordController.text.isEmpty || explanationController.text.isEmpty;
                 if (value.isEmpty) {
-                  aErrorText = 'Không được trống';
+                  eErrorText = 'Không được trống';
                   setState(() {});
                   return;
                 }
-                setState(() => aErrorText = null);
+                setState(() => eErrorText = null);
               },
-              controller: answerController,
+              controller: explanationController,
+              maxLines: 5,
+              minLines: 1,
               decoration: InputDecoration(
-                labelText: 'Đáp án',
+                labelText: 'Explanation',
                 labelStyle: TextStyle(
                   fontWeight: FontWeight.w600,
                   color: Theme.of(context).colorScheme.primary,
                 ),
-                errorText: aErrorText,
+                errorText: eErrorText,
                 border: const OutlineInputBorder(),
               ),
             ),
@@ -107,10 +100,8 @@ class _ObstacleQuestionEditorDialogState extends State<ObstacleQuestionEditorDia
             onPressed: disableDone
                 ? null
                 : () {
-                    bool hasChanged = widget.question == null
-                        ? true
-                        : questionController.text != widget.question!.question ||
-                            answerController.text != widget.question!.answer;
+                    bool hasChanged = keywordController.text != widget.keyword ||
+                        explanationController.text != widget.explanation;
 
                     if (!hasChanged) {
                       logger.i('No change, exiting');
@@ -118,15 +109,8 @@ class _ObstacleQuestionEditorDialogState extends State<ObstacleQuestionEditorDia
                       return;
                     }
 
-                    final newQ = ObstacleQuestion(
-                      widget.index,
-                      questionController.text,
-                      answerController.text,
-                      answerController.text.replaceAll(' ', '').length,
-                    );
-
-                    logger.i('Modified obstacle question: ${newQ.id}');
-                    Navigator.of(context).pop(newQ);
+                    logger.i('Modified obstacle: ${widget.keyword} -> ${keywordController.text}');
+                    Navigator.of(context).pop((keywordController.text, explanationController.text));
                   },
             child: const Text('Hoàn tất', style: TextStyle(fontSize: fontSizeMedium)),
           ),

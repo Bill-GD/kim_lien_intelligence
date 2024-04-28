@@ -5,6 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:kli_utils/kli_utils.dart';
 
 import '../../global.dart';
+import '../import_dialog.dart';
+import 'obstacle_editor.dart';
 import 'obstacle_question_editor.dart';
 
 class ObstacleQuestionManager extends StatefulWidget {
@@ -46,9 +48,7 @@ class _ObstacleQuestionManagerState extends State<ObstacleQuestionManager> {
     super.dispose();
   }
 
-  Future<void> getNewQuestion(String path) async {
-    Map<String, List> data = await storageHandler!.readFromExcel(path, 5, 1);
-
+  Future<void> getNewQuestion(Map<String, dynamic> data) async {
     final sheet = data.values.first;
 
     List<ObstacleQuestion> qL = [];
@@ -172,23 +172,22 @@ class _ObstacleQuestionManagerState extends State<ObstacleQuestionManager> {
             'Nhập từ file',
             enableCondition: selectedMatchIndex >= 0,
             onPressed: () async {
-              logger.i('Import new questions (.xlsx)');
+              Map<String, dynamic>? data =
+                  await Navigator.of(context).push<Map<String, dynamic>>(DialogRoute<Map<String, dynamic>>(
+                context: context,
+                barrierDismissible: false,
+                barrierLabel: '',
+                builder: (_) => ImportQuestionDialog(
+                  matchName: matchNames[selectedMatchIndex],
+                  maxColumnCount: 5,
+                  maxSheetCount: 1,
+                  columnWidths: const [100, 75, 500, 200, 500],
+                ),
+              ));
 
-              final result = await FilePicker.platform.pickFiles(
-                dialogTitle: 'Select File',
-                initialDirectory: storageHandler!.newDataDir.replaceAll('/', '\\'),
-                type: FileType.custom,
-                allowedExtensions: ['xlsx'],
-              );
+              if (data == null) return;
 
-              if (result == null) {
-                logger.i('No file selected');
-                return;
-              }
-
-              final p = result.files.single.path!;
-              logger.i('Import: ${storageHandler!.getRelative(p)}, match: ${matchNames[selectedMatchIndex]}');
-              await getNewQuestion(p);
+              await getNewQuestion(data);
               await saveNewQuestions();
               setState(() {});
             },
@@ -283,7 +282,7 @@ class _ObstacleQuestionManagerState extends State<ObstacleQuestionManager> {
                     final nQ = await Navigator.of(context).push<ObstacleQuestion>(
                       DialogRoute<ObstacleQuestion>(
                         context: context,
-                        builder: (_) => ObstacleEditorDialog(question: q, index: index),
+                        builder: (_) => ObstacleQuestionEditorDialog(question: q, index: index),
                       ),
                     );
 
@@ -324,29 +323,38 @@ class _ObstacleQuestionManagerState extends State<ObstacleQuestionManager> {
                   Flexible(
                     child: Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 16),
-                      child: TextField(
-                        style: const TextStyle(fontSize: fontSizeMedium),
-                        controller: obstacleController..text = selectedMatch.keyword,
-                        maxLines: 5,
-                        minLines: 1,
-                        decoration: InputDecoration(
-                          labelText: 'Đáp án',
-                          labelStyle: TextStyle(
-                            fontWeight: FontWeight.w600,
-                            color: Theme.of(context).colorScheme.primary,
-                          ),
-                          border: const OutlineInputBorder(),
+                      child: ListTile(
+                        tileColor: Theme.of(context).colorScheme.background,
+                        leadingAndTrailingTextStyle: const TextStyle(fontSize: fontSizeMedium),
+                        title: Text(selectedMatch.keyword),
+                        subtitle: Text('${selectedMatch.charCount} kí tự'),
+                        subtitleTextStyle: const TextStyle(fontSize: fontSizeSmall),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                          side: BorderSide(width: 2, color: Theme.of(context).colorScheme.onBackground),
                         ),
+                        onTap: () async {
+                          final newO = await Navigator.of(context).push<(String, String)>(
+                            DialogRoute<(String, String)>(
+                              context: context,
+                              builder: (_) => ObstacleEditor(
+                                keyword: selectedMatch.keyword,
+                                explanation: selectedMatch.explanation,
+                              ),
+                            ),
+                          );
+
+                          if (newO == null) return;
+
+                          selectedMatch.keyword = newO.$1;
+                          selectedMatch.explanation = newO.$2;
+                          selectedMatch.charCount = newO.$1.replaceAll(' ', '').length;
+                          await updateQuestions(selectedMatch);
+                          setState(() {});
+                        },
                       ),
                     ),
                   ),
-                  button(context, 'Lưu CNV', onPressed: () async {
-                    selectedMatch.keyword = obstacleController.text;
-                    selectedMatch.charCount = obstacleController.text.replaceAll(' ', '').length;
-                    logger.i('Modified keyword of match: ${matchNames[selectedMatchIndex]}');
-                    showToastMessage(context, 'Đã lưu CNV');
-                    await updateQuestions(selectedMatch);
-                  }),
                 ],
               ),
             ),
@@ -368,6 +376,7 @@ class _ObstacleQuestionManagerState extends State<ObstacleQuestionManager> {
                     ),
                   )),
           ),
+          const SizedBox(height: 20),
           if (selectedMatchIndex < 0)
             const SizedBox.shrink()
           else
