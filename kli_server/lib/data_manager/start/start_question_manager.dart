@@ -38,9 +38,14 @@ class _StartQuestionManagerState extends State<StartQuestionManager> {
       final List<StartQuestion> questions = [];
 
       for (final r in (data[sheet] as List<Map>)) {
-        final v = r.values;
-        final q = StartQuestion(StartQuestion.mapTypeValue(v.elementAt(1)), v.elementAt(2), v.elementAt(3));
-        questions.add(q);
+        try {
+          final v = r.values;
+          final q = StartQuestion(StartQuestion.mapTypeValue(v.elementAt(1)), v.elementAt(2), v.elementAt(3));
+          questions.add(q);
+        } on StateError {
+          showToastMessage(context, 'Sai định dạng');
+          break;
+        }
       }
       allQ.putIfAbsent(idx, () => questions);
       idx++;

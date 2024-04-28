@@ -53,22 +53,33 @@ class _ObstacleQuestionManagerState extends State<ObstacleQuestionManager> {
 
     List<ObstacleQuestion> qL = [];
     for (int i = 0; i < sheet.length - 1; i++) {
-      qL.add(ObstacleQuestion(
-        i,
-        sheet[i].values.elementAt(2),
-        sheet[i].values.elementAt(3),
-        int.parse(sheet[i].values.elementAt(1)),
-      ));
+      try {
+        qL.add(ObstacleQuestion(
+          i,
+          sheet[i].values.elementAt(2),
+          sheet[i].values.elementAt(3),
+          int.parse(sheet[i].values.elementAt(1)),
+        ));
+      } on FormatException {
+        showToastMessage(context, 'Sai định dạng (số ký tự)');
+        break;
+      }
     }
 
-    selectedMatch = ObstacleMatch(
-      match: matchNames[selectedMatchIndex],
-      keyword: sheet[5].values.elementAt(3),
-      imagePath: '',
-      charCount: int.parse(sheet[5].values.elementAt(1)),
-      explanation: sheet[5].values.elementAt(4),
-      hintQuestions: qL,
-    );
+    try {
+      selectedMatch = ObstacleMatch(
+        match: matchNames[selectedMatchIndex],
+        keyword: sheet[5].values.elementAt(3),
+        imagePath: '',
+        charCount: int.parse(sheet[5].values.elementAt(1)),
+        explanation: sheet[5].values.elementAt(4),
+        hintQuestions: qL,
+      );
+    } on RangeError catch (e, stack) {
+      showToastMessage(context, 'Sai định dạng (không đủ cột/hàng)');
+      logger.e(e, stackTrace: stack);
+      return;
+    }
     logger.i('Loaded ${selectedMatch.match} (${selectedMatch.keyword})');
   }
 

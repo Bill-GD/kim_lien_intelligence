@@ -51,6 +51,22 @@ class _AccelQuestionManagerState extends State<AccelQuestionManager> {
         imagePaths: [],
       );
       allQ.add(q);
+      if (allQ.length >= 4) {
+        logger.i('Got 4 questions -> break');
+        break;
+      }
+    }
+    if (allQ.length < 4) {
+      logger.i('Got less than 4 questions -> creating empty questions');
+      while (allQ.length < 4) {
+        allQ.add(AccelQuestion(
+          type: AccelQuestionType.none,
+          question: '',
+          answer: '',
+          explanation: '',
+          imagePaths: [],
+        ));
+      }
     }
     selectedMatch = AccelMatch(match: matchNames[selectedMatchIndex], questions: allQ);
     logger.i('Loaded ${selectedMatch.questions.length} questions from excel');
@@ -266,14 +282,20 @@ class _AccelQuestionManagerState extends State<AccelQuestionManager> {
                 return ListTile(
                   leading: Text("${index + 1}"),
                   tileColor: Theme.of(context).colorScheme.background,
-                  leadingAndTrailingTextStyle: const TextStyle(fontSize: fontSizeMedium),
+                  leadingAndTrailingTextStyle: const TextStyle(
+                    fontSize: fontSizeMedium,
+                    overflow: TextOverflow.fade,
+                  ),
                   title: Text(
                     q?.question ?? '',
                     style: const TextStyle(fontSize: fontSizeMedium),
                   ),
                   subtitle: Text(q?.type != null ? 'Loại: ${AccelQuestion.mapTypeDisplay(q!.type)}' : ''),
                   subtitleTextStyle: const TextStyle(fontSize: fontSizeSmall),
-                  trailing: Text(q?.answer ?? ''),
+                  trailing: Container(
+                    constraints: const BoxConstraints(maxHeight: 100, maxWidth: 400),
+                    child: Text(q?.answer ?? ''),
+                  ),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10),
                     side: BorderSide(

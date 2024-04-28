@@ -89,10 +89,11 @@ class _ServerSetupPageState extends State<ServerSetupPage> {
 
                   try {
                     await KLIServer.start();
-                  } on Exception catch (error) {
+                  } on Exception catch (error, stack) {
                     if (context.mounted) {
                       showToastMessage(context, error.toString());
                     }
+                    logger.e(error, stackTrace: stack);
                     return;
                   }
 

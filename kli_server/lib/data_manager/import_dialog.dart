@@ -90,9 +90,8 @@ class _ImportQuestionDialogState extends State<ImportQuestionDialog> with Ticker
                 ),
               ],
             ),
-            const SizedBox(width: 40),
             data.keys.length < 2
-                ? const SizedBox.shrink()
+                ? const SizedBox(height: 20)
                 : TabBar(
                     controller: tabController,
                     onTap: (value) {
@@ -141,7 +140,7 @@ class _ImportQuestionDialogState extends State<ImportQuestionDialog> with Ticker
     for (int i = 0; i < colTitles.length; i++) {
       final col = colTitles.elementAt(i);
       headerRow.add(Text(
-        col,
+        col == 'null' ? 'NA' : col,
         style: TextStyle(
           fontSize: fontSizeMSmall,
           color: i > nonNullColCount - 1 && col == 'null' ? Colors.red : null,
@@ -156,7 +155,7 @@ class _ImportQuestionDialogState extends State<ImportQuestionDialog> with Ticker
       for (int i = 0; i < q.values.length; i++) {
         final val = q.values.elementAt(i);
         row.add(Text(
-          val.toString(),
+          val.toString() == 'null' ? 'NA' : val.toString(),
           style: TextStyle(
             fontSize: fontSizeMSmall,
             color: i > nonNullColCount - 1 && val.toString() == 'null' ? Colors.red : null,

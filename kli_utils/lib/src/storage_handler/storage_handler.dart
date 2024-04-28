@@ -20,12 +20,12 @@ class StorageHandler {
   String get newDataDir => '$_userDataDir\\NewData';
 
   String get saveDataDir => '$_userDataDir\\SavedData';
-  String get matchSaveFile => '$saveDataDir\\match.txt';
-  String get startSaveFile => '$saveDataDir\\start.txt';
-  String get obstacleSaveFile => '$saveDataDir\\obstacle.txt';
-  String get accelSaveFile => '$saveDataDir\\accel.txt';
-  String get finishSaveFile => '$saveDataDir\\finish.txt';
-  String get extraSaveFile => '$saveDataDir\\extra.txt';
+  String get matchSaveFile => '$saveDataDir\\match.json';
+  String get startSaveFile => '$saveDataDir\\start.json';
+  String get obstacleSaveFile => '$saveDataDir\\obstacle.json';
+  String get accelSaveFile => '$saveDataDir\\accel.json';
+  String get finishSaveFile => '$saveDataDir\\finish.json';
+  String get extraSaveFile => '$saveDataDir\\extra.json';
 
   /// Use [StorageHandler.init] to create an instance instead.
   StorageHandler(this._parentFolder) : _userDataDir = '$_parentFolder\\UserData';

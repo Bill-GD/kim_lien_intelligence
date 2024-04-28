@@ -146,8 +146,8 @@ class DataManager {
     List<T> q = [];
     try {
       q = (jsonDecode(saved) as List).map((e) => func(e)).toList();
-    } on Exception catch (e) {
-      logger.e(e);
+    } on Exception catch (e, stack) {
+      logger.e(e, stackTrace: stack);
     }
     return q;
   }
