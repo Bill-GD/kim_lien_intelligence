@@ -110,20 +110,17 @@ class _ExtraEditorDialogState extends State<ExtraEditorDialog> {
             onPressed: disableDone
                 ? null
                 : () {
+                    final qTrim = questionController.text.trim(), aTrim = answerController.text.trim();
                     bool hasChanged = createNew
                         ? true
-                        : questionController.text != widget.question!.question ||
-                            answerController.text != widget.question!.answer;
+                        : qTrim != widget.question!.question || aTrim != widget.question!.answer;
 
                     if (!hasChanged) {
                       logger.i('No change, exiting');
                       Navigator.of(context).pop();
                       return;
                     }
-                    final newQ = ExtraQuestion(
-                      question: questionController.text,
-                      answer: answerController.text,
-                    );
+                    final newQ = ExtraQuestion(question: qTrim, answer: aTrim);
 
                     logger.i('${createNew ? 'Created' : 'Modified'} extra question');
                     Navigator.of(context).pop(newQ);

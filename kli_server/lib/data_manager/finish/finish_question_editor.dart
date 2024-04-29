@@ -282,11 +282,14 @@ class _FinishEditorDialogState extends State<FinishEditorDialog> {
             onPressed: disableDone
                 ? null
                 : () {
+                    final qTrim = questionController.text.trim(),
+                        aTrim = answerController.text.trim(),
+                        eTrim = explanationController.text.trim();
                     bool hasChanged = createNew
                         ? true
-                        : questionController.text != widget.question!.question ||
-                            answerController.text != widget.question!.answer ||
-                            explanationController.text != widget.question!.explanation ||
+                        : qTrim != widget.question!.question ||
+                            aTrim != widget.question!.answer ||
+                            eTrim != widget.question!.explanation ||
                             selectedPointValue != widget.question!.point ||
                             newMediaPath != widget.question!.mediaPath;
 
@@ -297,9 +300,9 @@ class _FinishEditorDialogState extends State<FinishEditorDialog> {
                     }
                     final newQ = FinishQuestion(
                       point: selectedPointValue,
-                      question: questionController.text,
-                      answer: answerController.text,
-                      explanation: explanationController.text,
+                      question: qTrim,
+                      answer: aTrim,
+                      explanation: eTrim,
                       mediaPath: newMediaPath,
                     );
 

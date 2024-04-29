@@ -129,11 +129,14 @@ class _AccelEditorDialogState extends State<AccelEditorDialog> {
             onPressed: disableDone
                 ? null
                 : () {
+                    final qTrim = questionController.text.trim(),
+                        aTrim = answerController.text.trim(),
+                        eTrim = explanationController.text.trim();
                     bool hasChanged = createNew
                         ? true
-                        : questionController.text != widget.question!.question ||
-                            answerController.text != widget.question!.answer ||
-                            explanationController.text != widget.question!.explanation ||
+                        : qTrim != widget.question!.question ||
+                            aTrim != widget.question!.answer ||
+                            eTrim != widget.question!.explanation ||
                             type != widget.question!.type;
 
                     if (!hasChanged) {
@@ -143,9 +146,9 @@ class _AccelEditorDialogState extends State<AccelEditorDialog> {
                     }
                     final newQ = AccelQuestion(
                       type: type,
-                      question: questionController.text,
-                      answer: answerController.text,
-                      explanation: explanationController.text,
+                      question: qTrim,
+                      answer: aTrim,
+                      explanation: eTrim,
                       imagePaths: createNew ? [] : widget.question!.imagePaths,
                     );
 

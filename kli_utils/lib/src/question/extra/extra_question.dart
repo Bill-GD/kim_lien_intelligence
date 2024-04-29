@@ -2,10 +2,7 @@ class ExtraQuestion {
   final String question;
   final String answer;
 
-  const ExtraQuestion({
-    required this.question,
-    required this.answer,
-  });
+  const ExtraQuestion({required this.question, required this.answer});
 
   Map<String, dynamic> toJson() => {'question': question, 'answer': answer};
 

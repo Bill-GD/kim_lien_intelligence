@@ -100,8 +100,8 @@ class _ObstacleeEditorDialogState extends State<ObstacleEditor> {
             onPressed: disableDone
                 ? null
                 : () {
-                    bool hasChanged = keywordController.text != widget.keyword ||
-                        explanationController.text != widget.explanation;
+                    final kTrim = keywordController.text.trim(), eTrim = explanationController.text.trim();
+                    bool hasChanged = kTrim != widget.keyword || eTrim != widget.explanation;
 
                     if (!hasChanged) {
                       logger.i('No change, exiting');
@@ -110,7 +110,7 @@ class _ObstacleeEditorDialogState extends State<ObstacleEditor> {
                     }
 
                     logger.i('Modified obstacle: ${widget.keyword} -> ${keywordController.text}');
-                    Navigator.of(context).pop((keywordController.text, explanationController.text));
+                    Navigator.of(context).pop((kTrim, eTrim));
                   },
             child: const Text('Hoàn tất', style: TextStyle(fontSize: fontSizeMedium)),
           ),

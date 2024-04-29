@@ -40,10 +40,14 @@ class _StartQuestionManagerState extends State<StartQuestionManager> {
       for (final r in (data[sheet] as List<Map>)) {
         try {
           final v = r.values;
-          final q = StartQuestion(StartQuestion.mapTypeValue(v.elementAt(1)), v.elementAt(2), v.elementAt(3));
+          final q = StartQuestion(
+            subject: StartQuestion.mapTypeValue(v.elementAt(1)),
+            question: v.elementAt(2),
+            answer: v.elementAt(3),
+          );
           questions.add(q);
         } on StateError {
-          showToastMessage(context, 'Sai định dạng');
+          showToastMessage(context, 'Sai định dạng (lĩnh vực)');
           break;
         }
       }

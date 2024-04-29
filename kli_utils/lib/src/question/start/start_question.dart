@@ -5,7 +5,7 @@ class StartQuestion {
   final String question;
   final String answer;
 
-  const StartQuestion(this.subject, this.question, this.answer);
+  const StartQuestion({required this.subject, required this.question, required this.answer});
 
   Map<String, dynamic> toJson() => {
         'subject': subject.name,
@@ -15,9 +15,9 @@ class StartQuestion {
 
   factory StartQuestion.fromJson(Map<String, dynamic> json) {
     return StartQuestion(
-      StartQuestionSubject.values.byName(json['subject']),
-      json['question'],
-      json['answer'],
+      subject: StartQuestionSubject.values.byName(json['subject']),
+      question: json['question'],
+      answer: json['answer'],
     );
   }
 

@@ -4,7 +4,12 @@ class ObstacleQuestion {
   final String answer;
   final int charCount;
 
-  const ObstacleQuestion(this.id, this.question, this.answer, this.charCount);
+  ObstacleQuestion({
+    required this.id,
+    required this.question,
+    required this.answer,
+    required this.charCount,
+  });
 
   Map<String, dynamic> toJson() => {
         'id': id,
@@ -15,10 +20,10 @@ class ObstacleQuestion {
 
   factory ObstacleQuestion.fromJson(Map<String, dynamic> json) {
     return ObstacleQuestion(
-      json['id'],
-      json['question'],
-      json['answer'],
-      json['charCount'],
+      id: json['id'],
+      question: json['question'],
+      answer: json['answer'],
+      charCount: json['charCount'],
     );
   }
 }

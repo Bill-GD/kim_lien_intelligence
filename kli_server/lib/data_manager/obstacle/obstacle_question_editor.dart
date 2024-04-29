@@ -107,10 +107,10 @@ class _ObstacleQuestionEditorDialogState extends State<ObstacleQuestionEditorDia
             onPressed: disableDone
                 ? null
                 : () {
+                    final qTrim = questionController.text.trim(), aTrim = answerController.text.trim();
                     bool hasChanged = widget.question == null
                         ? true
-                        : questionController.text != widget.question!.question ||
-                            answerController.text != widget.question!.answer;
+                        : qTrim != widget.question!.question || aTrim != widget.question!.answer;
 
                     if (!hasChanged) {
                       logger.i('No change, exiting');
@@ -119,10 +119,10 @@ class _ObstacleQuestionEditorDialogState extends State<ObstacleQuestionEditorDia
                     }
 
                     final newQ = ObstacleQuestion(
-                      widget.index,
-                      questionController.text,
-                      answerController.text,
-                      answerController.text.replaceAll(' ', '').length,
+                      id: widget.index,
+                      question: qTrim,
+                      answer: aTrim,
+                      charCount: aTrim.replaceAll(' ', '').length,
                     );
 
                     logger.i('Modified obstacle question: ${newQ.id}');

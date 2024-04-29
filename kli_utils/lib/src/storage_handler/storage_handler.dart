@@ -130,14 +130,8 @@ class StorageHandler {
 
         int cIdx = 0;
         for (final cell in row) {
-          if (cIdx >= maxColumnCount) {
-            // logMessageController.add((
-            //   LogType.info,
-            //   'row=${rIdx + 1} -> maxColumnCount exceeded -> break',
-            // ));
-            break;
-          }
-
+          if (cIdx >= maxColumnCount) break;
+          
           rec[attributes.elementAt(cIdx)] = (cell?.value).toString();
           cIdx++;
         }

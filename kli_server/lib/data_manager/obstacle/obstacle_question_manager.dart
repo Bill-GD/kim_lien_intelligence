@@ -55,10 +55,10 @@ class _ObstacleQuestionManagerState extends State<ObstacleQuestionManager> {
     for (int i = 0; i < sheet.length - 1; i++) {
       try {
         qL.add(ObstacleQuestion(
-          i,
-          sheet[i].values.elementAt(2),
-          sheet[i].values.elementAt(3),
-          int.parse(sheet[i].values.elementAt(1)),
+          id: i,
+          question: sheet[i].values.elementAt(2),
+          answer: sheet[i].values.elementAt(3),
+          charCount: int.parse(sheet[i].values.elementAt(1)),
         ));
       } on FormatException {
         showToastMessage(context, 'Sai định dạng (số ký tự)');

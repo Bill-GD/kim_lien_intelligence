@@ -43,7 +43,7 @@ class _ImportQuestionDialogState extends State<ImportQuestionDialog> with Ticker
       body: AlertDialog(
         title: const Text('Nhập câu hỏi từ file (Xem trước)', textAlign: TextAlign.center),
         content: Column(
-          mainAxisSize: MainAxisSize.min,
+          mainAxisSize: data.isEmpty ? MainAxisSize.min : MainAxisSize.max,
           children: [
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -121,7 +121,10 @@ class _ImportQuestionDialogState extends State<ImportQuestionDialog> with Ticker
             child: const Text('Hoàn tất', style: TextStyle(fontSize: fontSizeMSmall)),
           ),
           TextButton(
-            child: const Text('Hủy', style: TextStyle(fontSize: fontSizeMSmall)),
+            child: Text(
+              'Hủy',
+              style: TextStyle(fontSize: fontSizeMSmall, color: Theme.of(context).colorScheme.error),
+            ),
             onPressed: () {
               Navigator.of(context).pop();
             },
@@ -139,11 +142,14 @@ class _ImportQuestionDialogState extends State<ImportQuestionDialog> with Ticker
 
     for (int i = 0; i < colTitles.length; i++) {
       final col = colTitles.elementAt(i);
-      headerRow.add(Text(
-        col == 'null' ? 'NA' : col,
-        style: TextStyle(
-          fontSize: fontSizeMSmall,
-          color: i > nonNullColCount - 1 && col == 'null' ? Colors.red : null,
+      headerRow.add(Padding(
+        padding: const EdgeInsets.symmetric(vertical: 16),
+        child: Text(
+          col == 'null' ? 'NA' : col,
+          style: TextStyle(
+            fontSize: fontSizeMSmall,
+            color: i > nonNullColCount - 1 && col == 'null' ? Colors.red : null,
+          ),
         ),
       ));
     }
@@ -154,11 +160,14 @@ class _ImportQuestionDialogState extends State<ImportQuestionDialog> with Ticker
       final row = <Widget>[];
       for (int i = 0; i < q.values.length; i++) {
         final val = q.values.elementAt(i);
-        row.add(Text(
-          val.toString() == 'null' ? 'NA' : val.toString(),
-          style: TextStyle(
-            fontSize: fontSizeMSmall,
-            color: i > nonNullColCount - 1 && val.toString() == 'null' ? Colors.red : null,
+        row.add(Padding(
+          padding: const EdgeInsets.symmetric(vertical: 8),
+          child: Text(
+            val.toString() == 'null' ? 'NA' : val.toString(),
+            style: TextStyle(
+              fontSize: fontSizeMSmall,
+              color: i > nonNullColCount - 1 && val.toString() == 'null' ? Colors.red : null,
+            ),
           ),
         ));
       }

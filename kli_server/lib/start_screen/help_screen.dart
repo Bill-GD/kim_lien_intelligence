@@ -60,7 +60,8 @@ class _HelpScreenState extends State<HelpScreen> {
               sectionList(),
               instructions(),
             ],
-          )
+          ),
+          const SizedBox(height: 50),
         ],
       ),
     );

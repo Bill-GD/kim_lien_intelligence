@@ -154,10 +154,11 @@ class _StartEditorDialogState extends State<StartEditorDialog> {
             onPressed: disableDone
                 ? null
                 : () {
+                    final qTrim = questionController.text.trim(), aTrim = answerController.text.trim();
                     bool hasChanged = widget.question == null
                         ? true
-                        : questionController.text != widget.question!.question ||
-                            answerController.text != widget.question!.answer ||
+                        : qTrim != widget.question!.question ||
+                            aTrim != widget.question!.answer ||
                             type != widget.question!.subject ||
                             pos != widget.playerPos;
 
@@ -167,11 +168,7 @@ class _StartEditorDialogState extends State<StartEditorDialog> {
                       return;
                     }
 
-                    final newQ = StartQuestion(
-                      type,
-                      questionController.text,
-                      answerController.text,
-                    );
+                    final newQ = StartQuestion(subject: type, question: qTrim, answer: aTrim);
 
                     logger.i(
                       '${widget.question == null ? 'Created' : 'Modified'} start question: ${newQ.subject.name}',

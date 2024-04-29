@@ -127,11 +127,11 @@ class _MatchEditorDialogState extends State<MatchEditorDialog> {
                     }
 
                     final newMatch = KLIMatch(
-                      _matchNameController.text,
+                      _matchNameController.text.trim(),
                       _playerNameControllers.map((c) {
                         return c.text.isEmpty
                             ? null
-                            : KLIPlayer(c.text, imagePaths[_playerNameControllers.indexOf(c)]);
+                            : KLIPlayer(c.text.trim(), imagePaths[_playerNameControllers.indexOf(c)]);
                       }).toList(),
                     );
 
@@ -212,7 +212,7 @@ class _MatchEditorDialogState extends State<MatchEditorDialog> {
                 );
 
                 if (result == null) return;
-                
+
                 final p = result.files.single.path!;
                 imagePaths[index] = storageHandler!.getRelative(p);
                 logger.i('Chose ${imagePaths[index]} for player ${index + 1}');
