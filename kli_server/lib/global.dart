@@ -6,8 +6,6 @@ import 'package:kli_utils/kli_utils.dart';
 import 'package:logger/logger.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
-// TextEditingController? logPanelController;
-
 class Filter extends LogFilter {
   @override
   bool shouldLog(LogEvent event) => true;

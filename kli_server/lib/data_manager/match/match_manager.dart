@@ -88,7 +88,6 @@ class _MatchManagerState extends State<MatchManager> {
               if (newMatch != null) {
                 matches.add(newMatch);
                 await overwriteSave();
-                // logPanelController!.addText('Added match: ${newMatch.name}');
                 setState(() {});
               }
             },
@@ -133,7 +132,6 @@ class _MatchManagerState extends State<MatchManager> {
                 acceptLogMessage: 'Removed match: ${matches[currentMatchIndex].name}',
                 onAccept: () async {
                   if (mounted) showToastMessage(context, 'Đã xóa trận: ${matches[currentMatchIndex].name}');
-                  // logPanelController!.addText('Removed match: ${matches[currentMatchIndex].name}');
                   matches.removeAt(currentMatchIndex);
                   await overwriteSave();
                   setState(() => currentMatchIndex = -1);

@@ -188,7 +188,6 @@ class _ExtraQuestionManagerState extends State<ExtraQuestionManager> {
                   if (mounted) {
                     showToastMessage(context, 'Đã xóa (match: ${matchNames[selectedMatchIndex]})');
                   }
-                  // logPanelController!.addText('Removed questions (match: ${matchNames[selectedMatchIndex]})');
                   await removeMatch(selectedMatch);
                   selectedMatch = ExtraMatch(match: '', questions: []);
                   setState(() {});

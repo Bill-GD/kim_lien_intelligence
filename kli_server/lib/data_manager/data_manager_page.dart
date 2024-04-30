@@ -32,12 +32,6 @@ class _DataManagerPageState extends State<DataManagerPage> {
   @override
   void initState() {
     super.initState();
-    // logPanelController = TextEditingController()
-    //   ..addListener(() {
-    //     setState(() {});
-    //   });
-
-    // initStorageHandler().whenComplete(() {
     contentPages = [
       const MatchManager(),
       const StartQuestionManager(),
@@ -47,14 +41,10 @@ class _DataManagerPageState extends State<DataManagerPage> {
       const ExtraQuestionManager(),
     ];
     setState(() => isLoading = false);
-    // });
   }
 
   @override
   void dispose() {
-    // logger.i('Disposing storage handler...');
-    // storageHandler = null;
-    // logPanelController!.dispose();
     super.dispose();
   }
 
@@ -90,25 +80,6 @@ class _DataManagerPageState extends State<DataManagerPage> {
                 ),
                 subtitle: const SizedBox.shrink(),
               ),
-              // footer: SideNavigationBarFooter(
-              //   label: Container(
-              //     padding: const EdgeInsets.only(left: 8),
-              //     decoration: BoxDecoration(
-              //       color: Theme.of(context).colorScheme.background,
-              //       border: Border.all(width: 1, color: Theme.of(context).colorScheme.onBackground),
-              //     ),
-              //     constraints: const BoxConstraints(maxHeight: 450),
-              //     child: TextFormField(
-              //       style: TextStyle(
-              //         fontSize: fontSizeSmall,
-              //         color: Theme.of(context).colorScheme.onBackground,
-              //       ),
-              //       maxLines: 40,
-              //       readOnly: true,
-              //       controller: logPanelController,
-              //     ),
-              //   ),
-              // ),
               items: const [
                 SideNavigationBarItem(label: 'Trận đấu', icon: Icons.settings_rounded),
                 SideNavigationBarItem(label: 'Khởi động', icon: Icons.start_rounded),

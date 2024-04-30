@@ -16,7 +16,7 @@ class _HelpScreenState extends State<HelpScreen> {
   int selectedSectionIndex = -1;
   final helpController = TextEditingController();
   List<String> sectionNames = [
-    'Chung',
+    'Tổng quan',
     'Trận đấu',
     'Khởi động',
     'Chướng ngại vật',
@@ -37,8 +37,10 @@ class _HelpScreenState extends State<HelpScreen> {
     return Scaffold(
       backgroundColor: Colors.transparent,
       body: Column(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        // mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        mainAxisSize: MainAxisSize.min,
         children: [
+          const SizedBox(height: 100),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             crossAxisAlignment: CrossAxisAlignment.center,
@@ -53,6 +55,7 @@ class _HelpScreenState extends State<HelpScreen> {
               button(context, 'Mở file thông tin chi tiết'),
             ],
           ),
+          const SizedBox(height: 50),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             crossAxisAlignment: CrossAxisAlignment.center,
@@ -61,7 +64,6 @@ class _HelpScreenState extends State<HelpScreen> {
               instructions(),
             ],
           ),
-          const SizedBox(height: 50),
         ],
       ),
     );

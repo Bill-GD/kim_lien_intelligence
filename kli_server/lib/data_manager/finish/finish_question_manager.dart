@@ -220,7 +220,6 @@ class _FinishQuestionManagerState extends State<FinishQuestionManager> {
                   if (mounted) {
                     showToastMessage(context, 'Đã xóa (match: ${matchNames[selectedMatchIndex]})');
                   }
-                  // logPanelController!.addText('Removed questions (match: ${matchNames[selectedMatchIndex]})');
                   await removeMatch(selectedMatch);
                   selectedMatch = FinishMatch(match: '', questions: []);
                   setState(() {});

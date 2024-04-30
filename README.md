@@ -1,5 +1,7 @@
 # kim_lien_intelligence
 
+![GitHub repo size](https://img.shields.io/github/repo-size/Bill-GD/kim_lien_intelligence?style=plastic) ![GitHub repo size](https://img.shields.io/github/languages/code-size/Bill-GD/kim_lien_intelligence?style=plastic)
+
 A set of 2 apps and 1 lib.
 
 ## KLI Server

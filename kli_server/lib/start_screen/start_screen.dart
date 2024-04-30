@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:kli_utils/kli_utils.dart';
@@ -89,16 +90,58 @@ class _StartPageState extends State<StartPage> with WindowListener {
                 ),
               ),
               footer: SideNavigationBarFooter(
-                label: Text(
-                  'v${packageInfo.version}.${packageInfo.buildNumber}',
-                  style: TextStyle(color: Theme.of(context).colorScheme.secondary.withOpacity(0.8)),
+                label: GestureDetector(
+                  onTap: () async {
+                    logger.i('Opening changelog...');
+                    await showDialog(
+                      context: context,
+                      builder: (context) {
+                        final split = changelog.split(RegExp("(?={)|(?<=})"));
+                        return AlertDialog(
+                          title: const Text(
+                            'Changelog',
+                            textAlign: TextAlign.center,
+                          ),
+                          content: SingleChildScrollView(
+                            child: RichText(
+                              text: TextSpan(
+                                children: <InlineSpan>[
+                                  for (String t in split)
+                                    t.startsWith('{')
+                                        ? TextSpan(
+                                            text: t.substring(1, t.length - 1),
+                                            style: const TextStyle(
+                                                decoration: TextDecoration.underline, color: Colors.blue),
+                                            recognizer: TapGestureRecognizer()
+                                              ..onTap = () => launchUrl(
+                                                    Uri.parse(
+                                                      t.contains('latest')
+                                                          ? 'https://github.com/Bill-GD/kim_lien_intelligence/commit'
+                                                          : 'https://github.com/Bill-GD/kim_lien_intelligence/commit/${t.substring(1, t.length - 1)}',
+                                                    ),
+                                                  ),
+                                          )
+                                        : TextSpan(text: t),
+                                ],
+                              ),
+                              softWrap: true,
+                            ),
+                          ),
+                        );
+                      },
+                    );
+                  },
+                  child: Text(
+                    'v${packageInfo.version}.${packageInfo.buildNumber}',
+                    style: TextStyle(color: Theme.of(context).colorScheme.secondary.withOpacity(0.8)),
+                  ),
                 ),
               ),
               items: const [
                 SideNavigationBarItem(label: 'Hướng dẫn', icon: FontAwesomeIcons.circleQuestion),
                 SideNavigationBarItem(label: 'Quản lý dữ liệu', icon: FontAwesomeIcons.database),
                 SideNavigationBarItem(label: 'Server Setup', icon: FontAwesomeIcons.server),
-                SideNavigationBarItem(label: 'Log', icon: FontAwesomeIcons.solidFile),
+                SideNavigationBarItem(label: 'Miscellaneous', icon: FontAwesomeIcons.circlePlus),
               ],
               onTap: (newIndex) {
                 if (newIndex == 2) logger.i('Accessing help page');
@@ -159,4 +202,96 @@ class _StartPageState extends State<StartPage> with WindowListener {
       ),
     );
   }
+
+  String changelog = """
+  0.2.8.3 ({latest}):
+  - Added changelog & changelog view in app
+  - Changed help screen layout to avoid overflow on launch
+
+  0.2.8.2 ({8491f11}):
+  - Trim all text input fields
+  - Import preview line spacing
+  - Named parameters consistency
+
+  0.2.8.1 ({c858fb4}):
+  - Changed all save files to json
+  - Notify on errors where applicable
+
+  0.2.8 ({f06065d}):
+  - Added preview window for importing data -> can check for errors in data
+  - Added obstacle editor (NOT obstacle QUESTION editor)
+
+  0.2.7.1 ({dc7ecea}):
+  - Only enable editor 'Done' when all required fields is filled
+  - Fixed changing match name delete all of its saved questions
+
+  0.2.7 ({f41ab9c}):
+  - Added "localization"
+  - Added accel question type
+  - Better confirm dialog
+
+  0.2.6.3 ({34330ac}):
+  - Added confirm dialog when deleting questions
+  - Backend changes: early returns, save files structure
+  - Shortened some messages
+  - Log message has time
+  - Button to open app folder, instruction file, log file
+
+  0.2.6.2 ({7096e17}):
+  - Generics for question managers
+  - New background image
+  - Ensure window only show after forced fullscreen
+  - Added exit button in start screen
+
+  0.2.6.1 ({4e00f85}):
+  - Help screen is first/default page in start screen
+
+  0.2.6 ({6b65e46}):
+  - Added help screen
+  - Storage handler excel reader: limit sheet count
+  
+  0.2.5 ({119b134}):
+  - Added feature to add singular start question
+  - Fixed manager bug related to nullable
+  - Added acceleration question manager
+  - Minor fixes: match manager background, can't add start question, wrong log messages
+
+  0.2.4 ({e155b1c}):
+  - Better seekbar for finish question video
+  - Notify if media file isn't found at specified path
+  - Extra question manager
+  - Changed sdk lower bound: 2.19.6 -> 3.0 (record/pattern)
+  - Better custom list tile for question lists
+
+  0.2.3 ({2cb1ac7}):
+  - Finish question video rework: change lib, can remove
+  - Output log in release build
+  - Updated data manager background
+
+  0.2.2 ({2eea3c9}):
+  - Wrap Start questions in a match
+  - Log output to file, even from kli_utils
+  - Added finish question manager
+  - Change log file location
+
+  0.2.1 ({5f21bdf}):
+  - Obstacle question manager: wrap questions in a match
+
+  0.2 ({e8fc93f}):
+  - Added Match manager: match name, players
+  - Added Start question manager: question list, add/edit/remove
+  - App theme, icon
+  - Better storage handler: init folders/files, read/write file
+
+  0.1.x ({333b4f3}):
+  - Added basic messaging (with utf8)
+  - Basic setup for data manager: UI
+  - Added logger: logs to console
+  - Added basic start screen: side navigation, app version
+  - Added storage handler: read excel, write to file
+  - Force fullscreen on launch
+
+  0.0.1.x ({d9628a9}):
+  - Initial version -> setup workspace
+  - Added basic server setup & server-client connection""";
 }

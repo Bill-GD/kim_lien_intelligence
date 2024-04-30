@@ -25,9 +25,9 @@ void main() async {
   await storageHandler!.checkSaveDataDir();
   await initPackageInfo();
 
-  if (!kIsWeb && (Platform.isLinux || Platform.isMacOS || Platform.isWindows)) {
-    await windowManager.ensureInitialized();
+  if (!kIsWeb && Platform.isWindows) {
     await windowManager.hide();
+    await windowManager.ensureInitialized();
   }
   await windowManager.waitUntilReadyToShow(null, () async {
     await windowManager.setFullScreen(true);

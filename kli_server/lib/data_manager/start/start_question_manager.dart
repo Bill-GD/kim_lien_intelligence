@@ -282,7 +282,6 @@ class _StartQuestionManagerState extends State<StartQuestionManager> {
                 onAccept: () async {
                   if (mounted) showToastMessage(context, 'Đã xóa (trận: ${matchNames[selectedMatchIndex]})');
 
-                  // logPanelController!.addText('Removed questions (match: ${matchNames[selectedMatchIndex]})');
                   await removeMatch(selectedMatch);
                   selectedMatch = StartMatch(match: matchNames[selectedMatchIndex], questions: {});
                   setState(() {});
