@@ -1,4 +1,4 @@
-library kli_utils;
+library kli_lib;
 
 export 'src/storage_handler/storage_handler.dart';
 export 'src/match/kli_match.dart';

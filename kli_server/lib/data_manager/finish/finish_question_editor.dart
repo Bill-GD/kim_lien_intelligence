@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:audio_video_progress_bar/audio_video_progress_bar.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
-import 'package:kli_utils/kli_utils.dart';
+import 'package:kli_lib/kli_lib.dart';
 import 'package:video_player/video_player.dart';
 
 import '../../global.dart';

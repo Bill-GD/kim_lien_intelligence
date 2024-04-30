@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:kli_utils/kli_utils.dart';
+import 'package:kli_lib/kli_lib.dart';
 
 import '../global.dart';
 

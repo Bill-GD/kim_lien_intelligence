@@ -1,4 +1,4 @@
-import 'package:kli_utils/kli_utils.dart';
+import 'package:kli_lib/kli_lib.dart';
 import 'package:logger/logger.dart';
 
 late final Logger logger;

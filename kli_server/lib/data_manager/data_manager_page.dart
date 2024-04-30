@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:kli_utils/kli_utils.dart';
+import 'package:kli_lib/kli_lib.dart';
 import 'package:side_navigation/side_navigation.dart';
 
 import '../global.dart';

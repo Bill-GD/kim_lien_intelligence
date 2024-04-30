@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:kli_utils/kli_utils.dart';
+import 'package:kli_lib/kli_lib.dart';
 import 'package:side_navigation/side_navigation.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:window_manager/window_manager.dart';
@@ -219,7 +219,7 @@ class _StartPageState extends State<StartPage> with WindowListener {
   }
 
   String changelog = """
-  0.2.8.3 ({latest}):
+  0.2.8.3 ({47176ce}):
   - Added changelog & changelog view in app
   - Changed help screen layout to avoid overflow on launch
   - Added 'Licenses' button in changelog
@@ -286,7 +286,7 @@ class _StartPageState extends State<StartPage> with WindowListener {
 
   0.2.2 ({2eea3c9}):
   - Wrap Start questions in a match
-  - Log output to file, even from kli_utils
+  - Log output to file, even from kli_lib
   - Added finish question manager
   - Change log file location
 

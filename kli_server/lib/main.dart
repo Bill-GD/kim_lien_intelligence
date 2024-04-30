@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:theme_provider/theme_provider.dart';
 import 'package:window_manager/window_manager.dart';
-import 'package:kli_utils/kli_utils.dart';
+import 'package:kli_lib/kli_lib.dart';
 
 import 'global.dart';
 import 'start_screen/start_screen.dart';
