@@ -97,30 +97,28 @@ class _StartPageState extends State<StartPage> with WindowListener {
                       context: context,
                       builder: (context) {
                         final split = changelog.split(RegExp("(?={)|(?<=})"));
+
                         return AlertDialog(
-                          title: const Text(
-                            'Changelog',
-                            textAlign: TextAlign.center,
-                          ),
+                          title: const Text('Changelog', textAlign: TextAlign.center),
                           content: SingleChildScrollView(
                             child: RichText(
                               text: TextSpan(
                                 style: const TextStyle(fontSize: fontSizeMSmall),
                                 children: <InlineSpan>[
                                   for (String t in split)
-                                    t.startsWith('{')
-                                        ? TextSpan(
-                                            text: t.substring(1, t.length - 1),
-                                            style: const TextStyle(
-                                                decoration: TextDecoration.underline, color: Colors.blue),
-                                            recognizer: TapGestureRecognizer()
-                                              ..onTap = () => launchUrl(
-                                                    Uri.parse(
-                                                      'https://github.com/Bill-GD/kim_lien_intelligence/commit/${t.replaceAll(RegExp('(latest)|[{}]'), '')}',
-                                                    ),
-                                                  ),
-                                          )
-                                        : TextSpan(text: t),
+                                    TextSpan(
+                                      text: t.startsWith('{') ? t.substring(1, t.length - 1) : t,
+                                      style: t.startsWith('{') ? const TextStyle(color: Colors.blue) : null,
+                                      recognizer: t.startsWith('{')
+                                          ? (TapGestureRecognizer()
+                                            ..onTap = () {
+                                              final commitID = t.replaceAll(RegExp(r'(latest)|[{}]'), '');
+                                              final url =
+                                                  'https://github.com/Bill-GD/kim_lien_intelligence/commit/$commitID';
+                                              launchUrl(Uri.parse(url));
+                                            })
+                                          : null,
+                                    )
                                 ],
                               ),
                               softWrap: true,
