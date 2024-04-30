@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:ui';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -76,6 +77,7 @@ class KliServerApp extends StatelessWidget {
       child: ThemeConsumer(
         child: Builder(
           builder: (context) => MaterialApp(
+            scrollBehavior: const MaterialScrollBehavior().copyWith(dragDevices: {PointerDeviceKind.mouse}),
             theme: ThemeProvider.themeOf(context).data,
             home: const StartPage(),
           ),

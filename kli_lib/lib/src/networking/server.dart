@@ -31,11 +31,12 @@ class KLIServer {
   static int get totalClientCount => _clientList.length;
   static int get connectedClientCount => _clientList.where((element) => element != null).length;
 
-  static final _onClientConnectivityChangedController = StreamController<bool>.broadcast();
+  static StreamController<bool> _onClientConnectivityChangedController = StreamController<bool>.broadcast();
   static Stream<bool> get onClientConnectivityChanged => _onClientConnectivityChangedController.stream;
 
   // stream for client message
-  static final _onClientMessageController = StreamController<KLISocketMessage>.broadcast();
+  static StreamController<KLISocketMessage> _onClientMessageController =
+      StreamController<KLISocketMessage>.broadcast();
   static Stream<KLISocketMessage> get onClientMessage => _onClientMessageController.stream;
 
   static Future<void> start([int port = 8080]) async {
@@ -43,6 +44,9 @@ class KLIServer {
 
     _serverSocket = await ServerSocket.bind(InternetAddress(ip, type: InternetAddressType.IPv4), port);
     logMessageController.add((LogType.info, 'Server started on ${_serverSocket?.address}'));
+
+    _onClientConnectivityChangedController = StreamController<bool>.broadcast();
+    _onClientMessageController = StreamController<KLISocketMessage>.broadcast();
 
     _serverSocket!.listen((Socket clientSocket) {
       clientSocket.listen(
@@ -121,7 +125,10 @@ class KLIServer {
     if (!started) return;
 
     logMessageController.add(const (LogType.info, 'Disconnecting all clients'));
+
+    int idx = 0;
     for (final client in _clientList) {
+      sendMessage(mapIDToIndex.keys.elementAt(idx), KLISocketMessage('host', '', KLIMessageType.disconnect));
       client?.destroy();
     }
     _clientList = List.generate(_maxConnectionCount, (_) => null);

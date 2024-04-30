@@ -192,7 +192,7 @@ class _StartPageState extends State<StartPage> with WindowListener {
                   ),
                   button(
                     context,
-                    'Open Server Setup',
+                    'Mở phần thiết lập Server',
                     onPressed: () async {
                       logger.i('Opening Server Setup page...');
                       await Navigator.of(context).push(
@@ -219,6 +219,12 @@ class _StartPageState extends State<StartPage> with WindowListener {
   }
 
   String changelog = """
+  0.3 WIP ({latest}):
+  - Improved Server Setup UI
+  - Fixed stream controller not re-opened after restarting server
+  - Added disconnect message type
+  - Can't start/stop server when there is/isn't a running server
+
   0.2.8.3 ({47176ce}):
   - Added changelog & changelog view in app
   - Changed help screen layout to avoid overflow on launch

@@ -11,6 +11,7 @@ class Networking {
 
 enum KLIMessageType {
   sendID,
+  disconnect,
   normal,
 }
 
