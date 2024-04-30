@@ -100,6 +100,23 @@ class _StartPageState extends State<StartPage> with WindowListener {
 
                         return AlertDialog(
                           title: const Text('Changelog', textAlign: TextAlign.center),
+                          actions: [
+                            TextButton(
+                              child: const Text('Licenses'),
+                              onPressed: () {
+                                showLicensePage(
+                                  context: context,
+                                  applicationIcon: Image.asset(
+                                    'assets/images/ttkl_logo.png',
+                                    width: 50,
+                                    height: 50,
+                                  ),
+                                  applicationName: 'KLI Server',
+                                  applicationVersion: 'v${packageInfo.version}.${packageInfo.buildNumber}',
+                                );
+                              },
+                            ),
+                          ],
                           content: SingleChildScrollView(
                             child: RichText(
                               text: TextSpan(
@@ -112,6 +129,7 @@ class _StartPageState extends State<StartPage> with WindowListener {
                                       recognizer: t.startsWith('{')
                                           ? (TapGestureRecognizer()
                                             ..onTap = () {
+                                              logger.i('Opening commit: $t');
                                               final commitID = t.replaceAll(RegExp(r'(latest)|[{}]'), '');
                                               final url =
                                                   'https://github.com/Bill-GD/kim_lien_intelligence/commit/$commitID';
@@ -204,6 +222,7 @@ class _StartPageState extends State<StartPage> with WindowListener {
   0.2.8.3 ({latest}):
   - Added changelog & changelog view in app
   - Changed help screen layout to avoid overflow on launch
+  - Added 'Licenses' button in changelog
 
   0.2.8.2 ({8491f11}):
   - Trim all text input fields
