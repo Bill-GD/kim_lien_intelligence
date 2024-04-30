@@ -105,6 +105,7 @@ class _StartPageState extends State<StartPage> with WindowListener {
                           content: SingleChildScrollView(
                             child: RichText(
                               text: TextSpan(
+                                style: const TextStyle(fontSize: fontSizeMSmall),
                                 children: <InlineSpan>[
                                   for (String t in split)
                                     t.startsWith('{')
@@ -115,9 +116,7 @@ class _StartPageState extends State<StartPage> with WindowListener {
                                             recognizer: TapGestureRecognizer()
                                               ..onTap = () => launchUrl(
                                                     Uri.parse(
-                                                      t.contains('latest')
-                                                          ? 'https://github.com/Bill-GD/kim_lien_intelligence/commit'
-                                                          : 'https://github.com/Bill-GD/kim_lien_intelligence/commit/${t.substring(1, t.length - 1)}',
+                                                      'https://github.com/Bill-GD/kim_lien_intelligence/commit/${t.replaceAll(RegExp('(latest)|[{}]'), '')}',
                                                     ),
                                                   ),
                                           )
