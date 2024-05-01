@@ -15,8 +15,8 @@ Future<bool?> confirmDialog(
   BuildContext context, {
   required String message,
   required String acceptLogMessage,
-  required void Function() onAccept,
-  void Function()? onCancel,
+  required Future<void> Function() onAccept,
+  Future<void> Function()? onCancel,
 }) async {
   return await showDialog<bool>(
     context: context,
@@ -31,17 +31,17 @@ Future<bool?> confirmDialog(
         actions: <Widget>[
           TextButton(
             child: const Text('Có', style: TextStyle(fontSize: fontSizeMSmall)),
-            onPressed: () {
+            onPressed: () async {
               logMessageController.add((LogType.info, acceptLogMessage));
-              onAccept();
-              Navigator.pop(context, true);
+              await onAccept();
+              if (context.mounted) Navigator.pop(context, true);
             },
           ),
           TextButton(
             child: const Text('Không', style: TextStyle(fontSize: fontSizeMSmall)),
-            onPressed: () {
-              if (onCancel != null) onCancel();
-              Navigator.pop(context, false);
+            onPressed: () async {
+              if (onCancel != null) await onCancel();
+              if (context.mounted) Navigator.pop(context, false);
             },
           ),
         ],

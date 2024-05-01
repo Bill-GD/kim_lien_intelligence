@@ -21,7 +21,7 @@ class KLIClient {
   final _onMessageReceivedController = StreamController<KLISocketMessage>.broadcast();
   Stream<KLISocketMessage> get onMessageReceived => _onMessageReceivedController.stream;
 
-  static Future<KLIClient> init(String ip, String clientID, [int port = 8080]) async {
+  static Future<KLIClient> init(String ip, ClientID clientID, [int port = 8080]) async {
     logMessageController.add((LogType.info, 'Trying to connect to: $ip'));
 
     final s = KLIClient(await Socket.connect(ip, port).timeout(
@@ -33,7 +33,11 @@ class KLIClient {
 
     logMessageController.add((LogType.info, 'Connected to $ip as $clientID'));
 
-    s._socket!.write(KLISocketMessage(clientID, clientID, KLIMessageType.sendID));
+    s._socket!.write(KLISocketMessage(
+      senderID: clientID,
+      message: clientID.name,
+      type: KLIMessageType.sendID,
+    ));
     logMessageController.add((LogType.info, 'Sent ID ($clientID) to server'));
 
     s._socket.listen(s.handleIncomingMessage);
@@ -50,5 +54,10 @@ class KLIClient {
   void sendMessage(KLISocketMessage message) {
     if (!started) return;
     _socket!.write(message);
+  }
+
+  Future<void> disconnect() async {
+    if (!started) return;
+    await _socket!.close();
   }
 }

@@ -10,13 +10,13 @@ class KLIServer {
   static const _maxConnectionCount = 7;
 
   static const mapIDToIndex = {
-    'player1': 0,
-    'player2': 1,
-    'player3': 2,
-    'player4': 3,
-    'viewer1': 4,
-    'viewer2': 5,
-    'mc': 6
+    ClientID.player1: 0,
+    ClientID.player2: 1,
+    ClientID.player3: 2,
+    ClientID.player4: 3,
+    ClientID.viewer1: 4,
+    ClientID.viewer2: 5,
+    ClientID.mc: 6
   };
 
   static ServerSocket? _serverSocket;
@@ -63,7 +63,7 @@ class KLIServer {
           final idx = _clientList.indexOf(clientSocket);
           _clientList[idx] = null;
 
-          String cID = mapIDToIndex.keys.firstWhere((e) => mapIDToIndex[e] == idx);
+          String cID = mapIDToIndex.keys.firstWhere((e) => mapIDToIndex[e] == idx).name;
 
           _onClientConnectivityChangedController.add(true);
           logMessageController.add((LogType.info, 'Client $cID disconnected'));
@@ -75,7 +75,7 @@ class KLIServer {
     });
   }
 
-  static void sendMessage(String clientID, KLISocketMessage message) {
+  static void sendMessage(ClientID clientID, KLISocketMessage message) {
     Socket? client = getClient(clientID);
     if (client == null) {
       logMessageController.add((LogType.info, 'Client $clientID not connected, aborting'));
@@ -86,7 +86,7 @@ class KLIServer {
   }
 
   static void handleClientConnection(Socket clientSocket, KLISocketMessage socMsg) {
-    final clientID = socMsg.msg;
+    final clientID = socMsg.senderID;
     int idx = getClientIndex(clientID);
 
     if (idx < 0) {
@@ -108,11 +108,11 @@ class KLIServer {
     _onClientMessageController.add(socMsg);
   }
 
-  static int getClientIndex(String clientID) {
+  static int getClientIndex(ClientID clientID) {
     return mapIDToIndex[clientID] ?? -1;
   }
 
-  static Socket? getClient(String clientID) {
+  static Socket? getClient(ClientID clientID) {
     int idx = getClientIndex(clientID);
     if (idx < 0) {
       logMessageController.add(const (LogType.warn, 'Trying to assign to index -1, aborting'));
@@ -126,9 +126,14 @@ class KLIServer {
 
     logMessageController.add(const (LogType.info, 'Disconnecting all clients'));
 
-    int idx = 0;
+    for (int i = 0; i < _clientList.length; i++) {
+      if (_clientList[i] == null) continue;
+      sendMessage(
+        ClientID.values[i + 1],
+        KLISocketMessage(senderID: ClientID.host, message: '', type: KLIMessageType.disconnect),
+      );
+    }
     for (final client in _clientList) {
-      sendMessage(mapIDToIndex.keys.elementAt(idx), KLISocketMessage('host', '', KLIMessageType.disconnect));
       client?.destroy();
     }
     _clientList = List.generate(_maxConnectionCount, (_) => null);

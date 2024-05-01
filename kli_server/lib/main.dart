@@ -75,13 +75,13 @@ class KliServerApp extends StatelessWidget {
         ),
       ],
       child: ThemeConsumer(
-        child: Builder(
-          builder: (context) => MaterialApp(
+        child: Builder(builder: (context) {
+          return MaterialApp(
             scrollBehavior: const MaterialScrollBehavior().copyWith(dragDevices: {PointerDeviceKind.mouse}),
             theme: ThemeProvider.themeOf(context).data,
             home: const StartPage(),
-          ),
-        ),
+          );
+        }),
       ),
     );
   }

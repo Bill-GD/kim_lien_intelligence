@@ -6,16 +6,11 @@ import 'package:kli_lib/kli_lib.dart';
 import 'package:logger/logger.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
-class Filter extends LogFilter {
-  @override
-  bool shouldLog(LogEvent event) => true;
-}
-
 late final Logger logger;
 void initLogger(String logPath) {
   logger = Logger(
     printer: SimplePrinter(colors: false, printTime: true),
-    filter: Filter(),
+    filter: AlwaysLogFilter(),
     output: FileOutput(file: File(storageHandler!.logFile), overrideExisting: true),
   );
   logger.i('Logger init');
@@ -44,28 +39,6 @@ Future<List<String>> getMatchNames() async {
     matchNames = (jsonDecode(value) as Iterable).map((e) => e['name'] as String).toList();
   }
   return matchNames;
-}
-
-Widget button(
-  BuildContext context,
-  final String label, {
-  double fontSize = fontSizeMedium,
-  bool enableCondition = true,
-  void Function()? onPressed,
-  String disabledLabel = 'Disabled',
-}) {
-  final mainButton = OutlinedButton(
-    style: ButtonStyle(
-      backgroundColor: MaterialStatePropertyAll<Color>(Theme.of(context).colorScheme.background),
-      padding: const MaterialStatePropertyAll<EdgeInsets>(EdgeInsets.symmetric(vertical: 20, horizontal: 15)),
-    ),
-    onPressed: enableCondition && onPressed != null ? onPressed : null,
-    child: Text(label, style: TextStyle(fontSize: fontSize)),
-  );
-
-  return enableCondition && onPressed != null
-      ? mainButton
-      : Tooltip(message: disabledLabel, child: mainButton);
 }
 
 AppBar managerAppBar(BuildContext context, String title) {
@@ -188,3 +161,105 @@ class DataManager {
     await storageHandler!.writeToFile(filePath, jsonEncode(q));
   }
 }
+
+String changelog = """
+  0.3 ({latest}):
+  - Improved Server Setup UI
+  - Fixed stream controller not re-opened after restarting server
+  - Added disconnect message type
+  - Can no longer start/stop server when there is/isn't a running server
+  - Reworked Client ID
+  - Can disconnect individual client
+  - Disconnect all clients when stopping server
+
+  0.2.8.3 ({47176ce}):
+  - Added changelog & changelog view in app
+  - Changed help screen layout to avoid overflow on launch
+  - Added 'Licenses' button in changelog
+
+  0.2.8.2 ({8491f11}):
+  - Trim all text input fields
+  - Import preview line spacing
+  - Named parameters consistency
+
+  0.2.8.1 ({c858fb4}):
+  - Changed all save files to json
+  - Notify on errors where applicable
+
+  0.2.8 ({f06065d}):
+  - Added preview window for importing data -> can check for errors in data
+  - Added obstacle editor (NOT obstacle QUESTION editor)
+
+  0.2.7.1 ({dc7ecea}):
+  - Only enable editor 'Done' when all required fields is filled
+  - Fixed changing match name delete all of its saved questions
+
+  0.2.7 ({f41ab9c}):
+  - Added "localization"
+  - Added accel question type
+  - Better confirm dialog
+
+  0.2.6.3 ({34330ac}):
+  - Added confirm dialog when deleting questions
+  - Backend changes: early returns, save files structure
+  - Shortened some messages
+  - Log message has time
+  - Button to open app folder, instruction file, log file
+
+  0.2.6.2 ({7096e17}):
+  - Generics for question managers
+  - New background image
+  - Ensure window only show after forced fullscreen
+  - Added exit button in start screen
+
+  0.2.6.1 ({4e00f85}):
+  - Help screen is first/default page in start screen
+
+  0.2.6 ({6b65e46}):
+  - Added help screen
+  - Storage handler excel reader: limit sheet count
+  
+  0.2.5 ({119b134}):
+  - Added feature to add singular start question
+  - Fixed manager bug related to nullable
+  - Added acceleration question manager
+  - Minor fixes: match manager background, can't add start question, wrong log messages
+
+  0.2.4 ({e155b1c}):
+  - Better seekbar for finish question video
+  - Notify if media file isn't found at specified path
+  - Extra question manager
+  - Changed sdk lower bound: 2.19.6 -> 3.0 (record/pattern)
+  - Better custom list tile for question lists
+
+  0.2.3 ({2cb1ac7}):
+  - Finish question video rework: change lib, can remove
+  - Output log in release build
+  - Updated data manager background
+
+  0.2.2 ({2eea3c9}):
+  - Wrap Start questions in a match
+  - Log output to file, even from kli_lib
+  - Added finish question manager
+  - Change log file location
+
+  0.2.1 ({5f21bdf}):
+  - Obstacle question manager: wrap questions in a match
+
+  0.2 ({e8fc93f}):
+  - Added Match manager: match name, players
+  - Added Start question manager: question list, add/edit/remove
+  - App theme, icon
+  - Better storage handler: init folders/files, read/write file
+
+  0.1.x ({333b4f3}):
+  - Added basic messaging (with utf8)
+  - Basic setup for data manager: UI
+  - Added logger: logs to console
+  - Added basic start screen: side navigation, app version
+  - Added storage handler: read excel, write to file
+  - Force fullscreen on launch
+
+  0.0.1.x ({d9628a9}):
+  - Initial version -> setup workspace
+  - Added basic server setup & server-client connection""";

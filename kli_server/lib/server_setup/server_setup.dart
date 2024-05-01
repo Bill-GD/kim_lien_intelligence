@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:kli_lib/kli_lib.dart';
 
 import '../global.dart';
@@ -14,21 +15,20 @@ class _ServerSetupPageState extends State<ServerSetupPage> {
   String _localAddress = '';
   String chosenClientID = '';
   final _clientMessageController = TextEditingController();
-  String _clientMessage = '';
+  // String _clientMessage = '';
 
   @override
   void initState() {
     super.initState();
     getIpAddresses();
-    KLIServer.onClientConnectivityChanged.listen((event) {
-      logger.i('A client connected');
-      debugPrint('Client connected: $event');
-      setState(() {});
-    });
-    KLIServer.onClientMessage.listen((receivedMessage) {
-      _clientMessage = '${receivedMessage.senderID}: ${receivedMessage.msg}';
-      setState(() {});
-    });
+    // KLIServer.onClientConnectivityChanged.listen((event) {
+    //   logger.i('A client connected');
+    //   setState(() {});
+    // });
+    // KLIServer.onClientMessage.listen((receivedMessage) {
+    // _clientMessage = '${receivedMessage.senderID}: ${receivedMessage.msg}';
+    //   setState(() {});
+    // });
   }
 
   @override
@@ -46,18 +46,21 @@ class _ServerSetupPageState extends State<ServerSetupPage> {
   Widget build(BuildContext context) {
     return PopScope(
       canPop: false,
-      onPopInvoked: (pop) {
+      onPopInvoked: (pop) async {
         if (pop) return;
         if (!KLIServer.started) {
           logger.i('Leaving Server Setup page...');
           Navigator.pop(context);
           return;
         }
-        confirmDialog(
+        await confirmDialog(
           context,
           message: 'Bạn có chắc bạn muốn thoát?\nServer sẽ tự động đóng.',
           acceptLogMessage: 'Leaving Server Setup page...',
-          onAccept: () => Navigator.pop(context),
+          onAccept: () async {
+            await KLIServer.stop();
+            if (context.mounted) Navigator.pop(context);
+          },
         );
       },
       child: Scaffold(
@@ -169,11 +172,6 @@ class _ServerSetupPageState extends State<ServerSetupPage> {
 
               KLIServer.onClientConnectivityChanged.listen((event) {
                 logger.i('A client connected');
-                debugPrint('Client connected: $event');
-                setState(() {});
-              });
-              KLIServer.onClientMessage.listen((receivedMessage) {
-                _clientMessage = '${receivedMessage.senderID}: ${receivedMessage.msg}';
                 setState(() {});
               });
 
@@ -229,11 +227,35 @@ class _ServerSetupPageState extends State<ServerSetupPage> {
       final connected = client != null;
       String ip = connected ? '${client.address.address}:${client.port}' : 'Not connected';
       clients.add(ListTile(
-        title: Text(Networking.listOfClient[index]),
+        title: Text(Networking.getClientDisplayID(ClientID.values[index + 1])),
         subtitle: Text(ip),
         subtitleTextStyle: TextStyle(
           fontSize: fontSizeMSmall,
           color: connected ? Colors.greenAccent : Colors.redAccent,
+        ),
+        trailing: IconButton(
+          icon: const FaIcon(FontAwesomeIcons.linkSlash),
+          tooltip: 'Disconnect ${Networking.getClientDisplayID(ClientID.values[index + 1])}',
+          onPressed: !connected
+              ? null
+              : () async {
+                  await confirmDialog(
+                    context,
+                    message: 'Disconnect client?',
+                    acceptLogMessage: 'Disconnected Client: ${ClientID.values[index + 1]}',
+                    onAccept: () async {
+                      KLIServer.sendMessage(
+                        ClientID.values[index + 1],
+                        KLISocketMessage(
+                          senderID: ClientID.host,
+                          message: '',
+                          type: KLIMessageType.disconnect,
+                        ),
+                      );
+                      client.destroy();
+                    },
+                  );
+                },
         ),
       ));
     }
@@ -243,7 +265,6 @@ class _ServerSetupPageState extends State<ServerSetupPage> {
       constraints: const BoxConstraints(maxWidth: 250),
       child: ListView.separated(
         shrinkWrap: true,
-        // scrollDirection: Axis.horizontal,
         itemCount: clients.length,
         separatorBuilder: (_, __) {
           return const SizedBox(height: 30);
