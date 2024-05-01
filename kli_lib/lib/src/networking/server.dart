@@ -39,6 +39,8 @@ class KLIServer {
       StreamController<KLISocketMessage>.broadcast();
   static Stream<KLISocketMessage> get onClientMessage => _onClientMessageController.stream;
 
+  static bool get allPlayerConnected => _clientList.take(4).every((element) => element != null);
+
   static Future<void> start([int port = 8080]) async {
     String ip = await Networking.getLocalIP();
 
@@ -76,6 +78,7 @@ class KLIServer {
   }
 
   static void sendMessage(ClientID clientID, KLISocketMessage message) {
+    logMessageController.add((LogType.info, 'Attempting to send message to $clientID'));
     Socket? client = getClient(clientID);
     if (client == null) {
       logMessageController.add((LogType.info, 'Client $clientID not connected, aborting'));
@@ -90,7 +93,7 @@ class KLIServer {
     int idx = getClientIndex(clientID);
 
     if (idx < 0) {
-      logMessageController.add(const (LogType.warn, 'Trying to assign to index -1, aborting'));
+      logMessageController.add((LogType.warn, 'Can\'t find client $clientID, aborting'));
       return;
     }
 
@@ -108,17 +111,17 @@ class KLIServer {
     _onClientMessageController.add(socMsg);
   }
 
-  static int getClientIndex(ClientID clientID) {
-    return mapIDToIndex[clientID] ?? -1;
-  }
-
   static Socket? getClient(ClientID clientID) {
     int idx = getClientIndex(clientID);
     if (idx < 0) {
-      logMessageController.add(const (LogType.warn, 'Trying to assign to index -1, aborting'));
+      logMessageController.add((LogType.warn, 'Can\'t find client $clientID, aborting'));
       return null;
     }
     return clientAt(idx);
+  }
+
+  static int getClientIndex(ClientID clientID) {
+    return mapIDToIndex[clientID] ?? -1;
   }
 
   static Future<void> stop() async {

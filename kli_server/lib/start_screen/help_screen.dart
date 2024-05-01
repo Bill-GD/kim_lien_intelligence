@@ -21,7 +21,7 @@ class _HelpScreenState extends State<HelpScreen> {
     'Khởi động',
     'Chướng ngại vật',
     'Tăng tốc',
-    'Về đich',
+    'Về đích',
     'Câu hỏi phụ',
     'Server'
   ];

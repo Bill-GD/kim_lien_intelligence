@@ -21,7 +21,6 @@ class _ConnectPageState extends State<ConnectPage> {
   // messageController = TextEditingController();
   bool isConnecting = false, isConnected = false;
   // String serverMessage = '';
-  ClientID? playerId;
 
   @override
   void initState() {
@@ -185,7 +184,7 @@ class _ConnectPageState extends State<ConnectPage> {
       children: [
         DropdownMenu(
           enabled: !isConnected,
-          initialSelection: playerId,
+          initialSelection: KLIClient.clientID,
           controller: clientTextController,
           label: const Text('Client'),
           dropdownMenuEntries: [
@@ -193,7 +192,7 @@ class _ConnectPageState extends State<ConnectPage> {
               DropdownMenuEntry(value: c, label: Networking.getClientDisplayID(c))
           ],
           onSelected: (value) {
-            playerId = value!;
+            KLIClient.clientID = value!;
             setState(() {});
           },
         ),
@@ -233,28 +232,28 @@ class _ConnectPageState extends State<ConnectPage> {
               showToastMessage(context, 'Please enter an IP');
               return;
             }
-            if (playerId == null) {
+            if (KLIClient.clientID == null) {
               showToastMessage(context, 'Please select a player ID');
               return;
             }
-            logger.i('Client $playerId is trying to connect to: $ip');
+            logger.i('Client ${KLIClient.clientID} is trying to connect to: $ip');
 
             runZonedGuarded(
               () async {
                 setState(() => isConnecting = true);
-                await initClient(ip, playerId!);
+                await KLIClient.init(ip, KLIClient.clientID!);
                 setState(() {
                   isConnecting = false;
                   isConnected = true;
                 });
 
-                kliClient.onMessageReceived.listen((newMessage) {
+                KLIClient.onMessageReceived.listen((newMessage) async {
                   if (newMessage.type == KLIMessageType.disconnect) {
                     isConnected = false;
-                    playerId = null;
+                    await KLIClient.disconnect();
                     clientTextController.text = '';
                     setState(() {});
-                    showToastMessage(context, 'Server disconnected');
+                    if (mounted) showToastMessage(context, 'Server disconnected');
                   }
 
                   // serverMessage = newMessage.msg;
@@ -262,7 +261,8 @@ class _ConnectPageState extends State<ConnectPage> {
                 });
 
                 if (mounted) {
-                  showToastMessage(context, 'Connected to server as $playerId with IP: ${kliClient.address}');
+                  showToastMessage(
+                      context, 'Connected to server as ${KLIClient.clientID} with IP: ${KLIClient.address}');
                 }
               },
               (e, stack) {
@@ -285,12 +285,9 @@ class _ConnectPageState extends State<ConnectPage> {
           disabledLabel: 'Not connected',
           enableCondition: isConnected,
           onPressed: () async {
-            await kliClient.disconnect();
+            await KLIClient.disconnect();
             clientTextController.text = '';
-            setState(() {
-              isConnected = false;
-              playerId = null;
-            });
+            setState(() => isConnected = false);
             if (mounted) showToastMessage(context, 'Disconnected from server');
           },
         ),

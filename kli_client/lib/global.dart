@@ -30,13 +30,12 @@ void initLogger() {
   logger.i('Logger init');
 }
 
-late KLIClient kliClient;
-Future<void> initClient(String ip, ClientID clientID, [int port = 8080]) async {
-  kliClient = await KLIClient.init(ip, clientID, port);
-}
-
 String changelog = """
-  0.1 ({latest}):
+  0.1.1 ({latest}):
+  - KLIClient is static again
+  - KLIClient holds clientID
+  
+  0.1 ({3fbfae0}):
   - Improved UI
   - Improved server-client connection
   - Added changelog

@@ -3,6 +3,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:kli_lib/kli_lib.dart';
 
 import '../global.dart';
+import 'match_setup.dart';
 
 class ServerSetup extends StatefulWidget {
   const ServerSetup({super.key});
@@ -14,8 +15,6 @@ class ServerSetup extends StatefulWidget {
 class _ServerSetupState extends State<ServerSetup> {
   String _localAddress = '';
   String chosenClientID = '';
-  final _clientMessageController = TextEditingController();
-  // String _clientMessage = '';
 
   @override
   void initState() {
@@ -33,7 +32,6 @@ class _ServerSetupState extends State<ServerSetup> {
 
   @override
   void dispose() {
-    _clientMessageController.dispose();
     super.dispose();
   }
 
@@ -65,9 +63,7 @@ class _ServerSetupState extends State<ServerSetup> {
       },
       child: Scaffold(
         extendBodyBehindAppBar: true,
-        appBar: AppBar(
-          forceMaterialTransparency: true,
-        ),
+        appBar: AppBar(forceMaterialTransparency: true),
         body: Container(
           decoration: const BoxDecoration(
             image: DecorationImage(
@@ -92,52 +88,7 @@ class _ServerSetupState extends State<ServerSetup> {
                   mainAxisSize: MainAxisSize.max,
                   children: <Widget>[
                     serverStatus(),
-                    serverManageButtons(),
-                    // DropdownMenu(
-                    //   label: const Text('Client'),
-                    //   dropdownMenuEntries: [
-                    //     for (var i = 0; i < Networking.listOfClient.length; i++)
-                    //       DropdownMenuEntry(
-                    //         value: KLIServer.mapIDToIndex.keys.elementAt(i),
-                    //         label: Networking.listOfClient[i],
-                    //       )
-                    //   ],
-                    //   onSelected: (value) {
-                    //     chosenClientID = value!;
-                    //     setState(() {});
-                    //   },
-                    // ),
-                    // Text('Client message: $_clientMessage'),
-                    // TextField(
-                    //   controller: _clientMessageController,
-                    //   decoration: const InputDecoration(
-                    //     labelText: 'Message to Client',
-                    //   ),
-                    // ),
-                    // TextButton(
-                    //   onPressed: () async {
-                    //     if (!KLIServer.started) {
-                    //       showToastMessage(context, 'No server exist');
-                    //       return;
-                    //     }
-                    //     if (_clientMessageController.value.text.isEmpty) {
-                    //       showToastMessage(context, 'Please enter a message');
-                    //       return;
-                    //     }
-                    //     if (chosenClientID.isEmpty) {
-                    //       showToastMessage(context, 'Please select a client');
-                    //       return;
-                    //     }
-                    //     KLIServer.sendMessage(
-                    //       chosenClientID,
-                    //       KLISocketMessage(null, _clientMessageController.value.text, KLIMessageType.normal),
-                    //     );
-                    //     if (context.mounted) {
-                    //       showToastMessage(context, 'Sending');
-                    //     }
-                    //   },
-                    //   child: const Text("Send Message"),
-                    // ),
+                    managementButtons(),
                   ],
                 ),
               ),
@@ -157,7 +108,7 @@ class _ServerSetupState extends State<ServerSetup> {
     );
   }
 
-  Widget serverManageButtons() {
+  Widget managementButtons() {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
@@ -206,9 +157,12 @@ class _ServerSetupState extends State<ServerSetup> {
           context,
           'Match Setup',
           disabledLabel: 'Not available',
-          enableCondition: false,
+          enableCondition: !KLIServer.allPlayerConnected,
           onPressed: () async {
             logger.i('Opening Match Setup');
+            await Navigator.of(context).push(
+              MaterialPageRoute(builder: (context) => const MatchSetup()),
+            );
           },
         ),
       ],

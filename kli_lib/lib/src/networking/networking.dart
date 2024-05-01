@@ -24,7 +24,6 @@ enum ClientID { host, player1, player2, player3, player4, viewer1, viewer2, mc }
 enum KLIMessageType {
   sendID,
   disconnect,
-  normal,
 }
 
 class KLISocketMessage {
