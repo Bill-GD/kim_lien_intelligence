@@ -165,7 +165,7 @@ class DataManager {
 String changelog = """
   0.3.1 ({latest}):
   - Renamed data manager pages
-  - Match setup page: check if all info are good, show errors if not
+  - Match data checker page: check if all info are good, show errors if not
 
   0.3 ({3fbfae0}):
   - Improved Server Setup UI

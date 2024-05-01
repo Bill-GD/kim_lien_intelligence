@@ -10,6 +10,7 @@ import 'package:window_manager/window_manager.dart';
 
 import '../data_manager/data_manager_page.dart';
 import '../global.dart';
+import 'match_data_checker.dart';
 import '../server_setup/server_setup.dart';
 import 'help_screen.dart';
 
@@ -180,15 +181,31 @@ class _StartPageState extends State<StartPage> with WindowListener {
                 child: [
                   // Help screen
                   const HelpScreen(),
-                  button(
-                    context,
-                    'Mở phần quản lý dữ liệu',
-                    onPressed: () {
-                      logger.i('Opening Data Manager page...');
-                      Navigator.of(context).push(
-                        MaterialPageRoute(builder: (context) => const DataManagerPage()),
-                      );
-                    },
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      button(
+                        context,
+                        'Mở phần quản lý dữ liệu',
+                        onPressed: () {
+                          logger.i('Opening Data Manager page...');
+                          Navigator.of(context).push(
+                            MaterialPageRoute(builder: (context) => const DataManagerPage()),
+                          );
+                        },
+                      ),
+                      button(
+                        context,
+                        'Match Data Checker',
+                        disabledLabel: 'Not available',
+                        onPressed: () async {
+                          logger.i('Opening Match Setup');
+                          await Navigator.of(context).push(
+                            MaterialPageRoute(builder: (context) => const MatchDataChecker()),
+                          );
+                        },
+                      ),
+                    ],
                   ),
                   button(
                     context,

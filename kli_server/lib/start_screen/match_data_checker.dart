@@ -4,19 +4,18 @@ import 'package:flutter/material.dart';
 import 'package:kli_lib/kli_lib.dart';
 import 'package:kli_server/global.dart';
 
-class MatchSetup extends StatefulWidget {
-  const MatchSetup({super.key});
+class MatchDataChecker extends StatefulWidget {
+  const MatchDataChecker({super.key});
 
   @override
-  State<MatchSetup> createState() => _MatchSetupState();
+  State<MatchDataChecker> createState() => _MatchDataCheckerState();
 }
 
-class _MatchSetupState extends State<MatchSetup> {
+class _MatchDataCheckerState extends State<MatchDataChecker> {
   List<String> matchNames = [];
   int selectedMatchIndex = -1;
   bool isLoading = true;
   List<(bool, List<String>)> questionCheckResults = [];
-  bool disableContinue = true;
 
   final roundNames = <String>[
     'Thí sinh',
@@ -30,8 +29,9 @@ class _MatchSetupState extends State<MatchSetup> {
   @override
   void initState() {
     super.initState();
-    logger.i('Match setup');
+    logger.i('Match Data Checker');
     getMatchNames().then((value) async {
+      if (value.isEmpty) showToastMessage(context, 'No match found');
       if (value.isNotEmpty) matchNames = value;
       setState(() => isLoading = false);
     });
@@ -51,7 +51,7 @@ class _MatchSetupState extends State<MatchSetup> {
         backgroundColor: Colors.transparent,
         extendBodyBehindAppBar: true,
         appBar: AppBar(
-          title: const Text('Match Setup', style: TextStyle(fontSize: fontSizeLarge)),
+          title: const Text('Match Data Checker', style: TextStyle(fontSize: fontSizeLarge)),
           centerTitle: true,
           forceMaterialTransparency: true,
         ),
@@ -67,7 +67,6 @@ class _MatchSetupState extends State<MatchSetup> {
                 setState(() {});
               }),
               matchQuestionChecker(),
-              button(context, 'Continue', enableCondition: !disableContinue, onPressed: () async {}),
             ],
           ),
         ),

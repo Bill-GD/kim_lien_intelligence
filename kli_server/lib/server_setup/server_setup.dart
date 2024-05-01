@@ -3,7 +3,6 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:kli_lib/kli_lib.dart';
 
 import '../global.dart';
-import 'match_setup.dart';
 
 class ServerSetup extends StatefulWidget {
   const ServerSetup({super.key});
@@ -151,18 +150,6 @@ class _ServerSetupState extends State<ServerSetup> {
             if (mounted) {
               showToastMessage(context, 'Closed server.');
             }
-          },
-        ),
-        button(
-          context,
-          'Match Setup',
-          disabledLabel: 'Not available',
-          enableCondition: !KLIServer.allPlayerConnected,
-          onPressed: () async {
-            logger.i('Opening Match Setup');
-            await Navigator.of(context).push(
-              MaterialPageRoute(builder: (context) => const MatchSetup()),
-            );
           },
         ),
       ],

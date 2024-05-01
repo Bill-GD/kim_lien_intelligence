@@ -31,7 +31,7 @@ void initLogger() {
 }
 
 String changelog = """
-  0.1.1 ({latest}):
+  0.1.0.1 ({3cdc768}):
   - KLIClient is static again
   - KLIClient holds clientID
   

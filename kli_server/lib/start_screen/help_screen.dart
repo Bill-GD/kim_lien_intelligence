@@ -150,8 +150,8 @@ class _HelpScreenState extends State<HelpScreen> {
     Đây là hướng dẫn nhanh, để xem thông tin và hướng dẫn chi tiết, bấm nút mở file hướng dẫn phía trên.
 
     Sau khi mở, phần mềm sẽ tự động tạo thư mục UserData (cùng thư mục cha với phần mềm). Thư mục UserData bao gồm 3 thư mục Media, NewData, SavedData và file "log.txt".
-      - UserData/Media: nên dùng để chứa các video, hình ảnh liên quan đến trận đấu (ảnh thí sinh, CNV, video về đích)
-      - UserData/NewData: nên dùng để chứa các file excel (.xlsx) để có thể nhập cùng lúc nhiều câu hỏi cho 1 trận đấu
+      - UserData/Media: dùng để chứa các video, hình ảnh liên quan đến trận đấu (ảnh thí sinh, CNV, video về đích)
+      - UserData/NewData: dùng để chứa các file excel (.xlsx) để có thể nhập cùng lúc nhiều câu hỏi cho 1 trận đấu
       - UserData/SavedData: nơi phần mềm lưu các trận đấu và câu hỏi
       - log.txt: file lưu các thao tác, tác vụ phần mềm thực hiện, có thể xem file để phát hiện lỗi khi sử dụng phần mềm
     
