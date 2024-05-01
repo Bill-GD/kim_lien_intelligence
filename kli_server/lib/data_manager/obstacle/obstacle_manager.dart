@@ -9,14 +9,14 @@ import '../import_dialog.dart';
 import 'obstacle_editor.dart';
 import 'obstacle_question_editor.dart';
 
-class ObstacleQuestionManager extends StatefulWidget {
-  const ObstacleQuestionManager({super.key});
+class ObstacleManager extends StatefulWidget {
+  const ObstacleManager({super.key});
 
   @override
-  State<ObstacleQuestionManager> createState() => _ObstacleQuestionManagerState();
+  State<ObstacleManager> createState() => _ObstacleManagerState();
 }
 
-class _ObstacleQuestionManagerState extends State<ObstacleQuestionManager> {
+class _ObstacleManagerState extends State<ObstacleManager> {
   bool isLoading = true;
   List<String> matchNames = [];
   int selectedMatchIndex = -1;
@@ -293,7 +293,7 @@ class _ObstacleQuestionManagerState extends State<ObstacleQuestionManager> {
                     final nQ = await Navigator.of(context).push<ObstacleQuestion>(
                       DialogRoute<ObstacleQuestion>(
                         context: context,
-                        builder: (_) => ObstacleQuestionEditorDialog(question: q, index: index),
+                        builder: (_) => ObstacleQuestionEditor(question: q, index: index),
                       ),
                     );
 

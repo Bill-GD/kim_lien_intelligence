@@ -3,16 +3,16 @@ import 'package:kli_lib/kli_lib.dart';
 
 import '../../global.dart';
 
-class StartEditorDialog extends StatefulWidget {
+class StartQuestionEditor extends StatefulWidget {
   final StartQuestion? question;
   final int playerPos;
-  const StartEditorDialog({super.key, required this.question, required this.playerPos});
+  const StartQuestionEditor({super.key, required this.question, required this.playerPos});
 
   @override
-  State<StartEditorDialog> createState() => _StartEditorDialogState();
+  State<StartQuestionEditor> createState() => _StartQuestionEditorState();
 }
 
-class _StartEditorDialogState extends State<StartEditorDialog> {
+class _StartQuestionEditorState extends State<StartQuestionEditor> {
   final questionController = TextEditingController();
   final answerController = TextEditingController();
   late StartQuestionSubject type;

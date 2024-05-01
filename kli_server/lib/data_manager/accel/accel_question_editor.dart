@@ -3,15 +3,15 @@ import 'package:kli_lib/kli_lib.dart';
 
 import '../../global.dart';
 
-class AccelEditorDialog extends StatefulWidget {
+class AccelQuestionEditor extends StatefulWidget {
   final AccelQuestion? question;
-  const AccelEditorDialog({super.key, this.question});
+  const AccelQuestionEditor({super.key, this.question});
 
   @override
-  State<AccelEditorDialog> createState() => _AccelEditorDialogState();
+  State<AccelQuestionEditor> createState() => _AccelQuestionEditorState();
 }
 
-class _AccelEditorDialogState extends State<AccelEditorDialog> {
+class _AccelQuestionEditorState extends State<AccelQuestionEditor> {
   final questionController = TextEditingController(),
       answerController = TextEditingController(),
       explanationController = TextEditingController();

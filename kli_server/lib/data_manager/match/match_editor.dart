@@ -6,16 +6,16 @@ import 'package:kli_lib/kli_lib.dart';
 
 import '../../global.dart';
 
-class MatchEditorDialog extends StatefulWidget {
+class MatchEditor extends StatefulWidget {
   final KLIMatch? match;
   final Iterable<String> matchNames;
-  const MatchEditorDialog({super.key, this.match, required this.matchNames});
+  const MatchEditor({super.key, this.match, required this.matchNames});
 
   @override
-  State<MatchEditorDialog> createState() => _MatchEditorDialogState();
+  State<MatchEditor> createState() => _MatchEditorState();
 }
 
-class _MatchEditorDialogState extends State<MatchEditorDialog> {
+class _MatchEditorState extends State<MatchEditor> {
   final TextEditingController _matchNameController = TextEditingController();
   final List<TextEditingController> _playerNameControllers = [
     TextEditingController(),

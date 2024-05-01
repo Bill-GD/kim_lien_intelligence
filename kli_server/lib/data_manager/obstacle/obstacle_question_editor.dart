@@ -3,16 +3,16 @@ import 'package:kli_lib/kli_lib.dart';
 
 import '../../global.dart';
 
-class ObstacleQuestionEditorDialog extends StatefulWidget {
+class ObstacleQuestionEditor extends StatefulWidget {
   final ObstacleQuestion? question;
   final int index;
-  const ObstacleQuestionEditorDialog({super.key, this.question, required this.index});
+  const ObstacleQuestionEditor({super.key, this.question, required this.index});
 
   @override
-  State<ObstacleQuestionEditorDialog> createState() => _ObstacleQuestionEditorDialogState();
+  State<ObstacleQuestionEditor> createState() => _ObstacleQuestionEditorState();
 }
 
-class _ObstacleQuestionEditorDialogState extends State<ObstacleQuestionEditorDialog> {
+class _ObstacleQuestionEditorState extends State<ObstacleQuestionEditor> {
   final questionController = TextEditingController();
   final answerController = TextEditingController();
   String? qErrorText, aErrorText;

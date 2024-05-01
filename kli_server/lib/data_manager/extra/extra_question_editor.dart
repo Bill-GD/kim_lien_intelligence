@@ -3,15 +3,15 @@ import 'package:kli_lib/kli_lib.dart';
 
 import '../../global.dart';
 
-class ExtraEditorDialog extends StatefulWidget {
+class ExtraQuestionEditor extends StatefulWidget {
   final ExtraQuestion? question;
-  const ExtraEditorDialog({super.key, this.question});
+  const ExtraQuestionEditor({super.key, this.question});
 
   @override
-  State<ExtraEditorDialog> createState() => _ExtraEditorDialogState();
+  State<ExtraQuestionEditor> createState() => _ExtraQuestionEditorState();
 }
 
-class _ExtraEditorDialogState extends State<ExtraEditorDialog> {
+class _ExtraQuestionEditorState extends State<ExtraQuestionEditor> {
   final questionController = TextEditingController();
   final answerController = TextEditingController();
   String? qErrorText, aErrorText;

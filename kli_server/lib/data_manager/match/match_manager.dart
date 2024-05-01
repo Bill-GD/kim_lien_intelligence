@@ -81,7 +81,7 @@ class _MatchManagerState extends State<MatchManager> {
                   context: context,
                   barrierDismissible: false,
                   barrierLabel: '',
-                  builder: (_) => MatchEditorDialog(matchNames: matches.map((e) => e.name)),
+                  builder: (_) => MatchEditor(matchNames: matches.map((e) => e.name)),
                 ),
               );
 
@@ -102,7 +102,7 @@ class _MatchManagerState extends State<MatchManager> {
                   context: context,
                   barrierDismissible: false,
                   barrierLabel: '',
-                  builder: (_) => MatchEditorDialog(
+                  builder: (_) => MatchEditor(
                     match: matches[currentMatchIndex],
                     matchNames: matches.map((e) => e.name),
                   ),

@@ -4,14 +4,14 @@ import 'package:kli_lib/kli_lib.dart';
 
 import '../global.dart';
 
-class ServerSetupPage extends StatefulWidget {
-  const ServerSetupPage({super.key});
+class ServerSetup extends StatefulWidget {
+  const ServerSetup({super.key});
 
   @override
-  State<ServerSetupPage> createState() => _ServerSetupPageState();
+  State<ServerSetup> createState() => _ServerSetupState();
 }
 
-class _ServerSetupPageState extends State<ServerSetupPage> {
+class _ServerSetupState extends State<ServerSetup> {
   String _localAddress = '';
   String chosenClientID = '';
   final _clientMessageController = TextEditingController();
@@ -208,11 +208,7 @@ class _ServerSetupPageState extends State<ServerSetupPage> {
           disabledLabel: 'Not available',
           enableCondition: false,
           onPressed: () async {
-            await KLIServer.stop();
-            setState(() {});
-            if (mounted) {
-              showToastMessage(context, 'Closed server.');
-            }
+            logger.i('Opening Match Setup');
           },
         ),
       ],

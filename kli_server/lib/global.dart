@@ -163,7 +163,10 @@ class DataManager {
 }
 
 String changelog = """
-  0.3 ({latest}):
+  0.3.1 ({latest}):
+  - Renamed data manager pages
+
+  0.3 ({3fbfae0}):
   - Improved Server Setup UI
   - Fixed stream controller not re-opened after restarting server
   - Added disconnect message type

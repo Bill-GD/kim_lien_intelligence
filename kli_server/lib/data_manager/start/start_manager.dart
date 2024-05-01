@@ -185,7 +185,7 @@ class _StartQuestionManagerState extends State<StartQuestionManager> {
                 context: context,
                 barrierDismissible: false,
                 barrierLabel: '',
-                builder: (_) => const StartEditorDialog(question: null, playerPos: -1),
+                builder: (_) => const StartQuestionEditor(question: null, playerPos: -1),
               ));
               if (ret case (final newP, final newQ)?) {
                 final qList = selectedMatch.questions[newP];
@@ -362,7 +362,7 @@ class _StartQuestionManagerState extends State<StartQuestionManager> {
                           context: context,
                           barrierDismissible: false,
                           barrierLabel: '',
-                          builder: (_) => StartEditorDialog(question: q.$3, playerPos: q.$2),
+                          builder: (_) => StartQuestionEditor(question: q.$3, playerPos: q.$2),
                         ));
                         if (ret case (final newP, final newQ)?) {
                           if (newP == q.$2) {

@@ -8,14 +8,14 @@ import '../../global.dart';
 import '../import_dialog.dart';
 import 'accel_question_editor.dart';
 
-class AccelQuestionManager extends StatefulWidget {
-  const AccelQuestionManager({super.key});
+class AccelManager extends StatefulWidget {
+  const AccelManager({super.key});
 
   @override
-  State<AccelQuestionManager> createState() => _AccelQuestionManagerState();
+  State<AccelManager> createState() => _AccelManagerState();
 }
 
-class _AccelQuestionManagerState extends State<AccelQuestionManager> {
+class _AccelManagerState extends State<AccelManager> {
   bool isLoading = true;
   List<String> matchNames = [];
   int selectedMatchIndex = -1, selectedQuestionIndex = -1, selectedImageIndex = -1;
@@ -171,7 +171,7 @@ class _AccelQuestionManagerState extends State<AccelQuestionManager> {
                 context: context,
                 barrierDismissible: false,
                 barrierLabel: '',
-                builder: (_) => AccelEditorDialog(question: selectedQuestion),
+                builder: (_) => AccelQuestionEditor(question: selectedQuestion),
               ));
               if (newQ != null) {
                 selectedMatch.questions[selectedQuestionIndex] = newQ;

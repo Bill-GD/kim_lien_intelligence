@@ -5,14 +5,14 @@ import '../../global.dart';
 import '../import_dialog.dart';
 import 'extra_question_editor.dart';
 
-class ExtraQuestionManager extends StatefulWidget {
-  const ExtraQuestionManager({super.key});
+class ExtraManager extends StatefulWidget {
+  const ExtraManager({super.key});
 
   @override
-  State<ExtraQuestionManager> createState() => _ExtraQuestionManagerState();
+  State<ExtraManager> createState() => _ExtraManagerState();
 }
 
-class _ExtraQuestionManagerState extends State<ExtraQuestionManager> {
+class _ExtraManagerState extends State<ExtraManager> {
   bool isLoading = true;
   List<String> matchNames = [];
   int selectedMatchIndex = -1;
@@ -141,7 +141,7 @@ class _ExtraQuestionManagerState extends State<ExtraQuestionManager> {
                 context: context,
                 barrierDismissible: false,
                 barrierLabel: '',
-                builder: (_) => const ExtraEditorDialog(),
+                builder: (_) => const ExtraQuestionEditor(),
               ));
               if (newQ != null) {
                 selectedMatch.questions.add(newQ);
@@ -256,7 +256,7 @@ class _ExtraQuestionManagerState extends State<ExtraQuestionManager> {
                           context: context,
                           barrierDismissible: false,
                           barrierLabel: '',
-                          builder: (_) => ExtraEditorDialog(question: q),
+                          builder: (_) => ExtraQuestionEditor(question: q),
                         ));
                         if (newQ != null) {
                           selectedMatch.questions[index] = newQ;

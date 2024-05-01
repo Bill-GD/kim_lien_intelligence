@@ -4,12 +4,12 @@ import 'package:kli_lib/kli_lib.dart';
 import 'package:side_navigation/side_navigation.dart';
 
 import '../global.dart';
-import 'accel/accel_question_manager.dart';
-import 'extra/extra_question_manager.dart';
-import 'finish/finish_question_manager.dart';
+import 'accel/accel_manager.dart';
+import 'extra/extra_manager.dart';
+import 'finish/finish_manager.dart';
 import 'match/match_manager.dart';
-import 'obstacle/obstacle_question_manager.dart';
-import 'start/start_question_manager.dart';
+import 'obstacle/obstacle_manager.dart';
+import 'start/start_manager.dart';
 
 // This page allows user to manage data
 // Has options to manage match, questions
@@ -35,10 +35,10 @@ class _DataManagerPageState extends State<DataManagerPage> {
     contentPages = [
       const MatchManager(),
       const StartQuestionManager(),
-      const ObstacleQuestionManager(),
-      const AccelQuestionManager(),
-      const FinishQuestionManager(),
-      const ExtraQuestionManager(),
+      const ObstacleManager(),
+      const AccelManager(),
+      const FinishManager(),
+      const ExtraManager(),
     ];
     setState(() => isLoading = false);
   }

@@ -5,14 +5,14 @@ import '../../global.dart';
 import '../import_dialog.dart';
 import 'finish_question_editor.dart';
 
-class FinishQuestionManager extends StatefulWidget {
-  const FinishQuestionManager({super.key});
+class FinishManager extends StatefulWidget {
+  const FinishManager({super.key});
 
   @override
-  State<FinishQuestionManager> createState() => _FinishQuestionManagerState();
+  State<FinishManager> createState() => _FinishManagerState();
 }
 
-class _FinishQuestionManagerState extends State<FinishQuestionManager> {
+class _FinishManagerState extends State<FinishManager> {
   bool isLoading = true;
   List<String> matchNames = [];
   int selectedMatchIndex = -1, sortPoint = -1;
@@ -172,7 +172,7 @@ class _FinishQuestionManagerState extends State<FinishQuestionManager> {
                 context: context,
                 barrierDismissible: false,
                 barrierLabel: '',
-                builder: (_) => const FinishEditorDialog(),
+                builder: (_) => const FinishQuestionEditor(),
               ));
               if (newQ != null) {
                 selectedMatch.questions.add(newQ);
@@ -297,7 +297,7 @@ class _FinishQuestionManagerState extends State<FinishQuestionManager> {
                               context: context,
                               barrierDismissible: false,
                               barrierLabel: '',
-                              builder: (_) => FinishEditorDialog(question: q.$2)),
+                              builder: (_) => FinishQuestionEditor(question: q.$2)),
                         );
 
                         if (newQ != null) {

@@ -8,15 +8,15 @@ import 'package:video_player/video_player.dart';
 
 import '../../global.dart';
 
-class FinishEditorDialog extends StatefulWidget {
+class FinishQuestionEditor extends StatefulWidget {
   final FinishQuestion? question;
-  const FinishEditorDialog({super.key, this.question});
+  const FinishQuestionEditor({super.key, this.question});
 
   @override
-  State<FinishEditorDialog> createState() => _FinishEditorDialogState();
+  State<FinishQuestionEditor> createState() => _FinishQuestionEditorState();
 }
 
-class _FinishEditorDialogState extends State<FinishEditorDialog> {
+class _FinishQuestionEditorState extends State<FinishQuestionEditor> {
   final questionController = TextEditingController(),
       answerController = TextEditingController(),
       explanationController = TextEditingController();

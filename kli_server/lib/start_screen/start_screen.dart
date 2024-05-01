@@ -196,7 +196,7 @@ class _StartPageState extends State<StartPage> with WindowListener {
                     onPressed: () async {
                       logger.i('Opening Server Setup page...');
                       await Navigator.of(context).push(
-                        MaterialPageRoute(builder: (context) => const ServerSetupPage()),
+                        MaterialPageRoute(builder: (context) => const ServerSetup()),
                       );
                       await KLIServer.stop();
                     },
