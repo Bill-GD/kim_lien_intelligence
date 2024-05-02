@@ -8,10 +8,10 @@ class ObstacleEditor extends StatefulWidget {
   const ObstacleEditor({super.key, required this.keyword, required this.explanation});
 
   @override
-  State<ObstacleEditor> createState() => _ObstacleeEditorDialogState();
+  State<ObstacleEditor> createState() => _ObstacleEditorState();
 }
 
-class _ObstacleeEditorDialogState extends State<ObstacleEditor> {
+class _ObstacleEditorState extends State<ObstacleEditor> {
   final keywordController = TextEditingController(), explanationController = TextEditingController();
   String? kErrorText, eErrorText;
   bool disableDone = true;
