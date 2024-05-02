@@ -10,9 +10,8 @@ import 'package:window_manager/window_manager.dart';
 
 import '../data_manager/data_manager_page.dart';
 import '../global.dart';
-import 'match_data_checker.dart';
-import '../server_setup/server_setup.dart';
 import 'help_screen.dart';
+import 'match_data_checker.dart';
 
 // This page shows 2 options:
 // - Manage Data
@@ -26,7 +25,7 @@ class StartPage extends StatefulWidget {
 }
 
 class _StartPageState extends State<StartPage> with WindowListener {
-  int _sidebarIndex = 0;
+  int sidebarIndex = 0;
 
   @override
   void initState() {
@@ -71,7 +70,7 @@ class _StartPageState extends State<StartPage> with WindowListener {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             SideNavigationBar(
-              selectedIndex: _sidebarIndex,
+              selectedIndex: sidebarIndex,
               expandable: false,
               header: SideNavigationBarHeader(
                 image: const SizedBox.shrink(),
@@ -156,12 +155,11 @@ class _StartPageState extends State<StartPage> with WindowListener {
               items: const [
                 SideNavigationBarItem(label: 'Hướng dẫn', icon: FontAwesomeIcons.circleQuestion),
                 SideNavigationBarItem(label: 'Quản lý dữ liệu', icon: FontAwesomeIcons.database),
-                SideNavigationBarItem(label: 'Server Setup', icon: FontAwesomeIcons.server),
+                SideNavigationBarItem(label: 'Bắt đầu trận', icon: Icons.settings_rounded),
                 SideNavigationBarItem(label: 'Miscellaneous', icon: FontAwesomeIcons.circlePlus),
               ],
               onTap: (newIndex) {
-                if (newIndex == 2) logger.i('Accessing help page');
-                setState(() => _sidebarIndex = newIndex);
+                setState(() => sidebarIndex = newIndex);
               },
               theme: SideNavigationBarTheme(
                 itemTheme: SideNavigationBarItemTheme(
@@ -181,41 +179,24 @@ class _StartPageState extends State<StartPage> with WindowListener {
                 child: [
                   // Help screen
                   const HelpScreen(),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      button(
-                        context,
-                        'Mở phần quản lý dữ liệu',
-                        onPressed: () {
-                          logger.i('Opening Data Manager page...');
-                          Navigator.of(context).push(
-                            MaterialPageRoute(builder: (context) => const DataManagerPage()),
-                          );
-                        },
-                      ),
-                      button(
-                        context,
-                        'Match Data Checker',
-                        disabledLabel: 'Not available',
-                        onPressed: () async {
-                          logger.i('Opening Match Setup');
-                          await Navigator.of(context).push(
-                            MaterialPageRoute(builder: (context) => const MatchDataChecker()),
-                          );
-                        },
-                      ),
-                    ],
+                  button(
+                    context,
+                    'Mở phần quản lý dữ liệu',
+                    onPressed: () {
+                      logger.i('Opening Data Manager page...');
+                      Navigator.of(context).push(
+                        MaterialPageRoute(builder: (context) => const DataManagerPage()),
+                      );
+                    },
                   ),
                   button(
                     context,
-                    'Mở phần thiết lập Server',
+                    'Mở phần thiết lập trận đấu',
                     onPressed: () async {
-                      logger.i('Opening Server Setup page...');
+                      logger.i('Opening Match Setup');
                       await Navigator.of(context).push(
-                        MaterialPageRoute(builder: (context) => const ServerSetup()),
+                        MaterialPageRoute(builder: (context) => const MatchDataChecker()),
                       );
-                      await KLIServer.stop();
                     },
                   ),
                   button(
@@ -226,7 +207,7 @@ class _StartPageState extends State<StartPage> with WindowListener {
                       await launchUrl(Uri.parse(storageHandler!.logFile));
                     },
                   ),
-                ].elementAt(_sidebarIndex),
+                ].elementAt(sidebarIndex),
               ),
             ),
           ],
