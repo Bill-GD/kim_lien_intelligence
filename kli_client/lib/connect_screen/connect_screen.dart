@@ -258,7 +258,8 @@ class _ConnectPageState extends State<ConnectPage> {
                     await KLIClient.disconnect();
                     clientTextController.text = '';
                     setState(() {});
-                    if (mounted) showToastMessage(context, 'Server disconnected');
+                    if (mounted) showToastMessage(context, newMessage.msg);
+                    logger.i(newMessage.msg);
                   }
 
                   // serverMessage = newMessage.msg;

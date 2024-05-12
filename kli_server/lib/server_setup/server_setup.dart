@@ -186,7 +186,7 @@ class _ServerSetupState extends State<ServerSetup> {
                   ClientID.values[index + 1],
                   KLISocketMessage(
                     senderID: ClientID.host,
-                    message: '',
+                    message: 'Server forced disconnection',
                     type: KLIMessageType.disconnect,
                   ),
                 );

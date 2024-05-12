@@ -31,7 +31,7 @@ void initLogger() {
 }
 
 String changelog = """
-  0.1.0.2 ({latest}):
+  0.1.0.2 ({f043127}):
   - Moved assets to KLILib
 
   0.1.0.1 ({3cdc768}):

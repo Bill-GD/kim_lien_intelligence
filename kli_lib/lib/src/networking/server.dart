@@ -133,7 +133,11 @@ class KLIServer {
       if (_clientList[i] == null) continue;
       sendMessage(
         ClientID.values[i + 1],
-        KLISocketMessage(senderID: ClientID.host, message: '', type: KLIMessageType.disconnect),
+        KLISocketMessage(
+          senderID: ClientID.host,
+          message: 'Server stopped, forced disconnection',
+          type: KLIMessageType.disconnect,
+        ),
       );
     }
     for (final client in _clientList) {
