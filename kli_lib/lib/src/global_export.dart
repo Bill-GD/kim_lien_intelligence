@@ -49,6 +49,7 @@ Widget button(
   double fontSize = fontSizeMedium,
   bool enableCondition = true,
   void Function()? onPressed,
+  String enabledLabel = '',
   String disabledLabel = 'Disabled',
 }) {
   final mainButton = OutlinedButton(
@@ -60,7 +61,26 @@ Widget button(
     child: Text(label, style: TextStyle(fontSize: fontSize)),
   );
 
-  return enableCondition && onPressed != null
-      ? mainButton
-      : Tooltip(message: disabledLabel, child: mainButton);
+  return Tooltip(
+    message: enableCondition && onPressed != null ? enabledLabel : disabledLabel,
+    child: mainButton,
+  );
+}
+
+Widget iconButton(
+  BuildContext context,
+  Widget icon, {
+  bool enableCondition = true,
+  void Function()? onPressed,
+  String enabledLabel = '',
+  String disabledLabel = 'Disabled',
+}) {
+  final mainButton = IconButton(
+    icon: icon,
+    onPressed: enableCondition && onPressed != null ? onPressed : null,
+  );
+  return Tooltip(
+    message: enableCondition && onPressed != null ? enabledLabel : disabledLabel,
+    child: mainButton,
+  );
 }

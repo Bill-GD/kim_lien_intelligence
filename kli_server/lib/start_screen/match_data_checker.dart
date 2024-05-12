@@ -132,11 +132,12 @@ class _MatchDataCheckerState extends State<MatchDataChecker> {
               await showDialog(
                 context: context,
                 builder: (context) {
+                  final joinedErrorList = errorList.map((e) => e.contains('+') ? e : '- $e').join('\n');
                   return AlertDialog(
                     title: Text(roundNames[index], textAlign: TextAlign.center),
                     titleTextStyle: const TextStyle(fontSize: fontSizeMedium),
                     content: Text(
-                      errorList.isEmpty ? 'Đã hoàn thiện' : '- ${errorList.join('\n- ')}',
+                      errorList.isEmpty ? 'Đã hoàn thiện' : joinedErrorList,
                       textAlign: errorList.isEmpty ? TextAlign.center : null,
                     ),
                     contentTextStyle: const TextStyle(fontSize: fontSizeMSmall),
@@ -181,29 +182,34 @@ class _MatchDataCheckerState extends State<MatchDataChecker> {
       StartMatch.fromJson,
       storageHandler!.startSaveFile,
     );
-    if (saved.isEmpty) return (false, ['Thiếu dữ liệu']);
+    if (saved.isEmpty) return (false, ['Chưa có dữ liệu']);
 
     try {
       StartMatch match = saved.firstWhere((e) => e.match == matchNames[selectedMatchIndex]);
 
       if (match.questions.isEmpty) return (false, ['Chưa có câu hỏi']);
-      if (match.questions.keys.length < 4) errorList.add('Thiếu câu hỏi cho ít nhất 1 thí sinh');
 
       for (int i = 1; i <= 4; i++) {
         try {
           final qList = match.questions.values.elementAt(i - 1);
-          if (qList.length < 20) errorList.add('Thí sinh $i: ít hơn 20 câu hỏi');
+          final misingSubjects = <String>[];
           for (final qType in StartQuestionSubject.values) {
             if (qList.where((e) => e.subject == qType).isEmpty) {
-              errorList.add('Thí sinh $i: chưa có lĩnh vực ${StartQuestion.mapTypeDisplay(qType)}');
+              misingSubjects.add(StartQuestion.mapTypeDisplay(qType));
             }
           }
+
+          if (misingSubjects.isNotEmpty) {
+            errorList.add('Thí sinh $i:');
+            errorList.add('  + Chưa có ${misingSubjects.join(', ')}');
+          }
+          if (qList.length < 20) errorList.add('  + Ít hơn 20 câu hỏi');
         } on RangeError {
           errorList.add('Thí sinh $i: chưa có câu hỏi');
         }
       }
     } on StateError {
-      return (false, ['Thiếu dữ liệu']);
+      return (false, ['Chưa có dữ liệu']);
     }
 
     return (errorList.isEmpty, errorList);
@@ -216,7 +222,7 @@ class _MatchDataCheckerState extends State<MatchDataChecker> {
       ObstacleMatch.fromJson,
       storageHandler!.obstacleSaveFile,
     );
-    if (saved.isEmpty) return (false, ['Thiếu dữ liệu']);
+    if (saved.isEmpty) return (false, ['Chưa có dữ liệu']);
 
     try {
       ObstacleMatch match = saved.firstWhere((e) => e.match == matchNames[selectedMatchIndex]);
@@ -225,7 +231,7 @@ class _MatchDataCheckerState extends State<MatchDataChecker> {
       if (match.imagePath.isEmpty) errorList.add('Không có ảnh CNV');
       if (match.hintQuestions.length < 5) errorList.add('Không đủ số câu hỏi');
     } on StateError {
-      return (false, ['Thiếu dữ liệu']);
+      return (false, ['Chưa có dữ liệu']);
     }
 
     return (errorList.isEmpty, errorList);
@@ -238,7 +244,7 @@ class _MatchDataCheckerState extends State<MatchDataChecker> {
       AccelMatch.fromJson,
       storageHandler!.accelSaveFile,
     );
-    if (saved.isEmpty) return (false, ['Thiếu dữ liệu']);
+    if (saved.isEmpty) return (false, ['Chưa có dữ liệu']);
 
     try {
       AccelMatch match = saved.firstWhere((e) => e.match == matchNames[selectedMatchIndex]);
@@ -263,7 +269,7 @@ class _MatchDataCheckerState extends State<MatchDataChecker> {
         }
       }
     } on StateError {
-      return (false, ['Thiếu dữ liệu']);
+      return (false, ['Chưa có dữ liệu']);
     }
 
     return (errorList.isEmpty, errorList);
@@ -276,18 +282,18 @@ class _MatchDataCheckerState extends State<MatchDataChecker> {
       FinishMatch.fromJson,
       storageHandler!.finishSaveFile,
     );
-    if (saved.isEmpty) return (false, ['Thiếu dữ liệu']);
+    if (saved.isEmpty) return (false, ['Chưa có dữ liệu']);
 
     try {
       FinishMatch match = saved.firstWhere((e) => e.match == matchNames[selectedMatchIndex]);
       for (int i = 1; i <= 3; i++) {
         final qCount = match.questions.where((e) => e.point == i * 10).length;
         if (qCount < 12) {
-          errorList.add('Mức điểm ${i * 10} chưa đủ câu hỏi ($qCount/12)');
+          errorList.add('Mức điểm ${i * 10}: $qCount/12');
         }
       }
     } on StateError {
-      return (false, ['Thiếu dữ liệu']);
+      return (false, ['Chưa có dữ liệu']);
     }
 
     return (errorList.isEmpty, errorList);
@@ -300,14 +306,14 @@ class _MatchDataCheckerState extends State<MatchDataChecker> {
       ExtraMatch.fromJson,
       storageHandler!.extraSaveFile,
     );
-    if (saved.isEmpty) return (false, ['Thiếu dữ liệu']);
+    if (saved.isEmpty) return (false, ['Chưa có dữ liệu']);
 
     try {
       ExtraMatch match = saved.firstWhere((e) => e.match == matchNames[selectedMatchIndex]);
 
       if (match.questions.isEmpty) errorList.add('Chưa có câu hỏi');
     } on StateError {
-      return (false, ['Thiếu dữ liệu']);
+      return (false, ['Chưa có dữ liệu']);
     }
 
     return (errorList.isEmpty, errorList);

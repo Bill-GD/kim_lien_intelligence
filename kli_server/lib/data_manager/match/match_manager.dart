@@ -96,6 +96,7 @@ class _MatchManagerState extends State<MatchManager> {
             context,
             'Sửa trận${currentMatchIndex < 0 ? '' : ': ${matches[currentMatchIndex].name}'}',
             enableCondition: currentMatchIndex >= 0,
+            disabledLabel: 'Chưa chọn trận đấu',
             onPressed: () async {
               final newMatch = await Navigator.of(context).push<KLIMatch>(
                 DialogRoute<KLIMatch>(
@@ -125,6 +126,7 @@ class _MatchManagerState extends State<MatchManager> {
             context,
             'Xóa trận${currentMatchIndex < 0 ? '' : ': ${matches[currentMatchIndex].name}'}',
             enableCondition: currentMatchIndex >= 0,
+            disabledLabel: 'Chưa chọn trận đấu',
             onPressed: () async {
               await confirmDialog(
                 context,

@@ -182,6 +182,8 @@ class _ObstacleManagerState extends State<ObstacleManager> {
             context,
             'Nhập từ file',
             enableCondition: selectedMatchIndex >= 0,
+            enabledLabel: 'Cho phép nhập dữ liệu từ file Excel',
+            disabledLabel: 'Chưa chọn trận đấu',
             onPressed: () async {
               Map<String, dynamic>? data =
                   await Navigator.of(context).push<Map<String, dynamic>>(DialogRoute<Map<String, dynamic>>(
@@ -208,6 +210,8 @@ class _ObstacleManagerState extends State<ObstacleManager> {
             context,
             'Xóa câu hỏi',
             enableCondition: selectedMatchIndex >= 0,
+            enabledLabel: 'Xóa toàn bộ câu hỏi của phần thi hiện tại',
+            disabledLabel: 'Chưa chọn trận đấu',
             onPressed: () async {
               await confirmDialog(
                 context,

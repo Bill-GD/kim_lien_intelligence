@@ -163,7 +163,13 @@ class DataManager {
 }
 
 String changelog = """
-  0.3.1 ({latest}):
+  0.3.1.1 ({latest}):
+  - Assets moved to KLILib
+  - Added more tooltips to buttons
+  - Better data checker error for start question display
+  - Added iconButton custom widget (similar to other buttons)
+
+  0.3.1 ({8e8f615}):
   - Renamed data manager pages
   - Match data checker page: check if all info are good, show errors if not
 

@@ -170,29 +170,30 @@ class _ServerSetupState extends State<ServerSetup> {
           fontSize: fontSizeMSmall,
           color: connected ? Colors.greenAccent : Colors.redAccent,
         ),
-        trailing: IconButton(
-          icon: const FaIcon(FontAwesomeIcons.linkSlash),
-          tooltip: 'Disconnect ${Networking.getClientDisplayID(ClientID.values[index + 1])}',
-          onPressed: !connected
-              ? null
-              : () async {
-                  await confirmDialog(
-                    context,
-                    message: 'Disconnect client?',
-                    acceptLogMessage: 'Disconnected Client: ${ClientID.values[index + 1]}',
-                    onAccept: () async {
-                      KLIServer.sendMessage(
-                        ClientID.values[index + 1],
-                        KLISocketMessage(
-                          senderID: ClientID.host,
-                          message: '',
-                          type: KLIMessageType.disconnect,
-                        ),
-                      );
-                      client.destroy();
-                    },
-                  );
-                },
+        trailing: iconButton(
+          context,
+          const FaIcon(FontAwesomeIcons.linkSlash),
+          enableCondition: connected,
+          enabledLabel: 'Disconnect ${Networking.getClientDisplayID(ClientID.values[index + 1])}',
+          disabledLabel: 'Not connected',
+          onPressed: () async {
+            await confirmDialog(
+              context,
+              message: 'Disconnect client?',
+              acceptLogMessage: 'Disconnected Client: ${ClientID.values[index + 1]}',
+              onAccept: () async {
+                KLIServer.sendMessage(
+                  ClientID.values[index + 1],
+                  KLISocketMessage(
+                    senderID: ClientID.host,
+                    message: '',
+                    type: KLIMessageType.disconnect,
+                  ),
+                );
+                if (connected) client.destroy();
+              },
+            );
+          },
         ),
       ));
     }
