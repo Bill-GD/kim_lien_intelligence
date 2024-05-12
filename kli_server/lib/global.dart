@@ -168,6 +168,7 @@ String changelog = """
   - Added more tooltips to buttons
   - Better data checker error for start question display
   - Added iconButton custom widget (similar to other buttons)
+  - Checks Accel image errors better
 
   0.3.1 ({8e8f615}):
   - Renamed data manager pages

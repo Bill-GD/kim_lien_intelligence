@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:kli_lib/kli_lib.dart';
@@ -255,17 +256,12 @@ class _MatchDataCheckerState extends State<MatchDataChecker> {
         final q = match.questions[i - 1];
         if (q == null) continue;
 
-        if (q.type == AccelQuestionType.none) {
-          errorList.add('Câu $i: không có ảnh');
-        }
-        if (q.type == AccelQuestionType.iq && q.imagePaths.isEmpty) {
-          errorList.add('Câu $i (IQ): không có ảnh');
-        }
-        if (q.type == AccelQuestionType.arrange && q.imagePaths.length < 2) {
-          errorList.add('Câu $i (sắp xếp): không đủ 2 ảnh');
-        }
-        if (q.type == AccelQuestionType.sequence && q.imagePaths.length < 3) {
-          errorList.add('Câu $i (chuỗi hình ảnh): không đủ ít nhất 3 ảnh');
+        if (q.imagePaths.isEmpty) errorList.add('Câu $i: không có ảnh');
+
+        final missing = q.imagePaths.where((e) => !File('${storageHandler!.parentFolder}\\$e').existsSync());
+        if (missing.isNotEmpty) {
+          errorList
+              .add('Câu $i (${AccelQuestion.mapTypeDisplay(q.type)}): Không tìm thấy ${missing.join(', ')}');
         }
       }
     } on StateError {
