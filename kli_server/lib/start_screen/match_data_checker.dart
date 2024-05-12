@@ -44,7 +44,7 @@ class _MatchDataCheckerState extends State<MatchDataChecker> {
     return Container(
       decoration: const BoxDecoration(
         image: DecorationImage(
-          image: AssetImage('assets/images/ttkl_bg_new.png'),
+          image: AssetImage('assets/images/ttkl_bg_new.png', package: 'kli_lib'),
           fit: BoxFit.fill,
           opacity: 0.8,
         ),

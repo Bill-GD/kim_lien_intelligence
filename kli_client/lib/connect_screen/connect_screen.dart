@@ -58,7 +58,7 @@ class _ConnectPageState extends State<ConnectPage> {
       body: Container(
         decoration: const BoxDecoration(
           image: DecorationImage(
-            image: AssetImage('assets/images/ttkl_bg_new.png'),
+            image: AssetImage('assets/images/ttkl_bg_new.png', package: 'kli_lib'),
             fit: BoxFit.fill,
             opacity: 0.8,
           ),
@@ -123,7 +123,12 @@ class _ConnectPageState extends State<ConnectPage> {
                   onPressed: () {
                     showLicensePage(
                       context: context,
-                      applicationIcon: Image.asset('assets/images/ttkl_logo.png', width: 50, height: 50),
+                      applicationIcon: Image.asset(
+                        'assets/images/ttkl_logo.png',
+                        package: 'kli_lib',
+                        width: 50,
+                        height: 50,
+                      ),
                       applicationName: 'KLI Client',
                       applicationVersion: 'v${packageInfo.version}.${packageInfo.buildNumber}',
                     );

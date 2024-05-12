@@ -61,7 +61,7 @@ class _StartPageState extends State<StartPage> with WindowListener {
       body: Container(
         decoration: const BoxDecoration(
           image: DecorationImage(
-            image: AssetImage('assets/images/ttkl_bg_new.png'),
+            image: AssetImage('assets/images/ttkl_bg_new.png', package: 'kli_lib'),
             fit: BoxFit.fill,
             opacity: 0.8,
           ),
@@ -76,7 +76,7 @@ class _StartPageState extends State<StartPage> with WindowListener {
                 image: const SizedBox.shrink(),
                 title: Padding(
                   padding: const EdgeInsets.only(right: 20, top: 10),
-                  child: Image.asset('assets/images/ttkl_logo_title_light.png'),
+                  child: Image.asset('assets/images/ttkl_logo_title_light.png', package: 'kli_lib'),
                 ),
                 subtitle: Padding(
                   padding: const EdgeInsets.only(left: 100, bottom: 10),
@@ -108,6 +108,7 @@ class _StartPageState extends State<StartPage> with WindowListener {
                                   context: context,
                                   applicationIcon: Image.asset(
                                     'assets/images/ttkl_logo.png',
+                                    package: 'kli_lib',
                                     width: 50,
                                     height: 50,
                                   ),
