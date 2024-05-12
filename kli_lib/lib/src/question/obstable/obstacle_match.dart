@@ -1,9 +1,7 @@
 import '../../global_export.dart';
 import 'obstacle_question.dart';
 
-class ObstacleMatch implements BaseMatch {
-  @override
-  String match;
+class ObstacleMatch extends BaseMatch {
   String keyword;
   List<ObstacleQuestion?> hintQuestions;
   String imagePath;
@@ -11,7 +9,7 @@ class ObstacleMatch implements BaseMatch {
   int charCount;
 
   ObstacleMatch({
-    required this.match,
+    required super.match,
     required this.keyword,
     required this.hintQuestions,
     required this.imagePath,

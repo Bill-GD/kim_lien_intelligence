@@ -40,7 +40,7 @@ const double fontSizeXS = 12;
 
 abstract class BaseMatch {
   String match;
-  BaseMatch(this.match);
+  BaseMatch({required this.match});
 }
 
 Widget button(

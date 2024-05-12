@@ -1,14 +1,12 @@
 import '../../global_export.dart';
 import 'start_question.dart';
 
-class StartMatch implements BaseMatch {
-  @override
-  String match;
+class StartMatch extends BaseMatch {
   Map<int, List<StartQuestion>> questions;
 
   int get questionCount => questions.values.fold(0, (a, b) => a + b.length);
 
-  StartMatch({required this.match, required this.questions});
+  StartMatch({required super.match, required this.questions});
 
   Map<String, dynamic> toJson() => {
         'match': match,

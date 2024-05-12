@@ -1,12 +1,10 @@
 import '../../global_export.dart';
 import 'finish_question.dart';
 
-class FinishMatch implements BaseMatch {
-  @override
-  String match;
+class FinishMatch extends BaseMatch {
   List<FinishQuestion> questions;
 
-  FinishMatch({required this.match, required this.questions});
+  FinishMatch({required super.match, required this.questions});
 
   Map<String, dynamic> toJson() => {
         'match': match,

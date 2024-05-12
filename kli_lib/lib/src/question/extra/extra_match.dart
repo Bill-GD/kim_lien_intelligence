@@ -1,12 +1,10 @@
 import '../../global_export.dart';
 import 'extra_question.dart';
 
-class ExtraMatch implements BaseMatch {
-  @override
-  String match;
+class ExtraMatch extends BaseMatch {
   List<ExtraQuestion> questions;
 
-  ExtraMatch({required this.match, required this.questions});
+  ExtraMatch({required super.match, required this.questions});
 
   Map<String, dynamic> toJson() => {
         'match': match,

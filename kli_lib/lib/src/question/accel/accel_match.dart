@@ -1,12 +1,10 @@
 import '../../global_export.dart';
 import 'accel_question.dart';
 
-class AccelMatch implements BaseMatch {
-  @override
-  String match;
+class AccelMatch extends BaseMatch {
   List<AccelQuestion?> questions;
 
-  AccelMatch({required this.match, required this.questions});
+  AccelMatch({required super.match, required this.questions});
 
   Map<String, dynamic> toJson() => {
         'match': match,
