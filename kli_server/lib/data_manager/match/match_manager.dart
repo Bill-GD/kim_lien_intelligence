@@ -72,8 +72,7 @@ class _MatchManagerState extends State<MatchManager> {
         mainAxisSize: MainAxisSize.max,
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
-          button(
-            context,
+          KLIButton(
             'Thêm trận',
             onPressed: () async {
               final newMatch = await Navigator.of(context).push<KLIMatch>(
@@ -92,8 +91,7 @@ class _MatchManagerState extends State<MatchManager> {
               }
             },
           ),
-          button(
-            context,
+          KLIButton(
             'Sửa trận${currentMatchIndex < 0 ? '' : ': ${matches[currentMatchIndex].name}'}',
             enableCondition: currentMatchIndex >= 0,
             disabledLabel: 'Chưa chọn trận đấu',
@@ -122,8 +120,7 @@ class _MatchManagerState extends State<MatchManager> {
               }
             },
           ),
-          button(
-            context,
+          KLIButton(
             'Xóa trận${currentMatchIndex < 0 ? '' : ': ${matches[currentMatchIndex].name}'}',
             enableCondition: currentMatchIndex >= 0,
             disabledLabel: 'Chưa chọn trận đấu',
@@ -154,13 +151,19 @@ class _MatchManagerState extends State<MatchManager> {
           children: [
             Padding(
               padding: const EdgeInsets.only(bottom: 30),
-              child: Text('Danh sách trận đấu', style: Theme.of(context).textTheme.titleLarge),
+              child: Text(
+                'Danh sách trận đấu',
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.onPrimary,
+                  fontSize: fontSizeMedium,
+                ),
+              ),
             ),
             Flexible(
               child: matches.isEmpty
                   ? Container(
                       decoration: BoxDecoration(
-                        border: Border.all(width: 1, color: Theme.of(context).colorScheme.onBackground),
+                        border: Border.all(width: 1, color: Theme.of(context).colorScheme.onPrimary),
                         color: Theme.of(context).colorScheme.background,
                       ),
                       alignment: Alignment.center,
@@ -170,10 +173,16 @@ class _MatchManagerState extends State<MatchManager> {
                       itemCount: matches.length,
                       separatorBuilder: (_, index) => const SizedBox(height: 20),
                       itemBuilder: (_, index) => ListTile(
-                        title: Text(matches[index].name, style: const TextStyle(fontSize: fontSizeMedium)),
+                        title: Text(
+                          matches[index].name,
+                          style: const TextStyle(
+                            fontSize: fontSizeMedium,
+                            color: Colors.white,
+                          ),
+                        ),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(10),
-                          side: BorderSide(width: 2, color: Theme.of(context).colorScheme.onBackground),
+                          side: const BorderSide(width: 2, color: Colors.white),
                         ),
                         onTap: () {
                           currentMatchIndex = index;
@@ -196,7 +205,13 @@ class _MatchManagerState extends State<MatchManager> {
           children: [
             Padding(
               padding: const EdgeInsets.only(bottom: 30),
-              child: Text('Danh sách thí sinh', style: Theme.of(context).textTheme.titleLarge),
+              child: Text(
+                'Danh sách thí sinh',
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.onPrimary,
+                  fontSize: fontSizeMedium,
+                ),
+              ),
             ),
             Flexible(
               child: currentMatchIndex < 0
@@ -233,7 +248,11 @@ class _MatchManagerState extends State<MatchManager> {
             footer: hasPlayer
                 ? Text(
                     '${p[index]?.name}',
-                    style: const TextStyle(fontSize: fontSizeSmall, fontWeight: FontWeight.bold),
+                    style: const TextStyle(
+                      fontSize: fontSizeSmall,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
                     textAlign: TextAlign.center,
                   )
                 : null,

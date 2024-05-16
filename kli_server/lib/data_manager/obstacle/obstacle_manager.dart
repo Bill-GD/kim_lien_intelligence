@@ -178,8 +178,7 @@ class _ObstacleManagerState extends State<ObstacleManager> {
             await loadMatchQuestions(matchNames[selectedMatchIndex]);
             setState(() {});
           }),
-          button(
-            context,
+          KLIButton(
             'Nhập từ file',
             enableCondition: selectedMatchIndex >= 0,
             enabledLabel: 'Cho phép nhập dữ liệu từ file Excel',
@@ -205,9 +204,8 @@ class _ObstacleManagerState extends State<ObstacleManager> {
               setState(() {});
             },
           ),
-          // button(context, 'Export Excel', enableCondition: false),
-          button(
-            context,
+          // KLIButton('Export Excel', enableCondition: false),
+          KLIButton(
             'Xóa câu hỏi',
             enableCondition: selectedMatchIndex >= 0,
             enabledLabel: 'Xóa toàn bộ câu hỏi của phần thi hiện tại',

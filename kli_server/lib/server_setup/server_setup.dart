@@ -111,8 +111,7 @@ class _ServerSetupState extends State<ServerSetup> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
-        button(
-          context,
+        KLIButton(
           'Start Server',
           enableCondition: !KLIServer.started,
           disabledLabel: 'Server already started',
@@ -139,8 +138,7 @@ class _ServerSetupState extends State<ServerSetup> {
             }
           },
         ),
-        button(
-          context,
+        KLIButton(
           'Stop Server',
           disabledLabel: 'No server exist',
           enableCondition: KLIServer.started,
@@ -170,8 +168,7 @@ class _ServerSetupState extends State<ServerSetup> {
           fontSize: fontSizeMSmall,
           color: connected ? Colors.greenAccent : Colors.redAccent,
         ),
-        trailing: iconButton(
-          context,
+        trailing: KLIIconButton(
           const FaIcon(FontAwesomeIcons.linkSlash),
           enableCondition: connected,
           enabledLabel: 'Disconnect ${Networking.getClientDisplayID(ClientID.values[index + 1])}',

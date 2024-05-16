@@ -73,8 +73,7 @@ class _MatchDataCheckerState extends State<MatchDataChecker> {
                     disableServerSetup = !questionCheckResults.every((e) => e.$1 == true);
                     setState(() {});
                   }),
-                  button(
-                    context,
+                  KLIButton(
                     'Mở phần thiết lập Server',
                     enableCondition: !disableServerSetup,
                     disabledLabel: 'Trận đấu chưa đủ thông tin',

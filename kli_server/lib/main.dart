@@ -3,7 +3,6 @@ import 'dart:ui';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
 import 'package:theme_provider/theme_provider.dart';
 import 'package:window_manager/window_manager.dart';
 import 'package:kli_lib/kli_lib.dart';
@@ -45,21 +44,9 @@ class KliServerApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ThemeProvider(
-      defaultThemeId: '${SchedulerBinding.instance.platformDispatcher.platformBrightness.name}_theme',
+      defaultThemeId: 'dark_theme',
       themes: [
-        AppTheme(
-          id: 'light_theme',
-          description: 'Light theme',
-          data: ThemeData(
-            useMaterial3: true,
-            fontFamily: 'Nunito',
-            colorScheme: ColorScheme.fromSeed(
-              seedColor: Colors.white,
-              brightness: Brightness.light,
-              error: Colors.redAccent,
-            ).copyWith(background: Colors.white),
-          ),
-        ),
+        AppTheme(id: 'light_theme', description: 'Light theme (disabled)', data: ThemeData()),
         AppTheme(
           id: 'dark_theme',
           description: 'Dark theme',

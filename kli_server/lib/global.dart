@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:kli_lib/kli_lib.dart';
 import 'package:logger/logger.dart';
 import 'package:package_info_plus/package_info_plus.dart';
+import 'package:side_navigation/side_navigation.dart';
 
 late final Logger logger;
 void initLogger(String logPath) {
@@ -106,6 +107,22 @@ Text _applyFontSize(Text t) {
   return Text('${t.data}', textAlign: t.textAlign, style: const TextStyle(fontSize: fontSizeMedium));
 }
 
+SideNavigationBarTheme sideNavigationTheme(BuildContext context, [double height = 2]) {
+  return SideNavigationBarTheme(
+    itemTheme: SideNavigationBarItemTheme(
+      selectedItemColor: Theme.of(context).colorScheme.primary,
+      labelTextStyle: TextStyle(fontWeight: FontWeight.bold, fontSize: fontSizeMSmall, height: height),
+    ),
+    togglerTheme: SideNavigationBarTogglerTheme.standard(),
+    dividerTheme: const SideNavigationBarDividerTheme(
+      showHeaderDivider: true,
+      headerDividerColor: Color(0x64FFFFFF),
+      showMainDivider: true,
+      showFooterDivider: false,
+    ),
+  );
+}
+
 class DataManager {
   static Future<List<T>> getAllSavedQuestions<T extends BaseMatch>(
     T Function(Map<String, dynamic>) func,
@@ -163,7 +180,11 @@ class DataManager {
 }
 
 String changelog = """
-  0.3.1.1 ({latest}):
+  0.3.1.2 ({latest}):
+  - Disabled light theme (like who need this anyway)
+  - Use less theme colors
+
+  0.3.1.1 ({8541f82}):
   - Assets moved to KLILib
   - Added more tooltips to buttons
   - Better data checker error for start question display

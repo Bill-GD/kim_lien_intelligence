@@ -45,14 +45,13 @@ class _HelpScreenState extends State<HelpScreen> {
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              button(
-                context,
+              KLIButton(
                 'Mở thư mục chứa phần mềm',
                 onPressed: () async {
                   await launchUrl(Uri.parse(storageHandler!.parentFolder));
                 },
               ),
-              button(context, 'Mở file thông tin chi tiết'),
+              const KLIButton('Mở file thông tin chi tiết'),
             ],
           ),
           const SizedBox(height: 50),

@@ -132,8 +132,7 @@ class _ExtraManagerState extends State<ExtraManager> {
             await loadMatchQuestions(matchNames[selectedMatchIndex]);
             setState(() {});
           }),
-          button(
-            context,
+          KLIButton(
             'Thêm câu hỏi',
             enableCondition: selectedMatchIndex >= 0,
             enabledLabel: 'Thêm 1 câu hỏi cho phần thi',
@@ -152,8 +151,7 @@ class _ExtraManagerState extends State<ExtraManager> {
               setState(() {});
             },
           ),
-          button(
-            context,
+          KLIButton(
             'Nhập từ file',
             enableCondition: selectedMatchIndex >= 0,
             enabledLabel: 'Cho phép nhập dữ liệu từ file Excel',
@@ -179,8 +177,7 @@ class _ExtraManagerState extends State<ExtraManager> {
               setState(() {});
             },
           ),
-          button(
-            context,
+          KLIButton(
             'Xóa câu hỏi',
             enableCondition: selectedMatchIndex >= 0,
             enabledLabel: 'Xóa toàn bộ câu hỏi của phần thi hiện tại',

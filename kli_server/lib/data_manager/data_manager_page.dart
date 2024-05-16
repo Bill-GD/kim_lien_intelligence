@@ -51,6 +51,7 @@ class _DataManagerPageState extends State<DataManagerPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.transparent,
       body: Container(
         decoration: const BoxDecoration(
           image: DecorationImage(
@@ -92,18 +93,7 @@ class _DataManagerPageState extends State<DataManagerPage> {
                 setState(() => selectedPage = newIndex);
                 logger.i('Selecting ${contentPages[newIndex].runtimeType}');
               },
-              theme: SideNavigationBarTheme(
-                itemTheme: SideNavigationBarItemTheme(
-                  selectedItemColor: Theme.of(context).colorScheme.primary,
-                  labelTextStyle: const TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: fontSizeMSmall,
-                    height: 2,
-                  ),
-                ),
-                togglerTheme: SideNavigationBarTogglerTheme.standard(),
-                dividerTheme: SideNavigationBarDividerTheme.standard(),
-              ),
+              theme: sideNavigationTheme(context),
             ),
             Expanded(
               child: isLoading

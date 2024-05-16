@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/gestures.dart';
@@ -47,6 +48,7 @@ class _StartPageState extends State<StartPage> with WindowListener {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.transparent,
       extendBodyBehindAppBar: true,
       appBar: AppBar(
         actions: [
@@ -78,15 +80,9 @@ class _StartPageState extends State<StartPage> with WindowListener {
                   padding: const EdgeInsets.only(right: 20, top: 10),
                   child: Image.asset('assets/images/ttkl_logo_title_light.png', package: 'kli_lib'),
                 ),
-                subtitle: Padding(
-                  padding: const EdgeInsets.only(left: 100, bottom: 10),
-                  child: Text(
-                    'Host',
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: Theme.of(context).colorScheme.secondary.withOpacity(0.8),
-                    ),
-                  ),
+                subtitle: const Padding(
+                  padding: EdgeInsets.only(left: 100, bottom: 10),
+                  child: Text('Host', style: TextStyle(fontSize: fontSizeSmall, color: Colors.white70)),
                 ),
               ),
               footer: SideNavigationBarFooter(
@@ -149,7 +145,7 @@ class _StartPageState extends State<StartPage> with WindowListener {
                   },
                   child: Text(
                     'v${packageInfo.version}.${packageInfo.buildNumber}',
-                    style: TextStyle(color: Theme.of(context).colorScheme.secondary.withOpacity(0.8)),
+                    style: const TextStyle(color: Colors.white54),
                   ),
                 ),
               ),
@@ -162,26 +158,14 @@ class _StartPageState extends State<StartPage> with WindowListener {
               onTap: (newIndex) {
                 setState(() => sidebarIndex = newIndex);
               },
-              theme: SideNavigationBarTheme(
-                itemTheme: SideNavigationBarItemTheme(
-                  selectedItemColor: Theme.of(context).colorScheme.primary,
-                  labelTextStyle: const TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: fontSizeMSmall,
-                    height: 3,
-                  ),
-                ),
-                togglerTheme: SideNavigationBarTogglerTheme.standard(),
-                dividerTheme: SideNavigationBarDividerTheme.standard(),
-              ),
+              theme: sideNavigationTheme(context, 3),
             ),
             Expanded(
               child: Center(
                 child: [
                   // Help screen
                   const HelpScreen(),
-                  button(
-                    context,
+                  KLIButton(
                     'Mở phần quản lý dữ liệu',
                     onPressed: () {
                       logger.i('Opening Data Manager page...');
@@ -190,8 +174,7 @@ class _StartPageState extends State<StartPage> with WindowListener {
                       );
                     },
                   ),
-                  button(
-                    context,
+                  KLIButton(
                     'Mở phần thiết lập trận đấu',
                     onPressed: () async {
                       logger.i('Opening Match Setup');
@@ -200,13 +183,24 @@ class _StartPageState extends State<StartPage> with WindowListener {
                       );
                     },
                   ),
-                  button(
-                    context,
-                    'Open Log File',
-                    onPressed: () async {
-                      logger.i('Opening log...');
-                      await launchUrl(Uri.parse(storageHandler!.logFile));
-                    },
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      KLIButton(
+                        'Open Log File',
+                        onPressed: () async {
+                          logger.i('Opening log...');
+                          await launchUrl(Uri.parse(storageHandler!.logFile));
+                        },
+                      ),
+                      KLIButton(
+                        'Create MatchState',
+                        onPressed: () async {
+                          MatchState.createInstance("Match Name");
+                          logger.i(jsonEncode(MatchState.instance().toJson()));
+                        },
+                      ),
+                    ],
                   ),
                 ].elementAt(sidebarIndex),
               ),

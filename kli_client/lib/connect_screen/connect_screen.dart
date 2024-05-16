@@ -226,8 +226,7 @@ class _ConnectPageState extends State<ConnectPage> {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        button(
-          context,
+        KLIButton(
           'Connect',
           disabledLabel: 'Already connected',
           enableCondition: !isConnecting && !isConnected,
@@ -285,8 +284,7 @@ class _ConnectPageState extends State<ConnectPage> {
           },
         ),
         const SizedBox(width: 20),
-        button(
-          context,
+        KLIButton(
           'Disconnect',
           disabledLabel: 'Not connected',
           enableCondition: isConnected,
@@ -298,8 +296,7 @@ class _ConnectPageState extends State<ConnectPage> {
           },
         ),
         const SizedBox(width: 20),
-        button(
-          context,
+        KLIButton(
           'To waiting room',
           disabledLabel: 'Not connected',
           enableCondition: isConnected,
