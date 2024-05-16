@@ -6,6 +6,7 @@ export 'src/match/kli_player.dart';
 export 'src/match/match_state.dart';
 export 'src/networking/networking_export.dart';
 export 'src/question/questions_export.dart';
+export 'src/widget/changelog_panel.dart';
 export 'src/widget/kli_button.dart';
 export 'src/widget/kli_icon_button.dart';
 export 'src/global_export.dart';

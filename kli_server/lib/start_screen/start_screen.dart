@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:kli_lib/kli_lib.dart';
@@ -92,8 +91,6 @@ class _StartPageState extends State<StartPage> with WindowListener {
                     await showDialog(
                       context: context,
                       builder: (context) {
-                        final split = changelog.split(RegExp("(?={)|(?<=})"));
-
                         return AlertDialog(
                           title: const Text('Changelog', textAlign: TextAlign.center),
                           actions: [
@@ -114,31 +111,7 @@ class _StartPageState extends State<StartPage> with WindowListener {
                               },
                             ),
                           ],
-                          content: SingleChildScrollView(
-                            child: RichText(
-                              text: TextSpan(
-                                style: const TextStyle(fontSize: fontSizeMSmall),
-                                children: <InlineSpan>[
-                                  for (String t in split)
-                                    TextSpan(
-                                      text: t.startsWith('{') ? t.substring(1, t.length - 1) : t,
-                                      style: t.startsWith('{') ? const TextStyle(color: Colors.blue) : null,
-                                      recognizer: t.startsWith('{')
-                                          ? (TapGestureRecognizer()
-                                            ..onTap = () {
-                                              logger.i('Opening commit: $t');
-                                              final commitID = t.replaceAll(RegExp(r'(latest)|[{}]'), '');
-                                              final url =
-                                                  'https://github.com/Bill-GD/kim_lien_intelligence/commit/$commitID';
-                                              launchUrl(Uri.parse(url));
-                                            })
-                                          : null,
-                                    )
-                                ],
-                              ),
-                              softWrap: true,
-                            ),
-                          ),
+                          content: ChangelogPanel(changelog),
                         );
                       },
                     );

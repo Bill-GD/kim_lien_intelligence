@@ -4,6 +4,7 @@
 - Moved all assets from apps to lib
 - Server now disconnect client properly
 - Reduced KLIButton border radius
+- Changelog panel is now reusable
 
 ## 0.2.0
 

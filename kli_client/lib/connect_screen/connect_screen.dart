@@ -1,10 +1,8 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:kli_lib/kli_lib.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 import '../global.dart';
 
@@ -113,8 +111,6 @@ class _ConnectPageState extends State<ConnectPage> {
         await showDialog(
           context: context,
           builder: (context) {
-            final split = changelog.split(RegExp("(?={)|(?<=})"));
-
             return AlertDialog(
               title: const Text('Changelog', textAlign: TextAlign.center),
               actions: [
@@ -135,31 +131,7 @@ class _ConnectPageState extends State<ConnectPage> {
                   },
                 ),
               ],
-              content: SingleChildScrollView(
-                child: RichText(
-                  text: TextSpan(
-                    style: const TextStyle(fontSize: fontSizeMSmall),
-                    children: <InlineSpan>[
-                      for (String t in split)
-                        TextSpan(
-                          text: t.startsWith('{') ? t.substring(1, t.length - 1) : t,
-                          style: t.startsWith('{') ? const TextStyle(color: Colors.blue) : null,
-                          recognizer: t.startsWith('{')
-                              ? (TapGestureRecognizer()
-                                ..onTap = () {
-                                  logger.i('Opening commit: $t');
-                                  final commitID = t.replaceAll(RegExp(r'(latest)|[{}]'), '');
-                                  final url =
-                                      'https://github.com/Bill-GD/kim_lien_intelligence/commit/$commitID';
-                                  launchUrl(Uri.parse(url));
-                                })
-                              : null,
-                        )
-                    ],
-                  ),
-                  softWrap: true,
-                ),
-              ),
+              content: ChangelogPanel(changelog),
             );
           },
         );
