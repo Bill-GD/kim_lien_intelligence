@@ -183,6 +183,7 @@ String changelog = """
   0.3.1.2 ({latest}):
   - Disabled light theme (like who need this anyway)
   - Use less theme colors
+  - Can use 'Esc' to quickly exit page
 
   0.3.1.1 ({8541f82}):
   - Assets moved to KLILib

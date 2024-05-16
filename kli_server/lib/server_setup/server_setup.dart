@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:kli_lib/kli_lib.dart';
 
@@ -39,59 +40,73 @@ class _ServerSetupState extends State<ServerSetup> {
     setState(() {});
   }
 
+  Future<void> popHandler() async {
+    if (!KLIServer.started) {
+      logger.i('Leaving Server Setup page...');
+      Navigator.pop(context);
+      return;
+    }
+    await confirmDialog(
+      context,
+      message: 'Bạn có chắc bạn muốn thoát?\nServer sẽ tự động đóng.',
+      acceptLogMessage: 'Leaving Server Setup page...',
+      onAccept: () async {
+        await KLIServer.stop();
+        if (context.mounted) Navigator.pop(context);
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    return PopScope(
-      canPop: false,
-      onPopInvoked: (pop) async {
-        if (pop) return;
-        if (!KLIServer.started) {
-          logger.i('Leaving Server Setup page...');
-          Navigator.pop(context);
-          return;
+    return Focus(
+      autofocus: true,
+      onKeyEvent: (_, value) {
+        if (value is KeyDownEvent && value.logicalKey == LogicalKeyboardKey.escape) {
+          popHandler();
+          return KeyEventResult.handled;
         }
-        await confirmDialog(
-          context,
-          message: 'Bạn có chắc bạn muốn thoát?\nServer sẽ tự động đóng.',
-          acceptLogMessage: 'Leaving Server Setup page...',
-          onAccept: () async {
-            await KLIServer.stop();
-            if (context.mounted) Navigator.pop(context);
-          },
-        );
+        return KeyEventResult.ignored;
       },
-      child: Scaffold(
-        extendBodyBehindAppBar: true,
-        appBar: AppBar(forceMaterialTransparency: true),
-        body: Container(
-          decoration: const BoxDecoration(
-            image: DecorationImage(
-              image: AssetImage('assets/images/ttkl_bg_new.png', package: 'kli_lib'),
-              fit: BoxFit.fill,
-              opacity: 0.8,
+      child: PopScope(
+        canPop: false,
+        onPopInvoked: (pop) async {
+          if (pop) return;
+          await popHandler();
+        },
+        child: Scaffold(
+          extendBodyBehindAppBar: true,
+          appBar: AppBar(forceMaterialTransparency: true),
+          body: Container(
+            decoration: const BoxDecoration(
+              image: DecorationImage(
+                image: AssetImage('assets/images/ttkl_bg_new.png', package: 'kli_lib'),
+                fit: BoxFit.fill,
+                opacity: 0.8,
+              ),
             ),
-          ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Container(
-                decoration: const BoxDecoration(border: Border(right: BorderSide(width: 2))),
-                constraints: const BoxConstraints(maxWidth: 300),
-                child: Column(children: [
-                  clientList(),
-                ]),
-              ),
-              Expanded(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  mainAxisSize: MainAxisSize.max,
-                  children: <Widget>[
-                    serverStatus(),
-                    managementButtons(),
-                  ],
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Container(
+                  decoration: const BoxDecoration(border: Border(right: BorderSide(width: 2))),
+                  constraints: const BoxConstraints(maxWidth: 300),
+                  child: Column(children: [
+                    clientList(),
+                  ]),
                 ),
-              ),
-            ],
+                Expanded(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    mainAxisSize: MainAxisSize.max,
+                    children: <Widget>[
+                      serverStatus(),
+                      managementButtons(),
+                    ],
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:kli_lib/kli_lib.dart';
 import 'package:side_navigation/side_navigation.dart';
@@ -50,57 +51,68 @@ class _DataManagerPageState extends State<DataManagerPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.transparent,
-      body: Container(
-        decoration: const BoxDecoration(
-          image: DecorationImage(
-            image: AssetImage('assets/images/ttkl_bg_new.png', package: 'kli_lib'),
-            fit: BoxFit.fill,
-            opacity: 0.8,
+    return Focus(
+      autofocus: true,
+      onKeyEvent: (_, value) {
+        if (value is KeyDownEvent && value.logicalKey == LogicalKeyboardKey.escape) {
+          logger.i('Exiting data manager...');
+          Navigator.pop(context);
+          return KeyEventResult.handled;
+        }
+        return KeyEventResult.ignored;
+      },
+      child: Scaffold(
+        backgroundColor: Colors.transparent,
+        body: Container(
+          decoration: const BoxDecoration(
+            image: DecorationImage(
+              image: AssetImage('assets/images/ttkl_bg_new.png', package: 'kli_lib'),
+              fit: BoxFit.fill,
+              opacity: 0.8,
+            ),
           ),
-        ),
-        child: Row(
-          children: [
-            SideNavigationBar(
-              selectedIndex: selectedPage,
-              expandable: false,
-              header: SideNavigationBarHeader(
-                image: BackButton(
-                  onPressed: () {
-                    logger.i('Exiting data manager...');
-                    Navigator.of(context).pop();
-                  },
-                ),
-                title: const Padding(
-                  padding: EdgeInsets.symmetric(vertical: 30),
-                  child: Text(
-                    'Quản lý dữ liệu',
-                    style: TextStyle(fontSize: fontSizeLarge + 1, fontWeight: FontWeight.bold),
+          child: Row(
+            children: [
+              SideNavigationBar(
+                selectedIndex: selectedPage,
+                expandable: false,
+                header: SideNavigationBarHeader(
+                  image: BackButton(
+                    onPressed: () {
+                      logger.i('Exiting data manager...');
+                      Navigator.of(context).pop();
+                    },
                   ),
+                  title: const Padding(
+                    padding: EdgeInsets.symmetric(vertical: 30),
+                    child: Text(
+                      'Quản lý dữ liệu',
+                      style: TextStyle(fontSize: fontSizeLarge + 1, fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                  subtitle: const SizedBox.shrink(),
                 ),
-                subtitle: const SizedBox.shrink(),
+                items: const [
+                  SideNavigationBarItem(label: 'Trận đấu', icon: Icons.settings_rounded),
+                  SideNavigationBarItem(label: 'Khởi động', icon: Icons.start_rounded),
+                  SideNavigationBarItem(label: 'Vượt chướng ngại vật', icon: FontAwesomeIcons.roadBarrier),
+                  SideNavigationBarItem(label: 'Tăng tốc', icon: Icons.local_fire_department_rounded),
+                  SideNavigationBarItem(label: 'Về đích', icon: FontAwesomeIcons.flagCheckered),
+                  SideNavigationBarItem(label: 'Câu hỏi phụ', icon: Icons.add_box_rounded),
+                ],
+                onTap: (newIndex) {
+                  setState(() => selectedPage = newIndex);
+                  logger.i('Selecting ${contentPages[newIndex].runtimeType}');
+                },
+                theme: sideNavigationTheme(context),
               ),
-              items: const [
-                SideNavigationBarItem(label: 'Trận đấu', icon: Icons.settings_rounded),
-                SideNavigationBarItem(label: 'Khởi động', icon: Icons.start_rounded),
-                SideNavigationBarItem(label: 'Vượt chướng ngại vật', icon: FontAwesomeIcons.roadBarrier),
-                SideNavigationBarItem(label: 'Tăng tốc', icon: Icons.local_fire_department_rounded),
-                SideNavigationBarItem(label: 'Về đích', icon: FontAwesomeIcons.flagCheckered),
-                SideNavigationBarItem(label: 'Câu hỏi phụ', icon: Icons.add_box_rounded),
-              ],
-              onTap: (newIndex) {
-                setState(() => selectedPage = newIndex);
-                logger.i('Selecting ${contentPages[newIndex].runtimeType}');
-              },
-              theme: sideNavigationTheme(context),
-            ),
-            Expanded(
-              child: isLoading
-                  ? const Center(child: CircularProgressIndicator())
-                  : contentPages.elementAt(selectedPage),
-            ),
-          ],
+              Expanded(
+                child: isLoading
+                    ? const Center(child: CircularProgressIndicator())
+                    : contentPages.elementAt(selectedPage),
+              ),
+            ],
+          ),
         ),
       ),
     );
