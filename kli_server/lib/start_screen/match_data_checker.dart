@@ -43,63 +43,63 @@ class _MatchDataCheckerState extends State<MatchDataChecker> {
 
   @override
   Widget build(BuildContext context) {
-    return Focus(
-      autofocus: true,
-      onKeyEvent: (_, event) {
-        if (event is KeyDownEvent && event.logicalKey == LogicalKeyboardKey.escape) {
+    return CallbackShortcuts(
+      bindings: <ShortcutActivator, VoidCallback>{
+        const SingleActivator(LogicalKeyboardKey.escape): () {
           logger.i('Exiting match data checker...');
           Navigator.pop(context);
-          return KeyEventResult.handled;
         }
-        return KeyEventResult.ignored;
       },
-      child: Container(
-        decoration: const BoxDecoration(
-          image: DecorationImage(
-            image: AssetImage('assets/images/ttkl_bg_new.png', package: 'kli_lib'),
-            fit: BoxFit.fill,
-            opacity: 0.8,
+      child: Focus(
+        autofocus: true,
+        child: Container(
+          decoration: const BoxDecoration(
+            image: DecorationImage(
+              image: AssetImage('assets/images/ttkl_bg_new.png', package: 'kli_lib'),
+              fit: BoxFit.fill,
+              opacity: 0.8,
+            ),
           ),
-        ),
-        child: Scaffold(
-          backgroundColor: Colors.transparent,
-          extendBodyBehindAppBar: true,
-          appBar: AppBar(
-            title: const Text('Kiểm tra dữ liệu trận đấu', style: TextStyle(fontSize: fontSizeLarge)),
-            centerTitle: true,
-            forceMaterialTransparency: true,
-          ),
-          body: Padding(
-            padding: const EdgeInsets.only(left: 512, right: 512, top: 80, bottom: 128),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    matchSelector(matchNames, (value) async {
-                      selectedMatchIndex = matchNames.indexOf(value!);
-                      logger.i('Selected match: ${matchNames[selectedMatchIndex]}');
-                      questionCheckResults = await checkMatchQuestions();
-                      disableServerSetup = !questionCheckResults.every((e) => e.$1 == true);
-                      setState(() {});
-                    }),
-                    KLIButton(
-                      'Mở phần thiết lập Server',
-                      enableCondition: !disableServerSetup,
-                      disabledLabel: 'Trận đấu chưa đủ thông tin',
-                      onPressed: () async {
-                        logger.i('Opening Server Setup page...');
-                        await Navigator.of(context).push(
-                          MaterialPageRoute(builder: (context) => const ServerSetup()),
-                        );
-                        await KLIServer.stop();
-                      },
-                    ),
-                  ],
-                ),
-                matchQuestionChecker(),
-              ],
+          child: Scaffold(
+            backgroundColor: Colors.transparent,
+            extendBodyBehindAppBar: true,
+            appBar: AppBar(
+              title: const Text('Kiểm tra dữ liệu trận đấu', style: TextStyle(fontSize: fontSizeLarge)),
+              centerTitle: true,
+              forceMaterialTransparency: true,
+            ),
+            body: Padding(
+              padding: const EdgeInsets.only(left: 512, right: 512, top: 80, bottom: 128),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      matchSelector(matchNames, (value) async {
+                        selectedMatchIndex = matchNames.indexOf(value!);
+                        logger.i('Selected match: ${matchNames[selectedMatchIndex]}');
+                        questionCheckResults = await checkMatchQuestions();
+                        disableServerSetup = !questionCheckResults.every((e) => e.$1 == true);
+                        setState(() {});
+                      }),
+                      KLIButton(
+                        'Mở phần thiết lập Server',
+                        enableCondition: !disableServerSetup,
+                        disabledLabel: 'Trận đấu chưa đủ thông tin',
+                        onPressed: () async {
+                          logger.i('Opening Server Setup page...');
+                          await Navigator.of(context).push(
+                            MaterialPageRoute(builder: (context) => const ServerSetup()),
+                          );
+                          await KLIServer.stop();
+                        },
+                      ),
+                    ],
+                  ),
+                  matchQuestionChecker(),
+                ],
+              ),
             ),
           ),
         ),

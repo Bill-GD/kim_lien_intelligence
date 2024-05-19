@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -156,24 +155,12 @@ class _StartPageState extends State<StartPage> with WindowListener {
                       );
                     },
                   ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      KLIButton(
-                        'Open Log File',
-                        onPressed: () async {
-                          logger.i('Opening log...');
-                          await launchUrl(Uri.parse(storageHandler!.logFile));
-                        },
-                      ),
-                      KLIButton(
-                        'Create MatchState',
-                        onPressed: () async {
-                          MatchState.createInstance("Match Name");
-                          logger.i(jsonEncode(MatchState.instance().toJson()));
-                        },
-                      ),
-                    ],
+                  KLIButton(
+                    'Open Log File',
+                    onPressed: () async {
+                      logger.i('Opening log...');
+                      await launchUrl(Uri.parse(storageHandler!.logFile));
+                    },
                   ),
                 ].elementAt(sidebarIndex),
               ),
