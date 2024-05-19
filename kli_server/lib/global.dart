@@ -184,6 +184,8 @@ String changelog = """
   - Disabled light theme (like who need this anyway)
   - Use less theme colors
   - Can use 'Esc' to quickly exit page
+  - Fixed background images is a little dim
+  - Added Start match button after all player joined
 
   0.3.1.1 ({8541f82}):
   - Assets moved to KLILib

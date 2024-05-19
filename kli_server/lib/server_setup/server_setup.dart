@@ -79,7 +79,6 @@ class _ServerSetupState extends State<ServerSetup> {
                 image: DecorationImage(
                   image: AssetImage('assets/images/ttkl_bg_new.png', package: 'kli_lib'),
                   fit: BoxFit.fill,
-                  opacity: 0.8,
                 ),
               ),
               child: Row(
@@ -161,6 +160,16 @@ class _ServerSetupState extends State<ServerSetup> {
             if (mounted) {
               showToastMessage(context, 'Closed server.');
             }
+          },
+        ),
+        KLIButton(
+          'Start Match',
+          disabledLabel: 'No server exist',
+          enableCondition: KLIServer.started && KLIServer.allPlayerConnected,
+          onPressed: () async {
+            await KLIServer.stop();
+            setState(() {});
+            if (mounted) showToastMessage(context, 'Closed server.');
           },
         ),
       ],

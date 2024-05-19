@@ -182,7 +182,7 @@ packages:
       path: "D:/Code/Flutter/kim_lien_intelligence/kli_lib"
       relative: false
     source: path
-    version: "0.2.0"
+    version: "0.3.0"
   leak_tracker:
     dependency: transitive
     description:

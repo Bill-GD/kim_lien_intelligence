@@ -31,6 +31,9 @@ void initLogger() {
 }
 
 String changelog = """
+  0.1.1 ({latest}):
+  - Added waiting room
+
   0.1.0.2 ({f043127}):
   - Moved assets to KLILib
 

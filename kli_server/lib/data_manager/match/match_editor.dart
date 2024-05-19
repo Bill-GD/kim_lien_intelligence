@@ -16,8 +16,8 @@ class MatchEditor extends StatefulWidget {
 }
 
 class _MatchEditorState extends State<MatchEditor> {
-  final TextEditingController _matchNameController = TextEditingController();
-  final List<TextEditingController> _playerNameControllers = [
+  final TextEditingController matchNameController = TextEditingController();
+  final List<TextEditingController> playerNameControllers = [
     TextEditingController(),
     TextEditingController(),
     TextEditingController(),
@@ -35,16 +35,16 @@ class _MatchEditorState extends State<MatchEditor> {
     logger.i('Match editor: ${setNewMatch ? 'New' : '${widget.match?.name}'}');
     if (setNewMatch) return;
 
-    _matchNameController.text = widget.match!.name;
+    matchNameController.text = widget.match!.name;
     for (int i = 0; i < widget.match!.playerList.length; i++) {
-      _playerNameControllers[i].text = widget.match!.playerList[i]?.name ?? '';
+      playerNameControllers[i].text = widget.match!.playerList[i]?.name ?? '';
       imagePaths[i] = widget.match!.playerList[i]?.imagePath ?? '';
     }
   }
 
   @override
   void dispose() {
-    for (var c in [_matchNameController, ..._playerNameControllers]) {
+    for (var c in [matchNameController, ...playerNameControllers]) {
       c.dispose();
     }
     super.dispose();
@@ -76,7 +76,7 @@ class _MatchEditorState extends State<MatchEditor> {
               disableDone = false;
             });
           },
-          controller: _matchNameController,
+          controller: matchNameController,
           decoration: InputDecoration(
             labelText: 'Tên trận đấu',
             labelStyle: TextStyle(
@@ -104,34 +104,34 @@ class _MatchEditorState extends State<MatchEditor> {
             onPressed: disableDone
                 ? null
                 : () {
-                    if (_matchNameController.text.isEmpty) {
+                    if (matchNameController.text.isEmpty) {
                       showToastMessage(context, 'Tên trận không được trống');
                       return;
                     }
 
-                    for (var e in _playerNameControllers) {
-                      if (e.value.text.isNotEmpty && imagePaths[_playerNameControllers.indexOf(e)].isEmpty) {
+                    for (var e in playerNameControllers) {
+                      if (e.value.text.isNotEmpty && imagePaths[playerNameControllers.indexOf(e)].isEmpty) {
                         showToastMessage(
                           context,
-                          'Hãy chọn ảnh cho thí sinh ${_playerNameControllers.indexOf(e) + 1}',
+                          'Hãy chọn ảnh cho thí sinh ${playerNameControllers.indexOf(e) + 1}',
                         );
                         return;
                       }
-                      if (e.value.text.isEmpty && imagePaths[_playerNameControllers.indexOf(e)].isNotEmpty) {
+                      if (e.value.text.isEmpty && imagePaths[playerNameControllers.indexOf(e)].isNotEmpty) {
                         showToastMessage(
                           context,
-                          'Tên thí sinh ${_playerNameControllers.indexOf(e) + 1} không được trống',
+                          'Tên thí sinh ${playerNameControllers.indexOf(e) + 1} không được trống',
                         );
                         return;
                       }
                     }
 
                     final newMatch = KLIMatch(
-                      _matchNameController.text.trim(),
-                      _playerNameControllers.map((c) {
+                      name: matchNameController.text.trim(),
+                      playerList: playerNameControllers.map((c) {
                         return c.text.isEmpty
                             ? null
-                            : KLIPlayer(c.text.trim(), imagePaths[_playerNameControllers.indexOf(c)]);
+                            : KLIPlayer(c.text.trim(), imagePaths[playerNameControllers.indexOf(c)]);
                       }).toList(),
                     );
 
@@ -176,7 +176,7 @@ class _MatchEditorState extends State<MatchEditor> {
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 8),
               child: TextField(
-                controller: _playerNameControllers[index],
+                controller: playerNameControllers[index],
                 decoration: InputDecoration(
                   labelText: 'Tên',
                   labelStyle: TextStyle(

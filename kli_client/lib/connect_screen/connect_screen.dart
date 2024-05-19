@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:kli_lib/kli_lib.dart';
 
 import '../global.dart';
+import 'waiting_screen.dart';
 
 class ConnectPage extends StatefulWidget {
   const ConnectPage({super.key});
@@ -15,10 +16,7 @@ class ConnectPage extends StatefulWidget {
 
 class _ConnectPageState extends State<ConnectPage> {
   final clientTextController = TextEditingController(), ipTextController = TextEditingController();
-  // ,
-  // messageController = TextEditingController();
   bool isConnecting = false, isConnected = false;
-  // String serverMessage = '';
 
   @override
   void initState() {
@@ -28,7 +26,6 @@ class _ConnectPageState extends State<ConnectPage> {
   @override
   void dispose() {
     ipTextController.dispose();
-    // messageController.dispose();
     super.dispose();
   }
 
@@ -58,7 +55,6 @@ class _ConnectPageState extends State<ConnectPage> {
           image: DecorationImage(
             image: AssetImage('assets/images/ttkl_bg_new.png', package: 'kli_lib'),
             fit: BoxFit.fill,
-            opacity: 0.8,
           ),
         ),
         alignment: Alignment.center,
@@ -68,36 +64,6 @@ class _ConnectPageState extends State<ConnectPage> {
             connectionStatus(),
             connectInfo(),
             connectButtons(),
-            // Text('From server: $serverMessage'),
-            // TextField(
-            //   controller: messageController,
-            //   decoration: const InputDecoration(
-            //     labelText: 'Message to Server',
-            //   ),
-            // ),
-            // TextButton(
-            //   onPressed: () async {
-            //     if (!isConnected) {
-            //       showToastMessage(context, 'Not connected');
-            //       return;
-            //     }
-            //     if (messageController.value.text.isEmpty) {
-            //       showToastMessage(context, 'Please enter a message');
-            //       return;
-            //     }
-            //     kliClient.sendMessage(
-            //       KLISocketMessage(
-            //         senderID: playerId!,
-            //         message: messageController.value.text,
-            //         type: KLIMessageType.normal,
-            //       ),
-            //     );
-            //     if (context.mounted) {
-            //       showToastMessage(context, 'Sending');
-            //     }
-            //   },
-            //   child: const Text("Send Message"),
-            // ),
           ],
         ),
       ),
@@ -175,7 +141,6 @@ class _ConnectPageState extends State<ConnectPage> {
         ),
         const SizedBox(width: 20),
         TextField(
-          // enabled: !isConnected,
           readOnly: isConnected,
           style: const TextStyle(fontSize: fontSizeMedium),
           controller: ipTextController,
@@ -233,7 +198,6 @@ class _ConnectPageState extends State<ConnectPage> {
                     logger.i(newMessage.msg);
                   }
 
-                  // serverMessage = newMessage.msg;
                   setState(() {});
                 });
 
@@ -270,10 +234,11 @@ class _ConnectPageState extends State<ConnectPage> {
         const SizedBox(width: 20),
         KLIButton(
           'To waiting room',
+          enabledLabel: 'When you\'re ready',
           disabledLabel: 'Not connected',
           enableCondition: isConnected,
           onPressed: () {
-            showToastMessage(context, 'To waiting room');
+            Navigator.of(context).push(MaterialPageRoute(builder: (context) => const WaitingScreen()));
           },
         ),
       ],

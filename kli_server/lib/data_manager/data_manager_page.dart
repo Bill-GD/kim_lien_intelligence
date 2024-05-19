@@ -67,7 +67,6 @@ class _DataManagerPageState extends State<DataManagerPage> {
               image: DecorationImage(
                 image: AssetImage('assets/images/ttkl_bg_new.png', package: 'kli_lib'),
                 fit: BoxFit.fill,
-                opacity: 0.8,
               ),
             ),
             child: Row(
