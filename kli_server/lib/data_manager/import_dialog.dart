@@ -31,7 +31,7 @@ class _ImportQuestionDialogState extends State<ImportQuestionDialog> with Ticker
 
   @override
   void initState() {
-    logger.i('Import question dialog: ${widget.matchName}');
+    logHandler.info('Import question dialog: ${widget.matchName}');
     tabController = TabController(length: sheetCount, vsync: this);
     super.initState();
   }
@@ -53,7 +53,7 @@ class _ImportQuestionDialogState extends State<ImportQuestionDialog> with Ticker
                 ElevatedButton(
                   child: const Text('Chọn file'),
                   onPressed: () async {
-                    logger.i('Import new questions (.xlsx)');
+                    logHandler.info('Import new questions (.xlsx)');
 
                     final result = await FilePicker.platform.pickFiles(
                       dialogTitle: 'Select File',
@@ -63,7 +63,7 @@ class _ImportQuestionDialogState extends State<ImportQuestionDialog> with Ticker
                     );
 
                     if (result == null) {
-                      logger.i('No file selected');
+                      logHandler.info('No file selected');
                       return;
                     }
 
@@ -71,7 +71,7 @@ class _ImportQuestionDialogState extends State<ImportQuestionDialog> with Ticker
 
                     final p = result.files.single.path!;
                     chosenFile = storageHandler!.getRelative(p);
-                    logger.i('Import: $chosenFile');
+                    logHandler.info('Import: $chosenFile');
 
                     data = await storageHandler!.readFromExcel(
                       p,

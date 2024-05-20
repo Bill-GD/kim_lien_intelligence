@@ -21,13 +21,13 @@ class _ExtraQuestionEditorState extends State<ExtraQuestionEditor> {
   @override
   void initState() {
     super.initState();
-    logger.i('Opened obstacle question editor');
+    logHandler.info('Opened obstacle question editor');
     if (widget.question != null) {
-      logger.i('Modify extra question');
+      logHandler.info('Modify extra question');
       questionController.text = widget.question!.question;
       answerController.text = widget.question!.answer;
     } else {
-      logger.i('Add new extra question');
+      logHandler.info('Add new extra question');
       createNew = true;
       questionController.text = '';
       answerController.text = '';
@@ -116,13 +116,13 @@ class _ExtraQuestionEditorState extends State<ExtraQuestionEditor> {
                         : qTrim != widget.question!.question || aTrim != widget.question!.answer;
 
                     if (!hasChanged) {
-                      logger.i('No change, exiting');
+                      logHandler.info('No change, exiting');
                       Navigator.of(context).pop();
                       return;
                     }
                     final newQ = ExtraQuestion(question: qTrim, answer: aTrim);
 
-                    logger.i('${createNew ? 'Created' : 'Modified'} extra question');
+                    logHandler.info('${createNew ? 'Created' : 'Modified'} extra question');
                     Navigator.of(context).pop(newQ);
                   },
             child: const Text('Hoàn tất', style: TextStyle(fontSize: fontSizeMedium)),
@@ -133,7 +133,7 @@ class _ExtraQuestionEditorState extends State<ExtraQuestionEditor> {
               style: TextStyle(fontSize: fontSizeMedium, color: Theme.of(context).colorScheme.error),
             ),
             onPressed: () {
-              logger.i('Cancelled');
+              logHandler.info('Cancelled');
               Navigator.pop(context);
             },
           ),

@@ -17,7 +17,7 @@ class _WaitingScreenState extends State<WaitingScreen> {
     KLIClient.onMessageReceived.listen((newMessage) async {
       if (newMessage.type == KLIMessageType.disconnect) {
         await KLIClient.disconnect();
-        logger.i(newMessage.msg);
+        logHandler.info(newMessage.msg);
         if (mounted) Navigator.pop(context);
       }
     });
@@ -29,7 +29,7 @@ class _WaitingScreenState extends State<WaitingScreen> {
     return CallbackShortcuts(
       bindings: <ShortcutActivator, VoidCallback>{
         const SingleActivator(LogicalKeyboardKey.escape): () {
-          logger.i('Leaving waiting room');
+          logHandler.info('Leaving waiting room');
           Navigator.pop(context);
         },
       },

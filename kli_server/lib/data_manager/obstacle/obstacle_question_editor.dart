@@ -21,7 +21,7 @@ class _ObstacleQuestionEditorState extends State<ObstacleQuestionEditor> {
   @override
   void initState() {
     super.initState();
-    logger.i('Opened obstacle question editor');
+    logHandler.info('Opened obstacle question editor');
     if (widget.question != null) {
       disableDone = questionController.text.isEmpty || answerController.text.isEmpty;
       questionController.text = widget.question!.question;
@@ -113,7 +113,7 @@ class _ObstacleQuestionEditorState extends State<ObstacleQuestionEditor> {
                         : qTrim != widget.question!.question || aTrim != widget.question!.answer;
 
                     if (!hasChanged) {
-                      logger.i('No change, exiting');
+                      logHandler.info('No change, exiting');
                       Navigator.of(context).pop();
                       return;
                     }
@@ -125,7 +125,7 @@ class _ObstacleQuestionEditorState extends State<ObstacleQuestionEditor> {
                       charCount: aTrim.replaceAll(' ', '').length,
                     );
 
-                    logger.i('Modified obstacle question: ${newQ.id}');
+                    logHandler.info('Modified obstacle question: ${newQ.id}');
                     Navigator.of(context).pop(newQ);
                   },
             child: const Text('Hoàn tất', style: TextStyle(fontSize: fontSizeMedium)),
@@ -136,7 +136,7 @@ class _ObstacleQuestionEditorState extends State<ObstacleQuestionEditor> {
               style: TextStyle(fontSize: fontSizeMedium, color: Theme.of(context).colorScheme.error),
             ),
             onPressed: () {
-              logger.i('Cancelled');
+              logHandler.info('Cancelled');
               Navigator.pop(context);
             },
           ),

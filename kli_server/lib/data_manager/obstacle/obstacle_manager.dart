@@ -26,7 +26,7 @@ class _ObstacleManagerState extends State<ObstacleManager> {
   @override
   void initState() {
     super.initState();
-    logger.i('Obstacle question manager init');
+    logHandler.info('Obstacle question manager init');
     selectedMatch = ObstacleMatch(
       match: '',
       charCount: 0,
@@ -77,14 +77,14 @@ class _ObstacleManagerState extends State<ObstacleManager> {
       );
     } on RangeError catch (e, stack) {
       showToastMessage(context, 'Sai định dạng (không đủ cột/hàng)');
-      logger.e(e, stackTrace: stack);
+      logHandler.error(e, stackTrace: stack);
       return;
     }
-    logger.i('Loaded ${selectedMatch.match} (${selectedMatch.keyword})');
+    logHandler.info('Loaded ${selectedMatch.match} (${selectedMatch.keyword})');
   }
 
   Future<void> saveNewQuestions() async {
-    logger.i('Saving new questions of match: ${matchNames[selectedMatchIndex]}');
+    logHandler.info('Saving new questions of match: ${matchNames[selectedMatchIndex]}');
     final saved = await DataManager.getAllSavedQuestions<ObstacleMatch>(
       ObstacleMatch.fromJson,
       storageHandler!.obstacleSaveFile,
@@ -95,7 +95,7 @@ class _ObstacleManagerState extends State<ObstacleManager> {
   }
 
   Future<void> updateQuestions(ObstacleMatch oMatch) async {
-    logger.i('Updating questions of match: ${matchNames[selectedMatchIndex]}');
+    logHandler.info('Updating questions of match: ${matchNames[selectedMatchIndex]}');
     final saved = await DataManager.getAllSavedQuestions<ObstacleMatch>(
       ObstacleMatch.fromJson,
       storageHandler!.obstacleSaveFile,
@@ -115,9 +115,9 @@ class _ObstacleManagerState extends State<ObstacleManager> {
     try {
       selectedMatch = saved.firstWhere((e) => e.match == match);
       setState(() {});
-      logger.i('Loaded Obstacle (${selectedMatch.keyword}) of $match');
+      logHandler.info('Loaded Obstacle (${selectedMatch.keyword}) of $match');
     } on StateError {
-      logger.i('Obstacle match $match not found, temp empty match created');
+      logHandler.info('Obstacle match $match not found, temp empty match created');
       selectedMatch = ObstacleMatch(
         match: matchNames[selectedMatchIndex],
         keyword: '',
@@ -130,7 +130,7 @@ class _ObstacleManagerState extends State<ObstacleManager> {
   }
 
   Future<void> removeDeletedMatchQuestions() async {
-    logger.i('Removing questions of deleted matches');
+    logHandler.info('Removing questions of deleted matches');
     var saved = await DataManager.getAllSavedQuestions<ObstacleMatch>(
       ObstacleMatch.fromJson,
       storageHandler!.obstacleSaveFile,
@@ -140,7 +140,7 @@ class _ObstacleManagerState extends State<ObstacleManager> {
   }
 
   Future<void> removeMatch(ObstacleMatch oMatch) async {
-    logger.i('Removing questions of match: ${matchNames[selectedMatchIndex]}');
+    logHandler.info('Removing questions of match: ${matchNames[selectedMatchIndex]}');
     var saved = await DataManager.getAllSavedQuestions<ObstacleMatch>(
       ObstacleMatch.fromJson,
       storageHandler!.obstacleSaveFile,
@@ -174,7 +174,7 @@ class _ObstacleManagerState extends State<ObstacleManager> {
         children: [
           matchSelector(matchNames, (value) async {
             selectedMatchIndex = matchNames.indexOf(value!);
-            logger.i('Selected match: ${matchNames[selectedMatchIndex]}');
+            logHandler.info('Selected match: ${matchNames[selectedMatchIndex]}');
             await loadMatchQuestions(matchNames[selectedMatchIndex]);
             setState(() {});
           }),
@@ -396,7 +396,7 @@ class _ObstacleManagerState extends State<ObstacleManager> {
             ElevatedButton(
               child: const Text('Chọn ảnh'),
               onPressed: () async {
-                logger.i('Selecting image at ${storageHandler!.getRelative(storageHandler!.mediaDir)}');
+                logHandler.info('Selecting image at ${storageHandler!.getRelative(storageHandler!.mediaDir)}');
                 final result = await FilePicker.platform.pickFiles(
                   dialogTitle: 'Select image',
                   initialDirectory: storageHandler!.mediaDir.replaceAll('/', '\\'),
@@ -407,7 +407,7 @@ class _ObstacleManagerState extends State<ObstacleManager> {
                   final p = result.files.single.path!;
                   selectedMatch.imagePath = storageHandler!.getRelative(p);
                   await updateQuestions(selectedMatch);
-                  logger.i('Chose ${selectedMatch.imagePath}');
+                  logHandler.info('Chose ${selectedMatch.imagePath}');
                   setState(() {});
                 }
               },

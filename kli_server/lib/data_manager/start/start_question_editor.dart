@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:kli_lib/kli_lib.dart';
-
-import '../../global.dart';
+import 'package:kli_server/global.dart';
 
 class StartQuestionEditor extends StatefulWidget {
   final StartQuestion? question;
@@ -25,16 +24,16 @@ class _StartQuestionEditorState extends State<StartQuestionEditor> {
   @override
   void initState() {
     super.initState();
-    logger.i('Opened start question editor');
+    logHandler.info('Opened start question editor');
     if (widget.question != null) {
-      logger.i('Modify start question');
+      logHandler.info('Modify start question');
       questionController.text = widget.question!.question;
       answerController.text = widget.question!.answer;
       type = widget.question!.subject;
       pos = widget.playerPos;
       disableDone = questionController.text.isEmpty || answerController.text.isEmpty || pos < 0;
     } else {
-      logger.i('Add new start question');
+      logHandler.info('Add new start question');
       type = StartQuestionSubject.math;
     }
   }
@@ -163,14 +162,14 @@ class _StartQuestionEditorState extends State<StartQuestionEditor> {
                             pos != widget.playerPos;
 
                     if (!hasChanged) {
-                      logger.i('No change, exiting');
+                      logHandler.info('No change, exiting');
                       Navigator.of(context).pop();
                       return;
                     }
 
                     final newQ = StartQuestion(subject: type, question: qTrim, answer: aTrim);
 
-                    logger.i(
+                    logHandler.info(
                       '${widget.question == null ? 'Created' : 'Modified'} start question: ${newQ.subject.name}',
                     );
                     Navigator.of(context).pop((pos, newQ));
@@ -183,7 +182,7 @@ class _StartQuestionEditorState extends State<StartQuestionEditor> {
               style: TextStyle(fontSize: fontSizeMedium, color: Theme.of(context).colorScheme.error),
             ),
             onPressed: () {
-              logger.i('Cancelled');
+              logHandler.info('Cancelled');
               Navigator.pop(context);
             },
           ),

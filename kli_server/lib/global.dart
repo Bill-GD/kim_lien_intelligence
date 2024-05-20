@@ -3,24 +3,20 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:kli_lib/kli_lib.dart';
-import 'package:logger/logger.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:side_navigation/side_navigation.dart';
 
-late final Logger logger;
-void initLogger(String logPath) {
-  logger = Logger(
-    printer: SimplePrinter(colors: false, printTime: true),
-    filter: AlwaysLogFilter(),
-    output: FileOutput(file: File(storageHandler!.logFile), overrideExisting: true),
-  );
-  logger.i('Logger init');
+late final LogHandler logHandler;
+void initLogHandler() {
+  final rawDir = Platform.resolvedExecutable.split(Platform.executable).first;
+  String parentFolder = '${rawDir.substring(0, rawDir.length - 1).replaceAll('\\', '/')}\\UserData';
+  logHandler = LogHandler(logFile: '$parentFolder\\log.txt');
 }
 
 late final PackageInfo packageInfo;
 Future<void> initPackageInfo() async {
   packageInfo = await PackageInfo.fromPlatform();
-  logger.i('PackageInfo init');
+  logHandler.info('PackageInfo init');
 }
 
 StorageHandler? storageHandler;
@@ -128,21 +124,22 @@ class DataManager {
     T Function(Map<String, dynamic>) func,
     String filePath,
   ) async {
-    logger.i('Getting all saved $T questions');
+    logHandler.info('Getting all saved $T questions');
     final saved = await storageHandler!.readFromFile(filePath);
     if (saved.isEmpty) return <T>[];
     List<T> q = [];
     try {
       q = (jsonDecode(saved) as List).map((e) => func(e)).toList();
     } on Exception catch (e, stack) {
-      logger.e(e, stackTrace: stack);
+      logHandler.error(e, stackTrace: stack);
     }
     return q;
   }
 
   static Future<void> updateAllQuestionMatchName({required String oldName, required String newName}) async {
-    logger
-        .i('Match name update detected. Updating match name of all questions (\'$oldName\' -> \'$newName\')');
+    logHandler.info(
+      'Match name update detected. Updating match name of all questions (\'$oldName\' -> \'$newName\')',
+    );
 
     List<(Type, String)> typeToFileMap = [
       (StartMatch, storageHandler!.startSaveFile),
@@ -169,18 +166,21 @@ class DataManager {
         if (e.match == oldName) e.match = newName;
       }
       await overwriteSave(q, file);
-      logger.i('$type: Done');
+      logHandler.info('$type: Done');
     }
   }
 
   static Future<void> overwriteSave<T>(List<T> q, String filePath) async {
-    logger.i('Overwriting save');
+    logHandler.info('Overwriting save');
     await storageHandler!.writeToFile(filePath, jsonEncode(q));
   }
 }
 
 String changelog = """
-  0.3.1.2 ({latest}):
+  0.3.1.3 ({latest}):
+  - Now uses LogHandler for logging
+  
+  0.3.1.2 ({e50b469}):
   - Disabled light theme (like who need this anyway)
   - Use less theme colors
   - Can use 'Esc' to quickly exit page
@@ -290,7 +290,7 @@ String changelog = """
   0.1.x ({333b4f3}):
   - Added basic messaging (with utf8)
   - Basic setup for data manager: UI
-  - Added logger: logs to console
+  - Added logHandler: logs to console
   - Added basic start screen: side navigation, app version
   - Added storage handler: read excel, write to file
   - Force fullscreen on launch

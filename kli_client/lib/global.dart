@@ -1,38 +1,25 @@
 import 'dart:io';
 
 import 'package:kli_lib/kli_lib.dart';
-import 'package:logger/logger.dart';
 import 'package:package_info_plus/package_info_plus.dart';
-
-String? parentFolder;
-void initParentFolder() {
-  if (parentFolder != null) return;
-
-  final rawDir = Platform.resolvedExecutable.split(Platform.executable).first;
-  parentFolder = rawDir.substring(0, rawDir.length - 1).replaceAll('\\', '/');
-
-  File('$parentFolder\\log.txt').createSync();
-}
 
 late final PackageInfo packageInfo;
 Future<void> initPackageInfo() async {
   packageInfo = await PackageInfo.fromPlatform();
-  logger.i('PackageInfo init');
+  logHandler.info('PackageInfo init');
 }
 
-late final Logger logger;
-void initLogger() {
-  logger = Logger(
-    printer: SimplePrinter(colors: false, printTime: true),
-    filter: AlwaysLogFilter(),
-    output: FileOutput(file: File('$parentFolder\\log.txt'), overrideExisting: true),
-  );
-  logger.i('Logger init');
+late final LogHandler logHandler;
+void initLogHandler() {
+  final rawDir = Platform.resolvedExecutable.split(Platform.executable).first;
+  String parentFolder = '${rawDir.substring(0, rawDir.length - 1).replaceAll('\\', '/')}\\UserData';
+  logHandler = LogHandler(logFile: '$parentFolder\\log.txt');
 }
 
 String changelog = """
   0.1.1 ({latest}):
   - Added waiting room
+  - Now uses LogHandler for logging
 
   0.1.0.2 ({f043127}):
   - Moved assets to KLILib

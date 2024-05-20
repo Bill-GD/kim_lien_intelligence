@@ -22,7 +22,7 @@ class _StartQuestionManagerState extends State<StartQuestionManager> {
   @override
   void initState() {
     super.initState();
-    logger.i('Start question manager init');
+    logHandler.info('Start question manager init');
     selectedMatch = StartMatch(match: '', questions: {});
     getMatchNames().then((value) async {
       if (value.isNotEmpty) matchNames = value;
@@ -55,11 +55,11 @@ class _StartQuestionManagerState extends State<StartQuestionManager> {
       idx++;
     }
     selectedMatch = StartMatch(match: matchNames[selectedMatchIndex], questions: allQ);
-    logger.i('Loaded ${selectedMatch.questionCount} questions from excel');
+    logHandler.info('Loaded ${selectedMatch.questionCount} questions from excel');
   }
 
   Future<void> saveNewQuestions() async {
-    logger.i('Saving new questions of match: ${matchNames[selectedMatchIndex]}');
+    logHandler.info('Saving new questions of match: ${matchNames[selectedMatchIndex]}');
     final saved = await DataManager.getAllSavedQuestions<StartMatch>(
         StartMatch.fromJson, storageHandler!.startSaveFile);
     saved.removeWhere((e) => e.match == selectedMatch.match);
@@ -68,7 +68,7 @@ class _StartQuestionManagerState extends State<StartQuestionManager> {
   }
 
   Future<void> updateQuestions(StartMatch sMatch) async {
-    logger.i('Updating questions of match: ${matchNames[selectedMatchIndex]}');
+    logHandler.info('Updating questions of match: ${matchNames[selectedMatchIndex]}');
     final saved = await DataManager.getAllSavedQuestions<StartMatch>(
         StartMatch.fromJson, storageHandler!.startSaveFile);
     saved.removeWhere((e) => e.match == sMatch.match);
@@ -84,15 +84,15 @@ class _StartQuestionManagerState extends State<StartQuestionManager> {
     try {
       selectedMatch = saved.firstWhere((e) => e.match == match);
       setState(() {});
-      logger.i('Loaded ${selectedMatch.questionCount} start questions of match ${selectedMatch.match}');
+      logHandler.info('Loaded ${selectedMatch.questionCount} start questions of match ${selectedMatch.match}');
     } on StateError {
-      logger.i('Start match $match not found, temp empty match created');
+      logHandler.info('Start match $match not found, temp empty match created');
       selectedMatch = StartMatch(match: match, questions: {});
     }
   }
 
   Future<void> removeDeletedMatchQuestions() async {
-    logger.i('Removing questions of deleted matches');
+    logHandler.info('Removing questions of deleted matches');
     var saved = await DataManager.getAllSavedQuestions<StartMatch>(
         StartMatch.fromJson, storageHandler!.startSaveFile);
     saved = saved.where((e) => matchNames.contains(e.match)).toList();
@@ -100,7 +100,7 @@ class _StartQuestionManagerState extends State<StartQuestionManager> {
   }
 
   Future<void> removeMatch(StartMatch sMatch) async {
-    logger.i('Removing all questions of match: ${matchNames[selectedMatchIndex]}');
+    logHandler.info('Removing all questions of match: ${matchNames[selectedMatchIndex]}');
     var saved = await DataManager.getAllSavedQuestions<StartMatch>(
         StartMatch.fromJson, storageHandler!.startSaveFile);
     saved.removeWhere((e) => e.match == sMatch.match);
@@ -133,7 +133,7 @@ class _StartQuestionManagerState extends State<StartQuestionManager> {
           matchSelector(matchNames, (value) async {
             selectedMatchIndex = matchNames.indexOf(value!);
             selectedMatch.match = value;
-            logger.i('Selected match: ${matchNames[selectedMatchIndex]}');
+            logHandler.info('Selected match: ${matchNames[selectedMatchIndex]}');
             await loadMatchQuestions(matchNames[selectedMatchIndex]);
             setState(() {});
           }),
@@ -152,7 +152,7 @@ class _StartQuestionManagerState extends State<StartQuestionManager> {
             ],
             onSelected: (value) async {
               sortPlayerPos = value!;
-              logger.i('Sort position: $value');
+              logHandler.info('Sort position: $value');
               setState(() {});
             },
           ),
@@ -170,7 +170,7 @@ class _StartQuestionManagerState extends State<StartQuestionManager> {
                 )
             ],
             onSelected: (value) async {
-              logger.i('Sort subject: $value');
+              logHandler.info('Sort subject: $value');
               sortType = value;
               setState(() {});
             },
@@ -233,7 +233,7 @@ class _StartQuestionManagerState extends State<StartQuestionManager> {
           //   onPressed: () async {
           //     String fileName =
           //         'KĐ_${matchNames[selectedMatchIndex]}_${DateTime.now().toString().split('.').first.replaceAll(RegExp('[:-]'), '_')}.xlsx';
-          //     logger.i('Exporting ${matchNames[selectedMatchIndex]} start questions to $fileName');
+          //     logHandler.info('Exporting ${matchNames[selectedMatchIndex]} start questions to $fileName');
 
           //     final data = (jsonDecode(
           //       await storageHandler!.readFromFile(storageHandler!.startSaveFile),

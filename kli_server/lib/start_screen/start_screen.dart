@@ -51,7 +51,7 @@ class _StartPageState extends State<StartPage> with WindowListener {
       appBar: AppBar(
         actions: [
           CloseButton(onPressed: () {
-            logger.i('Exiting app');
+            logHandler.info('Exiting app');
             storageHandler = null;
             exit(0);
           }),
@@ -85,7 +85,7 @@ class _StartPageState extends State<StartPage> with WindowListener {
               footer: SideNavigationBarFooter(
                 label: GestureDetector(
                   onTap: () async {
-                    logger.i('Opening changelog...');
+                    logHandler.info('Opening changelog...');
                     await showDialog(
                       context: context,
                       builder: (context) {
@@ -139,7 +139,7 @@ class _StartPageState extends State<StartPage> with WindowListener {
                   KLIButton(
                     'Mở phần quản lý dữ liệu',
                     onPressed: () {
-                      logger.i('Opening Data Manager page...');
+                      logHandler.info('Opening Data Manager page...');
                       Navigator.of(context).push(
                         MaterialPageRoute(builder: (context) => const DataManagerPage()),
                       );
@@ -148,7 +148,7 @@ class _StartPageState extends State<StartPage> with WindowListener {
                   KLIButton(
                     'Mở phần thiết lập trận đấu',
                     onPressed: () async {
-                      logger.i('Opening Match Setup');
+                      logHandler.info('Opening Match Setup');
                       await Navigator.of(context).push(
                         MaterialPageRoute(builder: (context) => const MatchDataChecker()),
                       );
@@ -157,7 +157,7 @@ class _StartPageState extends State<StartPage> with WindowListener {
                   KLIButton(
                     'Open Log File',
                     onPressed: () async {
-                      logger.i('Opening log...');
+                      logHandler.info('Opening log...');
                       await launchUrl(Uri.parse(storageHandler!.logFile));
                     },
                   ),

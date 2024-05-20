@@ -54,7 +54,7 @@ class _DataManagerPageState extends State<DataManagerPage> {
     return CallbackShortcuts(
       bindings: <ShortcutActivator, VoidCallback>{
         const SingleActivator(LogicalKeyboardKey.escape): () {
-          logger.i('Exiting data manager...');
+          logHandler.info('Exiting data manager...');
           Navigator.pop(context);
         }
       },
@@ -77,7 +77,7 @@ class _DataManagerPageState extends State<DataManagerPage> {
                   header: SideNavigationBarHeader(
                     image: BackButton(
                       onPressed: () {
-                        logger.i('Exiting data manager...');
+                        logHandler.info('Exiting data manager...');
                         Navigator.of(context).pop();
                       },
                     ),
@@ -100,7 +100,7 @@ class _DataManagerPageState extends State<DataManagerPage> {
                   ],
                   onTap: (newIndex) {
                     setState(() => selectedPage = newIndex);
-                    logger.i('Selecting ${contentPages[newIndex].runtimeType}');
+                    logHandler.info('Selecting ${contentPages[newIndex].runtimeType}');
                   },
                   theme: sideNavigationTheme(context),
                 ),

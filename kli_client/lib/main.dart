@@ -13,13 +13,12 @@ import 'global.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  initParentFolder();
-  initLogger();
+  initLogHandler();
 
   logMessageStream.listen((m) {
-    if (m.$1 == LogType.info) logger.i(m.$2);
-    if (m.$1 == LogType.warn) logger.w(m.$2);
-    if (m.$1 == LogType.error) logger.e(m.$2);
+    if (m.$1 == LogType.info) logHandler.info(m.$2);
+    if (m.$1 == LogType.warn) logHandler.warn(m.$2);
+    if (m.$1 == LogType.error) logHandler.error(m.$2);
   });
 
   await initPackageInfo();
