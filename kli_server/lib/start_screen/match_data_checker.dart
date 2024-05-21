@@ -33,7 +33,7 @@ class _MatchDataCheckerState extends State<MatchDataChecker> {
   @override
   void initState() {
     super.initState();
-    logHandler.info('Match Data Checker');
+    logHandler.info('Opening Match Data Checker');
     getMatchNames().then((value) async {
       if (value.isEmpty) showToastMessage(context, 'No match found');
       if (value.isNotEmpty) matchNames = value;
@@ -46,7 +46,7 @@ class _MatchDataCheckerState extends State<MatchDataChecker> {
     return CallbackShortcuts(
       bindings: <ShortcutActivator, VoidCallback>{
         const SingleActivator(LogicalKeyboardKey.escape): () {
-          logHandler.info('Exiting match data checker...');
+          logHandler.info('Exiting match data checker...', d: 1);
           Navigator.pop(context);
         }
       },
@@ -77,7 +77,7 @@ class _MatchDataCheckerState extends State<MatchDataChecker> {
                     children: [
                       matchSelector(matchNames, (value) async {
                         selectedMatchIndex = matchNames.indexOf(value!);
-                        logHandler.info('Selected match: ${matchNames[selectedMatchIndex]}');
+                        logHandler.info('Selected match: ${matchNames[selectedMatchIndex]}', d: 1);
                         questionCheckResults = await checkMatchQuestions();
                         disableServerSetup = !questionCheckResults.every((e) => e.$1 == true);
                         setState(() {});
@@ -87,7 +87,6 @@ class _MatchDataCheckerState extends State<MatchDataChecker> {
                         enableCondition: !disableServerSetup,
                         disabledLabel: 'Trận đấu chưa đủ thông tin',
                         onPressed: () async {
-                          logHandler.info('Opening Server Setup page...');
                           await Navigator.of(context).push(
                             MaterialPageRoute(builder: (context) => const ServerSetup()),
                           );

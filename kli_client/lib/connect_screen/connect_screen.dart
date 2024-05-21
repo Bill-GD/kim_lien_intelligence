@@ -20,6 +20,7 @@ class _ConnectPageState extends State<ConnectPage> {
 
   @override
   void initState() {
+    logHandler.info('Connect screen');
     super.initState();
   }
 
@@ -177,7 +178,7 @@ class _ConnectPageState extends State<ConnectPage> {
               showToastMessage(context, 'Please select a player ID');
               return;
             }
-            logHandler.info('Client ${KLIClient.clientID} is trying to connect to: $ip');
+            logHandler.info('Selected role: ${KLIClient.clientID}', d: 1);
 
             runZonedGuarded(
               () async {
@@ -195,7 +196,7 @@ class _ConnectPageState extends State<ConnectPage> {
                     clientTextController.text = '';
                     setState(() {});
                     if (mounted) showToastMessage(context, newMessage.msg);
-                    logHandler.info(newMessage.msg);
+                    logHandler.info(newMessage.msg, d: 1);
                   }
 
                   setState(() {});
@@ -203,17 +204,19 @@ class _ConnectPageState extends State<ConnectPage> {
 
                 if (mounted) {
                   showToastMessage(
-                      context, 'Connected to server as ${KLIClient.clientID} with IP: ${KLIClient.address}');
+                    context,
+                    'Connected to server as ${KLIClient.clientID} with IP: ${KLIClient.address}',
+                  );
                 }
               },
               (e, stack) {
                 setState(() => isConnected = false);
-                logHandler.error('Error when trying to connect: $e');
+                logHandler.error('Error when trying to connect: $e', stackTrace: stack, d: 1);
                 if (e is SocketException) {
                   showToastMessage(context, 'Host (ip=$ip) not known');
                   setState(() => isConnecting = false);
                 } else {
-                  showToastMessage(context, '$e \n $stack');
+                  showToastMessage(context, 'An error occurred, please check log to see what happened');
                 }
               },
             );

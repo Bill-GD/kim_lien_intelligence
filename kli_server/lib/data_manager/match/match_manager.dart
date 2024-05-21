@@ -21,7 +21,7 @@ class _MatchManagerState extends State<MatchManager> {
 
   @override
   void initState() {
-    logHandler.info('Match manager init');
+    logHandler.info('Opened Match Manager', d: 1);
     storageHandler!.readFromFile(storageHandler!.matchSaveFile).then((value) {
       if (value.isNotEmpty) {
         matches = (jsonDecode(value) as List).map((e) => KLIMatch.fromJson(e)).toList();
@@ -29,7 +29,7 @@ class _MatchManagerState extends State<MatchManager> {
         setState(() {});
       }
       setState(() => isLoading = false);
-      logHandler.info('Loaded ${matches.length} matches');
+      logHandler.info('Loaded ${matches.length} matches', d: 2);
     });
     super.initState();
   }

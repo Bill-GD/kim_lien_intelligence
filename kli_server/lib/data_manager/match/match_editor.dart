@@ -32,7 +32,7 @@ class _MatchEditorState extends State<MatchEditor> {
   void initState() {
     super.initState();
     disableDone = setNewMatch = widget.match == null;
-    logHandler.info('Match editor: ${setNewMatch ? 'New' : '${widget.match?.name}'}');
+    logHandler.info('Match editor: ${setNewMatch ? 'New match' : 'Modify ${widget.match?.name}'}', d: 2);
     if (setNewMatch) return;
 
     matchNameController.text = widget.match!.name;
@@ -135,7 +135,7 @@ class _MatchEditorState extends State<MatchEditor> {
                       }).toList(),
                     );
 
-                    logHandler.info('${setNewMatch ? 'New' : 'Modified'} match: ${newMatch.name}');
+                    logHandler.info('${setNewMatch ? 'New' : 'Modified'} match: ${newMatch.name}', d: 3);
 
                     Navigator.of(context).pop(newMatch);
                   },
@@ -147,7 +147,7 @@ class _MatchEditorState extends State<MatchEditor> {
               style: TextStyle(fontSize: fontSizeMedium, color: Theme.of(context).colorScheme.error),
             ),
             onPressed: () {
-              logHandler.info('Cancelled');
+              logHandler.info('Cancelled', d: 3);
               Navigator.pop(context);
             },
           ),
@@ -205,7 +205,7 @@ class _MatchEditorState extends State<MatchEditor> {
               child: const Text('Chọn ảnh'),
               onPressed: () async {
                 logHandler
-                    .info('Selecting image at ${storageHandler!.getRelative(storageHandler!.mediaDir)}');
+                    .info('Selecting image at ${storageHandler!.getRelative(storageHandler!.mediaDir)}', d: 3);
                 final result = await FilePicker.platform.pickFiles(
                   dialogTitle: 'Select image',
                   initialDirectory: storageHandler!.mediaDir.replaceAll('/', '\\'),
@@ -216,7 +216,7 @@ class _MatchEditorState extends State<MatchEditor> {
 
                 final p = result.files.single.path!;
                 imagePaths[index] = storageHandler!.getRelative(p);
-                logHandler.info('Chose ${imagePaths[index]} for player ${index + 1}');
+                logHandler.info('Chose ${imagePaths[index]} for player ${index + 1}', d: 3);
                 setState(() {});
               },
             ),

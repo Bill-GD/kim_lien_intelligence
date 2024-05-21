@@ -19,6 +19,7 @@ class _ServerSetupState extends State<ServerSetup> {
   @override
   void initState() {
     super.initState();
+    logHandler.info('Opened Server Setup page', d: 1);
     getIpAddresses();
     // KLIServer.onClientConnectivityChanged.listen((event) {
     //   logHandler.i('A client connected');
@@ -42,7 +43,7 @@ class _ServerSetupState extends State<ServerSetup> {
 
   Future<void> popHandler() async {
     if (!KLIServer.started) {
-      logHandler.info('Leaving Server Setup page...');
+      logHandler.info('Leaving Server Setup page...', d: 2);
       Navigator.pop(context);
       return;
     }
@@ -132,7 +133,7 @@ class _ServerSetupState extends State<ServerSetup> {
               await KLIServer.start();
 
               KLIServer.onClientConnectivityChanged.listen((event) {
-                logHandler.info('A client connected');
+                logHandler.info('A client connected', d: 2);
                 setState(() {});
               });
 
@@ -141,7 +142,7 @@ class _ServerSetupState extends State<ServerSetup> {
               if (mounted) {
                 showToastMessage(context, error.toString());
               }
-              logHandler.error(error, stackTrace: stack);
+              logHandler.error('$error', stackTrace: stack, d: 2);
               return;
             }
 

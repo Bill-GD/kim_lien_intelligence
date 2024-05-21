@@ -26,19 +26,12 @@ class _ObstacleManagerState extends State<ObstacleManager> {
   @override
   void initState() {
     super.initState();
-    logHandler.info('Obstacle question manager init');
-    selectedMatch = ObstacleMatch(
-      match: '',
-      charCount: 0,
-      explanation: '',
-      hintQuestions: List<ObstacleQuestion?>.filled(5, null),
-      imagePath: '',
-      keyword: '',
-    );
+    logHandler.info('Opened Obstacle Manager', d: 1);
+    selectedMatch = ObstacleMatch.empty();
     getMatchNames().then((value) async {
       if (value.isNotEmpty) matchNames = value;
       setState(() => isLoading = false);
-      await removeDeletedMatchQuestions();
+      await removeDeletedMatchQuestions();  
     });
   }
 
@@ -77,14 +70,14 @@ class _ObstacleManagerState extends State<ObstacleManager> {
       );
     } on RangeError catch (e, stack) {
       showToastMessage(context, 'Sai định dạng (không đủ cột/hàng)');
-      logHandler.error(e, stackTrace: stack);
+      logHandler.error('$e', stackTrace: stack, d: 3);
       return;
     }
-    logHandler.info('Loaded ${selectedMatch.match} (${selectedMatch.keyword})');
+    logHandler.info('Loaded ${selectedMatch.match} (${selectedMatch.keyword})', d: 2);
   }
 
   Future<void> saveNewQuestions() async {
-    logHandler.info('Saving new questions of match: ${matchNames[selectedMatchIndex]}');
+    logHandler.info('Saving new questions of match: ${matchNames[selectedMatchIndex]}', d: 3);
     final saved = await DataManager.getAllSavedQuestions<ObstacleMatch>(
       ObstacleMatch.fromJson,
       storageHandler!.obstacleSaveFile,
@@ -95,7 +88,7 @@ class _ObstacleManagerState extends State<ObstacleManager> {
   }
 
   Future<void> updateQuestions(ObstacleMatch oMatch) async {
-    logHandler.info('Updating questions of match: ${matchNames[selectedMatchIndex]}');
+    logHandler.info('Updating questions of match: ${matchNames[selectedMatchIndex]}', d: 3);
     final saved = await DataManager.getAllSavedQuestions<ObstacleMatch>(
       ObstacleMatch.fromJson,
       storageHandler!.obstacleSaveFile,
@@ -115,22 +108,15 @@ class _ObstacleManagerState extends State<ObstacleManager> {
     try {
       selectedMatch = saved.firstWhere((e) => e.match == match);
       setState(() {});
-      logHandler.info('Loaded Obstacle (${selectedMatch.keyword}) of $match');
+      logHandler.info('Loaded Obstacle (${selectedMatch.keyword}) of $match', d: 3);
     } on StateError {
-      logHandler.info('Obstacle match $match not found, temp empty match created');
-      selectedMatch = ObstacleMatch(
-        match: matchNames[selectedMatchIndex],
-        keyword: '',
-        imagePath: '',
-        charCount: 0,
-        explanation: '',
-        hintQuestions: List<ObstacleQuestion?>.filled(5, null),
-      );
+      logHandler.info('Obstacle match $match not found, temp empty match created', d: 3);
+      selectedMatch = ObstacleMatch.empty(matchNames[selectedMatchIndex]);
     }
   }
 
   Future<void> removeDeletedMatchQuestions() async {
-    logHandler.info('Removing questions of deleted matches');
+    logHandler.info('Removing questions of deleted matches', d: 2);
     var saved = await DataManager.getAllSavedQuestions<ObstacleMatch>(
       ObstacleMatch.fromJson,
       storageHandler!.obstacleSaveFile,
@@ -140,7 +126,7 @@ class _ObstacleManagerState extends State<ObstacleManager> {
   }
 
   Future<void> removeMatch(ObstacleMatch oMatch) async {
-    logHandler.info('Removing questions of match: ${matchNames[selectedMatchIndex]}');
+    logHandler.info('Removing questions of match: ${matchNames[selectedMatchIndex]}', d: 3);
     var saved = await DataManager.getAllSavedQuestions<ObstacleMatch>(
       ObstacleMatch.fromJson,
       storageHandler!.obstacleSaveFile,
@@ -174,7 +160,7 @@ class _ObstacleManagerState extends State<ObstacleManager> {
         children: [
           matchSelector(matchNames, (value) async {
             selectedMatchIndex = matchNames.indexOf(value!);
-            logHandler.info('Selected match: ${matchNames[selectedMatchIndex]}');
+            logHandler.info('Selected match: ${matchNames[selectedMatchIndex]}', d: 2);
             await loadMatchQuestions(matchNames[selectedMatchIndex]);
             setState(() {});
           }),
@@ -220,14 +206,7 @@ class _ObstacleManagerState extends State<ObstacleManager> {
                   if (mounted) showToastMessage(context, 'Đã xóa (match: ${matchNames[selectedMatchIndex]})');
 
                   await removeMatch(selectedMatch);
-                  selectedMatch = ObstacleMatch(
-                    match: matchNames[selectedMatchIndex],
-                    keyword: '',
-                    imagePath: '',
-                    charCount: 0,
-                    explanation: '',
-                    hintQuestions: List<ObstacleQuestion?>.filled(5, null),
-                  );
+                  selectedMatch = ObstacleMatch.empty(matchNames[selectedMatchIndex]);
                   setState(() {});
                 },
               );
@@ -396,7 +375,8 @@ class _ObstacleManagerState extends State<ObstacleManager> {
             ElevatedButton(
               child: const Text('Chọn ảnh'),
               onPressed: () async {
-                logHandler.info('Selecting image at ${storageHandler!.getRelative(storageHandler!.mediaDir)}');
+                logHandler
+                    .info('Selecting image at ${storageHandler!.getRelative(storageHandler!.mediaDir)}', d: 3);
                 final result = await FilePicker.platform.pickFiles(
                   dialogTitle: 'Select image',
                   initialDirectory: storageHandler!.mediaDir.replaceAll('/', '\\'),
@@ -407,7 +387,7 @@ class _ObstacleManagerState extends State<ObstacleManager> {
                   final p = result.files.single.path!;
                   selectedMatch.imagePath = storageHandler!.getRelative(p);
                   await updateQuestions(selectedMatch);
-                  logHandler.info('Chose ${selectedMatch.imagePath}');
+                  logHandler.info('Chose ${selectedMatch.imagePath}', d: 3);
                   setState(() {});
                 }
               },

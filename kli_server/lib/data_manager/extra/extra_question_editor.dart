@@ -21,13 +21,13 @@ class _ExtraQuestionEditorState extends State<ExtraQuestionEditor> {
   @override
   void initState() {
     super.initState();
-    logHandler.info('Opened obstacle question editor');
+    logHandler.info('Opened Extra Question Editor', d: 2);
     if (widget.question != null) {
-      logHandler.info('Modify extra question');
+      logHandler.info('Objective: Modify extra question', d: 3);
       questionController.text = widget.question!.question;
       answerController.text = widget.question!.answer;
     } else {
-      logHandler.info('Add new extra question');
+      logHandler.info('Objective: Add new extra question', d: 3);
       createNew = true;
       questionController.text = '';
       answerController.text = '';
@@ -116,13 +116,13 @@ class _ExtraQuestionEditorState extends State<ExtraQuestionEditor> {
                         : qTrim != widget.question!.question || aTrim != widget.question!.answer;
 
                     if (!hasChanged) {
-                      logHandler.info('No change, exiting');
+                      logHandler.info('No change, exiting', d: 3);
                       Navigator.of(context).pop();
                       return;
                     }
                     final newQ = ExtraQuestion(question: qTrim, answer: aTrim);
 
-                    logHandler.info('${createNew ? 'Created' : 'Modified'} extra question');
+                    logHandler.info('${createNew ? 'Created' : 'Modified'} extra question', d: 3);
                     Navigator.of(context).pop(newQ);
                   },
             child: const Text('Hoàn tất', style: TextStyle(fontSize: fontSizeMedium)),
@@ -133,7 +133,7 @@ class _ExtraQuestionEditorState extends State<ExtraQuestionEditor> {
               style: TextStyle(fontSize: fontSizeMedium, color: Theme.of(context).colorScheme.error),
             ),
             onPressed: () {
-              logHandler.info('Cancelled');
+              logHandler.info('Cancelled', d: 3);
               Navigator.pop(context);
             },
           ),

@@ -31,7 +31,7 @@ class _ImportQuestionDialogState extends State<ImportQuestionDialog> with Ticker
 
   @override
   void initState() {
-    logHandler.info('Import question dialog: ${widget.matchName}');
+    logHandler.info('Import question dialog: ${widget.matchName}', d: 2);
     tabController = TabController(length: sheetCount, vsync: this);
     super.initState();
   }
@@ -53,8 +53,6 @@ class _ImportQuestionDialogState extends State<ImportQuestionDialog> with Ticker
                 ElevatedButton(
                   child: const Text('Chọn file'),
                   onPressed: () async {
-                    logHandler.info('Import new questions (.xlsx)');
-
                     final result = await FilePicker.platform.pickFiles(
                       dialogTitle: 'Select File',
                       initialDirectory: storageHandler!.newDataDir.replaceAll('/', '\\'),
@@ -63,7 +61,7 @@ class _ImportQuestionDialogState extends State<ImportQuestionDialog> with Ticker
                     );
 
                     if (result == null) {
-                      logHandler.info('No file selected');
+                      logHandler.info('No file selected', d: 3);
                       return;
                     }
 
@@ -71,7 +69,7 @@ class _ImportQuestionDialogState extends State<ImportQuestionDialog> with Ticker
 
                     final p = result.files.single.path!;
                     chosenFile = storageHandler!.getRelative(p);
-                    logHandler.info('Import: $chosenFile');
+                    logHandler.info('Import: $chosenFile', d: 3);
 
                     data = await storageHandler!.readFromExcel(
                       p,
@@ -113,11 +111,7 @@ class _ImportQuestionDialogState extends State<ImportQuestionDialog> with Ticker
         actionsAlignment: MainAxisAlignment.center,
         actions: [
           TextButton(
-            onPressed: disableDone
-                ? null
-                : () {
-                    Navigator.of(context).pop(data);
-                  },
+            onPressed: disableDone ? null : () => Navigator.of(context).pop(data),
             child: const Text('Hoàn tất', style: TextStyle(fontSize: fontSizeMSmall)),
           ),
           TextButton(

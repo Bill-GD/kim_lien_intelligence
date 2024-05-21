@@ -22,7 +22,7 @@ class _FinishManagerState extends State<FinishManager> {
   @override
   void initState() {
     super.initState();
-    logHandler.info('Finish question manager init');
+    logHandler.info('Opened Finish Manager', d: 1);
     selectedMatch = FinishMatch(match: '', questions: []);
     getMatchNames().then((value) async {
       if (value.isNotEmpty) matchNames = value;
@@ -53,11 +53,11 @@ class _FinishManagerState extends State<FinishManager> {
     }
 
     selectedMatch = FinishMatch(match: matchNames[selectedMatchIndex], questions: questions);
-    logHandler.info('Loaded ${selectedMatch.match}');
+    logHandler.info('Loaded ${questions.length} Finish questions of ${selectedMatch.match}', d: 2);
   }
 
   Future<void> saveNewQuestions() async {
-    logHandler.info('Saving new questions of match: ${matchNames[selectedMatchIndex]}');
+    logHandler.info('Saving new questions of match: ${matchNames[selectedMatchIndex]}', d: 2);
     final saved = await DataManager.getAllSavedQuestions<FinishMatch>(
       FinishMatch.fromJson,
       storageHandler!.finishSaveFile,
@@ -68,7 +68,7 @@ class _FinishManagerState extends State<FinishManager> {
   }
 
   Future<void> updateQuestions(FinishMatch fMatch) async {
-    logHandler.info('Updating questions of match: ${matchNames[selectedMatchIndex]}');
+    logHandler.info('Updating questions of match: ${matchNames[selectedMatchIndex]}', d: 2);
     final saved = await DataManager.getAllSavedQuestions<FinishMatch>(
       FinishMatch.fromJson,
       storageHandler!.finishSaveFile,
@@ -88,15 +88,16 @@ class _FinishManagerState extends State<FinishManager> {
     try {
       selectedMatch = saved.firstWhere((e) => e.match == match);
       setState(() {});
-      logHandler.info('Loaded ${selectedMatch.questions.length} finish questions of ${selectedMatch.match}');
+      logHandler.info('Loaded ${selectedMatch.questions.length} finish questions of ${selectedMatch.match}',
+          d: 2);
     } on StateError {
-      logHandler.info('Finish match $match not found, temp empty match created');
+      logHandler.info('Finish match $match not found, temp empty match created', d: 2);
       selectedMatch = FinishMatch(match: match, questions: []);
     }
   }
 
   Future<void> removeDeletedMatchQuestions() async {
-    logHandler.info('Removing questions of deleted matches');
+    logHandler.info('Removing questions of deleted matches', d: 2);
     var saved = await DataManager.getAllSavedQuestions<FinishMatch>(
       FinishMatch.fromJson,
       storageHandler!.finishSaveFile,
@@ -106,7 +107,7 @@ class _FinishManagerState extends State<FinishManager> {
   }
 
   Future<void> removeMatch(FinishMatch fMatch) async {
-    logHandler.info('Removing questions of match: ${matchNames[selectedMatchIndex]}');
+    logHandler.info('Removing questions of match: ${matchNames[selectedMatchIndex]}', d: 2);
     var saved = await DataManager.getAllSavedQuestions<FinishMatch>(
       FinishMatch.fromJson,
       storageHandler!.finishSaveFile,
@@ -140,7 +141,7 @@ class _FinishManagerState extends State<FinishManager> {
         children: [
           matchSelector(matchNames, (value) async {
             selectedMatchIndex = matchNames.indexOf(value!);
-            logHandler.info('Selected match: ${matchNames[selectedMatchIndex]}');
+            logHandler.info('Selected match: ${matchNames[selectedMatchIndex]}', d: 2);
             await loadMatchQuestions(matchNames[selectedMatchIndex]);
             setState(() {});
           }),
@@ -159,7 +160,7 @@ class _FinishManagerState extends State<FinishManager> {
             ],
             onSelected: (value) async {
               sortPoint = value!;
-              logHandler.info('Sort position: $value');
+              logHandler.info('Sort position: $value', d: 2);
               setState(() {});
             },
           ),

@@ -2,7 +2,7 @@
 
 ![GitHub repo size](https://img.shields.io/github/repo-size/Bill-GD/kim_lien_intelligence?style=plastic) ![GitHub repo size](https://img.shields.io/github/languages/code-size/Bill-GD/kim_lien_intelligence?style=plastic)
 
-A set of 2 apps and 1 lib.
+A set of 2 apps. The library is private.
 
 ## KLI Server
 
@@ -18,3 +18,4 @@ A set of 2 apps and 1 lib.
 
 - For contestants
 - Connects to host using host IP (local only)
+- Uses match state info form Server to display corresponding screens

@@ -3,23 +3,25 @@ import 'dart:io';
 import 'package:kli_lib/kli_lib.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
-late final PackageInfo packageInfo;
-Future<void> initPackageInfo() async {
-  packageInfo = await PackageInfo.fromPlatform();
-  logHandler.info('PackageInfo init');
-}
-
 late final LogHandler logHandler;
 void initLogHandler() {
   final rawDir = Platform.resolvedExecutable.split(Platform.executable).first;
-  String parentFolder = '${rawDir.substring(0, rawDir.length - 1).replaceAll('\\', '/')}\\UserData';
+  String parentFolder = rawDir.substring(0, rawDir.length - 1).replaceAll('\\', '/');
   logHandler = LogHandler(logFile: '$parentFolder\\log.txt');
+}
+
+late final PackageInfo packageInfo;
+Future<void> initPackageInfo() async {
+  packageInfo = await PackageInfo.fromPlatform();
+  logHandler.info('PackageInfo init: v${packageInfo.version}.${packageInfo.buildNumber}', d: 1);
 }
 
 String changelog = """
   0.1.1 ({latest}):
   - Added waiting room
   - Now uses LogHandler for logging
+  - Logs version on launch
+  - Better log messages & nested log
 
   0.1.0.2 ({f043127}):
   - Moved assets to KLILib

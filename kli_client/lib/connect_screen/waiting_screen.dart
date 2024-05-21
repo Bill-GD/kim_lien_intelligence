@@ -14,10 +14,11 @@ class WaitingScreen extends StatefulWidget {
 class _WaitingScreenState extends State<WaitingScreen> {
   @override
   void initState() {
+    logHandler.info('Waiting screen');
     KLIClient.onMessageReceived.listen((newMessage) async {
       if (newMessage.type == KLIMessageType.disconnect) {
         await KLIClient.disconnect();
-        logHandler.info(newMessage.msg);
+        logHandler.info('Message from Host: ${newMessage.msg}');
         if (mounted) Navigator.pop(context);
       }
     });

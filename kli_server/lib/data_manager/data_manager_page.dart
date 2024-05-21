@@ -33,6 +33,7 @@ class _DataManagerPageState extends State<DataManagerPage> {
   @override
   void initState() {
     super.initState();
+    logHandler.info('Opened Data Manager');
     contentPages = [
       const MatchManager(),
       const StartQuestionManager(),
@@ -44,19 +45,16 @@ class _DataManagerPageState extends State<DataManagerPage> {
     setState(() => isLoading = false);
   }
 
-  @override
-  void dispose() {
-    super.dispose();
+  void exitHandler() {
+    logHandler.info('Exiting data manager...', d: 1);
+    Navigator.pop(context);
   }
 
   @override
   Widget build(BuildContext context) {
     return CallbackShortcuts(
       bindings: <ShortcutActivator, VoidCallback>{
-        const SingleActivator(LogicalKeyboardKey.escape): () {
-          logHandler.info('Exiting data manager...');
-          Navigator.pop(context);
-        }
+        const SingleActivator(LogicalKeyboardKey.escape): exitHandler
       },
       child: Focus(
         autofocus: true,
@@ -75,12 +73,7 @@ class _DataManagerPageState extends State<DataManagerPage> {
                   selectedIndex: selectedPage,
                   expandable: false,
                   header: SideNavigationBarHeader(
-                    image: BackButton(
-                      onPressed: () {
-                        logHandler.info('Exiting data manager...');
-                        Navigator.of(context).pop();
-                      },
-                    ),
+                    image: BackButton(onPressed: exitHandler),
                     title: const Padding(
                       padding: EdgeInsets.symmetric(vertical: 30),
                       child: Text(
@@ -100,7 +93,6 @@ class _DataManagerPageState extends State<DataManagerPage> {
                   ],
                   onTap: (newIndex) {
                     setState(() => selectedPage = newIndex);
-                    logHandler.info('Selecting ${contentPages[newIndex].runtimeType}');
                   },
                   theme: sideNavigationTheme(context),
                 ),

@@ -5,7 +5,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:kli_lib/kli_lib.dart';
 import 'package:side_navigation/side_navigation.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:window_manager/window_manager.dart';
+// import 'package:window_manager/window_manager.dart';
 
 import '../data_manager/data_manager_page.dart';
 import '../global.dart';
@@ -23,24 +23,18 @@ class StartPage extends StatefulWidget {
   State<StartPage> createState() => _StartPageState();
 }
 
-class _StartPageState extends State<StartPage> with WindowListener {
+class _StartPageState extends State<StartPage> {
   int sidebarIndex = 0;
 
   @override
   void initState() {
     super.initState();
-    windowManager.addListener(this);
+    logHandler.info('Viewing help screen');
   }
 
   @override
   void dispose() {
-    windowManager.removeListener(this);
     super.dispose();
-  }
-
-  @override
-  void onWindowFocus() {
-    setState(() {});
   }
 
   @override
@@ -51,8 +45,8 @@ class _StartPageState extends State<StartPage> with WindowListener {
       appBar: AppBar(
         actions: [
           CloseButton(onPressed: () {
-            logHandler.info('Exiting app');
             storageHandler = null;
+            logHandler.info('Exiting app');
             exit(0);
           }),
         ],
@@ -127,6 +121,7 @@ class _StartPageState extends State<StartPage> with WindowListener {
                 SideNavigationBarItem(label: 'Miscellaneous', icon: FontAwesomeIcons.circlePlus),
               ],
               onTap: (newIndex) {
+                if (newIndex == 0) logHandler.info('Viewing help screen');
                 setState(() => sidebarIndex = newIndex);
               },
               theme: sideNavigationTheme(context, 3),
@@ -139,7 +134,6 @@ class _StartPageState extends State<StartPage> with WindowListener {
                   KLIButton(
                     'Mở phần quản lý dữ liệu',
                     onPressed: () {
-                      logHandler.info('Opening Data Manager page...');
                       Navigator.of(context).push(
                         MaterialPageRoute(builder: (context) => const DataManagerPage()),
                       );
@@ -148,7 +142,6 @@ class _StartPageState extends State<StartPage> with WindowListener {
                   KLIButton(
                     'Mở phần thiết lập trận đấu',
                     onPressed: () async {
-                      logHandler.info('Opening Match Setup');
                       await Navigator.of(context).push(
                         MaterialPageRoute(builder: (context) => const MatchDataChecker()),
                       );

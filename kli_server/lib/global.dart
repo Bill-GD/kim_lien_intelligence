@@ -9,14 +9,14 @@ import 'package:side_navigation/side_navigation.dart';
 late final LogHandler logHandler;
 void initLogHandler() {
   final rawDir = Platform.resolvedExecutable.split(Platform.executable).first;
-  String parentFolder = '${rawDir.substring(0, rawDir.length - 1).replaceAll('\\', '/')}\\UserData';
-  logHandler = LogHandler(logFile: '$parentFolder\\log.txt');
+  String userDataPath = '${rawDir.substring(0, rawDir.length - 1).replaceAll('\\', '/')}\\UserData';
+  logHandler = LogHandler(logFile: '$userDataPath\\log.txt');
 }
 
 late final PackageInfo packageInfo;
 Future<void> initPackageInfo() async {
   packageInfo = await PackageInfo.fromPlatform();
-  logHandler.info('PackageInfo init');
+  logHandler.info('PackageInfo init: v${packageInfo.version}.${packageInfo.buildNumber}', d: 1);
 }
 
 StorageHandler? storageHandler;
@@ -124,14 +124,14 @@ class DataManager {
     T Function(Map<String, dynamic>) func,
     String filePath,
   ) async {
-    logHandler.info('Getting all saved $T questions');
+    logHandler.info('Getting all saved $T questions', d: 2);
     final saved = await storageHandler!.readFromFile(filePath);
     if (saved.isEmpty) return <T>[];
     List<T> q = [];
     try {
       q = (jsonDecode(saved) as List).map((e) => func(e)).toList();
     } on Exception catch (e, stack) {
-      logHandler.error(e, stackTrace: stack);
+      logHandler.error('$e', stackTrace: stack, d: 2);
     }
     return q;
   }
@@ -139,6 +139,7 @@ class DataManager {
   static Future<void> updateAllQuestionMatchName({required String oldName, required String newName}) async {
     logHandler.info(
       'Match name update detected. Updating match name of all questions (\'$oldName\' -> \'$newName\')',
+      d: 1,
     );
 
     List<(Type, String)> typeToFileMap = [
@@ -166,12 +167,12 @@ class DataManager {
         if (e.match == oldName) e.match = newName;
       }
       await overwriteSave(q, file);
-      logHandler.info('$type: Done');
+      logHandler.info('Updated $type', d: 2);
     }
   }
 
   static Future<void> overwriteSave<T>(List<T> q, String filePath) async {
-    logHandler.info('Overwriting save');
+    logHandler.info('Overwriting save', d: 2);
     await storageHandler!.writeToFile(filePath, jsonEncode(q));
   }
 }
@@ -179,7 +180,9 @@ class DataManager {
 String changelog = """
   0.3.1.3 ({latest}):
   - Now uses LogHandler for logging
-  
+  - Logs version on launch
+  - Better log messages & nested log
+
   0.3.1.2 ({e50b469}):
   - Disabled light theme (like who need this anyway)
   - Use less theme colors

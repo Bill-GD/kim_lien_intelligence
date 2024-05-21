@@ -33,15 +33,15 @@ class _FinishQuestionEditorState extends State<FinishQuestionEditor> {
   @override
   void initState() {
     super.initState();
-    logHandler.info('Opened finish question editor');
+    logHandler.info('Opened Finish Question Editor', d: 1);
     if (widget.question == null) {
-      logHandler.info('Create new finish question');
+      logHandler.info('Create new finish question', d: 2);
       createNew = true;
       questionController.text = '';
       answerController.text = '';
       explanationController.text = '';
     } else {
-      logHandler.info('Modify finish question');
+      logHandler.info('Modify finish question', d: 2);
       questionController.text = widget.question!.question;
       answerController.text = widget.question!.answer;
       explanationController.text = widget.question!.explanation;
@@ -244,7 +244,7 @@ class _FinishQuestionEditorState extends State<FinishQuestionEditor> {
                         child: const Text('Chọn Video'),
                         onPressed: () async {
                           logHandler.info(
-                            'Selecting video at ${storageHandler!.getRelative(storageHandler!.mediaDir)}',
+                            '-- Selecting video at ${storageHandler!.getRelative(storageHandler!.mediaDir)}',
                           );
                           final result = await FilePicker.platform.pickFiles(
                             dialogTitle: 'Select image',
@@ -256,7 +256,7 @@ class _FinishQuestionEditorState extends State<FinishQuestionEditor> {
                             final p = result.files.single.path!;
                             newMediaPath = storageHandler!.getRelative(p);
                             await changeVideoSource(newMediaPath);
-                            logHandler.info('Chose $newMediaPath');
+                            logHandler.info('Chose $newMediaPath', d: 2);
                             setState(() {});
                           }
                         },
@@ -264,7 +264,7 @@ class _FinishQuestionEditorState extends State<FinishQuestionEditor> {
                       ElevatedButton(
                         child: const Text('Xóa Video'),
                         onPressed: () {
-                          logHandler.info('Removing video');
+                          logHandler.info('Removing video', d: 2);
                           newMediaPath = '';
                           setState(() {});
                         },
@@ -294,7 +294,7 @@ class _FinishQuestionEditorState extends State<FinishQuestionEditor> {
                             newMediaPath != widget.question!.mediaPath;
 
                     if (!hasChanged) {
-                      logHandler.info('No change, exiting');
+                      logHandler.info('No change, exiting', d: 2);
                       Navigator.of(context).pop();
                       return;
                     }
@@ -306,7 +306,7 @@ class _FinishQuestionEditorState extends State<FinishQuestionEditor> {
                       mediaPath: newMediaPath,
                     );
 
-                    logHandler.info('${createNew ? 'Created' : 'Modified'} finish question');
+                    logHandler.info('${createNew ? 'Created' : 'Modified'} finish question', d: 2);
                     Navigator.of(context).pop(newQ);
                   },
             child: const Text('Hoàn tất', style: TextStyle(fontSize: fontSizeMedium)),
@@ -317,7 +317,7 @@ class _FinishQuestionEditorState extends State<FinishQuestionEditor> {
               style: TextStyle(fontSize: fontSizeMedium, color: Theme.of(context).colorScheme.error),
             ),
             onPressed: () {
-              logHandler.info('Cancelled');
+              logHandler.info('Cancelled', d: 2);
               Navigator.pop(context);
             },
           ),

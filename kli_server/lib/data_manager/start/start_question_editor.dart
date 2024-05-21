@@ -24,16 +24,16 @@ class _StartQuestionEditorState extends State<StartQuestionEditor> {
   @override
   void initState() {
     super.initState();
-    logHandler.info('Opened start question editor');
+    logHandler.info('Opened Start Question Editor', d: 1);
     if (widget.question != null) {
-      logHandler.info('Modify start question');
+      logHandler.info('Modify start question', d: 2);
       questionController.text = widget.question!.question;
       answerController.text = widget.question!.answer;
       type = widget.question!.subject;
       pos = widget.playerPos;
       disableDone = questionController.text.isEmpty || answerController.text.isEmpty || pos < 0;
     } else {
-      logHandler.info('Add new start question');
+      logHandler.info('Add new start question', d: 2);
       type = StartQuestionSubject.math;
     }
   }
@@ -162,7 +162,7 @@ class _StartQuestionEditorState extends State<StartQuestionEditor> {
                             pos != widget.playerPos;
 
                     if (!hasChanged) {
-                      logHandler.info('No change, exiting');
+                      logHandler.info('No change, exiting', d: 2);
                       Navigator.of(context).pop();
                       return;
                     }
@@ -171,6 +171,7 @@ class _StartQuestionEditorState extends State<StartQuestionEditor> {
 
                     logHandler.info(
                       '${widget.question == null ? 'Created' : 'Modified'} start question: ${newQ.subject.name}',
+                      d: 2,
                     );
                     Navigator.of(context).pop((pos, newQ));
                   },
@@ -182,7 +183,7 @@ class _StartQuestionEditorState extends State<StartQuestionEditor> {
               style: TextStyle(fontSize: fontSizeMedium, color: Theme.of(context).colorScheme.error),
             ),
             onPressed: () {
-              logHandler.info('Cancelled');
+              logHandler.info('Cancelled', d: 2);
               Navigator.pop(context);
             },
           ),

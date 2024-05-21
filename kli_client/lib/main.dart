@@ -14,11 +14,12 @@ import 'global.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   initLogHandler();
+  logHandler.info('Starting KLIClient');
 
   logMessageStream.listen((m) {
-    if (m.$1 == LogType.info) logHandler.info(m.$2);
-    if (m.$1 == LogType.warn) logHandler.warn(m.$2);
-    if (m.$1 == LogType.error) logHandler.error(m.$2);
+    if (m.$1 == LogType.info) logHandler.info(m.$2, d: m.$3);
+    if (m.$1 == LogType.warn) logHandler.warn(m.$2, d: m.$3);
+    if (m.$1 == LogType.error) logHandler.error(m.$2, d: m.$3);
   });
 
   await initPackageInfo();

@@ -21,7 +21,7 @@ class _ExtraManagerState extends State<ExtraManager> {
   @override
   void initState() {
     super.initState();
-    logHandler.info('Extra question manager init');
+    logHandler.info('Opened Extra Manager', d: 1);
     selectedMatch = ExtraMatch(match: '', questions: []);
     getMatchNames().then((value) async {
       if (value.isNotEmpty) matchNames = value;
@@ -41,11 +41,11 @@ class _ExtraManagerState extends State<ExtraManager> {
     }
 
     selectedMatch = ExtraMatch(match: matchNames[selectedMatchIndex], questions: allQ);
-    logHandler.info('Loaded ${selectedMatch.questions.length} questions from excel');
+    logHandler.info('Loaded ${selectedMatch.questions.length} questions from excel', d: 2);
   }
 
   Future<void> saveNewQuestions() async {
-    logHandler.info('Saving new questions of match: ${matchNames[selectedMatchIndex]}');
+    logHandler.info('Saving new questions of match: ${matchNames[selectedMatchIndex]}', d: 2);
     final saved = await DataManager.getAllSavedQuestions<ExtraMatch>(
       ExtraMatch.fromJson,
       storageHandler!.extraSaveFile,
@@ -56,7 +56,7 @@ class _ExtraManagerState extends State<ExtraManager> {
   }
 
   Future<void> updateQuestions(ExtraMatch eMatch) async {
-    logHandler.info('Updating questions of match: ${matchNames[selectedMatchIndex]}');
+    logHandler.info('Updating questions of match: ${matchNames[selectedMatchIndex]}', d: 2);
     final saved = await DataManager.getAllSavedQuestions<ExtraMatch>(
       ExtraMatch.fromJson,
       storageHandler!.extraSaveFile,
@@ -76,16 +76,18 @@ class _ExtraManagerState extends State<ExtraManager> {
     try {
       selectedMatch = saved.firstWhere((e) => e.match == match);
       setState(() {});
-      logHandler
-          .info('Loaded ${selectedMatch.questions.length} extra questions of match ${selectedMatch.match}');
+      logHandler.info(
+        'Loaded ${selectedMatch.questions.length} extra questions of match ${selectedMatch.match}',
+        d: 2,
+      );
     } on StateError {
-      logHandler.info('Extra match $match not found, temp empty match created');
+      logHandler.info('Extra match $match not found, temp empty match created', d: 2);
       selectedMatch = ExtraMatch(match: match, questions: []);
     }
   }
 
   Future<void> removeDeletedMatchQuestions() async {
-    logHandler.info('Removing questions of deleted matches');
+    logHandler.info('Removing questions of deleted matches', d: 2);
     var saved = await DataManager.getAllSavedQuestions<ExtraMatch>(
       ExtraMatch.fromJson,
       storageHandler!.extraSaveFile,
@@ -95,7 +97,7 @@ class _ExtraManagerState extends State<ExtraManager> {
   }
 
   Future<void> removeMatch(ExtraMatch eMatch) async {
-    logHandler.info('Removing questions of match: ${matchNames[selectedMatchIndex]}');
+    logHandler.info('Removing questions of match: ${matchNames[selectedMatchIndex]}', d: 2);
     var saved = await DataManager.getAllSavedQuestions<ExtraMatch>(
       ExtraMatch.fromJson,
       storageHandler!.extraSaveFile,
@@ -129,7 +131,7 @@ class _ExtraManagerState extends State<ExtraManager> {
         children: [
           matchSelector(matchNames, (value) async {
             selectedMatchIndex = matchNames.indexOf(value!);
-            logHandler.info('Selected match: ${matchNames[selectedMatchIndex]}');
+            logHandler.info('Selected match: ${matchNames[selectedMatchIndex]}', d: 2);
             await loadMatchQuestions(matchNames[selectedMatchIndex]);
             setState(() {});
           }),
@@ -245,7 +247,7 @@ class _ExtraManagerState extends State<ExtraManager> {
                                 onAccept: () async {
                                   selectedMatch.questions.removeAt(index);
                                   await updateQuestions(selectedMatch);
-                                  logHandler.info('Deleted extra question of ${selectedMatch.match}');
+                                  logHandler.info('Deleted extra question of ${selectedMatch.match}', d: 2);
                                   setState(() {});
                                 },
                               );

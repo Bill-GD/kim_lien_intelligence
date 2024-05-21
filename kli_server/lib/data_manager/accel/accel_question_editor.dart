@@ -23,16 +23,16 @@ class _AccelQuestionEditorState extends State<AccelQuestionEditor> {
   @override
   void initState() {
     super.initState();
-    logHandler.info('Opened accel question editor');
+    logHandler.info('Opened Accel Question Editor', d: 1);
     if (widget.question != null) {
-      logHandler.info('Modify accel question');
+      logHandler.info('Objective: Modify accel question', d: 2);
       questionController.text = widget.question!.question;
       answerController.text = widget.question!.answer;
       explanationController.text = widget.question!.explanation;
       type = widget.question!.type;
       disableDone = questionController.text.isEmpty || answerController.text.isEmpty;
     } else {
-      logHandler.info('Add new accel question');
+      logHandler.info('Objective: Add new accel question', d: 2);
       createNew = true;
       questionController.text = '';
       answerController.text = '';
@@ -140,7 +140,7 @@ class _AccelQuestionEditorState extends State<AccelQuestionEditor> {
                             type != widget.question!.type;
 
                     if (!hasChanged) {
-                      logHandler.info('No change, exiting');
+                      logHandler.info('No change, exiting', d: 2);
                       Navigator.of(context).pop();
                       return;
                     }
@@ -152,7 +152,7 @@ class _AccelQuestionEditorState extends State<AccelQuestionEditor> {
                       imagePaths: createNew ? [] : widget.question!.imagePaths,
                     );
 
-                    logHandler.info('${createNew ? 'Created' : 'Modified'} accel question');
+                    logHandler.info('${createNew ? 'Created' : 'Modified'} accel question', d: 2);
                     Navigator.of(context).pop(newQ);
                   },
             child: const Text('Hoàn tất', style: TextStyle(fontSize: fontSizeMedium)),
@@ -163,7 +163,7 @@ class _AccelQuestionEditorState extends State<AccelQuestionEditor> {
               style: TextStyle(fontSize: fontSizeMedium, color: Theme.of(context).colorScheme.error),
             ),
             onPressed: () {
-              logHandler.info('Cancelled');
+              logHandler.info('Cancelled', d: 2);
               Navigator.pop(context);
             },
           ),
