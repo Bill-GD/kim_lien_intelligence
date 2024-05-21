@@ -23,7 +23,7 @@ class _FinishManagerState extends State<FinishManager> {
   void initState() {
     super.initState();
     logHandler.info('Opened Finish Manager', d: 1);
-    selectedMatch = FinishMatch(match: '', questions: []);
+    selectedMatch = FinishMatch.empty();
     getMatchNames().then((value) async {
       if (value.isNotEmpty) matchNames = value;
       setState(() => isLoading = false);
@@ -225,7 +225,7 @@ class _FinishManagerState extends State<FinishManager> {
                     showToastMessage(context, 'Đã xóa (match: ${matchNames[selectedMatchIndex]})');
                   }
                   await removeMatch(selectedMatch);
-                  selectedMatch = FinishMatch(match: '', questions: []);
+                  selectedMatch = FinishMatch.empty();
                   setState(() {});
                 },
               );

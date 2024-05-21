@@ -23,7 +23,7 @@ class _StartQuestionManagerState extends State<StartQuestionManager> {
   void initState() {
     super.initState();
     logHandler.info('Opened Start Manager', d: 1);
-    selectedMatch = StartMatch(match: '', questions: {});
+    selectedMatch = StartMatch.empty();
     getMatchNames().then((value) async {
       if (value.isNotEmpty) matchNames = value;
       setState(() => isLoading = false);
@@ -84,8 +84,10 @@ class _StartQuestionManagerState extends State<StartQuestionManager> {
     try {
       selectedMatch = saved.firstWhere((e) => e.match == match);
       setState(() {});
-      logHandler
-          .info('Loaded ${selectedMatch.questionCount} start questions of match ${selectedMatch.match}', d: 2);
+      logHandler.info(
+        'Loaded ${selectedMatch.questionCount} start questions of match ${selectedMatch.match}',
+        d: 2,
+      );
     } on StateError {
       logHandler.info('Start match $match not found, temp empty match created', d: 2);
       selectedMatch = StartMatch(match: match, questions: {});

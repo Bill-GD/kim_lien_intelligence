@@ -26,9 +26,8 @@ class _AccelManagerState extends State<AccelManager> {
   void initState() {
     super.initState();
     logHandler.info('Opened Accel Manager', d: 1);
-    selectedMatch = AccelMatch(match: '', questions: List.filled(4, null));
-    selectedQuestion = AccelQuestion(
-        type: AccelQuestionType.none, question: '', answer: '', explanation: '', imagePaths: []);
+    selectedMatch = AccelMatch.empty();
+    selectedQuestion = AccelQuestion.empty();
     getMatchNames().then((value) async {
       if (value.isNotEmpty) matchNames = value;
       setState(() => isLoading = false);

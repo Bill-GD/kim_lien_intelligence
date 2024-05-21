@@ -22,7 +22,7 @@ class _ExtraManagerState extends State<ExtraManager> {
   void initState() {
     super.initState();
     logHandler.info('Opened Extra Manager', d: 1);
-    selectedMatch = ExtraMatch(match: '', questions: []);
+    selectedMatch = ExtraMatch.empty();
     getMatchNames().then((value) async {
       if (value.isNotEmpty) matchNames = value;
       setState(() => isLoading = false);
@@ -195,7 +195,7 @@ class _ExtraManagerState extends State<ExtraManager> {
                     showToastMessage(context, 'Đã xóa (match: ${matchNames[selectedMatchIndex]})');
                   }
                   await removeMatch(selectedMatch);
-                  selectedMatch = ExtraMatch(match: '', questions: []);
+                  selectedMatch = ExtraMatch.empty();
                   setState(() {});
                 },
               );
