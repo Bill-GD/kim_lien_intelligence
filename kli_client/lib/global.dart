@@ -22,6 +22,7 @@ String changelog = """
   - Now uses LogHandler for logging
   - Logs version on launch
   - Better log messages & nested log
+  - Disabled light theme
 
   0.1.0.2 ({f043127}):
   - Moved assets to KLILib

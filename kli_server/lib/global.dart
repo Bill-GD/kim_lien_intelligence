@@ -178,7 +178,7 @@ class DataManager {
 }
 
 String changelog = """
-  0.3.1.3 ({latest}):
+  0.3.1.3 ({d51cbc6}):
   - Now uses LogHandler for logging
   - Logs version on launch
   - Better log messages & nested log
