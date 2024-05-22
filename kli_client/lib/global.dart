@@ -1,13 +1,16 @@
 import 'dart:io';
 
+import 'package:flutter/material.dart';
 import 'package:kli_lib/kli_lib.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
+bool useDefaultBackground = false;
+DecorationImage? bgWidget;
+
 late final LogHandler logHandler;
 void initLogHandler() {
-  final rawDir = Platform.resolvedExecutable.split(Platform.executable).first;
-  String parentFolder = rawDir.substring(0, rawDir.length - 1).replaceAll('\\', '/');
-  logHandler = LogHandler(logFile: '$parentFolder\\log.txt');
+  final parentDir = Platform.resolvedExecutable.split(Platform.executable).first;
+  logHandler = LogHandler(logFile: '$parentDir\\log.txt');
 }
 
 late final PackageInfo packageInfo;
@@ -23,6 +26,7 @@ String changelog = """
   - Logs version on launch
   - Better log messages & nested log
   - Disabled light theme
+  - Uses shared background hosted online, else default background
 
   0.1.0.2 ({f043127}):
   - Moved assets to KLILib

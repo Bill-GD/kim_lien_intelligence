@@ -37,12 +37,7 @@ class _WaitingScreenState extends State<WaitingScreen> {
       child: Focus(
         autofocus: true,
         child: Container(
-          decoration: const BoxDecoration(
-            image: DecorationImage(
-              image: AssetImage('assets/images/ttkl_bg_new.png', package: 'kli_lib'),
-              fit: BoxFit.fill,
-            ),
-          ),
+          decoration: BoxDecoration(image: bgWidget),
           child: Scaffold(
             backgroundColor: Colors.transparent,
             appBar: AppBar(

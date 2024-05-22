@@ -22,8 +22,9 @@ void main() async {
   logHandler.info('Starting KLIServer');
 
   await initPackageInfo();
+  // useDefaultBackground = !(await downloadBackgroundImage());
+  bgWidget = await getBackgroundWidget(useDefaultBackground);
   await initStorageHandler();
-  await storageHandler!.checkSaveDataDir();
 
   if (!kIsWeb && Platform.isWindows) {
     await windowManager.hide();

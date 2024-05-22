@@ -6,11 +6,13 @@ import 'package:kli_lib/kli_lib.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:side_navigation/side_navigation.dart';
 
+bool useDefaultBackground = true;
+DecorationImage? bgWidget;
+
 late final LogHandler logHandler;
 void initLogHandler() {
   final rawDir = Platform.resolvedExecutable.split(Platform.executable).first;
-  String userDataPath = '${rawDir.substring(0, rawDir.length - 1).replaceAll('\\', '/')}\\UserData';
-  logHandler = LogHandler(logFile: '$userDataPath\\log.txt');
+  logHandler = LogHandler(logFile: '$rawDir\\UserData\\log.txt');
 }
 
 late final PackageInfo packageInfo;
@@ -24,9 +26,7 @@ Future<void> initStorageHandler() async {
   if (storageHandler != null) return;
 
   final rawDir = Platform.resolvedExecutable.split(Platform.executable).first;
-  String parentFolder = rawDir.substring(0, rawDir.length - 1).replaceAll('\\', '/');
-
-  storageHandler = await StorageHandler.init(parentFolder);
+  storageHandler = await StorageHandler.init(rawDir);
 }
 
 Future<List<String>> getMatchNames() async {
@@ -178,10 +178,13 @@ class DataManager {
 }
 
 String changelog = """
-  0.3.1.3 ({d51cbc6}):
+  0.3.1.3 ({latest}):
   - Now uses LogHandler for logging
   - Logs version on launch
   - Better log messages & nested log
+  - Added background manager
+  - Uses shared background hosted online, else default background
+  - Better client list in Server Setup
 
   0.3.1.2 ({e50b469}):
   - Disabled light theme (like who need this anyway)

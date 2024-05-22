@@ -76,21 +76,15 @@ class _ServerSetupState extends State<ServerSetup> {
             extendBodyBehindAppBar: true,
             appBar: AppBar(forceMaterialTransparency: true),
             body: Container(
-              decoration: const BoxDecoration(
-                image: DecorationImage(
-                  image: AssetImage('assets/images/ttkl_bg_new.png', package: 'kli_lib'),
-                  fit: BoxFit.fill,
-                ),
-              ),
+              decoration: BoxDecoration(image: bgWidget),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Container(
                     decoration: const BoxDecoration(border: Border(right: BorderSide(width: 2))),
                     constraints: const BoxConstraints(maxWidth: 300),
-                    child: Column(children: [
-                      clientList(),
-                    ]),
+                    alignment: Alignment.topRight,
+                    child: clientList(),
                   ),
                   Expanded(
                     child: Column(
@@ -133,7 +127,6 @@ class _ServerSetupState extends State<ServerSetup> {
               await KLIServer.start();
 
               KLIServer.onClientConnectivityChanged.listen((event) {
-                logHandler.info('A client connected', d: 2);
                 setState(() {});
               });
 
@@ -165,7 +158,7 @@ class _ServerSetupState extends State<ServerSetup> {
         ),
         KLIButton(
           'Start Match',
-          disabledLabel: 'No server exist',
+          disabledLabel: !KLIServer.started ? 'No server exist' : 'Not enough player',
           enableCondition: KLIServer.started && KLIServer.allPlayerConnected,
           onPressed: () async {
             await KLIServer.stop();
@@ -182,35 +175,29 @@ class _ServerSetupState extends State<ServerSetup> {
 
     for (int index = 0; index < KLIServer.totalClientCount; index++) {
       final client = KLIServer.clientAt(index);
-      final connected = client != null;
-      String ip = connected ? '${client.address.address}:${client.port}' : 'Not connected';
+      final clientConnected = client != null;
+      String ip = clientConnected ? '${client.address.address}:${client.port}' : 'Not connected';
+
       clients.add(ListTile(
         title: Text(Networking.getClientDisplayID(ClientID.values[index + 1])),
         subtitle: Text(ip),
         subtitleTextStyle: TextStyle(
           fontSize: fontSizeMSmall,
-          color: connected ? Colors.greenAccent : Colors.redAccent,
+          color: clientConnected ? Colors.greenAccent : Colors.redAccent,
         ),
         trailing: KLIIconButton(
           const FaIcon(FontAwesomeIcons.linkSlash),
-          enableCondition: connected,
+          enableCondition: clientConnected,
           enabledLabel: 'Disconnect ${Networking.getClientDisplayID(ClientID.values[index + 1])}',
           disabledLabel: 'Not connected',
           onPressed: () async {
             await confirmDialog(
               context,
               message: 'Disconnect client?',
-              acceptLogMessage: 'Disconnected Client: ${ClientID.values[index + 1]}',
+              acceptLogMessage: 'Forced disconnect Client: ${ClientID.values[index + 1]}',
               onAccept: () async {
-                KLIServer.sendMessage(
-                  ClientID.values[index + 1],
-                  KLISocketMessage(
-                    senderID: ClientID.host,
-                    message: 'Server forced disconnection',
-                    type: KLIMessageType.disconnect,
-                  ),
-                );
-                if (connected) client.destroy();
+                KLIServer.disconnectClient(ClientID.values[index + 1], 'Server forced disconnection');
+                if (clientConnected) client.destroy();
               },
             );
           },
@@ -218,19 +205,11 @@ class _ServerSetupState extends State<ServerSetup> {
       ));
     }
 
-    return Container(
-      alignment: Alignment.center,
-      constraints: const BoxConstraints(maxWidth: 250),
-      child: ListView.separated(
-        shrinkWrap: true,
-        itemCount: clients.length,
-        separatorBuilder: (_, __) {
-          return const SizedBox(height: 30);
-        },
-        itemBuilder: (_, index) {
-          return clients[index];
-        },
-      ),
+    return ListView.separated(
+      shrinkWrap: true,
+      itemCount: clients.length,
+      separatorBuilder: (_, __) => const SizedBox(height: 30),
+      itemBuilder: (_, index) => clients[index],
     );
   }
 }

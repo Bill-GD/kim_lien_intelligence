@@ -51,30 +51,27 @@ class _ConnectPageState extends State<ConnectPage> {
         ],
         forceMaterialTransparency: true,
       ),
-      body: Container(
-        decoration: const BoxDecoration(
-          image: DecorationImage(
-            image: AssetImage('assets/images/ttkl_bg_new.png', package: 'kli_lib'),
-            fit: BoxFit.fill,
-          ),
-        ),
-        alignment: Alignment.center,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: <Widget>[
-            connectionStatus(),
-            connectInfo(),
-            connectButtons(),
-          ],
-        ),
-      ),
+      body: bgWidget == null
+          ? const Center(child: CircularProgressIndicator())
+          : Container(
+              decoration: BoxDecoration(image: bgWidget),
+              alignment: Alignment.center,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: <Widget>[
+                  connectionStatus(),
+                  connectInfo(),
+                  connectButtons(),
+                ],
+              ),
+            ),
     );
   }
 
   Widget changeLogVersionText() {
     return GestureDetector(
       onTap: () async {
-        logHandler.info('Opening changelog...');
+        logHandler.info('Opening changelog...', d: 1);
         await showDialog(
           context: context,
           builder: (context) {

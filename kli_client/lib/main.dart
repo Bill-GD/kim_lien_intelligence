@@ -22,6 +22,8 @@ void main() async {
   });
 
   await initPackageInfo();
+  // useDefaultBackground = !(await downloadBackgroundImage());
+  bgWidget = await getBackgroundWidget(useDefaultBackground);
 
   if (!kIsWeb && Platform.isWindows) {
     await windowManager.hide();
