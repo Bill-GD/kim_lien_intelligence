@@ -45,8 +45,7 @@ class _ObstacleEditorState extends State<ObstacleEditor> {
           mainAxisSize: MainAxisSize.min,
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
-            TextField(
-              style: const TextStyle(fontSize: fontSizeMedium),
+            KLITextField(
               onChanged: (value) {
                 disableDone = keywordController.text.isEmpty || explanationController.text.isEmpty;
                 if (value.isEmpty) {
@@ -57,19 +56,11 @@ class _ObstacleEditorState extends State<ObstacleEditor> {
                 setState(() => kErrorText = null);
               },
               controller: keywordController,
-              decoration: InputDecoration(
-                labelText: 'Keyword',
-                labelStyle: TextStyle(
-                  fontWeight: FontWeight.w600,
-                  color: Theme.of(context).colorScheme.primary,
-                ),
-                errorText: kErrorText,
-                border: const OutlineInputBorder(),
-              ),
+              labelText: 'Keyword',
+              errorText: kErrorText,
             ),
             const SizedBox(height: 30),
-            TextField(
-              style: const TextStyle(fontSize: fontSizeMedium),
+            KLITextField(
               onChanged: (value) {
                 disableDone = keywordController.text.isEmpty || explanationController.text.isEmpty;
                 if (value.isEmpty) {
@@ -82,15 +73,8 @@ class _ObstacleEditorState extends State<ObstacleEditor> {
               controller: explanationController,
               maxLines: 5,
               minLines: 1,
-              decoration: InputDecoration(
-                labelText: 'Explanation',
-                labelStyle: TextStyle(
-                  fontWeight: FontWeight.w600,
-                  color: Theme.of(context).colorScheme.primary,
-                ),
-                errorText: eErrorText,
-                border: const OutlineInputBorder(),
-              ),
+              labelText: 'Explanation',
+              errorText: eErrorText,
             ),
           ],
         ),
@@ -109,7 +93,8 @@ class _ObstacleEditorState extends State<ObstacleEditor> {
                       return;
                     }
 
-                    logHandler.info('Modified obstacle: ${widget.keyword} -> ${keywordController.text}', d: 3);
+                    logHandler.info('Modified obstacle: ${widget.keyword} -> ${keywordController.text}',
+                        d: 3);
                     Navigator.of(context).pop((kTrim, eTrim));
                   },
             child: const Text('Hoàn tất', style: TextStyle(fontSize: fontSizeMedium)),

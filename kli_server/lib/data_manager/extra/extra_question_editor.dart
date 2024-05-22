@@ -55,8 +55,7 @@ class _ExtraQuestionEditorState extends State<ExtraQuestionEditor> {
           mainAxisSize: MainAxisSize.min,
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
-            TextField(
-              style: const TextStyle(fontSize: fontSizeMedium),
+            KLITextField(
               onChanged: (value) {
                 disableDone = questionController.text.isEmpty || answerController.text.isEmpty;
                 if (value.isEmpty) {
@@ -69,19 +68,11 @@ class _ExtraQuestionEditorState extends State<ExtraQuestionEditor> {
               controller: questionController,
               maxLines: 5,
               minLines: 1,
-              decoration: InputDecoration(
-                labelText: 'Câu hỏi',
-                labelStyle: TextStyle(
-                  fontWeight: FontWeight.w600,
-                  color: Theme.of(context).colorScheme.primary,
-                ),
-                errorText: qErrorText,
-                border: const OutlineInputBorder(),
-              ),
+              labelText: 'Câu hỏi',
+              errorText: qErrorText,
             ),
             const SizedBox(height: 30),
-            TextField(
-              style: const TextStyle(fontSize: fontSizeMedium),
+            KLITextField(
               onChanged: (value) {
                 disableDone = questionController.text.isEmpty || answerController.text.isEmpty;
                 if (value.isEmpty) {
@@ -92,15 +83,8 @@ class _ExtraQuestionEditorState extends State<ExtraQuestionEditor> {
                 setState(() => aErrorText = null);
               },
               controller: answerController,
-              decoration: InputDecoration(
-                labelText: 'Đáp án',
-                labelStyle: TextStyle(
-                  fontWeight: FontWeight.w600,
-                  color: Theme.of(context).colorScheme.primary,
-                ),
-                errorText: aErrorText,
-                border: const OutlineInputBorder(),
-              ),
+              labelText: 'Đáp án',
+              errorText: aErrorText,
             ),
           ],
         ),

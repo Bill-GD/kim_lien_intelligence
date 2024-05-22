@@ -3,9 +3,9 @@ import 'dart:ui';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:kli_lib/kli_lib.dart';
 import 'package:theme_provider/theme_provider.dart';
 import 'package:window_manager/window_manager.dart';
-import 'package:kli_lib/kli_lib.dart';
 
 import 'global.dart';
 import 'start_screen/start_screen.dart';

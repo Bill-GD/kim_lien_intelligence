@@ -141,20 +141,12 @@ class _ConnectPageState extends State<ConnectPage> {
           },
         ),
         const SizedBox(width: 20),
-        TextField(
+        KLITextField(
           readOnly: isConnected,
-          style: const TextStyle(fontSize: fontSizeMedium),
           controller: ipTextController,
-          decoration: InputDecoration(
-            constraints: const BoxConstraints(maxWidth: 250),
-            labelText: 'Host IP',
-            hintText: 'Enter Host IP',
-            labelStyle: TextStyle(
-              fontWeight: FontWeight.w500,
-              color: Theme.of(context).colorScheme.primary,
-            ),
-            border: const OutlineInputBorder(),
-          ),
+          constraints: const BoxConstraints(maxWidth: 250),
+          labelText: 'Host IP',
+          hintText: 'Enter Host IP',
         ),
       ],
     );

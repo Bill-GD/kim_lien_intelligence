@@ -57,7 +57,8 @@ class _MatchEditorState extends State<MatchEditor> {
       body: AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         titlePadding: const EdgeInsets.symmetric(vertical: 32, horizontal: 256),
-        title: TextField(
+        title: KLITextField(
+          style: const TextStyle(fontSize: fontSizeSmall),
           onChanged: (value) {
             if (value.isEmpty) {
               matchNameError = 'Không được trống';
@@ -77,15 +78,8 @@ class _MatchEditorState extends State<MatchEditor> {
             });
           },
           controller: matchNameController,
-          decoration: InputDecoration(
-            labelText: 'Tên trận đấu',
-            labelStyle: TextStyle(
-              fontWeight: FontWeight.w600,
-              color: Theme.of(context).colorScheme.primary,
-            ),
-            errorText: matchNameError.isEmpty ? null : matchNameError,
-            border: const OutlineInputBorder(),
-          ),
+          labelText: 'Tên trận đấu',
+          errorText: matchNameError.isEmpty ? null : matchNameError,
         ),
         contentPadding: const EdgeInsets.only(bottom: 40),
         content: Column(
@@ -175,16 +169,10 @@ class _MatchEditorState extends State<MatchEditor> {
             ),
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 8),
-              child: TextField(
+              child: KLITextField(
+                style: const TextStyle(fontSize: fontSizeSmall),
                 controller: playerNameControllers[index],
-                decoration: InputDecoration(
-                  labelText: 'Tên',
-                  labelStyle: TextStyle(
-                    fontWeight: FontWeight.w600,
-                    color: Theme.of(context).colorScheme.primary,
-                  ),
-                  border: const OutlineInputBorder(),
-                ),
+                labelText: 'Tên',
               ),
             ),
             Container(
@@ -204,8 +192,8 @@ class _MatchEditorState extends State<MatchEditor> {
             ElevatedButton(
               child: const Text('Chọn ảnh'),
               onPressed: () async {
-                logHandler
-                    .info('Selecting image at ${storageHandler!.getRelative(storageHandler!.mediaDir)}', d: 3);
+                logHandler.info('Selecting image at ${storageHandler!.getRelative(storageHandler!.mediaDir)}',
+                    d: 3);
                 final result = await FilePicker.platform.pickFiles(
                   dialogTitle: 'Select image',
                   initialDirectory: storageHandler!.mediaDir.replaceAll('/', '\\'),
