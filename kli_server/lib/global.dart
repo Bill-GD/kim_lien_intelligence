@@ -6,7 +6,7 @@ import 'package:kli_lib/kli_lib.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:side_navigation/side_navigation.dart';
 
-bool useDefaultBackground = true;
+bool useDefaultBackground = false;
 DecorationImage? bgWidget;
 
 late final LogHandler logHandler;
@@ -178,7 +178,10 @@ class DataManager {
 }
 
 String changelog = """
-  0.3.1.3 ({latest}):
+  0.3.2 ({latest}):
+  - Added Loading screen
+
+  0.3.1.3 ({aa2a188}):
   - Now uses LogHandler for logging
   - Logs version on launch
   - Better log messages & nested log

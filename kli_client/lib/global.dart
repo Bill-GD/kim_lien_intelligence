@@ -20,7 +20,10 @@ Future<void> initPackageInfo() async {
 }
 
 String changelog = """
-  0.1.1 ({latest}):
+  0.1.2 ({latest}):
+  - Added Loading screen
+  
+  0.1.1 ({aa2a188}):
   - Added waiting room
   - Now uses LogHandler for logging
   - Logs version on launch

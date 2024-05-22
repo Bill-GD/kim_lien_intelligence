@@ -8,7 +8,7 @@ import 'package:theme_provider/theme_provider.dart';
 import 'package:window_manager/window_manager.dart';
 
 import 'global.dart';
-import 'start_screen/start_screen.dart';
+import 'loading_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -20,11 +20,6 @@ void main() async {
     if (m.$1 == LogType.error) logHandler.error(m.$2, d: m.$3);
   });
   logHandler.info('Starting KLIServer');
-
-  await initPackageInfo();
-  // useDefaultBackground = !(await downloadBackgroundImage());
-  bgWidget = await getBackgroundWidget(useDefaultBackground);
-  await initStorageHandler();
 
   if (!kIsWeb && Platform.isWindows) {
     await windowManager.hide();
@@ -67,7 +62,7 @@ class KliServerApp extends StatelessWidget {
           return MaterialApp(
             scrollBehavior: const MaterialScrollBehavior().copyWith(dragDevices: {PointerDeviceKind.mouse}),
             theme: ThemeProvider.themeOf(context).data,
-            home: const StartPage(),
+            home: const LoadingScreen(),
           );
         }),
       ),

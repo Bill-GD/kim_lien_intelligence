@@ -15,7 +15,16 @@ class BackgroundManager extends StatefulWidget {
 }
 
 class _BackgroundManagerState extends State<BackgroundManager> {
+  bool hasLocalShared = false;
   String? chosenFilePath;
+
+  @override
+  void initState() {
+    hasLocalShared =
+        File('${Platform.resolvedExecutable.split(Platform.executable).first}\\$backgroundLocalPath')
+            .existsSync();
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -60,17 +69,18 @@ class _BackgroundManagerState extends State<BackgroundManager> {
                   'Reset to Default',
                   enableCondition: !useDefaultBackground,
                   disabledLabel: 'Already using default background',
-                  onPressed: () {
+                  onPressed: () async {
                     useDefaultBackground = true;
+                    bgWidget = await getBackgroundWidget(useDefaultBackground);
                     widget.parentSetState(() {});
                   },
                 ),
                 KLIButton(
-                  'Used Shared Background',
-                  enableCondition: useDefaultBackground,
-                  disabledLabel: 'Already using shared background',
-                  onPressed: () {
+                  'Use Shared Background',
+                  enableCondition: useDefaultBackground && hasLocalShared,
+                  onPressed: () async {
                     useDefaultBackground = false;
+                    bgWidget = await getBackgroundWidget(useDefaultBackground);
                     widget.parentSetState(() {});
                   },
                 ),
@@ -87,14 +97,17 @@ class _BackgroundManagerState extends State<BackgroundManager> {
                   enabledLabel: 'Save to shared storage',
                   disabledLabel: 'No file chosen',
                   onPressed: () async {
+                    final bytes = await File(chosenFilePath!).readAsBytes();
+                    File('${Platform.resolvedExecutable.split(Platform.executable).first}\\$backgroundLocalPath')
+                        .writeAsBytesSync(bytes);
+                    useDefaultBackground = false;
+                    setState(() => hasLocalShared = true);
+                    widget.parentSetState(() {});
                     await githubHandler.uploadFile(
                       backgroundGitHubPath,
-                      bytes: File(chosenFilePath!).readAsBytesSync(),
+                      bytes: bytes,
                       message: 'Update background image',
                     );
-                    await downloadBackgroundImage();
-                    useDefaultBackground = false;
-                    widget.parentSetState(() {});
                   },
                 ),
               ],

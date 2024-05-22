@@ -7,8 +7,8 @@ import 'package:kli_lib/kli_lib.dart';
 import 'package:theme_provider/theme_provider.dart';
 import 'package:window_manager/window_manager.dart';
 
-import 'connect_screen/connect_screen.dart';
 import 'global.dart';
+import 'loading_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -20,10 +20,6 @@ void main() async {
     if (m.$1 == LogType.warn) logHandler.warn(m.$2, d: m.$3);
     if (m.$1 == LogType.error) logHandler.error(m.$2, d: m.$3);
   });
-
-  await initPackageInfo();
-  // useDefaultBackground = !(await downloadBackgroundImage());
-  bgWidget = await getBackgroundWidget(useDefaultBackground);
 
   if (!kIsWeb && Platform.isWindows) {
     await windowManager.hide();
@@ -66,7 +62,7 @@ class KliClientApp extends StatelessWidget {
           return MaterialApp(
             scrollBehavior: const MaterialScrollBehavior().copyWith(dragDevices: {PointerDeviceKind.mouse}),
             theme: ThemeProvider.themeOf(context).data,
-            home: const ConnectPage(),
+            home: const LoadingScreen(),
           );
         }),
       ),

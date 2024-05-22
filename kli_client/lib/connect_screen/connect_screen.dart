@@ -15,12 +15,14 @@ class ConnectPage extends StatefulWidget {
 }
 
 class _ConnectPageState extends State<ConnectPage> {
+  String loadingText = 'Initializing package info...';
+  bool isLoading = true;
+
   final clientTextController = TextEditingController(), ipTextController = TextEditingController();
   bool isConnecting = false, isConnected = false;
 
   @override
   void initState() {
-    logHandler.info('Connect screen');
     super.initState();
   }
 
@@ -35,6 +37,7 @@ class _ConnectPageState extends State<ConnectPage> {
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         toolbarHeight: kToolbarHeight * 1.5,
         title: Column(
           children: [
@@ -51,20 +54,18 @@ class _ConnectPageState extends State<ConnectPage> {
         ],
         forceMaterialTransparency: true,
       ),
-      body: bgWidget == null
-          ? const Center(child: CircularProgressIndicator())
-          : Container(
-              decoration: BoxDecoration(image: bgWidget),
-              alignment: Alignment.center,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: <Widget>[
-                  connectionStatus(),
-                  connectInfo(),
-                  connectButtons(),
-                ],
-              ),
-            ),
+      body: Container(
+        decoration: BoxDecoration(image: bgWidget),
+        alignment: Alignment.center,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: <Widget>[
+            connectionStatus(),
+            connectInfo(),
+            connectButtons(),
+          ],
+        ),
+      ),
     );
   }
 
