@@ -20,7 +20,7 @@ Future<void> initPackageInfo() async {
 }
 
 String changelog = """
-  0.1.2 ({latest}):
+  0.1.2 ({ed509df}):
   - Added Loading screen
   
   0.1.1 ({aa2a188}):

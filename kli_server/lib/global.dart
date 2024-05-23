@@ -180,6 +180,7 @@ class DataManager {
 String changelog = """
   0.3.2 ({latest}):
   - Added Loading screen
+  - Can now delete shared background
 
   0.3.1.3 ({aa2a188}):
   - Now uses LogHandler for logging

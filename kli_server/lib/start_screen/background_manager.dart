@@ -20,6 +20,7 @@ class _BackgroundManagerState extends State<BackgroundManager> {
 
   @override
   void initState() {
+    logHandler.info('Background Manager');
     hasLocalShared =
         File('${Platform.resolvedExecutable.split(Platform.executable).first}\\$backgroundLocalPath')
             .existsSync();
@@ -62,56 +63,8 @@ class _BackgroundManagerState extends State<BackgroundManager> {
               ],
             ),
             const SizedBox(height: 20),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                KLIButton(
-                  'Reset to Default',
-                  enableCondition: !useDefaultBackground,
-                  disabledLabel: 'Already using default background',
-                  onPressed: () async {
-                    useDefaultBackground = true;
-                    bgWidget = await getBackgroundWidget(useDefaultBackground);
-                    widget.parentSetState(() {});
-                  },
-                ),
-                KLIButton(
-                  'Use Shared Background',
-                  enableCondition: useDefaultBackground && hasLocalShared,
-                  onPressed: () async {
-                    useDefaultBackground = false;
-                    bgWidget = await getBackgroundWidget(useDefaultBackground);
-                    widget.parentSetState(() {});
-                  },
-                ),
-                KLIButton('Select Image', onPressed: () {
-                  FilePicker.platform.pickFiles().then((value) {
-                    if (value == null) return;
-                    chosenFilePath = value.files.single.path;
-                    setState(() {});
-                  });
-                }),
-                KLIButton(
-                  'Save Image',
-                  enableCondition: chosenFilePath != null,
-                  enabledLabel: 'Save to shared storage',
-                  disabledLabel: 'No file chosen',
-                  onPressed: () async {
-                    final bytes = await File(chosenFilePath!).readAsBytes();
-                    File('${Platform.resolvedExecutable.split(Platform.executable).first}\\$backgroundLocalPath')
-                        .writeAsBytesSync(bytes);
-                    useDefaultBackground = false;
-                    setState(() => hasLocalShared = true);
-                    widget.parentSetState(() {});
-                    await githubHandler.uploadFile(
-                      backgroundGitHubPath,
-                      bytes: bytes,
-                      message: 'Update background image',
-                    );
-                  },
-                ),
-              ],
-            ),
+            sharedBackgroundManageButtons(),
+            backgroundManageButtons(),
           ],
         ),
       ),
@@ -149,6 +102,93 @@ class _BackgroundManagerState extends State<BackgroundManager> {
                     : Image.file(File(path), fit: BoxFit.fill),
           ),
         ),
+      ],
+    );
+  }
+
+  Widget sharedBackgroundManageButtons() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      children: [
+        KLIButton('Select Image', onPressed: () {
+          logHandler.info('Selecting image...', d: 1);
+          FilePicker.platform.pickFiles().then((value) {
+            if (value == null) {
+              logHandler.warn('No file chosen', d: 1);
+              return;
+            }
+            chosenFilePath = value.files.single.path;
+            setState(() {});
+          });
+        }),
+        KLIButton(
+          'Save Image',
+          enableCondition: chosenFilePath != null,
+          enabledLabel: 'Save to shared storage',
+          disabledLabel: 'No file chosen',
+          onPressed: () async {
+            final bytes = await File(chosenFilePath!).readAsBytes();
+            File('${Platform.resolvedExecutable.split(Platform.executable).first}\\$backgroundLocalPath')
+                .writeAsBytesSync(bytes);
+            setState(() => hasLocalShared = true);
+            widget.parentSetState(() {});
+            await githubHandler.uploadFile(
+              backgroundGitHubPath,
+              bytes: bytes,
+              message: 'Update background image',
+            );
+          },
+        ),
+      ],
+    );
+  }
+
+  Widget backgroundManageButtons() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      children: [
+        KLIButton(
+          'Reset to Default',
+          enableCondition: !useDefaultBackground && hasLocalShared,
+          disabledLabel: 'Already using default background',
+          onPressed: () async {
+            useDefaultBackground = true;
+            bgWidget = await getBackgroundWidget(useDefaultBackground);
+            widget.parentSetState(() {});
+          },
+        ),
+        KLIButton(
+          'Use Shared Background',
+          enableCondition: useDefaultBackground && hasLocalShared,
+          disabledLabel: !useDefaultBackground
+              ? 'Already using shared background'
+              : !hasLocalShared
+                  ? 'No shared background'
+                  : null,
+          onPressed: () async {
+            useDefaultBackground = false;
+            bgWidget = await getBackgroundWidget(useDefaultBackground);
+            widget.parentSetState(() {});
+          },
+        ),
+        KLIButton(
+          'Remove Shared Background',
+          enableCondition: hasLocalShared,
+          disabledLabel: 'No shared background',
+          onPressed: () async {
+            await File('${Platform.resolvedExecutable.split(Platform.executable).first}\\$backgroundLocalPath')
+                .delete();
+            if (!useDefaultBackground) useDefaultBackground = true;
+            bgWidget = await getBackgroundWidget(useDefaultBackground);
+            hasLocalShared = false;
+            setState(() {});
+            widget.parentSetState(() {});
+            await githubHandler.deleteFile(
+              backgroundGitHubPath,
+              message: 'Remove background image',
+            );
+          },
+        )
       ],
     );
   }
