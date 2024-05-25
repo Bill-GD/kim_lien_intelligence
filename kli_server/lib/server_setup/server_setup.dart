@@ -13,7 +13,7 @@ class ServerSetup extends StatefulWidget {
 }
 
 class _ServerSetupState extends State<ServerSetup> {
-  String _localAddress = '';
+  String localAddress = '', publicAddress = '';
   String chosenClientID = '';
 
   @override
@@ -37,7 +37,8 @@ class _ServerSetupState extends State<ServerSetup> {
   }
 
   void getIpAddresses() async {
-    _localAddress = await Networking.getLocalIP();
+    localAddress = await Networking.getLocalIP();
+    publicAddress = await Networking.getPublicIP();
     setState(() {});
   }
 
@@ -108,7 +109,7 @@ class _ServerSetupState extends State<ServerSetup> {
   Widget serverStatus() {
     const s = TextStyle(fontSize: fontSizeLarge);
     return Text(
-      'Server status: ${KLIServer.started ? '🟢' : '🔴'} \nLocal IP: $_localAddress',
+      'Server status: ${KLIServer.started ? '🟢' : '🔴'}\nLocal IP: $localAddress\nPublic IP: $publicAddress',
       textAlign: TextAlign.center,
       style: s,
     );
@@ -140,7 +141,7 @@ class _ServerSetupState extends State<ServerSetup> {
             }
 
             if (mounted) {
-              showToastMessage(context, 'Started a local server with IP: ${KLIServer.address}');
+              showToastMessage(context, 'Started a server');
             }
           },
         ),
@@ -176,7 +177,7 @@ class _ServerSetupState extends State<ServerSetup> {
     for (int index = 0; index < KLIServer.totalClientCount; index++) {
       final client = KLIServer.clientAt(index);
       final clientConnected = client != null;
-      String ip = clientConnected ? '${client.address.address}:${client.port}' : 'Not connected';
+      String ip = clientConnected ? '${client.remoteAddress.address}:${client.remotePort}' : 'Not connected';
 
       clients.add(ListTile(
         title: Text(Networking.getClientDisplayID(ClientID.values[index + 1])),

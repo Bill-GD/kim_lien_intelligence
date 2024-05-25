@@ -180,15 +180,13 @@ class _ConnectPageState extends State<ConnectPage> {
                 });
 
                 KLIClient.onMessageReceived.listen((newMessage) async {
-                  if (newMessage.type == KLIMessageType.disconnect) {
-                    isConnected = false;
-                    await KLIClient.disconnect();
-                    clientTextController.text = '';
-                    setState(() {});
-                    if (mounted) showToastMessage(context, newMessage.msg);
-                    logHandler.info(newMessage.msg, d: 1);
-                  }
+                  if (newMessage.type != KLIMessageType.disconnect) return;
 
+                  isConnected = false;
+                  await KLIClient.disconnect();
+                  clientTextController.text = '';
+                  if (mounted) showToastMessage(context, newMessage.msg);
+                  logHandler.info(newMessage.msg, d: 1);
                   setState(() {});
                 });
 
