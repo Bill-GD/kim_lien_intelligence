@@ -21,6 +21,8 @@ class _ConnectPageState extends State<ConnectPage> {
   final clientTextController = TextEditingController(), ipTextController = TextEditingController();
   bool isConnecting = false, isConnected = false;
 
+  StreamSubscription<KLISocketMessage>? newMessageSubscription;
+
   @override
   void initState() {
     super.initState();
@@ -179,14 +181,16 @@ class _ConnectPageState extends State<ConnectPage> {
                   isConnected = true;
                 });
 
-                KLIClient.onMessageReceived.listen((newMessage) async {
+                newMessageSubscription = KLIClient.onMessageReceived.listen((newMessage) {
                   if (newMessage.type != KLIMessageType.disconnect) return;
 
                   isConnected = false;
-                  await KLIClient.disconnect();
+                  KLIClient.disconnect();
                   clientTextController.text = '';
                   if (mounted) showToastMessage(context, newMessage.msg);
-                  logHandler.info(newMessage.msg, d: 1);
+                  newMessageSubscription!.cancel();
+                  newMessageSubscription = null;
+
                   setState(() {});
                 });
 
@@ -215,8 +219,8 @@ class _ConnectPageState extends State<ConnectPage> {
           'Disconnect',
           disabledLabel: 'Not connected',
           enableCondition: isConnected,
-          onPressed: () async {
-            await KLIClient.disconnect();
+          onPressed: () {
+            KLIClient.disconnect();
             clientTextController.text = '';
             setState(() => isConnected = false);
             if (mounted) showToastMessage(context, 'Disconnected from server');

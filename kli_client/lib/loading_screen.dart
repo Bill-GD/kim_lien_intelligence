@@ -5,6 +5,7 @@ import 'connect_screen/connect_screen.dart';
 import 'global.dart';
 
 class LoadingScreen extends StatefulWidget {
+  final delayMilli = const Duration(milliseconds: 150);
   const LoadingScreen({super.key});
 
   @override
@@ -22,14 +23,13 @@ class _LoadingScreenState extends State<LoadingScreen> {
 
   void initializeApp() async {
     await initPackageInfo();
-    await Future.delayed(200.ms);
 
     setState(() => loadingText = 'Loading background image...');
     bgWidget = await getBackgroundWidget(useDefaultBackground);
-    await Future.delayed(200.ms);
+    await Future.delayed(widget.delayMilli);
 
     setState(() => loadingText = 'Finished initialization');
-    await Future.delayed(200.ms);
+    await Future.delayed(widget.delayMilli);
 
     if (mounted) {
       Navigator.of(context).push(

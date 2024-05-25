@@ -15,11 +15,11 @@ class _WaitingScreenState extends State<WaitingScreen> {
   @override
   void initState() {
     logHandler.info('Waiting screen');
-    KLIClient.onMessageReceived.listen((newMessage) async {
+    KLIClient.onMessageReceived.listen((newMessage) {
       if (newMessage.type == KLIMessageType.disconnect) {
-        await KLIClient.disconnect();
+        KLIClient.disconnect();
         logHandler.info('Message from Host: ${newMessage.msg}');
-        if (mounted) Navigator.pop(context);
+        Navigator.pop(context);
       }
     });
     super.initState();
