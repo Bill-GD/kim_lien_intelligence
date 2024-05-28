@@ -35,6 +35,8 @@ class _LoadingScreenState extends State<LoadingScreen> {
     setState(() => loadingText = 'Finished initialization');
     await Future.delayed(widget.delayMilli);
 
+    logHandler.info('Finished initializing app\n');
+
     if (mounted) {
       Navigator.of(context).push(
         MaterialPageRoute(builder: (context) => const StartPage()),

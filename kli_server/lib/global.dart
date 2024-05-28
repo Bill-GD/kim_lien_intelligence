@@ -179,6 +179,7 @@ String changelog = """
   - Added Loading screen
   - Can now delete shared background
   - Fixed client list wrong IP and port
+  - Fixed more log messages
 
   0.3.1.3 ({aa2a188}):
   - Now uses LogHandler for logging

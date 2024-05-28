@@ -108,9 +108,9 @@ class _ObstacleManagerState extends State<ObstacleManager> {
     try {
       selectedMatch = saved.firstWhere((e) => e.match == match);
       setState(() {});
-      logHandler.info('Loaded Obstacle (${selectedMatch.keyword}) of $match', d: 3);
+      logHandler.info('Loaded Obstacle (${selectedMatch.keyword}) of $match', d: 2);
     } on StateError {
-      logHandler.info('Obstacle match $match not found, temp empty match created', d: 3);
+      logHandler.info('Obstacle match $match not found, temp empty match created', d: 2);
       selectedMatch = ObstacleMatch.empty(matchNames[selectedMatchIndex]);
     }
   }

@@ -8,9 +8,9 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../data_manager/data_manager_page.dart';
 import '../global.dart';
+import '../match_setup/match_data_checker.dart';
 import 'background_manager.dart';
 import 'help_screen.dart';
-import 'match_data_checker.dart';
 
 class StartPage extends StatefulWidget {
   const StartPage({super.key});

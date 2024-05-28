@@ -23,16 +23,16 @@ class _AccelQuestionEditorState extends State<AccelQuestionEditor> {
   @override
   void initState() {
     super.initState();
-    logHandler.info('Opened Accel Question Editor', d: 1);
+    logHandler.info('Opened Accel Question Editor', d: 2);
     if (widget.question != null) {
-      logHandler.info('Objective: Modify accel question', d: 2);
+      logHandler.info('Objective: Modify accel question', d: 3);
       questionController.text = widget.question!.question;
       answerController.text = widget.question!.answer;
       explanationController.text = widget.question!.explanation;
       type = widget.question!.type;
       disableDone = questionController.text.isEmpty || answerController.text.isEmpty;
     } else {
-      logHandler.info('Objective: Add new accel question', d: 2);
+      logHandler.info('Objective: Add new accel question', d: 3);
       createNew = true;
       questionController.text = '';
       answerController.text = '';
@@ -116,7 +116,7 @@ class _AccelQuestionEditorState extends State<AccelQuestionEditor> {
                             type != widget.question!.type;
 
                     if (!hasChanged) {
-                      logHandler.info('No change, exiting', d: 2);
+                      logHandler.info('No change, exiting', d: 3);
                       Navigator.of(context).pop();
                       return;
                     }
@@ -128,7 +128,7 @@ class _AccelQuestionEditorState extends State<AccelQuestionEditor> {
                       imagePaths: createNew ? [] : widget.question!.imagePaths,
                     );
 
-                    logHandler.info('${createNew ? 'Created' : 'Modified'} accel question', d: 2);
+                    logHandler.info('${createNew ? 'Created' : 'Modified'} accel question', d: 3);
                     Navigator.of(context).pop(newQ);
                   },
             child: const Text('Hoàn tất', style: TextStyle(fontSize: fontSizeMedium)),
@@ -139,7 +139,7 @@ class _AccelQuestionEditorState extends State<AccelQuestionEditor> {
               style: TextStyle(fontSize: fontSizeMedium, color: Theme.of(context).colorScheme.error),
             ),
             onPressed: () {
-              logHandler.info('Cancelled', d: 2);
+              logHandler.info('Cancelled', d: 3);
               Navigator.pop(context);
             },
           ),

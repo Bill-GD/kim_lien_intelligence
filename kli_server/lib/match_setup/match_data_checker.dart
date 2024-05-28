@@ -6,7 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:kli_lib/kli_lib.dart';
 
 import '../global.dart';
-import '../server_setup/server_setup.dart';
+import 'server_setup.dart';
 
 class MatchDataChecker extends StatefulWidget {
   const MatchDataChecker({super.key});
@@ -41,14 +41,16 @@ class _MatchDataCheckerState extends State<MatchDataChecker> {
     });
   }
 
+  void exitHandler() {
+    logHandler.info('Closed match data checker\n', d: 1);
+    Navigator.pop(context);
+  }
+
   @override
   Widget build(BuildContext context) {
     return CallbackShortcuts(
       bindings: <ShortcutActivator, VoidCallback>{
-        const SingleActivator(LogicalKeyboardKey.escape): () {
-          logHandler.info('Exiting match data checker...', d: 1);
-          Navigator.pop(context);
-        }
+        const SingleActivator(LogicalKeyboardKey.escape): exitHandler
       },
       child: Focus(
         autofocus: true,
@@ -61,6 +63,7 @@ class _MatchDataCheckerState extends State<MatchDataChecker> {
               title: const Text('Kiểm tra dữ liệu trận đấu', style: TextStyle(fontSize: fontSizeLarge)),
               centerTitle: true,
               forceMaterialTransparency: true,
+              leading: BackButton(onPressed: exitHandler),
             ),
             body: Padding(
               padding: const EdgeInsets.only(left: 512, right: 512, top: 80, bottom: 128),

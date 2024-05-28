@@ -120,6 +120,7 @@ class _ImportQuestionDialogState extends State<ImportQuestionDialog> with Ticker
               style: TextStyle(fontSize: fontSizeMSmall, color: Theme.of(context).colorScheme.error),
             ),
             onPressed: () {
+              logHandler.info('Cancelled', d: 3);
               Navigator.of(context).pop();
             },
           ),
