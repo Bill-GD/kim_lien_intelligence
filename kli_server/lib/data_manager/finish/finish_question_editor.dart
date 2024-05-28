@@ -65,7 +65,7 @@ class _FinishQuestionEditorState extends State<FinishQuestionEditor> {
   }
 
   Future<void> changeVideoSource(String relativePath) async {
-    fullVideoPath = '${storageHandler!.parentFolder}\\$relativePath';
+    fullVideoPath = '${storageHandler.parentFolder}\\$relativePath';
     final f = File(fullVideoPath);
 
     if (!f.existsSync()) return;
@@ -217,17 +217,17 @@ class _FinishQuestionEditorState extends State<FinishQuestionEditor> {
                         child: const Text('Chọn Video'),
                         onPressed: () async {
                           logHandler.info(
-                            '-- Selecting video at ${storageHandler!.getRelative(storageHandler!.mediaDir)}',
+                            '-- Selecting video at ${storageHandler.getRelative(storageHandler.mediaDir)}',
                           );
                           final result = await FilePicker.platform.pickFiles(
                             dialogTitle: 'Select image',
-                            initialDirectory: storageHandler!.mediaDir.replaceAll('/', '\\'),
+                            initialDirectory: storageHandler.mediaDir.replaceAll('/', '\\'),
                             type: FileType.video,
                           );
 
                           if (result != null) {
                             final p = result.files.single.path!;
-                            newMediaPath = storageHandler!.getRelative(p);
+                            newMediaPath = storageHandler.getRelative(p);
                             await changeVideoSource(newMediaPath);
                             logHandler.info('Chose $newMediaPath', d: 2);
                             setState(() {});

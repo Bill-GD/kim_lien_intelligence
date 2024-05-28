@@ -4,9 +4,9 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:kli_lib/kli_lib.dart';
-import 'package:kli_server/server_setup/server_setup.dart';
 
 import '../global.dart';
+import '../server_setup/server_setup.dart';
 
 class MatchDataChecker extends StatefulWidget {
   const MatchDataChecker({super.key});
@@ -171,7 +171,7 @@ class _MatchDataCheckerState extends State<MatchDataChecker> {
   Future<(bool, List<String>)> checkMatch() async {
     final errorList = <String>[];
 
-    final match = (jsonDecode(await storageHandler!.readFromFile(storageHandler!.matchSaveFile)) as List)
+    final match = (jsonDecode(await storageHandler.readFromFile(storageHandler.matchSaveFile)) as List)
         .map((e) => KLIMatch.fromJson(e))
         .firstWhere((e) => e.name == matchNames[selectedMatchIndex]);
 
@@ -185,7 +185,7 @@ class _MatchDataCheckerState extends State<MatchDataChecker> {
 
     final saved = await DataManager.getAllSavedQuestions<StartMatch>(
       StartMatch.fromJson,
-      storageHandler!.startSaveFile,
+      storageHandler.startSaveFile,
     );
     if (saved.isEmpty) return (false, ['Chưa có dữ liệu']);
 
@@ -225,7 +225,7 @@ class _MatchDataCheckerState extends State<MatchDataChecker> {
 
     final saved = await DataManager.getAllSavedQuestions<ObstacleMatch>(
       ObstacleMatch.fromJson,
-      storageHandler!.obstacleSaveFile,
+      storageHandler.obstacleSaveFile,
     );
     if (saved.isEmpty) return (false, ['Chưa có dữ liệu']);
 
@@ -247,7 +247,7 @@ class _MatchDataCheckerState extends State<MatchDataChecker> {
 
     final saved = await DataManager.getAllSavedQuestions<AccelMatch>(
       AccelMatch.fromJson,
-      storageHandler!.accelSaveFile,
+      storageHandler.accelSaveFile,
     );
     if (saved.isEmpty) return (false, ['Chưa có dữ liệu']);
 
@@ -262,7 +262,7 @@ class _MatchDataCheckerState extends State<MatchDataChecker> {
 
         if (q.imagePaths.isEmpty) errorList.add('Câu $i: không có ảnh');
 
-        final missing = q.imagePaths.where((e) => !File('${storageHandler!.parentFolder}\\$e').existsSync());
+        final missing = q.imagePaths.where((e) => !File('${storageHandler.parentFolder}\\$e').existsSync());
         if (missing.isNotEmpty) {
           errorList
               .add('Câu $i (${AccelQuestion.mapTypeDisplay(q.type)}): Không tìm thấy ${missing.join(', ')}');
@@ -280,7 +280,7 @@ class _MatchDataCheckerState extends State<MatchDataChecker> {
 
     final saved = await DataManager.getAllSavedQuestions<FinishMatch>(
       FinishMatch.fromJson,
-      storageHandler!.finishSaveFile,
+      storageHandler.finishSaveFile,
     );
     if (saved.isEmpty) return (false, ['Chưa có dữ liệu']);
 
@@ -304,7 +304,7 @@ class _MatchDataCheckerState extends State<MatchDataChecker> {
 
     final saved = await DataManager.getAllSavedQuestions<ExtraMatch>(
       ExtraMatch.fromJson,
-      storageHandler!.extraSaveFile,
+      storageHandler.extraSaveFile,
     );
     if (saved.isEmpty) return (false, ['Chưa có dữ liệu']);
 

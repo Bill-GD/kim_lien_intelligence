@@ -60,28 +60,28 @@ class _FinishManagerState extends State<FinishManager> {
     logHandler.info('Saving new questions of match: ${matchNames[selectedMatchIndex]}', d: 2);
     final saved = await DataManager.getAllSavedQuestions<FinishMatch>(
       FinishMatch.fromJson,
-      storageHandler!.finishSaveFile,
+      storageHandler.finishSaveFile,
     );
     saved.removeWhere((e) => e.match == selectedMatch.match);
     saved.add(selectedMatch);
-    await DataManager.overwriteSave(saved, storageHandler!.finishSaveFile);
+    await DataManager.overwriteSave(saved, storageHandler.finishSaveFile);
   }
 
   Future<void> updateQuestions(FinishMatch fMatch) async {
     logHandler.info('Updating questions of match: ${matchNames[selectedMatchIndex]}', d: 2);
     final saved = await DataManager.getAllSavedQuestions<FinishMatch>(
       FinishMatch.fromJson,
-      storageHandler!.finishSaveFile,
+      storageHandler.finishSaveFile,
     );
     saved.removeWhere((e) => e.match == fMatch.match);
     saved.add(fMatch);
-    await DataManager.overwriteSave(saved, storageHandler!.finishSaveFile);
+    await DataManager.overwriteSave(saved, storageHandler.finishSaveFile);
   }
 
   Future<void> loadMatchQuestions(String match) async {
     final saved = await DataManager.getAllSavedQuestions<FinishMatch>(
       FinishMatch.fromJson,
-      storageHandler!.finishSaveFile,
+      storageHandler.finishSaveFile,
     );
     if (saved.isEmpty) return;
 
@@ -100,20 +100,20 @@ class _FinishManagerState extends State<FinishManager> {
     logHandler.info('Removing questions of deleted matches', d: 2);
     var saved = await DataManager.getAllSavedQuestions<FinishMatch>(
       FinishMatch.fromJson,
-      storageHandler!.finishSaveFile,
+      storageHandler.finishSaveFile,
     );
     saved = saved.where((e) => matchNames.contains(e.match)).toList();
-    await DataManager.overwriteSave(saved, storageHandler!.finishSaveFile);
+    await DataManager.overwriteSave(saved, storageHandler.finishSaveFile);
   }
 
   Future<void> removeMatch(FinishMatch fMatch) async {
     logHandler.info('Removing questions of match: ${matchNames[selectedMatchIndex]}', d: 2);
     var saved = await DataManager.getAllSavedQuestions<FinishMatch>(
       FinishMatch.fromJson,
-      storageHandler!.finishSaveFile,
+      storageHandler.finishSaveFile,
     );
     saved.removeWhere((e) => e.match == fMatch.match);
-    await DataManager.overwriteSave(saved, storageHandler!.finishSaveFile);
+    await DataManager.overwriteSave(saved, storageHandler.finishSaveFile);
   }
 
   @override

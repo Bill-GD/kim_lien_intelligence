@@ -48,28 +48,28 @@ class _ExtraManagerState extends State<ExtraManager> {
     logHandler.info('Saving new questions of match: ${matchNames[selectedMatchIndex]}', d: 2);
     final saved = await DataManager.getAllSavedQuestions<ExtraMatch>(
       ExtraMatch.fromJson,
-      storageHandler!.extraSaveFile,
+      storageHandler.extraSaveFile,
     );
     saved.removeWhere((e) => e.match == selectedMatch.match);
     saved.add(selectedMatch);
-    await DataManager.overwriteSave(saved, storageHandler!.extraSaveFile);
+    await DataManager.overwriteSave(saved, storageHandler.extraSaveFile);
   }
 
   Future<void> updateQuestions(ExtraMatch eMatch) async {
     logHandler.info('Updating questions of match: ${matchNames[selectedMatchIndex]}', d: 2);
     final saved = await DataManager.getAllSavedQuestions<ExtraMatch>(
       ExtraMatch.fromJson,
-      storageHandler!.extraSaveFile,
+      storageHandler.extraSaveFile,
     );
     saved.removeWhere((e) => e.match == eMatch.match);
     saved.add(eMatch);
-    await DataManager.overwriteSave(saved, storageHandler!.extraSaveFile);
+    await DataManager.overwriteSave(saved, storageHandler.extraSaveFile);
   }
 
   Future<void> loadMatchQuestions(String match) async {
     final saved = await DataManager.getAllSavedQuestions<ExtraMatch>(
       ExtraMatch.fromJson,
-      storageHandler!.extraSaveFile,
+      storageHandler.extraSaveFile,
     );
     if (saved.isEmpty) return;
 
@@ -90,20 +90,20 @@ class _ExtraManagerState extends State<ExtraManager> {
     logHandler.info('Removing questions of deleted matches', d: 2);
     var saved = await DataManager.getAllSavedQuestions<ExtraMatch>(
       ExtraMatch.fromJson,
-      storageHandler!.extraSaveFile,
+      storageHandler.extraSaveFile,
     );
     saved = saved.where((e) => matchNames.contains(e.match)).toList();
-    await DataManager.overwriteSave(saved, storageHandler!.extraSaveFile);
+    await DataManager.overwriteSave(saved, storageHandler.extraSaveFile);
   }
 
   Future<void> removeMatch(ExtraMatch eMatch) async {
     logHandler.info('Removing questions of match: ${matchNames[selectedMatchIndex]}', d: 2);
     var saved = await DataManager.getAllSavedQuestions<ExtraMatch>(
       ExtraMatch.fromJson,
-      storageHandler!.extraSaveFile,
+      storageHandler.extraSaveFile,
     );
     saved.removeWhere((e) => e.match == eMatch.match);
-    await DataManager.overwriteSave(saved, storageHandler!.extraSaveFile);
+    await DataManager.overwriteSave(saved, storageHandler.extraSaveFile);
   }
 
   @override

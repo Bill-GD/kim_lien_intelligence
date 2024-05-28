@@ -31,7 +31,7 @@ class _ObstacleManagerState extends State<ObstacleManager> {
     getMatchNames().then((value) async {
       if (value.isNotEmpty) matchNames = value;
       setState(() => isLoading = false);
-      await removeDeletedMatchQuestions();  
+      await removeDeletedMatchQuestions();
     });
   }
 
@@ -80,28 +80,28 @@ class _ObstacleManagerState extends State<ObstacleManager> {
     logHandler.info('Saving new questions of match: ${matchNames[selectedMatchIndex]}', d: 3);
     final saved = await DataManager.getAllSavedQuestions<ObstacleMatch>(
       ObstacleMatch.fromJson,
-      storageHandler!.obstacleSaveFile,
+      storageHandler.obstacleSaveFile,
     );
     saved.removeWhere((e) => e.match == selectedMatch.match);
     saved.add(selectedMatch);
-    await DataManager.overwriteSave(saved, storageHandler!.obstacleSaveFile);
+    await DataManager.overwriteSave(saved, storageHandler.obstacleSaveFile);
   }
 
   Future<void> updateQuestions(ObstacleMatch oMatch) async {
     logHandler.info('Updating questions of match: ${matchNames[selectedMatchIndex]}', d: 3);
     final saved = await DataManager.getAllSavedQuestions<ObstacleMatch>(
       ObstacleMatch.fromJson,
-      storageHandler!.obstacleSaveFile,
+      storageHandler.obstacleSaveFile,
     );
     saved.removeWhere((e) => e.match == oMatch.match);
     saved.add(oMatch);
-    await DataManager.overwriteSave(saved, storageHandler!.obstacleSaveFile);
+    await DataManager.overwriteSave(saved, storageHandler.obstacleSaveFile);
   }
 
   Future<void> loadMatchQuestions(String match) async {
     final saved = await DataManager.getAllSavedQuestions<ObstacleMatch>(
       ObstacleMatch.fromJson,
-      storageHandler!.obstacleSaveFile,
+      storageHandler.obstacleSaveFile,
     );
     if (saved.isEmpty) return;
 
@@ -119,20 +119,20 @@ class _ObstacleManagerState extends State<ObstacleManager> {
     logHandler.info('Removing questions of deleted matches', d: 2);
     var saved = await DataManager.getAllSavedQuestions<ObstacleMatch>(
       ObstacleMatch.fromJson,
-      storageHandler!.obstacleSaveFile,
+      storageHandler.obstacleSaveFile,
     );
     saved = saved.where((e) => matchNames.contains(e.match)).toList();
-    await DataManager.overwriteSave(saved, storageHandler!.obstacleSaveFile);
+    await DataManager.overwriteSave(saved, storageHandler.obstacleSaveFile);
   }
 
   Future<void> removeMatch(ObstacleMatch oMatch) async {
     logHandler.info('Removing questions of match: ${matchNames[selectedMatchIndex]}', d: 3);
     var saved = await DataManager.getAllSavedQuestions<ObstacleMatch>(
       ObstacleMatch.fromJson,
-      storageHandler!.obstacleSaveFile,
+      storageHandler.obstacleSaveFile,
     );
     saved.removeWhere((e) => e.match == oMatch.match);
-    await DataManager.overwriteSave(saved, storageHandler!.obstacleSaveFile);
+    await DataManager.overwriteSave(saved, storageHandler.obstacleSaveFile);
   }
 
   @override
@@ -294,7 +294,7 @@ class _ObstacleManagerState extends State<ObstacleManager> {
   Widget obstaclePreview() {
     bool imageFound = false;
     String fullImagePath = '';
-    fullImagePath = '${storageHandler!.parentFolder}\\${selectedMatch.imagePath}';
+    fullImagePath = '${storageHandler.parentFolder}\\${selectedMatch.imagePath}';
     imageFound = File(fullImagePath).existsSync();
 
     return Flexible(
@@ -375,17 +375,17 @@ class _ObstacleManagerState extends State<ObstacleManager> {
             ElevatedButton(
               child: const Text('Chọn ảnh'),
               onPressed: () async {
-                logHandler
-                    .info('Selecting image at ${storageHandler!.getRelative(storageHandler!.mediaDir)}', d: 3);
+                logHandler.info('Selecting image at ${storageHandler.getRelative(storageHandler.mediaDir)}',
+                    d: 3);
                 final result = await FilePicker.platform.pickFiles(
                   dialogTitle: 'Select image',
-                  initialDirectory: storageHandler!.mediaDir.replaceAll('/', '\\'),
+                  initialDirectory: storageHandler.mediaDir.replaceAll('/', '\\'),
                   type: FileType.image,
                 );
 
                 if (result != null) {
                   final p = result.files.single.path!;
-                  selectedMatch.imagePath = storageHandler!.getRelative(p);
+                  selectedMatch.imagePath = storageHandler.getRelative(p);
                   await updateQuestions(selectedMatch);
                   logHandler.info('Chose ${selectedMatch.imagePath}', d: 3);
                   setState(() {});

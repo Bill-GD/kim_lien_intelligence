@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:kli_lib/kli_lib.dart';
-import 'package:kli_server/global.dart';
+
+import '../../global.dart';
 
 class StartQuestionEditor extends StatefulWidget {
   final StartQuestion? question;

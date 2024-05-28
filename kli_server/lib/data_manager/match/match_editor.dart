@@ -154,7 +154,7 @@ class _MatchEditorState extends State<MatchEditor> {
     bool imageFound = false;
     String fullPath = '';
     if (imagePaths[index].isNotEmpty) {
-      fullPath = '${storageHandler!.parentFolder}\\${imagePaths[index]}';
+      fullPath = '${storageHandler.parentFolder}\\${imagePaths[index]}';
       imageFound = File(fullPath).existsSync();
     }
     return Expanded(
@@ -192,18 +192,18 @@ class _MatchEditorState extends State<MatchEditor> {
             ElevatedButton(
               child: const Text('Chọn ảnh'),
               onPressed: () async {
-                logHandler.info('Selecting image at ${storageHandler!.getRelative(storageHandler!.mediaDir)}',
+                logHandler.info('Selecting image at ${storageHandler.getRelative(storageHandler.mediaDir)}',
                     d: 3);
                 final result = await FilePicker.platform.pickFiles(
                   dialogTitle: 'Select image',
-                  initialDirectory: storageHandler!.mediaDir.replaceAll('/', '\\'),
+                  initialDirectory: storageHandler.mediaDir.replaceAll('/', '\\'),
                   type: FileType.image,
                 );
 
                 if (result == null) return;
 
                 final p = result.files.single.path!;
-                imagePaths[index] = storageHandler!.getRelative(p);
+                imagePaths[index] = storageHandler.getRelative(p);
                 logHandler.info('Chose ${imagePaths[index]} for player ${index + 1}', d: 3);
                 setState(() {});
               },

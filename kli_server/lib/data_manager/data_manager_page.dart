@@ -12,11 +12,6 @@ import 'match/match_manager.dart';
 import 'obstacle/obstacle_manager.dart';
 import 'start/start_manager.dart';
 
-// This page allows user to manage data
-// Has options to manage match, questions
-// Opens new page for each type -> init data
-// Edit an entry by editing in a dialog box
-
 class DataManagerPage extends StatefulWidget {
   const DataManagerPage({super.key});
 

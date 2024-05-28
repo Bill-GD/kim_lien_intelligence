@@ -55,7 +55,7 @@ class _ImportQuestionDialogState extends State<ImportQuestionDialog> with Ticker
                   onPressed: () async {
                     final result = await FilePicker.platform.pickFiles(
                       dialogTitle: 'Select File',
-                      initialDirectory: storageHandler!.newDataDir.replaceAll('/', '\\'),
+                      initialDirectory: storageHandler.newDataDir.replaceAll('/', '\\'),
                       type: FileType.custom,
                       allowedExtensions: ['xlsx'],
                     );
@@ -68,10 +68,10 @@ class _ImportQuestionDialogState extends State<ImportQuestionDialog> with Ticker
                     disableDone = false;
 
                     final p = result.files.single.path!;
-                    chosenFile = storageHandler!.getRelative(p);
+                    chosenFile = storageHandler.getRelative(p);
                     logHandler.info('Import: $chosenFile', d: 3);
 
-                    data = await storageHandler!.readFromExcel(
+                    data = await storageHandler.readFromExcel(
                       p,
                       widget.maxColumnCount,
                       widget.maxSheetCount,

@@ -16,7 +16,7 @@ class MatchState {
   }
 
   MatchState._([String? matchName]) {
-    storageHandler!.readFromFile(storageHandler!.matchSaveFile).then((value) {
+    storageHandler.readFromFile(storageHandler.matchSaveFile).then((value) {
       if (value.isEmpty) return;
 
       match = (jsonDecode(value) as Iterable)

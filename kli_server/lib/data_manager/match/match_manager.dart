@@ -22,7 +22,7 @@ class _MatchManagerState extends State<MatchManager> {
   @override
   void initState() {
     logHandler.info('Opened Match Manager', d: 1);
-    storageHandler!.readFromFile(storageHandler!.matchSaveFile).then((value) {
+    storageHandler.readFromFile(storageHandler.matchSaveFile).then((value) {
       if (value.isNotEmpty) {
         matches = (jsonDecode(value) as List).map((e) => KLIMatch.fromJson(e)).toList();
         currentMatchIndex = -1;
@@ -35,7 +35,7 @@ class _MatchManagerState extends State<MatchManager> {
   }
 
   Future<void> overwriteSave() async {
-    await storageHandler!.writeToFile(storageHandler!.matchSaveFile, jsonEncode(matches));
+    await storageHandler.writeToFile(storageHandler.matchSaveFile, jsonEncode(matches));
   }
 
   @override
@@ -236,7 +236,7 @@ class _MatchManagerState extends State<MatchManager> {
       itemBuilder: (_, index) {
         final p = matches[currentMatchIndex].playerList;
 
-        String fullImagePath = '${storageHandler!.parentFolder}\\${p[index]?.imagePath}';
+        String fullImagePath = '${storageHandler.parentFolder}\\${p[index]?.imagePath}';
 
         bool hasPlayer = p[index] != null, imageFound = false;
         if (hasPlayer) {

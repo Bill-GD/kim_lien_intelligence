@@ -60,25 +60,25 @@ class _StartQuestionManagerState extends State<StartQuestionManager> {
 
   Future<void> saveNewQuestions() async {
     logHandler.info('Saving new questions of match: ${matchNames[selectedMatchIndex]}', d: 2);
-    final saved = await DataManager.getAllSavedQuestions<StartMatch>(
-        StartMatch.fromJson, storageHandler!.startSaveFile);
+    final saved =
+        await DataManager.getAllSavedQuestions<StartMatch>(StartMatch.fromJson, storageHandler.startSaveFile);
     saved.removeWhere((e) => e.match == selectedMatch.match);
     saved.add(selectedMatch);
-    await DataManager.overwriteSave(saved, storageHandler!.startSaveFile);
+    await DataManager.overwriteSave(saved, storageHandler.startSaveFile);
   }
 
   Future<void> updateQuestions(StartMatch sMatch) async {
     logHandler.info('Updating questions of match: ${matchNames[selectedMatchIndex]}', d: 2);
-    final saved = await DataManager.getAllSavedQuestions<StartMatch>(
-        StartMatch.fromJson, storageHandler!.startSaveFile);
+    final saved =
+        await DataManager.getAllSavedQuestions<StartMatch>(StartMatch.fromJson, storageHandler.startSaveFile);
     saved.removeWhere((e) => e.match == sMatch.match);
     saved.add(sMatch);
-    await DataManager.overwriteSave(saved, storageHandler!.startSaveFile);
+    await DataManager.overwriteSave(saved, storageHandler.startSaveFile);
   }
 
   Future<void> loadMatchQuestions(String match) async {
-    final saved = await DataManager.getAllSavedQuestions<StartMatch>(
-        StartMatch.fromJson, storageHandler!.startSaveFile);
+    final saved =
+        await DataManager.getAllSavedQuestions<StartMatch>(StartMatch.fromJson, storageHandler.startSaveFile);
     if (saved.isEmpty) return;
 
     try {
@@ -96,18 +96,18 @@ class _StartQuestionManagerState extends State<StartQuestionManager> {
 
   Future<void> removeDeletedMatchQuestions() async {
     logHandler.info('Removing questions of deleted matches', d: 2);
-    var saved = await DataManager.getAllSavedQuestions<StartMatch>(
-        StartMatch.fromJson, storageHandler!.startSaveFile);
+    var saved =
+        await DataManager.getAllSavedQuestions<StartMatch>(StartMatch.fromJson, storageHandler.startSaveFile);
     saved = saved.where((e) => matchNames.contains(e.match)).toList();
-    await DataManager.overwriteSave(saved, storageHandler!.startSaveFile);
+    await DataManager.overwriteSave(saved, storageHandler.startSaveFile);
   }
 
   Future<void> removeMatch(StartMatch sMatch) async {
     logHandler.info('Removing all questions of match: ${matchNames[selectedMatchIndex]}', d: 2);
-    var saved = await DataManager.getAllSavedQuestions<StartMatch>(
-        StartMatch.fromJson, storageHandler!.startSaveFile);
+    var saved =
+        await DataManager.getAllSavedQuestions<StartMatch>(StartMatch.fromJson, storageHandler.startSaveFile);
     saved.removeWhere((e) => e.match == sMatch.match);
-    await DataManager.overwriteSave(saved, storageHandler!.startSaveFile);
+    await DataManager.overwriteSave(saved, storageHandler.startSaveFile);
   }
 
   @override
@@ -239,7 +239,7 @@ class _StartQuestionManagerState extends State<StartQuestionManager> {
           //     logHandler.info('Exporting ${matchNames[selectedMatchIndex]} start questions to $fileName', d: 2);
 
           //     final data = (jsonDecode(
-          //       await storageHandler!.readFromFile(storageHandler!.startSaveFile),
+          //       await storageHandler.readFromFile(storageHandler.startSaveFile),
           //     ) as List)
           //         .map((e) => StartMatch.fromJson(e))
           //         .toList();
@@ -264,11 +264,11 @@ class _StartQuestionManagerState extends State<StartQuestionManager> {
           //       }
           //     }
 
-          //     await storageHandler!.writeToExcel(fileName, newData);
+          //     await storageHandler.writeToExcel(fileName, newData);
           //     if (mounted) {
           //       showToastMessage(
           //         context,
-          //         'Saved to ${storageHandler!.getRelative(storageHandler!.excelOutput)}/$fileName',
+          //         'Saved to ${storageHandler.getRelative(storageHandler.excelOutput)}/$fileName',
           //       );
           //     }
           //   },

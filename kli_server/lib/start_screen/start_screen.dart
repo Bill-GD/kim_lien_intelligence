@@ -37,7 +37,6 @@ class _StartPageState extends State<StartPage> {
         automaticallyImplyLeading: false,
         actions: [
           CloseButton(onPressed: () {
-            storageHandler = null;
             logHandler.info('Exiting app');
             exit(0);
           }),
@@ -140,7 +139,7 @@ class _StartPageState extends State<StartPage> {
                     'Open Log File',
                     onPressed: () async {
                       logHandler.info('Opening log...');
-                      await launchUrl(Uri.parse(storageHandler!.logFile));
+                      await launchUrl(Uri.parse(storageHandler.logFile));
                     },
                   ),
                 ].elementAt(sidebarIndex),

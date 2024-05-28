@@ -21,17 +21,15 @@ Future<void> initPackageInfo() async {
   logHandler.info('PackageInfo init: v${packageInfo.version}.${packageInfo.buildNumber}', d: 1);
 }
 
-StorageHandler? storageHandler;
+late final StorageHandler storageHandler;
 Future<void> initStorageHandler() async {
-  if (storageHandler != null) return;
-
   final rawDir = Platform.resolvedExecutable.split(Platform.executable).first;
   storageHandler = await StorageHandler.init(rawDir);
 }
 
 Future<List<String>> getMatchNames() async {
   List<String> matchNames = [];
-  String value = await storageHandler!.readFromFile(storageHandler!.matchSaveFile);
+  String value = await storageHandler.readFromFile(storageHandler.matchSaveFile);
   if (value.isNotEmpty) {
     matchNames = (jsonDecode(value) as Iterable).map((e) => e['name'] as String).toList();
   }
@@ -64,8 +62,7 @@ Widget matchSelector(List<String> matchNames, void Function(String?) onSelected)
   );
 }
 
-/// A custom ListTile with variable column count and an optional delete button.
-///
+/// A custom ListTile with variable column count and an optional delete button.<br>
 /// The columns are defined by a pair/record ```(content: Widget, widthRatio: double)```.
 Widget customListTile(
   BuildContext context, {
@@ -125,7 +122,7 @@ class DataManager {
     String filePath,
   ) async {
     logHandler.info('Getting all saved $T questions', d: 2);
-    final saved = await storageHandler!.readFromFile(filePath);
+    final saved = await storageHandler.readFromFile(filePath);
     if (saved.isEmpty) return <T>[];
     List<T> q = [];
     try {
@@ -143,11 +140,11 @@ class DataManager {
     );
 
     List<(Type, String)> typeToFileMap = [
-      (StartMatch, storageHandler!.startSaveFile),
-      (ObstacleMatch, storageHandler!.obstacleSaveFile),
-      (AccelMatch, storageHandler!.accelSaveFile),
-      (FinishMatch, storageHandler!.finishSaveFile),
-      (ExtraMatch, storageHandler!.extraSaveFile),
+      (StartMatch, storageHandler.startSaveFile),
+      (ObstacleMatch, storageHandler.obstacleSaveFile),
+      (AccelMatch, storageHandler.accelSaveFile),
+      (FinishMatch, storageHandler.finishSaveFile),
+      (ExtraMatch, storageHandler.extraSaveFile),
     ];
 
     for (final (type, file) in typeToFileMap) {
@@ -173,7 +170,7 @@ class DataManager {
 
   static Future<void> overwriteSave<T>(List<T> q, String filePath) async {
     logHandler.info('Overwriting save', d: 2);
-    await storageHandler!.writeToFile(filePath, jsonEncode(q));
+    await storageHandler.writeToFile(filePath, jsonEncode(q));
   }
 }
 
