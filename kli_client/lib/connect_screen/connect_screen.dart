@@ -202,14 +202,16 @@ class _ConnectPageState extends State<ConnectPage> {
                 }
               },
               (e, stack) {
-                setState(() => isConnected = false);
                 logHandler.error('Error when trying to connect: $e', stackTrace: stack, d: 1);
                 if (e is SocketException) {
                   showToastMessage(context, 'Host (ip=$ip) not known');
-                  setState(() => isConnecting = false);
                 } else {
                   showToastMessage(context, 'An error occurred, please check log to see what happened');
                 }
+                setState(() {
+                  isConnected = false;
+                  isConnecting = false;
+                });
               },
             );
           },

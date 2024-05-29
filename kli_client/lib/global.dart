@@ -20,9 +20,10 @@ Future<void> initPackageInfo() async {
 }
 
 String changelog = """
-  0.1.2 ({74f6a89}):
+  0.1.2 ({latest}):
   - Added Loading screen
   - Fixed client still listen to server after disconnect
+  - Fixed UI not updating after getting connection error
   
   0.1.1 ({aa2a188}):
   - Added waiting room
