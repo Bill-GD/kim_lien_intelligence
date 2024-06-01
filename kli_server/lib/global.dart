@@ -18,7 +18,7 @@ void initLogHandler() {
 late final PackageInfo packageInfo;
 Future<void> initPackageInfo() async {
   packageInfo = await PackageInfo.fromPlatform();
-  logHandler.info('PackageInfo init: v${packageInfo.version}.${packageInfo.buildNumber}', d: 1);
+  logHandler.info('PackageInfo init: v${packageInfo.version}.${packageInfo.buildNumber}');
 }
 
 late final StorageHandler storageHandler;
@@ -121,14 +121,14 @@ class DataManager {
     T Function(Map<String, dynamic>) func,
     String filePath,
   ) async {
-    logHandler.info('Getting all saved $T questions', d: 2);
+    logHandler.info('Getting all saved $T questions');
     final saved = await storageHandler.readFromFile(filePath);
     if (saved.isEmpty) return <T>[];
     List<T> q = [];
     try {
       q = (jsonDecode(saved) as List).map((e) => func(e)).toList();
     } on Exception catch (e, stack) {
-      logHandler.error('$e', stackTrace: stack, d: 2);
+      logHandler.error('$e', stackTrace: stack);
     }
     return q;
   }
@@ -164,12 +164,12 @@ class DataManager {
         if (e.match == oldName) e.match = newName;
       }
       await overwriteSave(q, file);
-      logHandler.info('Updated $type', d: 2);
+      logHandler.info('Updated $type');
     }
   }
 
   static Future<void> overwriteSave<T>(List<T> q, String filePath) async {
-    logHandler.info('Overwriting save', d: 2);
+    logHandler.info('Overwriting save');
     await storageHandler.writeToFile(filePath, jsonEncode(q));
   }
 }
@@ -299,7 +299,7 @@ String changelog = """
   0.1.x ({333b4f3}):
   - Added basic messaging (with utf8)
   - Basic setup for data manager: UI
-  - Added logHandler: logs to console
+  - Added LogHandler: logs to console
   - Added basic start screen: side navigation, app version
   - Added storage handler: read excel, write to file
   - Force fullscreen on launch

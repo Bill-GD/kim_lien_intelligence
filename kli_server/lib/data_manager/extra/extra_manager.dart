@@ -22,6 +22,7 @@ class _ExtraManagerState extends State<ExtraManager> {
   void initState() {
     super.initState();
     logHandler.info('Opened Extra Manager', d: 1);
+    logHandler.depth = 2;
     selectedMatch = ExtraMatch.empty();
     getMatchNames().then((value) async {
       if (value.isNotEmpty) matchNames = value;
@@ -41,11 +42,11 @@ class _ExtraManagerState extends State<ExtraManager> {
     }
 
     selectedMatch = ExtraMatch(match: matchNames[selectedMatchIndex], questions: allQ);
-    logHandler.info('Loaded ${selectedMatch.questions.length} questions from excel', d: 2);
+    logHandler.info('Loaded ${selectedMatch.questions.length} questions from excel');
   }
 
   Future<void> saveNewQuestions() async {
-    logHandler.info('Saving new questions of match: ${matchNames[selectedMatchIndex]}', d: 2);
+    logHandler.info('Saving new questions of match: ${matchNames[selectedMatchIndex]}');
     final saved = await DataManager.getAllSavedQuestions<ExtraMatch>(
       ExtraMatch.fromJson,
       storageHandler.extraSaveFile,
@@ -56,7 +57,7 @@ class _ExtraManagerState extends State<ExtraManager> {
   }
 
   Future<void> updateQuestions(ExtraMatch eMatch) async {
-    logHandler.info('Updating questions of match: ${matchNames[selectedMatchIndex]}', d: 2);
+    logHandler.info('Updating questions of match: ${matchNames[selectedMatchIndex]}');
     final saved = await DataManager.getAllSavedQuestions<ExtraMatch>(
       ExtraMatch.fromJson,
       storageHandler.extraSaveFile,
@@ -81,13 +82,13 @@ class _ExtraManagerState extends State<ExtraManager> {
         d: 2,
       );
     } on StateError {
-      logHandler.info('Extra match $match not found, temp empty match created', d: 2);
+      logHandler.info('Extra match $match not found, temp empty match created');
       selectedMatch = ExtraMatch(match: match, questions: []);
     }
   }
 
   Future<void> removeDeletedMatchQuestions() async {
-    logHandler.info('Removing questions of deleted matches', d: 2);
+    logHandler.info('Removing questions of deleted matches');
     var saved = await DataManager.getAllSavedQuestions<ExtraMatch>(
       ExtraMatch.fromJson,
       storageHandler.extraSaveFile,
@@ -97,7 +98,7 @@ class _ExtraManagerState extends State<ExtraManager> {
   }
 
   Future<void> removeMatch(ExtraMatch eMatch) async {
-    logHandler.info('Removing questions of match: ${matchNames[selectedMatchIndex]}', d: 2);
+    logHandler.info('Removing questions of match: ${matchNames[selectedMatchIndex]}');
     var saved = await DataManager.getAllSavedQuestions<ExtraMatch>(
       ExtraMatch.fromJson,
       storageHandler.extraSaveFile,
@@ -131,7 +132,7 @@ class _ExtraManagerState extends State<ExtraManager> {
         children: [
           matchSelector(matchNames, (value) async {
             selectedMatchIndex = matchNames.indexOf(value!);
-            logHandler.info('Selected match: ${matchNames[selectedMatchIndex]}', d: 2);
+            logHandler.info('Selected match: ${matchNames[selectedMatchIndex]}');
             await loadMatchQuestions(matchNames[selectedMatchIndex]);
             setState(() {});
           }),
@@ -247,7 +248,7 @@ class _ExtraManagerState extends State<ExtraManager> {
                                 onAccept: () async {
                                   selectedMatch.questions.removeAt(index);
                                   await updateQuestions(selectedMatch);
-                                  logHandler.info('Deleted extra question of ${selectedMatch.match}', d: 2);
+                                  logHandler.info('Deleted extra question of ${selectedMatch.match}');
                                   setState(() {});
                                 },
                               );

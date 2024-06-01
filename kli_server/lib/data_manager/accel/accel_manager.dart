@@ -26,6 +26,7 @@ class _AccelManagerState extends State<AccelManager> {
   void initState() {
     super.initState();
     logHandler.info('Opened Accel Manager', d: 1);
+    logHandler.depth = 2;
     selectedMatch = AccelMatch.empty();
     selectedQuestion = AccelQuestion.empty();
     getMatchNames().then((value) async {
@@ -36,7 +37,7 @@ class _AccelManagerState extends State<AccelManager> {
   }
 
   Future<void> getNewQuestion(Map<String, dynamic> data) async {
-    logHandler.info('Extracting excel data', d: 2);
+    logHandler.info('Extracting excel data');
     final List<AccelQuestion> allQ = [];
 
     final sheet = data.values.first;
@@ -52,22 +53,22 @@ class _AccelManagerState extends State<AccelManager> {
       );
       allQ.add(q);
       if (allQ.length >= 4) {
-        logHandler.info('Got 4 questions -> break', d: 2);
+        logHandler.info('Got 4 questions -> break');
         break;
       }
     }
     if (allQ.length < 4) {
-      logHandler.info('Got less than 4 questions -> creating empty questions', d: 2);
+      logHandler.info('Got less than 4 questions -> creating empty questions');
       while (allQ.length < 4) {
         allQ.add(AccelQuestion.empty());
       }
     }
     selectedMatch = AccelMatch(match: matchNames[selectedMatchIndex], questions: allQ);
-    logHandler.info('Loaded ${selectedMatch.questions.length} questions from excel', d: 2);
+    logHandler.info('Loaded ${selectedMatch.questions.length} questions from excel');
   }
 
   Future<void> saveNewQuestions() async {
-    logHandler.info('Saving new questions of match: ${matchNames[selectedMatchIndex]}', d: 2);
+    logHandler.info('Saving new questions of match: ${matchNames[selectedMatchIndex]}');
     final saved = await DataManager.getAllSavedQuestions<AccelMatch>(
       AccelMatch.fromJson,
       storageHandler.accelSaveFile,
@@ -78,7 +79,7 @@ class _AccelManagerState extends State<AccelManager> {
   }
 
   Future<void> updateQuestions(AccelMatch aMatch) async {
-    logHandler.info('Updating questions of match: ${matchNames[selectedMatchIndex]}', d: 2);
+    logHandler.info('Updating questions of match: ${matchNames[selectedMatchIndex]}');
     final saved = await DataManager.getAllSavedQuestions<AccelMatch>(
       AccelMatch.fromJson,
       storageHandler.accelSaveFile,
@@ -103,13 +104,13 @@ class _AccelManagerState extends State<AccelManager> {
         d: 2,
       );
     } on StateError {
-      logHandler.info('Accel match $match not found, temp empty match created', d: 2);
+      logHandler.info('Accel match $match not found, temp empty match created');
       selectedMatch = AccelMatch(match: match, questions: List.filled(4, null));
     }
   }
 
   Future<void> removeDeletedMatchQuestions() async {
-    logHandler.info('Removing questions of deleted matches', d: 2);
+    logHandler.info('Removing questions of deleted matches');
     var saved = await DataManager.getAllSavedQuestions<AccelMatch>(
       AccelMatch.fromJson,
       storageHandler.accelSaveFile,
@@ -119,7 +120,7 @@ class _AccelManagerState extends State<AccelManager> {
   }
 
   Future<void> removeMatch(AccelMatch aMatch) async {
-    logHandler.info('Removing questions of match: ${matchNames[selectedMatchIndex]}', d: 2);
+    logHandler.info('Removing questions of match: ${matchNames[selectedMatchIndex]}');
     var saved = await DataManager.getAllSavedQuestions<AccelMatch>(
       AccelMatch.fromJson,
       storageHandler.accelSaveFile,
@@ -153,7 +154,7 @@ class _AccelManagerState extends State<AccelManager> {
         children: [
           matchSelector(matchNames, (value) async {
             selectedMatchIndex = matchNames.indexOf(value!);
-            logHandler.info('Selected match: ${matchNames[selectedMatchIndex]}', d: 2);
+            logHandler.info('Selected match: ${matchNames[selectedMatchIndex]}');
             await loadMatchQuestions(matchNames[selectedMatchIndex]);
             selectedQuestionIndex = -1;
             selectedImageIndex = -1;
@@ -304,7 +305,7 @@ class _AccelManagerState extends State<AccelManager> {
                   onTap: () async {
                     selectedQuestionIndex = index;
                     if (q == null) {
-                      logHandler.info('Selected question is null, creating new question', d: 2);
+                      logHandler.info('Selected question is null, creating new question');
                       selectedQuestion = AccelQuestion.empty();
                       selectedMatch.questions[index] = selectedQuestion;
                       await updateQuestions(selectedMatch);
@@ -346,7 +347,7 @@ class _AccelManagerState extends State<AccelManager> {
                 fontSize: fontSizeSmall,
                 onPressed: () async {
                   logHandler
-                      .info('Selecting image at ${storageHandler.getRelative(storageHandler.mediaDir)}', d: 2);
+                      .info('Selecting image at ${storageHandler.getRelative(storageHandler.mediaDir)}');
                   final result = await FilePicker.platform.pickFiles(
                     dialogTitle: 'Select Image',
                     initialDirectory: storageHandler.mediaDir.replaceAll('/', '\\'),
@@ -361,7 +362,7 @@ class _AccelManagerState extends State<AccelManager> {
                       AccelQuestion.getTypeFromImageCount(selectedQuestion.imagePaths.length);
                   if (selectedImageIndex < 0) selectedImageIndex = 0;
                   await updateQuestions(selectedMatch);
-                  logHandler.info('Chose ${storageHandler.getRelative(p)}', d: 2);
+                  logHandler.info('Chose ${storageHandler.getRelative(p)}');
                   setState(() {});
                 },
               ),
@@ -370,7 +371,7 @@ class _AccelManagerState extends State<AccelManager> {
                 enableCondition: selectedQuestionIndex >= 0 && selectedImageIndex >= 0,
                 fontSize: fontSizeSmall,
                 onPressed: () async {
-                  logHandler.info('Removing image $selectedImageIndex', d: 2);
+                  logHandler.info('Removing image $selectedImageIndex');
                   selectedQuestion.imagePaths.removeAt(selectedImageIndex);
                   if (selectedQuestion.imagePaths.isNotEmpty) {
                     if (selectedImageIndex > 0) selectedImageIndex--;

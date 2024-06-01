@@ -22,6 +22,7 @@ class _LoadingScreenState extends State<LoadingScreen> {
   }
 
   void initializeApp() async {
+    logHandler.depth = 1;
     await initPackageInfo();
 
     setState(() => loadingText = 'Loading background image...');
@@ -30,6 +31,7 @@ class _LoadingScreenState extends State<LoadingScreen> {
 
     setState(() => loadingText = 'Finished initialization');
     await Future.delayed(widget.delayMilli);
+    logHandler.depth = 0;
 
     if (mounted) {
       Navigator.of(context).push(

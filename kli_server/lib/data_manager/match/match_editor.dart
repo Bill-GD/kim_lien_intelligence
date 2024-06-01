@@ -32,7 +32,8 @@ class _MatchEditorState extends State<MatchEditor> {
   void initState() {
     super.initState();
     disableDone = setNewMatch = widget.match == null;
-    logHandler.info('Match editor: ${setNewMatch ? 'New match' : 'Modify ${widget.match?.name}'}', d: 2);
+    logHandler.info('Match editor: ${setNewMatch ? 'New match' : 'Modify ${widget.match?.name}'}');
+    logHandler.depth = 3;
     if (setNewMatch) return;
 
     matchNameController.text = widget.match!.name;
@@ -47,6 +48,7 @@ class _MatchEditorState extends State<MatchEditor> {
     for (var c in [matchNameController, ...playerNameControllers]) {
       c.dispose();
     }
+    logHandler.depth = 2;
     super.dispose();
   }
 
@@ -129,7 +131,7 @@ class _MatchEditorState extends State<MatchEditor> {
                       }).toList(),
                     );
 
-                    logHandler.info('${setNewMatch ? 'New' : 'Modified'} match: ${newMatch.name}', d: 3);
+                    logHandler.info('${setNewMatch ? 'New' : 'Modified'} match: ${newMatch.name}');
 
                     Navigator.of(context).pop(newMatch);
                   },
@@ -141,7 +143,7 @@ class _MatchEditorState extends State<MatchEditor> {
               style: TextStyle(fontSize: fontSizeMedium, color: Theme.of(context).colorScheme.error),
             ),
             onPressed: () {
-              logHandler.info('Cancelled', d: 3);
+              logHandler.info('Cancelled');
               Navigator.pop(context);
             },
           ),
@@ -204,7 +206,7 @@ class _MatchEditorState extends State<MatchEditor> {
 
                 final p = result.files.single.path!;
                 imagePaths[index] = storageHandler.getRelative(p);
-                logHandler.info('Chose ${imagePaths[index]} for player ${index + 1}', d: 3);
+                logHandler.info('Chose ${imagePaths[index]} for player ${index + 1}');
                 setState(() {});
               },
             ),

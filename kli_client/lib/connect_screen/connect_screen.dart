@@ -25,6 +25,7 @@ class _ConnectPageState extends State<ConnectPage> {
 
   @override
   void initState() {
+    logHandler.depth = 1;
     super.initState();
   }
 
@@ -50,7 +51,7 @@ class _ConnectPageState extends State<ConnectPage> {
         centerTitle: true,
         actions: [
           CloseButton(onPressed: () {
-            logHandler.info('Exiting app');
+            logHandler.info('Exiting app', d: 0);
             exit(0);
           }),
         ],
@@ -74,7 +75,7 @@ class _ConnectPageState extends State<ConnectPage> {
   Widget changeLogVersionText() {
     return GestureDetector(
       onTap: () async {
-        logHandler.info('Opening changelog...', d: 1);
+        logHandler.info('Opening changelog...');
         await showDialog(
           context: context,
           builder: (context) {
@@ -170,7 +171,7 @@ class _ConnectPageState extends State<ConnectPage> {
               showToastMessage(context, 'Please select a player ID');
               return;
             }
-            logHandler.info('Selected role: ${KLIClient.clientID}', d: 1);
+            logHandler.info('Selected role: ${KLIClient.clientID}');
 
             runZonedGuarded(
               () async {
@@ -202,7 +203,7 @@ class _ConnectPageState extends State<ConnectPage> {
                 }
               },
               (e, stack) {
-                logHandler.error('Error when trying to connect: $e', stackTrace: stack, d: 1);
+                logHandler.error('Error when trying to connect: $e', stackTrace: stack);
                 if (e is SocketException) {
                   showToastMessage(context, 'Host (ip=$ip) not known');
                 } else {

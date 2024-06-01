@@ -19,7 +19,8 @@ class _ObstacleEditorState extends State<ObstacleEditor> {
   @override
   void initState() {
     super.initState();
-    logHandler.info('Opened Obstacle Editor', d: 2);
+    logHandler.info('Opened Obstacle Editor');
+    logHandler.depth = 3;
     disableDone = keywordController.text.isEmpty || explanationController.text.isEmpty;
     keywordController.text = widget.keyword;
     explanationController.text = widget.explanation;
@@ -29,6 +30,7 @@ class _ObstacleEditorState extends State<ObstacleEditor> {
   void dispose() {
     keywordController.dispose();
     explanationController.dispose();
+    logHandler.depth = 2;
     super.dispose();
   }
 
@@ -88,13 +90,12 @@ class _ObstacleEditorState extends State<ObstacleEditor> {
                     bool hasChanged = kTrim != widget.keyword || eTrim != widget.explanation;
 
                     if (!hasChanged) {
-                      logHandler.info('No change, exiting', d: 3);
+                      logHandler.info('No change, exiting');
                       Navigator.of(context).pop();
                       return;
                     }
 
-                    logHandler.info('Modified obstacle: ${widget.keyword} -> ${keywordController.text}',
-                        d: 3);
+                    logHandler.info('Modified obstacle: ${widget.keyword} -> ${keywordController.text}');
                     Navigator.of(context).pop((kTrim, eTrim));
                   },
             child: const Text('Hoàn tất', style: TextStyle(fontSize: fontSizeMedium)),
@@ -105,7 +106,7 @@ class _ObstacleEditorState extends State<ObstacleEditor> {
               style: TextStyle(fontSize: fontSizeMedium, color: Theme.of(context).colorScheme.error),
             ),
             onPressed: () {
-              logHandler.info('Cancelled', d: 3);
+              logHandler.info('Cancelled');
               Navigator.pop(context);
             },
           ),

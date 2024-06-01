@@ -4,9 +4,11 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:kli_lib/kli_lib.dart';
 
 import '../global.dart';
+import '../match_state.dart';
 
 class ServerSetup extends StatefulWidget {
-  const ServerSetup({super.key});
+  final String matchName;
+  const ServerSetup(this.matchName, {super.key});
 
   @override
   State<ServerSetup> createState() => _ServerSetupState();
@@ -18,8 +20,10 @@ class _ServerSetupState extends State<ServerSetup> {
 
   @override
   void initState() {
+    KLIServer.stop();
     super.initState();
-    logHandler.info('Opened Server Setup page', d: 1);
+    logHandler.info('Opened Server Setup page');
+    logHandler.depth = 2;
     getIpAddresses();
     // KLIServer.onClientConnectivityChanged.listen((event) {
     //   logHandler.i('A client connected');
@@ -33,6 +37,7 @@ class _ServerSetupState extends State<ServerSetup> {
 
   @override
   void dispose() {
+    logHandler.depth = 1;
     super.dispose();
   }
 
@@ -44,7 +49,7 @@ class _ServerSetupState extends State<ServerSetup> {
 
   Future<void> popHandler() async {
     if (!KLIServer.started) {
-      logHandler.info('Leaving Server Setup page...', d: 2);
+      logHandler.info('Leaving Server Setup page...');
       Navigator.pop(context);
       return;
     }
@@ -136,7 +141,7 @@ class _ServerSetupState extends State<ServerSetup> {
               if (mounted) {
                 showToastMessage(context, error.toString());
               }
-              logHandler.error('$error', stackTrace: stack, d: 2);
+              logHandler.error('$error', stackTrace: stack);
               return;
             }
 
@@ -161,10 +166,9 @@ class _ServerSetupState extends State<ServerSetup> {
           'Start Match',
           disabledLabel: !KLIServer.started ? 'No server exist' : 'Not enough player',
           enableCondition: KLIServer.started && KLIServer.allPlayerConnected,
-          onPressed: () async {
-            await KLIServer.stop();
+          onPressed: () {
+            MatchState.instance(widget.matchName);
             setState(() {});
-            if (mounted) showToastMessage(context, 'Closed server.');
           },
         ),
       ],

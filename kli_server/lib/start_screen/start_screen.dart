@@ -24,8 +24,8 @@ class _StartPageState extends State<StartPage> {
 
   @override
   void initState() {
+    logHandler.depth = 0;
     super.initState();
-    logHandler.info('Viewing help screen');
   }
 
   @override
@@ -37,7 +37,7 @@ class _StartPageState extends State<StartPage> {
         automaticallyImplyLeading: false,
         actions: [
           CloseButton(onPressed: () {
-            logHandler.info('Exiting app');
+            logHandler.info('Exiting app', d: 0);
             exit(0);
           }),
         ],
@@ -65,7 +65,7 @@ class _StartPageState extends State<StartPage> {
               footer: SideNavigationBarFooter(
                 label: GestureDetector(
                   onTap: () async {
-                    logHandler.info('Opening changelog...');
+                    logHandler.info('Opening changelog...', d: 0);
                     await showDialog(
                       context: context,
                       builder: (context) {
@@ -108,7 +108,6 @@ class _StartPageState extends State<StartPage> {
                 SideNavigationBarItem(label: 'Log', icon: FontAwesomeIcons.solidFile),
               ],
               onTap: (newIndex) {
-                if (newIndex == 0) logHandler.info('Viewing help screen');
                 setState(() => sidebarIndex = newIndex);
               },
               theme: sideNavigationTheme(context, 3),

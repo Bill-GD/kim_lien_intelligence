@@ -21,7 +21,8 @@ class _ObstacleQuestionEditorState extends State<ObstacleQuestionEditor> {
   @override
   void initState() {
     super.initState();
-    logHandler.info('Opened Obstacle Question Editor', d: 2);
+    logHandler.info('Opened Obstacle Question Editor');
+    logHandler.depth = 3;
     if (widget.question != null) {
       disableDone = questionController.text.isEmpty || answerController.text.isEmpty;
       questionController.text = widget.question!.question;
@@ -33,6 +34,7 @@ class _ObstacleQuestionEditorState extends State<ObstacleQuestionEditor> {
   void dispose() {
     questionController.dispose();
     answerController.dispose();
+    logHandler.depth = 2;
     super.dispose();
   }
 
@@ -97,7 +99,7 @@ class _ObstacleQuestionEditorState extends State<ObstacleQuestionEditor> {
                         : qTrim != widget.question!.question || aTrim != widget.question!.answer;
 
                     if (!hasChanged) {
-                      logHandler.info('No change, exiting', d: 3);
+                      logHandler.info('No change, exiting');
                       Navigator.of(context).pop();
                       return;
                     }
@@ -109,7 +111,7 @@ class _ObstacleQuestionEditorState extends State<ObstacleQuestionEditor> {
                       charCount: aTrim.replaceAll(' ', '').length,
                     );
 
-                    logHandler.info('Modified obstacle question: ${newQ.id}', d: 3);
+                    logHandler.info('Modified obstacle question: ${newQ.id}');
                     Navigator.of(context).pop(newQ);
                   },
             child: const Text('Hoàn tất', style: TextStyle(fontSize: fontSizeMedium)),
@@ -120,7 +122,7 @@ class _ObstacleQuestionEditorState extends State<ObstacleQuestionEditor> {
               style: TextStyle(fontSize: fontSizeMedium, color: Theme.of(context).colorScheme.error),
             ),
             onPressed: () {
-              logHandler.info('Cancelled', d: 3);
+              logHandler.info('Cancelled');
               Navigator.pop(context);
             },
           ),

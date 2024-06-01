@@ -21,10 +21,17 @@ class _BackgroundManagerState extends State<BackgroundManager> {
   @override
   void initState() {
     logHandler.info('Background Manager');
+    logHandler.depth = 1;
     hasLocalShared =
         File('${Platform.resolvedExecutable.split(Platform.executable).first}\\$backgroundLocalPath')
             .existsSync();
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    logHandler.depth = 0;
+    super.dispose();
   }
 
   @override
@@ -111,10 +118,10 @@ class _BackgroundManagerState extends State<BackgroundManager> {
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
         KLIButton('Select Image', onPressed: () {
-          logHandler.info('Selecting image...', d: 1);
+          logHandler.info('Selecting image...');
           FilePicker.platform.pickFiles().then((value) {
             if (value == null) {
-              logHandler.warn('No file chosen', d: 1);
+              logHandler.warn('No file chosen');
               return;
             }
             chosenFilePath = value.files.single.path;

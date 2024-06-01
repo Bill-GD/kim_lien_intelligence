@@ -21,13 +21,14 @@ class _ExtraQuestionEditorState extends State<ExtraQuestionEditor> {
   @override
   void initState() {
     super.initState();
-    logHandler.info('Opened Extra Question Editor', d: 2);
+    logHandler.info('Opened Extra Question Editor');
+    logHandler.depth = 3;
     if (widget.question != null) {
-      logHandler.info('Objective: Modify extra question', d: 3);
+      logHandler.info('Objective: Modify extra question');
       questionController.text = widget.question!.question;
       answerController.text = widget.question!.answer;
     } else {
-      logHandler.info('Objective: Add new extra question', d: 3);
+      logHandler.info('Objective: Add new extra question');
       createNew = true;
       questionController.text = '';
       answerController.text = '';
@@ -39,6 +40,7 @@ class _ExtraQuestionEditorState extends State<ExtraQuestionEditor> {
   void dispose() {
     questionController.dispose();
     answerController.dispose();
+    logHandler.depth = 2;
     super.dispose();
   }
 
@@ -100,13 +102,13 @@ class _ExtraQuestionEditorState extends State<ExtraQuestionEditor> {
                         : qTrim != widget.question!.question || aTrim != widget.question!.answer;
 
                     if (!hasChanged) {
-                      logHandler.info('No change, exiting', d: 3);
+                      logHandler.info('No change, exiting');
                       Navigator.of(context).pop();
                       return;
                     }
                     final newQ = ExtraQuestion(question: qTrim, answer: aTrim);
 
-                    logHandler.info('${createNew ? 'Created' : 'Modified'} extra question', d: 3);
+                    logHandler.info('${createNew ? 'Created' : 'Modified'} extra question');
                     Navigator.of(context).pop(newQ);
                   },
             child: const Text('Hoàn tất', style: TextStyle(fontSize: fontSizeMedium)),
@@ -117,7 +119,7 @@ class _ExtraQuestionEditorState extends State<ExtraQuestionEditor> {
               style: TextStyle(fontSize: fontSizeMedium, color: Theme.of(context).colorScheme.error),
             ),
             onPressed: () {
-              logHandler.info('Cancelled', d: 3);
+              logHandler.info('Cancelled');
               Navigator.pop(context);
             },
           ),

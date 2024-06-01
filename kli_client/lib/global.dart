@@ -16,7 +16,7 @@ void initLogHandler() {
 late final PackageInfo packageInfo;
 Future<void> initPackageInfo() async {
   packageInfo = await PackageInfo.fromPlatform();
-  logHandler.info('PackageInfo init: v${packageInfo.version}.${packageInfo.buildNumber}', d: 1);
+  logHandler.info('PackageInfo init: v${packageInfo.version}.${packageInfo.buildNumber}');
 }
 
 String changelog = """

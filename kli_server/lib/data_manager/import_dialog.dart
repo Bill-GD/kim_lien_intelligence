@@ -31,7 +31,8 @@ class _ImportQuestionDialogState extends State<ImportQuestionDialog> with Ticker
 
   @override
   void initState() {
-    logHandler.info('Import question dialog: ${widget.matchName}', d: 2);
+    logHandler.info('Import question dialog: ${widget.matchName}');
+    logHandler.depth = 3;
     tabController = TabController(length: sheetCount, vsync: this);
     super.initState();
   }
@@ -61,7 +62,7 @@ class _ImportQuestionDialogState extends State<ImportQuestionDialog> with Ticker
                     );
 
                     if (result == null) {
-                      logHandler.info('No file selected', d: 3);
+                      logHandler.info('No file selected');
                       return;
                     }
 
@@ -69,7 +70,7 @@ class _ImportQuestionDialogState extends State<ImportQuestionDialog> with Ticker
 
                     final p = result.files.single.path!;
                     chosenFile = storageHandler.getRelative(p);
-                    logHandler.info('Import: $chosenFile', d: 3);
+                    logHandler.info('Import: $chosenFile');
 
                     data = await storageHandler.readFromExcel(
                       p,
@@ -120,7 +121,8 @@ class _ImportQuestionDialogState extends State<ImportQuestionDialog> with Ticker
               style: TextStyle(fontSize: fontSizeMSmall, color: Theme.of(context).colorScheme.error),
             ),
             onPressed: () {
-              logHandler.info('Cancelled', d: 3);
+              logHandler.info('Cancelled');
+              logHandler.depth = 2;
               Navigator.of(context).pop();
             },
           ),

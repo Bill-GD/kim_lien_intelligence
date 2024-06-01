@@ -34,6 +34,7 @@ class _MatchDataCheckerState extends State<MatchDataChecker> {
   void initState() {
     super.initState();
     logHandler.info('Opening Match Data Checker');
+    logHandler.depth = 1;
     getMatchNames().then((value) async {
       if (value.isEmpty) showToastMessage(context, 'No match found');
       if (value.isNotEmpty) matchNames = value;
@@ -42,7 +43,8 @@ class _MatchDataCheckerState extends State<MatchDataChecker> {
   }
 
   void exitHandler() {
-    logHandler.info('Closed match data checker\n', d: 1);
+    logHandler.info('Closed match data checker\n');
+    logHandler.depth = 0;
     Navigator.pop(context);
   }
 
@@ -75,7 +77,7 @@ class _MatchDataCheckerState extends State<MatchDataChecker> {
                     children: [
                       matchSelector(matchNames, (value) async {
                         selectedMatchIndex = matchNames.indexOf(value!);
-                        logHandler.info('Selected match: ${matchNames[selectedMatchIndex]}', d: 1);
+                        logHandler.info('Selected match: ${matchNames[selectedMatchIndex]}');
                         questionCheckResults = await checkMatchQuestions();
                         disableServerSetup = !questionCheckResults.every((e) => e.$1 == true);
                         setState(() {});
@@ -84,11 +86,10 @@ class _MatchDataCheckerState extends State<MatchDataChecker> {
                         'Mở phần thiết lập Server',
                         enableCondition: !disableServerSetup,
                         disabledLabel: 'Trận đấu chưa đủ thông tin',
-                        onPressed: () async {
-                          await Navigator.of(context).push(
-                            MaterialPageRoute(builder: (context) => const ServerSetup()),
-                          );
-                          await KLIServer.stop();
+                        onPressed: () {
+                          Navigator.of(context).push(MaterialPageRoute(
+                            builder: (context) => ServerSetup(matchNames[selectedMatchIndex]),
+                          ));
                         },
                       ),
                     ],

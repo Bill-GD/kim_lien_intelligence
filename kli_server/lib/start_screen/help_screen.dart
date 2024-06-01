@@ -27,8 +27,16 @@ class _HelpScreenState extends State<HelpScreen> {
   ];
 
   @override
+  void initState() {
+    super.initState();
+    logHandler.info('Viewing help screen');
+    logHandler.depth = 1;
+  }
+
+  @override
   void dispose() {
     helpController.dispose();
+    logHandler.depth = 0;
     super.dispose();
   }
 
@@ -48,7 +56,7 @@ class _HelpScreenState extends State<HelpScreen> {
               KLIButton(
                 'Mở thư mục chứa phần mềm',
                 onPressed: () async {
-                  logHandler.info('Opened parent folder: ${storageHandler.parentFolder}', d: 1);
+                  logHandler.info('Opened parent folder: ${storageHandler.parentFolder}');
                   await launchUrl(Uri.parse(storageHandler.parentFolder));
                 },
               ),
