@@ -1,8 +1,10 @@
 # kim_lien_intelligence
 
-![GitHub repo size](https://img.shields.io/github/repo-size/Bill-GD/kim_lien_intelligence?style=plastic) ![GitHub repo size](https://img.shields.io/github/languages/code-size/Bill-GD/kim_lien_intelligence?style=plastic)
+![GitHub repo size](https://img.shields.io/github/repo-size/Bill-GD/kim_lien_intelligence?style=plastic) ![GitHub repo size](https://img.shields.io/github/languages/code-size/Bill-GD/kim_lien_intelligence?style=plastic)  
+[![wakatime](https://wakatime.com/badge/github/Bill-GD/kim_lien_intelligence.svg)](https://wakatime.com/badge/github/Bill-GD/kim_lien_intelligence)
 
-A set of 2 apps. The library is private.
+A set of 2 apps. The library is private.  
+Date created: 01/04/2024
 
 ## KLI Server
 

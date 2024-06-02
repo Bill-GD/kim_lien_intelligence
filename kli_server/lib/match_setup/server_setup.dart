@@ -16,7 +16,6 @@ class ServerSetup extends StatefulWidget {
 
 class _ServerSetupState extends State<ServerSetup> {
   String localAddress = '', publicAddress = '';
-  String chosenClientID = '';
 
   @override
   void initState() {
@@ -184,7 +183,7 @@ class _ServerSetupState extends State<ServerSetup> {
       String ip = clientConnected ? '${client.remoteAddress.address}:${client.remotePort}' : 'Not connected';
 
       clients.add(ListTile(
-        title: Text(Networking.getClientDisplayID(ClientID.values[index + 1])),
+        title: Text(Networking.getClientDisplayID(ConnectionID.values[index + 1])),
         subtitle: Text(ip),
         subtitleTextStyle: TextStyle(
           fontSize: fontSizeMSmall,
@@ -193,15 +192,15 @@ class _ServerSetupState extends State<ServerSetup> {
         trailing: KLIIconButton(
           const FaIcon(FontAwesomeIcons.linkSlash),
           enableCondition: clientConnected,
-          enabledLabel: 'Disconnect ${Networking.getClientDisplayID(ClientID.values[index + 1])}',
+          enabledLabel: 'Disconnect ${Networking.getClientDisplayID(ConnectionID.values[index + 1])}',
           disabledLabel: 'Not connected',
           onPressed: () async {
             await confirmDialog(
               context,
               message: 'Disconnect client?',
-              acceptLogMessage: 'Forced disconnect Client: ${ClientID.values[index + 1]}',
+              acceptLogMessage: 'Forced disconnect Client: ${ConnectionID.values[index + 1]}',
               onAccept: () async {
-                KLIServer.disconnectClient(ClientID.values[index + 1], 'Server forced disconnection');
+                KLIServer.disconnectClient(ConnectionID.values[index + 1], 'Server forced disconnection');
                 if (clientConnected) client.destroy();
               },
             );

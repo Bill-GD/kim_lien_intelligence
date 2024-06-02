@@ -63,41 +63,10 @@ class _StartPageState extends State<StartPage> {
                 ),
               ),
               footer: SideNavigationBarFooter(
-                label: GestureDetector(
-                  onTap: () async {
-                    logHandler.info('Opening changelog...', d: 0);
-                    await showDialog(
-                      context: context,
-                      builder: (context) {
-                        return AlertDialog(
-                          title: const Text('Changelog', textAlign: TextAlign.center),
-                          actions: [
-                            TextButton(
-                              child: const Text('Licenses'),
-                              onPressed: () {
-                                showLicensePage(
-                                  context: context,
-                                  applicationIcon: Image.asset(
-                                    'assets/images/ttkl_logo.png',
-                                    package: 'kli_lib',
-                                    width: 50,
-                                    height: 50,
-                                  ),
-                                  applicationName: 'KLI Server',
-                                  applicationVersion: 'v${packageInfo.version}.${packageInfo.buildNumber}',
-                                );
-                              },
-                            ),
-                          ],
-                          content: ChangelogPanel(changelog),
-                        );
-                      },
-                    );
-                  },
-                  child: Text(
-                    'v${packageInfo.version}.${packageInfo.buildNumber}',
-                    style: const TextStyle(color: Colors.white54),
-                  ),
+                label: ChangelogPanel(
+                  changelog: changelog,
+                  versionString: 'v${packageInfo.version}.${packageInfo.buildNumber}',
+                  appName: 'KLI Server',
                 ),
               ),
               items: const [

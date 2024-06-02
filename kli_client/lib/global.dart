@@ -20,10 +20,14 @@ Future<void> initPackageInfo() async {
 }
 
 String changelog = """
-  0.1.2 ({latest}):
+  0.1.2.1 ({latest}):
+  - Updated KLI Lib to 0.4
+  
+  0.1.2 ({c2fb3d0}):
   - Added Loading screen
   - Fixed client still listen to server after disconnect
   - Fixed UI not updating after getting connection error
+  - Fixed some log messages
   
   0.1.1 ({aa2a188}):
   - Added waiting room

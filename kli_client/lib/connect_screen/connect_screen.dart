@@ -45,7 +45,11 @@ class _ConnectPageState extends State<ConnectPage> {
         title: Column(
           children: [
             const Text('Client', style: TextStyle(fontSize: fontSizeLarge)),
-            changeLogVersionText(),
+            ChangelogPanel(
+              changelog: changelog,
+              versionString: 'v${packageInfo.version}.${packageInfo.buildNumber}',
+              appName: 'KLI Client',
+            ),
           ],
         ),
         centerTitle: true,
@@ -72,48 +76,6 @@ class _ConnectPageState extends State<ConnectPage> {
     );
   }
 
-  Widget changeLogVersionText() {
-    return GestureDetector(
-      onTap: () async {
-        logHandler.info('Opening changelog...');
-        await showDialog(
-          context: context,
-          builder: (context) {
-            return AlertDialog(
-              title: const Text('Changelog', textAlign: TextAlign.center),
-              actions: [
-                TextButton(
-                  child: const Text('Licenses'),
-                  onPressed: () {
-                    showLicensePage(
-                      context: context,
-                      applicationIcon: Image.asset(
-                        'assets/images/ttkl_logo.png',
-                        package: 'kli_lib',
-                        width: 50,
-                        height: 50,
-                      ),
-                      applicationName: 'KLI Client',
-                      applicationVersion: 'v${packageInfo.version}.${packageInfo.buildNumber}',
-                    );
-                  },
-                ),
-              ],
-              content: ChangelogPanel(changelog),
-            );
-          },
-        );
-      },
-      child: Text(
-        'v${packageInfo.version}.${packageInfo.buildNumber}',
-        style: TextStyle(
-          fontSize: fontSizeXS,
-          color: Theme.of(context).colorScheme.secondary.withOpacity(0.8),
-        ),
-      ),
-    );
-  }
-
   Widget connectionStatus() {
     const s = TextStyle(fontSize: fontSizeLarge);
     return Text(
@@ -133,7 +95,7 @@ class _ConnectPageState extends State<ConnectPage> {
           controller: clientTextController,
           label: const Text('Client'),
           dropdownMenuEntries: [
-            for (final c in ClientID.values.getRange(1, ClientID.values.length))
+            for (final c in ConnectionID.values.getRange(1, ConnectionID.values.length))
               DropdownMenuEntry(value: c, label: Networking.getClientDisplayID(c))
           ],
           onSelected: (value) {

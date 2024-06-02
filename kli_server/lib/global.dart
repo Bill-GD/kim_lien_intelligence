@@ -175,7 +175,10 @@ class DataManager {
 }
 
 String changelog = """
-  0.3.2 ({latest}):
+  0.3.2.1 ({latest}):
+  - Updated KLI Lib to 0.4
+  
+  0.3.2 ({c2fb3d0}):
   - Added Loading screen
   - Can now delete shared background
   - Fixed client list wrong IP and port
