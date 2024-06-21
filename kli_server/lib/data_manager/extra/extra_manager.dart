@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:kli_lib/kli_lib.dart';
 
 import '../../global.dart';
+import '../data_manager.dart';
 import '../import_dialog.dart';
 import 'extra_question_editor.dart';
 
@@ -13,9 +14,8 @@ class ExtraManager extends StatefulWidget {
 }
 
 class _ExtraManagerState extends State<ExtraManager> {
-  bool isLoading = true;
+  bool isLoading = true, hasSelectedMatch = false;
   List<String> matchNames = [];
-  int selectedMatchIndex = -1;
   late ExtraMatch selectedMatch;
 
   @override
@@ -41,7 +41,7 @@ class _ExtraManagerState extends State<ExtraManager> {
       allQ.add(q);
     }
 
-    selectedMatch = ExtraMatch(matchName: matchNames[selectedMatchIndex], questions: allQ);
+    selectedMatch = ExtraMatch(matchName: selectedMatch.matchName, questions: allQ);
     logHandler.info('Loaded ${selectedMatch.questions.length} questions from excel');
   }
 
@@ -69,14 +69,14 @@ class _ExtraManagerState extends State<ExtraManager> {
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
           matchSelector(matchNames, (value) async {
-            selectedMatchIndex = matchNames.indexOf(value!);
-            logHandler.info('Selected match: ${matchNames[selectedMatchIndex]}');
-            selectedMatch = await DataManager.getMatchQuestions(matchNames[selectedMatchIndex]);
+            logHandler.info('Selected match: $value');
+            hasSelectedMatch = value != null;
+            selectedMatch = await DataManager.getMatchQuestions(value!);
             setState(() {});
           }),
           KLIButton(
             'Thêm câu hỏi',
-            enableCondition: selectedMatchIndex >= 0,
+            enableCondition: hasSelectedMatch,
             enabledLabel: 'Thêm 1 câu hỏi cho phần thi',
             disabledLabel: 'Chưa chọn trận đấu',
             onPressed: () async {
@@ -95,7 +95,7 @@ class _ExtraManagerState extends State<ExtraManager> {
           ),
           KLIButton(
             'Nhập từ file',
-            enableCondition: selectedMatchIndex >= 0,
+            enableCondition: hasSelectedMatch,
             enabledLabel: 'Cho phép nhập dữ liệu từ file Excel',
             disabledLabel: 'Chưa chọn trận đấu',
             onPressed: () async {
@@ -105,7 +105,7 @@ class _ExtraManagerState extends State<ExtraManager> {
                 barrierDismissible: false,
                 barrierLabel: '',
                 builder: (_) => ImportQuestionDialog(
-                  matchName: matchNames[selectedMatchIndex],
+                  matchName: selectedMatch.matchName,
                   maxColumnCount: 3,
                   maxSheetCount: 1,
                   columnWidths: const [100, 500, 250, 200, 200],
@@ -121,17 +121,17 @@ class _ExtraManagerState extends State<ExtraManager> {
           ),
           KLIButton(
             'Xóa câu hỏi',
-            enableCondition: selectedMatchIndex >= 0,
+            enableCondition: hasSelectedMatch,
             enabledLabel: 'Xóa toàn bộ câu hỏi của phần thi hiện tại',
             disabledLabel: 'Chưa chọn trận đấu',
             onPressed: () async {
               await confirmDialog(
                 context,
-                message: 'Bạn có muốn xóa tất cả câu hỏi phụ của trận: ${matchNames[selectedMatchIndex]}?',
-                acceptLogMessage: 'Removed all extra questions for match: ${matchNames[selectedMatchIndex]}',
+                message: 'Bạn có muốn xóa tất cả câu hỏi phụ của trận: ${selectedMatch.matchName}?',
+                acceptLogMessage: 'Removed all extra questions for match: ${selectedMatch.matchName}',
                 onAccept: () async {
                   if (mounted) {
-                    showToastMessage(context, 'Đã xóa (match: ${matchNames[selectedMatchIndex]})');
+                    showToastMessage(context, 'Đã xóa (match: ${selectedMatch.matchName})');
                   }
                   await DataManager.removeQuestionsOfMatch<ExtraMatch>(selectedMatch);
                   selectedMatch = ExtraMatch.empty();

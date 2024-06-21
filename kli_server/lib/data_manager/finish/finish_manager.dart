@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:kli_lib/kli_lib.dart';
 
 import '../../global.dart';
+import '../data_manager.dart';
 import '../import_dialog.dart';
 import 'finish_question_editor.dart';
 
@@ -13,9 +14,9 @@ class FinishManager extends StatefulWidget {
 }
 
 class _FinishManagerState extends State<FinishManager> {
-  bool isLoading = true;
+  bool isLoading = true, hasSelectedMatch = false;
   List<String> matchNames = [];
-  int selectedMatchIndex = -1, sortPoint = -1;
+  int sortPoint = -1;
   late FinishMatch selectedMatch;
   final obstacleController = TextEditingController();
 
@@ -53,7 +54,7 @@ class _FinishManagerState extends State<FinishManager> {
       }
     }
 
-    selectedMatch = FinishMatch(matchName: matchNames[selectedMatchIndex], questions: questions);
+    selectedMatch = FinishMatch(matchName: selectedMatch.matchName, questions: questions);
     logHandler.info('Loaded ${questions.length} Finish questions of ${selectedMatch.matchName}');
   }
 
@@ -81,16 +82,16 @@ class _FinishManagerState extends State<FinishManager> {
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
           matchSelector(matchNames, (value) async {
-            selectedMatchIndex = matchNames.indexOf(value!);
-            logHandler.info('Selected match: ${matchNames[selectedMatchIndex]}');
-            selectedMatch = await DataManager.getMatchQuestions<FinishMatch>(matchNames[selectedMatchIndex]);
+            logHandler.info('Selected match: $value');
+            hasSelectedMatch = value != null;
+            selectedMatch = await DataManager.getMatchQuestions<FinishMatch>(value!);
             setState(() {});
           }),
           // sort point
           DropdownMenu(
             label: const Text('Lọc điểm'),
             initialSelection: -1,
-            enabled: selectedMatchIndex >= 0,
+            enabled: hasSelectedMatch,
             dropdownMenuEntries: [
               const DropdownMenuEntry(value: -1, label: 'Tất cả'),
               for (var i = 1; i <= 3; i++)
@@ -107,7 +108,7 @@ class _FinishManagerState extends State<FinishManager> {
           ),
           KLIButton(
             'Thêm câu hỏi',
-            enableCondition: selectedMatchIndex >= 0,
+            enableCondition: hasSelectedMatch,
             enabledLabel: 'Thêm 1 câu hỏi cho phần thi',
             disabledLabel: 'Chưa chọn trận đấu',
             onPressed: () async {
@@ -126,7 +127,7 @@ class _FinishManagerState extends State<FinishManager> {
           ),
           KLIButton(
             'Nhập từ file',
-            enableCondition: selectedMatchIndex >= 0,
+            enableCondition: hasSelectedMatch,
             enabledLabel: 'Cho phép nhập dữ liệu từ file Excel',
             disabledLabel: 'Chưa chọn trận đấu',
             onPressed: () async {
@@ -136,7 +137,7 @@ class _FinishManagerState extends State<FinishManager> {
                 barrierDismissible: false,
                 barrierLabel: '',
                 builder: (_) => ImportQuestionDialog(
-                  matchName: matchNames[selectedMatchIndex],
+                  matchName: selectedMatch.matchName,
                   maxColumnCount: 4,
                   maxSheetCount: 3,
                   columnWidths: const [50, 500, 150, 400, 200],
@@ -152,18 +153,18 @@ class _FinishManagerState extends State<FinishManager> {
           ),
           KLIButton(
             'Xóa câu hỏi',
-            enableCondition: selectedMatchIndex >= 0,
+            enableCondition: hasSelectedMatch,
             enabledLabel: 'Xóa toàn bộ câu hỏi của phần thi hiện tại',
             disabledLabel: 'Chưa chọn trận đấu',
             onPressed: () async {
               await confirmDialog(
                 context,
                 message:
-                    'Bạn có muốn xóa tất cả câu hỏi về đích của trận: ${matchNames[selectedMatchIndex]}?',
-                acceptLogMessage: 'Removed all finish questions for match: ${matchNames[selectedMatchIndex]}',
+                    'Bạn có muốn xóa tất cả câu hỏi về đích của trận: ${selectedMatch.matchName}?',
+                acceptLogMessage: 'Removed all finish questions for match: ${selectedMatch.matchName}',
                 onAccept: () async {
                   if (mounted) {
-                    showToastMessage(context, 'Đã xóa (match: ${matchNames[selectedMatchIndex]})');
+                    showToastMessage(context, 'Đã xóa (match: ${selectedMatch.matchName})');
                   }
                   await DataManager.removeQuestionsOfMatch<FinishMatch>(selectedMatch);
                   selectedMatch = FinishMatch.empty();

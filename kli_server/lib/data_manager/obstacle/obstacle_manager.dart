@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:kli_lib/kli_lib.dart';
 
 import '../../global.dart';
+import '../data_manager.dart';
 import '../import_dialog.dart';
 import 'obstacle_editor.dart';
 import 'obstacle_question_editor.dart';
@@ -17,9 +18,8 @@ class ObstacleManager extends StatefulWidget {
 }
 
 class _ObstacleManagerState extends State<ObstacleManager> {
-  bool isLoading = true;
+  bool isLoading = true, hasSelectedMatch = false;
   List<String> matchNames = [];
-  int selectedMatchIndex = -1;
   late ObstacleMatch selectedMatch;
   final obstacleController = TextEditingController();
 
@@ -62,7 +62,7 @@ class _ObstacleManagerState extends State<ObstacleManager> {
 
     try {
       selectedMatch = ObstacleMatch(
-        matchName: matchNames[selectedMatchIndex],
+        matchName: selectedMatch.matchName,
         keyword: sheet[5].values.elementAt(3),
         imagePath: '',
         charCount: int.parse(sheet[5].values.elementAt(1)),
@@ -101,16 +101,14 @@ class _ObstacleManagerState extends State<ObstacleManager> {
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
           matchSelector(matchNames, (value) async {
-            selectedMatchIndex = matchNames.indexOf(value!);
-            logHandler.info('Selected match: ${matchNames[selectedMatchIndex]}');
-            selectedMatch = await DataManager.getMatchQuestions<ObstacleMatch>(
-              matchNames[selectedMatchIndex],
-            );
+            logHandler.info('Selected match: $value');
+            hasSelectedMatch = value != null;
+            selectedMatch = await DataManager.getMatchQuestions<ObstacleMatch>(value!);
             setState(() {});
           }),
           KLIButton(
             'Nhập từ file',
-            enableCondition: selectedMatchIndex >= 0,
+            enableCondition: hasSelectedMatch,
             enabledLabel: 'Cho phép nhập dữ liệu từ file Excel',
             disabledLabel: 'Chưa chọn trận đấu',
             onPressed: () async {
@@ -120,7 +118,7 @@ class _ObstacleManagerState extends State<ObstacleManager> {
                 barrierDismissible: false,
                 barrierLabel: '',
                 builder: (_) => ImportQuestionDialog(
-                  matchName: matchNames[selectedMatchIndex],
+                  matchName: selectedMatch.matchName,
                   maxColumnCount: 5,
                   maxSheetCount: 1,
                   columnWidths: const [100, 75, 500, 200, 500],
@@ -137,20 +135,19 @@ class _ObstacleManagerState extends State<ObstacleManager> {
           // KLIButton('Export Excel', enableCondition: false),
           KLIButton(
             'Xóa câu hỏi',
-            enableCondition: selectedMatchIndex >= 0,
+            enableCondition: hasSelectedMatch,
             enabledLabel: 'Xóa toàn bộ câu hỏi của phần thi hiện tại',
             disabledLabel: 'Chưa chọn trận đấu',
             onPressed: () async {
               await confirmDialog(
                 context,
-                message: 'Bạn có muốn xóa tất cả hàng ngang của trận: ${matchNames[selectedMatchIndex]}?',
-                acceptLogMessage:
-                    'Removed all obstacle questions for match: ${matchNames[selectedMatchIndex]}',
+                message: 'Bạn có muốn xóa tất cả hàng ngang của trận: ${selectedMatch.matchName}?',
+                acceptLogMessage: 'Removed all obstacle questions for match: ${selectedMatch.matchName}',
                 onAccept: () async {
-                  if (mounted) showToastMessage(context, 'Đã xóa (match: ${matchNames[selectedMatchIndex]})');
+                  if (mounted) showToastMessage(context, 'Đã xóa (match: ${selectedMatch.matchName})');
 
                   await DataManager.removeQuestionsOfMatch<ObstacleMatch>(selectedMatch);
-                  selectedMatch = ObstacleMatch.empty(matchNames[selectedMatchIndex]);
+                  selectedMatch = ObstacleMatch.empty(selectedMatch.matchName);
                   setState(() {});
                 },
               );
@@ -185,7 +182,7 @@ class _ObstacleManagerState extends State<ObstacleManager> {
             padding: EdgeInsets.only(bottom: 16),
             child: Text('Danh sách câu hỏi', style: TextStyle(fontSize: fontSizeMedium)),
           ),
-          if (selectedMatchIndex < 0)
+          if (!hasSelectedMatch)
             Container(
               alignment: Alignment.center,
               decoration: BoxDecoration(
@@ -248,7 +245,7 @@ class _ObstacleManagerState extends State<ObstacleManager> {
             padding: EdgeInsets.only(bottom: 16),
             child: Text('Chướng ngại vật', style: TextStyle(fontSize: fontSizeMedium)),
           ),
-          if (selectedMatchIndex < 0)
+          if (!hasSelectedMatch)
             const SizedBox.shrink()
           else
             Padding(
@@ -299,12 +296,12 @@ class _ObstacleManagerState extends State<ObstacleManager> {
               border: Border.all(width: 1, color: Theme.of(context).colorScheme.onBackground),
             ),
             constraints: const BoxConstraints(maxHeight: 400, maxWidth: 600),
-            child: selectedMatchIndex >= 0 && fullImagePath.isNotEmpty && imageFound
+            child: hasSelectedMatch && fullImagePath.isNotEmpty && imageFound
                 ? Image.file(File(fullImagePath), fit: BoxFit.contain)
                 : Material(
                     child: Center(
                     child: Text(
-                      selectedMatchIndex < 0
+                      !hasSelectedMatch
                           ? 'Chưa chọn trận đấu'
                           : selectedMatch.imagePath.isEmpty
                               ? 'Không có ảnh'
@@ -313,7 +310,7 @@ class _ObstacleManagerState extends State<ObstacleManager> {
                   )),
           ),
           const SizedBox(height: 20),
-          if (selectedMatchIndex < 0)
+          if (!hasSelectedMatch)
             const SizedBox.shrink()
           else
             ElevatedButton(

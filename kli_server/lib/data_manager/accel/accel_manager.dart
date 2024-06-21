@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:kli_lib/kli_lib.dart';
 
 import '../../global.dart';
+import '../data_manager.dart';
 import '../import_dialog.dart';
 import 'accel_question_editor.dart';
 
@@ -16,9 +17,9 @@ class AccelManager extends StatefulWidget {
 }
 
 class _AccelManagerState extends State<AccelManager> {
-  bool isLoading = true;
+  bool isLoading = true, hasSelectedMatch = false;
   List<String> matchNames = [];
-  int selectedMatchIndex = -1, selectedQuestionIndex = -1, selectedImageIndex = -1;
+  int selectedQuestionIndex = -1, selectedImageIndex = -1;
   late AccelMatch selectedMatch;
   late AccelQuestion selectedQuestion;
 
@@ -63,7 +64,7 @@ class _AccelManagerState extends State<AccelManager> {
         allQ.add(AccelQuestion.empty());
       }
     }
-    selectedMatch = AccelMatch(matchName: matchNames[selectedMatchIndex], questions: allQ);
+    selectedMatch = AccelMatch(matchName: selectedMatch.matchName, questions: allQ);
     logHandler.info('Loaded ${selectedMatch.questions.length} questions from excel');
   }
 
@@ -91,9 +92,9 @@ class _AccelManagerState extends State<AccelManager> {
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
           matchSelector(matchNames, (value) async {
-            selectedMatchIndex = matchNames.indexOf(value!);
-            logHandler.info('Selected match: ${matchNames[selectedMatchIndex]}');
-            selectedMatch = await DataManager.getMatchQuestions<AccelMatch>(matchNames[selectedMatchIndex]);
+            logHandler.info('Selected match: $value');
+            hasSelectedMatch = value != null;
+            selectedMatch = await DataManager.getMatchQuestions<AccelMatch>(value!);
             selectedQuestionIndex = -1;
             selectedImageIndex = -1;
             setState(() {});
@@ -117,7 +118,7 @@ class _AccelManagerState extends State<AccelManager> {
           ),
           KLIButton(
             'Nhập từ file',
-            enableCondition: selectedMatchIndex >= 0,
+            enableCondition: hasSelectedMatch,
             enabledLabel: 'Cho phép nhập dữ liệu từ file Excel',
             disabledLabel: 'Chưa chọn trận đấu',
             onPressed: () async {
@@ -127,7 +128,7 @@ class _AccelManagerState extends State<AccelManager> {
                 barrierDismissible: false,
                 barrierLabel: '',
                 builder: (_) => ImportQuestionDialog(
-                  matchName: matchNames[selectedMatchIndex],
+                  matchName: selectedMatch.matchName,
                   maxColumnCount: 4,
                   maxSheetCount: 1,
                   columnWidths: const [100, 400, 150, 400, 200],
@@ -145,22 +146,21 @@ class _AccelManagerState extends State<AccelManager> {
           ),
           KLIButton(
             'Xóa câu hỏi',
-            enableCondition: selectedMatchIndex >= 0,
+            enableCondition: hasSelectedMatch,
             enabledLabel: 'Xóa toàn bộ câu hỏi của phần thi hiện tại',
             disabledLabel: 'Chưa chọn trận đấu',
             onPressed: () async {
               await confirmDialog(
                 context,
-                message:
-                    'Bạn có muốn xóa tất cả câu hỏi tăng tốc của trận: ${matchNames[selectedMatchIndex]}?',
-                acceptLogMessage: 'Removed all accel questions for match: ${matchNames[selectedMatchIndex]}',
+                message: 'Bạn có muốn xóa tất cả câu hỏi tăng tốc của trận: ${selectedMatch.matchName}?',
+                acceptLogMessage: 'Removed all accel questions for match: ${selectedMatch.matchName}',
                 onAccept: () async {
                   if (mounted) {
-                    showToastMessage(context, 'Đã xóa (match: ${matchNames[selectedMatchIndex]})');
+                    showToastMessage(context, 'Đã xóa (match: ${selectedMatch.matchName})');
                   }
                   await DataManager.removeQuestionsOfMatch<AccelMatch>(selectedMatch);
                   selectedMatch = AccelMatch(
-                    matchName: matchNames[selectedMatchIndex],
+                    matchName: selectedMatch.matchName,
                     questions: List.filled(4, null),
                   );
                   selectedQuestionIndex = -1;
@@ -199,7 +199,7 @@ class _AccelManagerState extends State<AccelManager> {
             padding: EdgeInsets.only(top: 32, bottom: 64),
             child: Text('Danh sách câu hỏi', style: TextStyle(fontSize: fontSizeLarge)),
           ),
-          if (selectedMatchIndex < 0)
+          if (!hasSelectedMatch)
             Container(
               alignment: Alignment.center,
               decoration: BoxDecoration(
@@ -331,10 +331,10 @@ class _AccelManagerState extends State<AccelManager> {
               border: Border.all(width: 1, color: Theme.of(context).colorScheme.onBackground),
             ),
             constraints: const BoxConstraints(maxHeight: 400, maxWidth: 600),
-            child: selectedMatchIndex < 0 || selectedQuestionIndex < 0 || !imageFound
+            child: !hasSelectedMatch || selectedQuestionIndex < 0 || !imageFound
                 ? Material(
                     child: Center(
-                      child: Text(selectedMatchIndex < 0
+                      child: Text(!hasSelectedMatch
                           ? 'Chưa chọn trận đấu'
                           : selectedQuestionIndex < 0
                               ? 'Chưa chọn câu hỏi'

@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:kli_lib/kli_lib.dart';
 
 import '../../global.dart';
+import '../data_manager.dart';
 import 'match_editor.dart';
 
 class MatchManager extends StatefulWidget {

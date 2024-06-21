@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:kli_lib/kli_lib.dart';
 
 import '../../global.dart';
+import '../data_manager.dart';
 import '../import_dialog.dart';
 import 'start_question_editor.dart';
 
@@ -13,10 +14,10 @@ class StartQuestionManager extends StatefulWidget {
 }
 
 class _StartQuestionManagerState extends State<StartQuestionManager> {
-  bool isLoading = true;
+  bool isLoading = true, hasSelectedMatch = false;
   List<String> matchNames = [];
   late StartMatch selectedMatch;
-  int selectedMatchIndex = -1, sortPlayerPos = -1;
+  int sortPlayerPos = -1;
   StartQuestionSubject? sortType;
 
   @override
@@ -55,7 +56,7 @@ class _StartQuestionManagerState extends State<StartQuestionManager> {
       allQ.putIfAbsent(idx, () => questions);
       idx++;
     }
-    selectedMatch = StartMatch(matchName: matchNames[selectedMatchIndex], questions: allQ);
+    selectedMatch = StartMatch(matchName: selectedMatch.matchName, questions: allQ);
     logHandler.info('Loaded ${selectedMatch.questionCount} questions from excel');
   }
 
@@ -82,18 +83,17 @@ class _StartQuestionManagerState extends State<StartQuestionManager> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
-          matchSelector(matchNames, (selectedMatchName) async {
-            selectedMatchIndex = matchNames.indexOf(selectedMatchName!);
-            selectedMatch.matchName = selectedMatchName;
-            logHandler.info('Selected match: ${matchNames[selectedMatchIndex]}');
-            selectedMatch = await DataManager.getMatchQuestions<StartMatch>(matchNames[selectedMatchIndex]);
+          matchSelector(matchNames, (value) async {
+            logHandler.info('Selected match: $value');
+            hasSelectedMatch = value != null;
+            selectedMatch = await DataManager.getMatchQuestions<StartMatch>(value!);
             setState(() {});
           }),
           // sort player pos
           DropdownMenu(
             label: const Text('Lọc vị trí'),
             initialSelection: -1,
-            enabled: selectedMatchIndex >= 0,
+            enabled: hasSelectedMatch,
             dropdownMenuEntries: [
               const DropdownMenuEntry(value: -1, label: 'Tất cả'),
               for (var i = 0; i < 4; i++)
@@ -112,7 +112,7 @@ class _StartQuestionManagerState extends State<StartQuestionManager> {
           DropdownMenu(
             label: const Text('Lọc lĩnh vực'),
             initialSelection: null,
-            enabled: selectedMatchIndex >= 0,
+            enabled: hasSelectedMatch,
             dropdownMenuEntries: [
               const DropdownMenuEntry(value: null, label: 'Tất cả'),
               for (final s in StartQuestionSubject.values)
@@ -129,7 +129,7 @@ class _StartQuestionManagerState extends State<StartQuestionManager> {
           ),
           KLIButton(
             'Thêm câu hỏi',
-            enableCondition: selectedMatchIndex >= 0,
+            enableCondition: hasSelectedMatch,
             enabledLabel: 'Thêm 1 câu hỏi cho phần thi',
             disabledLabel: 'Chưa chọn trận đấu',
             onPressed: () async {
@@ -154,7 +154,7 @@ class _StartQuestionManagerState extends State<StartQuestionManager> {
           ),
           KLIButton(
             'Nhập từ file',
-            enableCondition: selectedMatchIndex >= 0,
+            enableCondition: hasSelectedMatch,
             enabledLabel: 'Cho phép nhập dữ liệu từ file Excel',
             disabledLabel: 'Chưa chọn trận đấu',
             onPressed: () async {
@@ -164,7 +164,7 @@ class _StartQuestionManagerState extends State<StartQuestionManager> {
                 barrierDismissible: false,
                 barrierLabel: '',
                 builder: (_) => ImportQuestionDialog(
-                  matchName: matchNames[selectedMatchIndex],
+                  matchName: selectedMatch.matchName,
                   maxColumnCount: 4,
                   maxSheetCount: 4,
                   columnWidths: const [100, 150, 600, 200, 200],
@@ -181,7 +181,7 @@ class _StartQuestionManagerState extends State<StartQuestionManager> {
           ),
           // KLIButton(
           //   'Export Excel',
-          //   enableCondition: selectedMatchIndex >= 0,
+          //   enableCondition: hasSelectedMatch,
           //   onPressed: () async {
           //     String fileName =
           //         'KĐ_${matchNames[selectedMatchIndex]}_${DateTime.now().toString().split('.').first.replaceAll(RegExp('[:-]'), '_')}.xlsx';
@@ -224,20 +224,19 @@ class _StartQuestionManagerState extends State<StartQuestionManager> {
           // ),
           KLIButton(
             'Xóa câu hỏi',
-            enableCondition: selectedMatchIndex >= 0,
+            enableCondition: hasSelectedMatch,
             enabledLabel: 'Xóa toàn bộ câu hỏi của phần thi hiện tại',
             disabledLabel: 'Chưa chọn trận đấu',
             onPressed: () async {
               await confirmDialog(
                 context,
-                message:
-                    'Bạn có muốn xóa tất cả câu hỏi khởi động của trận: ${matchNames[selectedMatchIndex]}?',
-                acceptLogMessage: 'Removed all start questions for match: ${matchNames[selectedMatchIndex]}',
+                message: 'Bạn có muốn xóa tất cả câu hỏi khởi động của trận: ${selectedMatch.matchName}?',
+                acceptLogMessage: 'Removed all start questions for match: ${selectedMatch.matchName}',
                 onAccept: () async {
-                  if (mounted) showToastMessage(context, 'Đã xóa (trận: ${matchNames[selectedMatchIndex]})');
+                  if (mounted) showToastMessage(context, 'Đã xóa (trận: ${selectedMatch.matchName})');
 
                   await DataManager.removeQuestionsOfMatch<StartMatch>(selectedMatch);
-                  selectedMatch = StartMatch(matchName: matchNames[selectedMatchIndex], questions: {});
+                  selectedMatch = StartMatch(matchName: selectedMatch.matchName, questions: {});
                   setState(() {});
                 },
               );
