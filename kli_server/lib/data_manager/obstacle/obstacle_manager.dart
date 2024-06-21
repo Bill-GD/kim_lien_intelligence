@@ -29,10 +29,10 @@ class _ObstacleManagerState extends State<ObstacleManager> {
     logHandler.info('Opened Obstacle Manager', d: 1);
     logHandler.depth = 2;
     selectedMatch = ObstacleMatch.empty();
-    getMatchNames().then((value) async {
+    DataManager.getMatchNames().then((value) async {
       if (value.isNotEmpty) matchNames = value;
       setState(() => isLoading = false);
-      await removeDeletedMatchQuestions();
+      await DataManager.removeDeletedMatchQuestions<ObstacleMatch>();
     });
   }
 
@@ -62,7 +62,7 @@ class _ObstacleManagerState extends State<ObstacleManager> {
 
     try {
       selectedMatch = ObstacleMatch(
-        match: matchNames[selectedMatchIndex],
+        matchName: matchNames[selectedMatchIndex],
         keyword: sheet[5].values.elementAt(3),
         imagePath: '',
         charCount: int.parse(sheet[5].values.elementAt(1)),
@@ -74,66 +74,7 @@ class _ObstacleManagerState extends State<ObstacleManager> {
       logHandler.error('$e', stackTrace: stack, d: 3);
       return;
     }
-    logHandler.info('Loaded ${selectedMatch.match} (${selectedMatch.keyword})');
-  }
-
-  Future<void> saveNewQuestions() async {
-    logHandler.info('Saving new questions of match: ${matchNames[selectedMatchIndex]}', d: 3);
-    final saved = await DataManager.getAllSavedQuestions<ObstacleMatch>(
-      ObstacleMatch.fromJson,
-      storageHandler.obstacleSaveFile,
-    );
-    saved.removeWhere((e) => e.match == selectedMatch.match);
-    saved.add(selectedMatch);
-    await DataManager.overwriteSave(saved, storageHandler.obstacleSaveFile);
-  }
-
-  Future<void> updateQuestions(ObstacleMatch oMatch) async {
-    logHandler.info('Updating questions of match: ${matchNames[selectedMatchIndex]}', d: 3);
-    final saved = await DataManager.getAllSavedQuestions<ObstacleMatch>(
-      ObstacleMatch.fromJson,
-      storageHandler.obstacleSaveFile,
-    );
-    saved.removeWhere((e) => e.match == oMatch.match);
-    saved.add(oMatch);
-    await DataManager.overwriteSave(saved, storageHandler.obstacleSaveFile);
-  }
-
-  Future<void> loadMatchQuestions(String match) async {
-    final saved = await DataManager.getAllSavedQuestions<ObstacleMatch>(
-      ObstacleMatch.fromJson,
-      storageHandler.obstacleSaveFile,
-    );
-    if (saved.isEmpty) return;
-
-    try {
-      selectedMatch = saved.firstWhere((e) => e.match == match);
-      setState(() {});
-      logHandler.info('Loaded Obstacle (${selectedMatch.keyword}) of $match');
-    } on StateError {
-      logHandler.info('Obstacle match $match not found, temp empty match created');
-      selectedMatch = ObstacleMatch.empty(matchNames[selectedMatchIndex]);
-    }
-  }
-
-  Future<void> removeDeletedMatchQuestions() async {
-    logHandler.info('Removing questions of deleted matches');
-    var saved = await DataManager.getAllSavedQuestions<ObstacleMatch>(
-      ObstacleMatch.fromJson,
-      storageHandler.obstacleSaveFile,
-    );
-    saved = saved.where((e) => matchNames.contains(e.match)).toList();
-    await DataManager.overwriteSave(saved, storageHandler.obstacleSaveFile);
-  }
-
-  Future<void> removeMatch(ObstacleMatch oMatch) async {
-    logHandler.info('Removing questions of match: ${matchNames[selectedMatchIndex]}', d: 3);
-    var saved = await DataManager.getAllSavedQuestions<ObstacleMatch>(
-      ObstacleMatch.fromJson,
-      storageHandler.obstacleSaveFile,
-    );
-    saved.removeWhere((e) => e.match == oMatch.match);
-    await DataManager.overwriteSave(saved, storageHandler.obstacleSaveFile);
+    logHandler.info('Loaded ${selectedMatch.matchName} (${selectedMatch.keyword})');
   }
 
   @override
@@ -162,7 +103,9 @@ class _ObstacleManagerState extends State<ObstacleManager> {
           matchSelector(matchNames, (value) async {
             selectedMatchIndex = matchNames.indexOf(value!);
             logHandler.info('Selected match: ${matchNames[selectedMatchIndex]}');
-            await loadMatchQuestions(matchNames[selectedMatchIndex]);
+            selectedMatch = await DataManager.getMatchQuestions<ObstacleMatch>(
+              matchNames[selectedMatchIndex],
+            );
             setState(() {});
           }),
           KLIButton(
@@ -187,7 +130,7 @@ class _ObstacleManagerState extends State<ObstacleManager> {
               if (data == null) return;
 
               await getNewQuestion(data);
-              await saveNewQuestions();
+              await DataManager.saveNewQuestions<ObstacleMatch>(selectedMatch);
               setState(() {});
             },
           ),
@@ -206,7 +149,7 @@ class _ObstacleManagerState extends State<ObstacleManager> {
                 onAccept: () async {
                   if (mounted) showToastMessage(context, 'Đã xóa (match: ${matchNames[selectedMatchIndex]})');
 
-                  await removeMatch(selectedMatch);
+                  await DataManager.removeQuestionsOfMatch<ObstacleMatch>(selectedMatch);
                   selectedMatch = ObstacleMatch.empty(matchNames[selectedMatchIndex]);
                   setState(() {});
                 },
@@ -281,7 +224,7 @@ class _ObstacleManagerState extends State<ObstacleManager> {
 
                     if (nQ == null) return;
                     selectedMatch.hintQuestions[index] = nQ;
-                    await updateQuestions(selectedMatch);
+                    await DataManager.updateQuestions<ObstacleMatch>(selectedMatch);
                     setState(() {});
                   },
                 );
@@ -342,7 +285,7 @@ class _ObstacleManagerState extends State<ObstacleManager> {
                           selectedMatch.keyword = newO.$1;
                           selectedMatch.explanation = newO.$2;
                           selectedMatch.charCount = newO.$1.replaceAll(' ', '').length;
-                          await updateQuestions(selectedMatch);
+                          await DataManager.updateQuestions<ObstacleMatch>(selectedMatch);
                           setState(() {});
                         },
                       ),
@@ -387,7 +330,7 @@ class _ObstacleManagerState extends State<ObstacleManager> {
                 if (result != null) {
                   final p = result.files.single.path!;
                   selectedMatch.imagePath = storageHandler.getRelative(p);
-                  await updateQuestions(selectedMatch);
+                  await DataManager.updateQuestions<ObstacleMatch>(selectedMatch);
                   logHandler.info('Chose ${selectedMatch.imagePath}');
                   setState(() {});
                 }

@@ -25,10 +25,10 @@ class _FinishManagerState extends State<FinishManager> {
     logHandler.info('Opened Finish Manager', d: 1);
     logHandler.depth = 2;
     selectedMatch = FinishMatch.empty();
-    getMatchNames().then((value) async {
+    DataManager.getMatchNames().then((value) async {
       if (value.isNotEmpty) matchNames = value;
       setState(() => isLoading = false);
-      await removeDeletedMatchQuestions();
+      await DataManager.removeDeletedMatchQuestions<FinishMatch>();
     });
   }
 
@@ -53,68 +53,8 @@ class _FinishManagerState extends State<FinishManager> {
       }
     }
 
-    selectedMatch = FinishMatch(match: matchNames[selectedMatchIndex], questions: questions);
-    logHandler.info('Loaded ${questions.length} Finish questions of ${selectedMatch.match}');
-  }
-
-  Future<void> saveNewQuestions() async {
-    logHandler.info('Saving new questions of match: ${matchNames[selectedMatchIndex]}');
-    final saved = await DataManager.getAllSavedQuestions<FinishMatch>(
-      FinishMatch.fromJson,
-      storageHandler.finishSaveFile,
-    );
-    saved.removeWhere((e) => e.match == selectedMatch.match);
-    saved.add(selectedMatch);
-    await DataManager.overwriteSave(saved, storageHandler.finishSaveFile);
-  }
-
-  Future<void> updateQuestions(FinishMatch fMatch) async {
-    logHandler.info('Updating questions of match: ${matchNames[selectedMatchIndex]}');
-    final saved = await DataManager.getAllSavedQuestions<FinishMatch>(
-      FinishMatch.fromJson,
-      storageHandler.finishSaveFile,
-    );
-    saved.removeWhere((e) => e.match == fMatch.match);
-    saved.add(fMatch);
-    await DataManager.overwriteSave(saved, storageHandler.finishSaveFile);
-  }
-
-  Future<void> loadMatchQuestions(String match) async {
-    final saved = await DataManager.getAllSavedQuestions<FinishMatch>(
-      FinishMatch.fromJson,
-      storageHandler.finishSaveFile,
-    );
-    if (saved.isEmpty) return;
-
-    try {
-      selectedMatch = saved.firstWhere((e) => e.match == match);
-      setState(() {});
-      logHandler.info('Loaded ${selectedMatch.questions.length} finish questions of ${selectedMatch.match}',
-          d: 2);
-    } on StateError {
-      logHandler.info('Finish match $match not found, temp empty match created');
-      selectedMatch = FinishMatch(match: match, questions: []);
-    }
-  }
-
-  Future<void> removeDeletedMatchQuestions() async {
-    logHandler.info('Removing questions of deleted matches');
-    var saved = await DataManager.getAllSavedQuestions<FinishMatch>(
-      FinishMatch.fromJson,
-      storageHandler.finishSaveFile,
-    );
-    saved = saved.where((e) => matchNames.contains(e.match)).toList();
-    await DataManager.overwriteSave(saved, storageHandler.finishSaveFile);
-  }
-
-  Future<void> removeMatch(FinishMatch fMatch) async {
-    logHandler.info('Removing questions of match: ${matchNames[selectedMatchIndex]}');
-    var saved = await DataManager.getAllSavedQuestions<FinishMatch>(
-      FinishMatch.fromJson,
-      storageHandler.finishSaveFile,
-    );
-    saved.removeWhere((e) => e.match == fMatch.match);
-    await DataManager.overwriteSave(saved, storageHandler.finishSaveFile);
+    selectedMatch = FinishMatch(matchName: matchNames[selectedMatchIndex], questions: questions);
+    logHandler.info('Loaded ${questions.length} Finish questions of ${selectedMatch.matchName}');
   }
 
   @override
@@ -143,7 +83,7 @@ class _FinishManagerState extends State<FinishManager> {
           matchSelector(matchNames, (value) async {
             selectedMatchIndex = matchNames.indexOf(value!);
             logHandler.info('Selected match: ${matchNames[selectedMatchIndex]}');
-            await loadMatchQuestions(matchNames[selectedMatchIndex]);
+            selectedMatch = await DataManager.getMatchQuestions<FinishMatch>(matchNames[selectedMatchIndex]);
             setState(() {});
           }),
           // sort point
@@ -179,7 +119,7 @@ class _FinishManagerState extends State<FinishManager> {
               ));
               if (newQ != null) {
                 selectedMatch.questions.add(newQ);
-                await updateQuestions(selectedMatch);
+                await DataManager.updateQuestions<FinishMatch>(selectedMatch);
               }
               setState(() {});
             },
@@ -206,7 +146,7 @@ class _FinishManagerState extends State<FinishManager> {
               if (data == null) return;
 
               await getNewQuestion(data);
-              await saveNewQuestions();
+              await DataManager.saveNewQuestions<FinishMatch>(selectedMatch);
               setState(() {});
             },
           ),
@@ -225,7 +165,7 @@ class _FinishManagerState extends State<FinishManager> {
                   if (mounted) {
                     showToastMessage(context, 'Đã xóa (match: ${matchNames[selectedMatchIndex]})');
                   }
-                  await removeMatch(selectedMatch);
+                  await DataManager.removeQuestionsOfMatch<FinishMatch>(selectedMatch);
                   selectedMatch = FinishMatch.empty();
                   setState(() {});
                 },
@@ -287,7 +227,7 @@ class _FinishManagerState extends State<FinishManager> {
                                 acceptLogMessage: 'Removed finish question (p=${q.$2.point})',
                                 onAccept: () async {
                                   selectedMatch.questions.removeAt(q.$1);
-                                  await updateQuestions(selectedMatch);
+                                  await DataManager.updateQuestions<FinishMatch>(selectedMatch);
                                   setState(() {});
                                 },
                               );
@@ -307,7 +247,7 @@ class _FinishManagerState extends State<FinishManager> {
 
                         if (newQ != null) {
                           selectedMatch.questions[q.$1] = newQ;
-                          await updateQuestions(selectedMatch);
+                          await DataManager.updateQuestions<FinishMatch>(selectedMatch);
                         }
                         setState(() {});
                       },

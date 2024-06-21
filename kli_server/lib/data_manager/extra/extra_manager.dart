@@ -24,10 +24,10 @@ class _ExtraManagerState extends State<ExtraManager> {
     logHandler.info('Opened Extra Manager', d: 1);
     logHandler.depth = 2;
     selectedMatch = ExtraMatch.empty();
-    getMatchNames().then((value) async {
+    DataManager.getMatchNames().then((value) async {
       if (value.isNotEmpty) matchNames = value;
       setState(() => isLoading = false);
-      await removeDeletedMatchQuestions();
+      await DataManager.removeDeletedMatchQuestions<ExtraMatch>();
     });
   }
 
@@ -41,70 +41,8 @@ class _ExtraManagerState extends State<ExtraManager> {
       allQ.add(q);
     }
 
-    selectedMatch = ExtraMatch(match: matchNames[selectedMatchIndex], questions: allQ);
+    selectedMatch = ExtraMatch(matchName: matchNames[selectedMatchIndex], questions: allQ);
     logHandler.info('Loaded ${selectedMatch.questions.length} questions from excel');
-  }
-
-  Future<void> saveNewQuestions() async {
-    logHandler.info('Saving new questions of match: ${matchNames[selectedMatchIndex]}');
-    final saved = await DataManager.getAllSavedQuestions<ExtraMatch>(
-      ExtraMatch.fromJson,
-      storageHandler.extraSaveFile,
-    );
-    saved.removeWhere((e) => e.match == selectedMatch.match);
-    saved.add(selectedMatch);
-    await DataManager.overwriteSave(saved, storageHandler.extraSaveFile);
-  }
-
-  Future<void> updateQuestions(ExtraMatch eMatch) async {
-    logHandler.info('Updating questions of match: ${matchNames[selectedMatchIndex]}');
-    final saved = await DataManager.getAllSavedQuestions<ExtraMatch>(
-      ExtraMatch.fromJson,
-      storageHandler.extraSaveFile,
-    );
-    saved.removeWhere((e) => e.match == eMatch.match);
-    saved.add(eMatch);
-    await DataManager.overwriteSave(saved, storageHandler.extraSaveFile);
-  }
-
-  Future<void> loadMatchQuestions(String match) async {
-    final saved = await DataManager.getAllSavedQuestions<ExtraMatch>(
-      ExtraMatch.fromJson,
-      storageHandler.extraSaveFile,
-    );
-    if (saved.isEmpty) return;
-
-    try {
-      selectedMatch = saved.firstWhere((e) => e.match == match);
-      setState(() {});
-      logHandler.info(
-        'Loaded ${selectedMatch.questions.length} extra questions of match ${selectedMatch.match}',
-        d: 2,
-      );
-    } on StateError {
-      logHandler.info('Extra match $match not found, temp empty match created');
-      selectedMatch = ExtraMatch(match: match, questions: []);
-    }
-  }
-
-  Future<void> removeDeletedMatchQuestions() async {
-    logHandler.info('Removing questions of deleted matches');
-    var saved = await DataManager.getAllSavedQuestions<ExtraMatch>(
-      ExtraMatch.fromJson,
-      storageHandler.extraSaveFile,
-    );
-    saved = saved.where((e) => matchNames.contains(e.match)).toList();
-    await DataManager.overwriteSave(saved, storageHandler.extraSaveFile);
-  }
-
-  Future<void> removeMatch(ExtraMatch eMatch) async {
-    logHandler.info('Removing questions of match: ${matchNames[selectedMatchIndex]}');
-    var saved = await DataManager.getAllSavedQuestions<ExtraMatch>(
-      ExtraMatch.fromJson,
-      storageHandler.extraSaveFile,
-    );
-    saved.removeWhere((e) => e.match == eMatch.match);
-    await DataManager.overwriteSave(saved, storageHandler.extraSaveFile);
   }
 
   @override
@@ -133,7 +71,7 @@ class _ExtraManagerState extends State<ExtraManager> {
           matchSelector(matchNames, (value) async {
             selectedMatchIndex = matchNames.indexOf(value!);
             logHandler.info('Selected match: ${matchNames[selectedMatchIndex]}');
-            await loadMatchQuestions(matchNames[selectedMatchIndex]);
+            selectedMatch = await DataManager.getMatchQuestions(matchNames[selectedMatchIndex]);
             setState(() {});
           }),
           KLIButton(
@@ -150,7 +88,7 @@ class _ExtraManagerState extends State<ExtraManager> {
               ));
               if (newQ != null) {
                 selectedMatch.questions.add(newQ);
-                await updateQuestions(selectedMatch);
+                await DataManager.updateQuestions<ExtraMatch>(selectedMatch);
               }
               setState(() {});
             },
@@ -177,7 +115,7 @@ class _ExtraManagerState extends State<ExtraManager> {
               if (data == null) return;
 
               await getNewQuestion(data);
-              await saveNewQuestions();
+              await DataManager.saveNewQuestions<ExtraMatch>(selectedMatch);
               setState(() {});
             },
           ),
@@ -195,7 +133,7 @@ class _ExtraManagerState extends State<ExtraManager> {
                   if (mounted) {
                     showToastMessage(context, 'Đã xóa (match: ${matchNames[selectedMatchIndex]})');
                   }
-                  await removeMatch(selectedMatch);
+                  await DataManager.removeQuestionsOfMatch<ExtraMatch>(selectedMatch);
                   selectedMatch = ExtraMatch.empty();
                   setState(() {});
                 },
@@ -247,8 +185,8 @@ class _ExtraManagerState extends State<ExtraManager> {
                                 acceptLogMessage: 'Removed an extra question',
                                 onAccept: () async {
                                   selectedMatch.questions.removeAt(index);
-                                  await updateQuestions(selectedMatch);
-                                  logHandler.info('Deleted extra question of ${selectedMatch.match}');
+                                  await DataManager.updateQuestions<ExtraMatch>(selectedMatch);
+                                  logHandler.info('Deleted extra question of ${selectedMatch.matchName}');
                                   setState(() {});
                                 },
                               );
@@ -267,7 +205,7 @@ class _ExtraManagerState extends State<ExtraManager> {
                         ));
                         if (newQ != null) {
                           selectedMatch.questions[index] = newQ;
-                          await updateQuestions(selectedMatch);
+                          await DataManager.updateQuestions<ExtraMatch>(selectedMatch);
                         }
                         setState(() {});
                       },

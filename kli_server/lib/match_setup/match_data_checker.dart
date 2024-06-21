@@ -35,7 +35,7 @@ class _MatchDataCheckerState extends State<MatchDataChecker> {
     super.initState();
     logHandler.info('Opening Match Data Checker');
     logHandler.depth = 1;
-    getMatchNames().then((value) async {
+    DataManager.getMatchNames().then((value) async {
       if (value.isEmpty) showToastMessage(context, 'No match found');
       if (value.isNotEmpty) matchNames = value;
       setState(() => isLoading = false);
@@ -187,14 +187,11 @@ class _MatchDataCheckerState extends State<MatchDataChecker> {
   Future<(bool, List<String>)> checkStartQuestions() async {
     final errorList = <String>[];
 
-    final saved = await DataManager.getAllSavedQuestions<StartMatch>(
-      StartMatch.fromJson,
-      storageHandler.startSaveFile,
-    );
+    final saved = await DataManager.getAllSavedQuestions<StartMatch>();
     if (saved.isEmpty) return (false, ['Chưa có dữ liệu']);
 
     try {
-      StartMatch match = saved.firstWhere((e) => e.match == matchNames[selectedMatchIndex]);
+      StartMatch match = saved.firstWhere((e) => e.matchName == matchNames[selectedMatchIndex]);
 
       if (match.questions.isEmpty) return (false, ['Chưa có câu hỏi']);
 
@@ -227,14 +224,11 @@ class _MatchDataCheckerState extends State<MatchDataChecker> {
   Future<(bool, List<String>)> checkObstacleQuestions() async {
     final errorList = <String>[];
 
-    final saved = await DataManager.getAllSavedQuestions<ObstacleMatch>(
-      ObstacleMatch.fromJson,
-      storageHandler.obstacleSaveFile,
-    );
+    final saved = await DataManager.getAllSavedQuestions<ObstacleMatch>();
     if (saved.isEmpty) return (false, ['Chưa có dữ liệu']);
 
     try {
-      ObstacleMatch match = saved.firstWhere((e) => e.match == matchNames[selectedMatchIndex]);
+      ObstacleMatch match = saved.firstWhere((e) => e.matchName == matchNames[selectedMatchIndex]);
 
       if (match.keyword.isEmpty) errorList.add('Không có đáp án CNV');
       if (match.imagePath.isEmpty) errorList.add('Không có ảnh CNV');
@@ -249,14 +243,11 @@ class _MatchDataCheckerState extends State<MatchDataChecker> {
   Future<(bool, List<String>)> checkAccelQuestions() async {
     final errorList = <String>[];
 
-    final saved = await DataManager.getAllSavedQuestions<AccelMatch>(
-      AccelMatch.fromJson,
-      storageHandler.accelSaveFile,
-    );
+    final saved = await DataManager.getAllSavedQuestions<AccelMatch>();
     if (saved.isEmpty) return (false, ['Chưa có dữ liệu']);
 
     try {
-      AccelMatch match = saved.firstWhere((e) => e.match == matchNames[selectedMatchIndex]);
+      AccelMatch match = saved.firstWhere((e) => e.matchName == matchNames[selectedMatchIndex]);
 
       if (!match.questions.every((e) => e != null)) errorList.add('Không đủ 4 câu hỏi');
 
@@ -282,14 +273,11 @@ class _MatchDataCheckerState extends State<MatchDataChecker> {
   Future<(bool, List<String>)> checkFinishQuestions() async {
     final errorList = <String>[];
 
-    final saved = await DataManager.getAllSavedQuestions<FinishMatch>(
-      FinishMatch.fromJson,
-      storageHandler.finishSaveFile,
-    );
+    final saved = await DataManager.getAllSavedQuestions<FinishMatch>();
     if (saved.isEmpty) return (false, ['Chưa có dữ liệu']);
 
     try {
-      FinishMatch match = saved.firstWhere((e) => e.match == matchNames[selectedMatchIndex]);
+      FinishMatch match = saved.firstWhere((e) => e.matchName == matchNames[selectedMatchIndex]);
       for (int i = 1; i <= 3; i++) {
         final qCount = match.questions.where((e) => e.point == i * 10).length;
         if (qCount < 12) {
@@ -306,14 +294,11 @@ class _MatchDataCheckerState extends State<MatchDataChecker> {
   Future<(bool, List<String>)> checkExtraQuestions() async {
     final errorList = <String>[];
 
-    final saved = await DataManager.getAllSavedQuestions<ExtraMatch>(
-      ExtraMatch.fromJson,
-      storageHandler.extraSaveFile,
-    );
+    final saved = await DataManager.getAllSavedQuestions<ExtraMatch>();
     if (saved.isEmpty) return (false, ['Chưa có dữ liệu']);
 
     try {
-      ExtraMatch match = saved.firstWhere((e) => e.match == matchNames[selectedMatchIndex]);
+      ExtraMatch match = saved.firstWhere((e) => e.matchName == matchNames[selectedMatchIndex]);
 
       if (match.questions.isEmpty) errorList.add('Chưa có câu hỏi');
     } on StateError {

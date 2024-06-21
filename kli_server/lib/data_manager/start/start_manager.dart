@@ -25,10 +25,10 @@ class _StartQuestionManagerState extends State<StartQuestionManager> {
     logHandler.info('Opened Start Manager', d: 1);
     logHandler.depth = 2;
     selectedMatch = StartMatch.empty();
-    getMatchNames().then((value) async {
+    DataManager.getMatchNames().then((value) async {
       if (value.isNotEmpty) matchNames = value;
       setState(() => isLoading = false);
-      await removeDeletedMatchQuestions();
+      await DataManager.removeDeletedMatchQuestions<StartMatch>();
     });
   }
 
@@ -55,59 +55,8 @@ class _StartQuestionManagerState extends State<StartQuestionManager> {
       allQ.putIfAbsent(idx, () => questions);
       idx++;
     }
-    selectedMatch = StartMatch(match: matchNames[selectedMatchIndex], questions: allQ);
+    selectedMatch = StartMatch(matchName: matchNames[selectedMatchIndex], questions: allQ);
     logHandler.info('Loaded ${selectedMatch.questionCount} questions from excel');
-  }
-
-  Future<void> saveNewQuestions() async {
-    logHandler.info('Saving new questions of match: ${matchNames[selectedMatchIndex]}');
-    final saved =
-        await DataManager.getAllSavedQuestions<StartMatch>(StartMatch.fromJson, storageHandler.startSaveFile);
-    saved.removeWhere((e) => e.match == selectedMatch.match);
-    saved.add(selectedMatch);
-    await DataManager.overwriteSave(saved, storageHandler.startSaveFile);
-  }
-
-  Future<void> updateQuestions(StartMatch sMatch) async {
-    logHandler.info('Updating questions of match: ${matchNames[selectedMatchIndex]}');
-    final saved =
-        await DataManager.getAllSavedQuestions<StartMatch>(StartMatch.fromJson, storageHandler.startSaveFile);
-    saved.removeWhere((e) => e.match == sMatch.match);
-    saved.add(sMatch);
-    await DataManager.overwriteSave(saved, storageHandler.startSaveFile);
-  }
-
-  Future<void> loadMatchQuestions(String match) async {
-    final saved =
-        await DataManager.getAllSavedQuestions<StartMatch>(StartMatch.fromJson, storageHandler.startSaveFile);
-    if (saved.isEmpty) return;
-
-    try {
-      selectedMatch = saved.firstWhere((e) => e.match == match);
-      setState(() {});
-      logHandler.info(
-        'Loaded ${selectedMatch.questionCount} start questions of match ${selectedMatch.match}',
-      );
-    } on StateError {
-      logHandler.info('Start match $match not found, temp empty match created');
-      selectedMatch = StartMatch(match: match, questions: {});
-    }
-  }
-
-  Future<void> removeDeletedMatchQuestions() async {
-    logHandler.info('Removing questions of deleted matches');
-    var saved =
-        await DataManager.getAllSavedQuestions<StartMatch>(StartMatch.fromJson, storageHandler.startSaveFile);
-    saved = saved.where((e) => matchNames.contains(e.match)).toList();
-    await DataManager.overwriteSave(saved, storageHandler.startSaveFile);
-  }
-
-  Future<void> removeMatch(StartMatch sMatch) async {
-    logHandler.info('Removing all questions of match: ${matchNames[selectedMatchIndex]}');
-    var saved =
-        await DataManager.getAllSavedQuestions<StartMatch>(StartMatch.fromJson, storageHandler.startSaveFile);
-    saved.removeWhere((e) => e.match == sMatch.match);
-    await DataManager.overwriteSave(saved, storageHandler.startSaveFile);
   }
 
   @override
@@ -133,11 +82,11 @@ class _StartQuestionManagerState extends State<StartQuestionManager> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
-          matchSelector(matchNames, (value) async {
-            selectedMatchIndex = matchNames.indexOf(value!);
-            selectedMatch.match = value;
+          matchSelector(matchNames, (selectedMatchName) async {
+            selectedMatchIndex = matchNames.indexOf(selectedMatchName!);
+            selectedMatch.matchName = selectedMatchName;
             logHandler.info('Selected match: ${matchNames[selectedMatchIndex]}');
-            await loadMatchQuestions(matchNames[selectedMatchIndex]);
+            selectedMatch = await DataManager.getMatchQuestions<StartMatch>(matchNames[selectedMatchIndex]);
             setState(() {});
           }),
           // sort player pos
@@ -198,7 +147,7 @@ class _StartQuestionManagerState extends State<StartQuestionManager> {
                 } else {
                   qList.add(newQ);
                 }
-                await updateQuestions(selectedMatch);
+                await DataManager.updateQuestions<StartMatch>(selectedMatch);
               }
               setState(() {});
             },
@@ -225,7 +174,7 @@ class _StartQuestionManagerState extends State<StartQuestionManager> {
               if (data == null) return;
 
               await getNewQuestion(data);
-              await saveNewQuestions();
+              await DataManager.saveNewQuestions<StartMatch>(selectedMatch);
 
               setState(() {});
             },
@@ -287,8 +236,8 @@ class _StartQuestionManagerState extends State<StartQuestionManager> {
                 onAccept: () async {
                   if (mounted) showToastMessage(context, 'Đã xóa (trận: ${matchNames[selectedMatchIndex]})');
 
-                  await removeMatch(selectedMatch);
-                  selectedMatch = StartMatch(match: matchNames[selectedMatchIndex], questions: {});
+                  await DataManager.removeQuestionsOfMatch<StartMatch>(selectedMatch);
+                  selectedMatch = StartMatch(matchName: matchNames[selectedMatchIndex], questions: {});
                   setState(() {});
                 },
               );
@@ -352,7 +301,7 @@ class _StartQuestionManagerState extends State<StartQuestionManager> {
                                 acceptLogMessage: 'Removed start question: pos=${q.$2}, idx=${q.$1}',
                                 onAccept: () async {
                                   selectedMatch.questions[q.$2]?.removeAt(q.$1);
-                                  await updateQuestions(selectedMatch);
+                                  await DataManager.updateQuestions<StartMatch>(selectedMatch);
                                   setState(() {});
                                 },
                               );
@@ -376,7 +325,7 @@ class _StartQuestionManagerState extends State<StartQuestionManager> {
                             selectedMatch.questions[q.$2]!.removeAt(q.$1);
                             selectedMatch.questions[newP]!.add(newQ);
                           }
-                          await updateQuestions(selectedMatch);
+                          await DataManager.updateQuestions<StartMatch>(selectedMatch);
                         }
                         setState(() {});
                       },
