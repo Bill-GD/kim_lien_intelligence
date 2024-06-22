@@ -149,6 +149,7 @@ class _HelpScreenState extends State<HelpScreen> {
   }
 
   final helpContentList = [
+    // * Overview
     '''
     Phần mềm chia thành 2 phần chính: phần quản lý trận đấu, câu hỏi và host & điều khiển trận đấu đang diễn ra.
 
@@ -170,6 +171,7 @@ class _HelpScreenState extends State<HelpScreen> {
     Hình nền & âm thanh:
     - Phần mềm cần hình nền và âm thanh để có thể tiếp tục.
     - Chọn mục âm thanh ở bên trái. Mở thư mục Assets để quản lý.''',
+    // * Background & Sounds
     '''
     Hình nền và âm thanh của phần mềm được lưu ở 'UserData/Assets'.
     
@@ -178,12 +180,14 @@ class _HelpScreenState extends State<HelpScreen> {
     Vị trí hình nền và âm thanh sẽ dùng chung cho cả bên Server và Client. Tên và vị trí lưu cần chính xác, phần mềm sẽ báo lỗi nếu có sai sót.
     
     Nếu thiếu file (không bị nhầm chỗ) thì có thể tải bản âm thanh, hình nền mặc định.''',
+    // * Data Manager
     '''
     Ngoài hình nền và âm thanh, loại dữ liệu khác cần quản lý là dữ liệu trận đấu và câu hỏi.
     
     Dữ liệu trận đấu và câu hỏi được phần mềm lưu ở 'UserData/SavedData'. Không nên chỉnh sửa nếu không hiểu rõ cấu trúc dữ liệu, điều này có thể gây lỗi dữ liệu khi đọc.
     
     Các file hình ảnh, video được sử dụng cho các trận đấu lưu ở 'UserData/Media' để dễ quản lý.''',
+    // * Import from Excel
     '''
     Khi nhập dữ liệu câu hỏi, có thể thêm một cách thủ công hoặc nhập từ file Excel.
     
@@ -197,6 +201,7 @@ class _HelpScreenState extends State<HelpScreen> {
     - Không gộp (merge) các hàng/cột với nhau. Chỉ có hàng/cột đầu tiên của nhóm đã gộp có dữ liệu và sẽ đọc thiếu dữ liệu.
     - Dòng 1 là tiêu đề cột (STT, câu hỏi, đáp án...).
     - Một số phần thì cũng có số lượng sheet nhất định. Nếu thừa sẽ không đọc tiếp.''',
+    // * Data Checker
     '''
     Trước khi bắt đầu trận đấu, hệ thống cần xác nhận trận đấu đã chọn có đủ dữ liệu hay không.
     
@@ -211,6 +216,7 @@ class _HelpScreenState extends State<HelpScreen> {
     - Tăng tốc: Có ít nhất 1 ảnh, có ảnh tại vị trí đã nhập, đủ 4 câu hỏi
     - Về đích: Ít nhất 12 câu mỗi mức điểm, các video nếu 
     - Câu hỏi phụ: Có ít nhất 1 câu hỏi''',
+    // * Server
     '''
     Chỉ có thể tạo Server nếu có ít nhất 1 trận đấu vả có đủ dữ liệu cần thiết.
     

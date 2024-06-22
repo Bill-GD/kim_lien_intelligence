@@ -34,29 +34,27 @@ class _StartQuestionManagerState extends State<StartQuestionManager> {
   }
 
   Future<void> getNewQuestion(Map<String, dynamic> data) async {
-    final Map<int, List<StartQuestion>> allQ = {};
+    final List<StartQuestion> questions = [];
     int idx = 0;
-    for (var sheet in data.keys) {
-      final List<StartQuestion> questions = [];
 
+    for (var sheet in data.keys) {
       for (final r in (data[sheet] as List<Map>)) {
         try {
           final v = r.values;
-          final q = StartQuestion(
+          questions.add(StartQuestion(
+            pos: idx + 1,
             subject: StartQuestion.mapTypeValue(v.elementAt(1)),
             question: v.elementAt(2),
             answer: v.elementAt(3),
-          );
-          questions.add(q);
+          ));
         } on StateError {
           showToastMessage(context, 'Sai định dạng (lĩnh vực)');
           break;
         }
       }
-      allQ.putIfAbsent(idx, () => questions);
       idx++;
     }
-    selectedMatch = StartMatch(matchName: selectedMatch.matchName, questions: allQ);
+    selectedMatch = StartMatch(matchName: selectedMatch.matchName, questions: questions);
     logHandler.info('Loaded ${selectedMatch.questionCount} questions from excel');
   }
 
@@ -130,10 +128,10 @@ class _StartQuestionManagerState extends State<StartQuestionManager> {
             enabled: hasSelectedMatch,
             dropdownMenuEntries: [
               const DropdownMenuEntry(value: -1, label: 'Tất cả'),
-              for (var i = 0; i < 4; i++)
+              for (var i = 1; i <= 4; i++)
                 DropdownMenuEntry(
                   value: i,
-                  label: '${i + 1}',
+                  label: '$i',
                 )
             ],
             onSelected: (value) async {
@@ -167,22 +165,17 @@ class _StartQuestionManagerState extends State<StartQuestionManager> {
             enabledLabel: 'Thêm 1 câu hỏi cho phần thi',
             disabledLabel: 'Chưa chọn trận đấu',
             onPressed: () async {
-              final ret =
-                  await Navigator.of(context).push<(int, StartQuestion)>(DialogRoute<(int, StartQuestion)>(
+              final ret = await Navigator.of(context).push<StartQuestion>(DialogRoute<StartQuestion>(
                 context: context,
                 barrierDismissible: false,
                 barrierLabel: '',
-                builder: (_) => const StartQuestionEditor(question: null, playerPos: -1),
+                builder: (_) => const StartQuestionEditor(question: null),
               ));
-              if (ret case (final newP, final newQ)?) {
-                final qList = selectedMatch.questions[newP];
-                if (qList == null) {
-                  selectedMatch.questions[newP] = [newQ];
-                } else {
-                  qList.add(newQ);
-                }
-                await DataManager.updateQuestions<StartMatch>(selectedMatch);
-              }
+
+              if (ret == null) return;
+
+              selectedMatch.questions.add(ret);
+              await DataManager.updateQuestions<StartMatch>(selectedMatch);
               setState(() {});
             },
           ),
@@ -213,49 +206,6 @@ class _StartQuestionManagerState extends State<StartQuestionManager> {
               setState(() {});
             },
           ),
-          // KLIButton(
-          //   'Export Excel',
-          //   enableCondition: hasSelectedMatch,
-          //   onPressed: () async {
-          //     String fileName =
-          //         'KĐ_${matchNames[selectedMatchIndex]}_${DateTime.now().toString().split('.').first.replaceAll(RegExp('[:-]'), '_')}.xlsx';
-          //     logHandler.info('Exporting ${matchNames[selectedMatchIndex]} start questions to $fileName');
-
-          //     final data = (jsonDecode(
-          //       await storageHandler.readFromFile(storageHandler.startSaveFile),
-          //     ) as List)
-          //         .map((e) => StartMatch.fromJson(e))
-          //         .toList();
-
-          //     final newData = <String, List>{};
-
-          //     int idx = 0;
-          //     for (final m in data) {
-          //       for (final qL in m.questions.entries) {
-          //         final kName = 'Thí sinh ${qL.key + 1}';
-          //         final qMap = qL.value.map((q) {
-          //           idx++;
-          //           return {
-          //             'STT': '$idx',
-          //             'Loại câu hỏi': StartQuestion.mapTypeDisplay(q.subject),
-          //             'Nội dung': q.question,
-          //             'Đáp án': q.answer,
-          //           };
-          //         }).toList();
-
-          //         newData[kName] = qMap;
-          //       }
-          //     }
-
-          //     await storageHandler.writeToExcel(fileName, newData);
-          //     if (mounted) {
-          //       showToastMessage(
-          //         context,
-          //         'Saved to ${storageHandler.getRelative(storageHandler.excelOutput)}/$fileName',
-          //       );
-          //     }
-          //   },
-          // ),
           KLIButton(
             'Xóa câu hỏi',
             enableCondition: hasSelectedMatch,
@@ -270,7 +220,7 @@ class _StartQuestionManagerState extends State<StartQuestionManager> {
                   if (mounted) showToastMessage(context, 'Đã xóa (trận: ${selectedMatch.matchName})');
 
                   await DataManager.removeQuestionsOfMatch<StartMatch>(selectedMatch);
-                  selectedMatch = StartMatch(matchName: selectedMatch.matchName, questions: {});
+                  selectedMatch = StartMatch.empty(selectedMatch.matchName);
                   setState(() {});
                 },
               );
@@ -282,14 +232,12 @@ class _StartQuestionManagerState extends State<StartQuestionManager> {
   }
 
   Widget questionList() {
-    List<(int, int, StartQuestion)> filtered = [];
-    selectedMatch.questions.forEach((pos, qL) {
-      for (int i = 0; i < qL.length; i++) {
-        if (sortType != null && qL[i].subject != sortType) continue;
-        if (sortPlayerPos >= 0 && pos != sortPlayerPos) continue;
-        filtered.add((i, pos, qL[i]));
-      }
-    });
+    List<StartQuestion> filtered = [];
+    for (var q in selectedMatch.questions) {
+      if (sortType != null && q.subject != sortType) continue;
+      if (sortPlayerPos >= 0 && q.pos != sortPlayerPos) continue;
+      filtered.add(q);
+    }
 
     List<double> widthRatios = [0.07, 0.1, 0.4, 0.1, 0.02];
 
@@ -320,20 +268,20 @@ class _StartQuestionManagerState extends State<StartQuestionManager> {
                     return customListTile(
                       context,
                       columns: [
-                        (Text('${q.$2 + 1}', textAlign: TextAlign.center), widthRatios[0]),
-                        (Text(StartQuestion.mapTypeDisplay(q.$3.subject)), widthRatios[1]),
-                        (Text(q.$3.question, textAlign: TextAlign.left), widthRatios[2]),
-                        (Text(q.$3.answer, textAlign: TextAlign.right), widthRatios[3]),
+                        (Text('${q.pos}', textAlign: TextAlign.center), widthRatios[0]),
+                        (Text(StartQuestion.mapTypeDisplay(q.subject)), widthRatios[1]),
+                        (Text(q.question, textAlign: TextAlign.left), widthRatios[2]),
+                        (Text(q.answer, textAlign: TextAlign.right), widthRatios[3]),
                         (
                           IconButton(
                             icon: const Icon(Icons.delete),
                             onPressed: () async {
                               await confirmDialog(
                                 context,
-                                message: 'Bạn có muốn xóa câu hỏi này?\n"${q.$3.question}"',
-                                acceptLogMessage: 'Removed start question: pos=${q.$2}, idx=${q.$1}',
+                                message: 'Bạn có muốn xóa câu hỏi này?\n"${q.question}"',
+                                acceptLogMessage: 'Removed start question: pos=${q.pos}, idx=$index',
                                 onAccept: () async {
-                                  selectedMatch.questions[q.$2]?.removeAt(q.$1);
+                                  selectedMatch.questions.removeWhere((e) => e == q);
                                   await DataManager.updateQuestions<StartMatch>(selectedMatch);
                                   setState(() {});
                                 },
@@ -344,22 +292,19 @@ class _StartQuestionManagerState extends State<StartQuestionManager> {
                         )
                       ],
                       onTap: () async {
-                        final ret = await Navigator.of(context)
-                            .push<(int, StartQuestion)>(DialogRoute<(int, StartQuestion)>(
+                        final ret =
+                            await Navigator.of(context).push<StartQuestion>(DialogRoute<StartQuestion>(
                           context: context,
                           barrierDismissible: false,
                           barrierLabel: '',
-                          builder: (_) => StartQuestionEditor(question: q.$3, playerPos: q.$2),
+                          builder: (_) => StartQuestionEditor(question: q),
                         ));
-                        if (ret case (final newP, final newQ)?) {
-                          if (newP == q.$2) {
-                            selectedMatch.questions[q.$2]![q.$1] = newQ;
-                          } else {
-                            selectedMatch.questions[q.$2]!.removeAt(q.$1);
-                            selectedMatch.questions[newP]!.add(newQ);
-                          }
-                          await DataManager.updateQuestions<StartMatch>(selectedMatch);
-                        }
+
+                        if (ret == null) return;
+
+                        selectedMatch.questions[selectedMatch.questions.indexOf(q)] = ret;
+                        await DataManager.updateQuestions<StartMatch>(selectedMatch);
+
                         setState(() {});
                       },
                     );

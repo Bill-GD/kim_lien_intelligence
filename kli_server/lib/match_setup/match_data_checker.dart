@@ -204,7 +204,7 @@ class _MatchDataCheckerState extends State<MatchDataChecker> {
 
       for (int i = 1; i <= 4; i++) {
         try {
-          final qList = match.questions.values.elementAt(i - 1);
+          final qList = match.questions.where((v) => v.pos == i);
           final misingSubjects = <String>[];
           for (final qType in StartQuestionSubject.values) {
             if (qList.where((e) => e.subject == qType).isEmpty) {

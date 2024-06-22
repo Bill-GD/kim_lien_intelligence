@@ -5,8 +5,7 @@ import '../../global.dart';
 
 class StartQuestionEditor extends StatefulWidget {
   final StartQuestion? question;
-  final int playerPos;
-  const StartQuestionEditor({super.key, required this.question, required this.playerPos});
+  const StartQuestionEditor({super.key, required this.question});
 
   @override
   State<StartQuestionEditor> createState() => _StartQuestionEditorState();
@@ -32,7 +31,7 @@ class _StartQuestionEditorState extends State<StartQuestionEditor> {
       questionController.text = widget.question!.question;
       answerController.text = widget.question!.answer;
       type = widget.question!.subject;
-      pos = widget.playerPos;
+      pos = widget.question!.pos;
       disableDone = questionController.text.isEmpty || answerController.text.isEmpty || pos < 0;
     } else {
       logHandler.info('Add new start question');
@@ -65,9 +64,9 @@ class _StartQuestionEditorState extends State<StartQuestionEditor> {
                 textStyle: const TextStyle(fontSize: fontSizeMSmall),
                 initialSelection: pos,
                 dropdownMenuEntries: [
-                  for (var i = 1; i < 5; i++)
+                  for (var i = 1; i <= 4; i++)
                     DropdownMenuEntry(
-                      value: i - 1,
+                      value: i,
                       label: '$i',
                     )
                 ],
@@ -146,7 +145,7 @@ class _StartQuestionEditorState extends State<StartQuestionEditor> {
                         : qTrim != widget.question!.question ||
                             aTrim != widget.question!.answer ||
                             type != widget.question!.subject ||
-                            pos != widget.playerPos;
+                            pos != widget.question!.pos;
 
                     if (!hasChanged) {
                       logHandler.info('No change, exiting');
@@ -154,12 +153,17 @@ class _StartQuestionEditorState extends State<StartQuestionEditor> {
                       return;
                     }
 
-                    final newQ = StartQuestion(subject: type, question: qTrim, answer: aTrim);
+                    final newQ = StartQuestion(
+                      pos: pos,
+                      subject: type,
+                      question: qTrim,
+                      answer: aTrim,
+                    );
 
                     logHandler.info(
                       '${widget.question == null ? 'Created' : 'Modified'} start question: ${newQ.subject.name}',
                     );
-                    Navigator.of(context).pop((pos, newQ));
+                    Navigator.of(context).pop(newQ);
                   },
             child: const Text('Hoàn tất', style: TextStyle(fontSize: fontSizeMedium)),
           ),
