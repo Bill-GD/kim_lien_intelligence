@@ -317,7 +317,7 @@ class _ObstacleManagerState extends State<ObstacleManager> {
               child: const Text('Chọn ảnh'),
               onPressed: () async {
                 logHandler.depth = 3;
-                logHandler.info('Selecting image at ${storageHandler.getRelative(storageHandler.mediaDir)}');
+                logHandler.info('Selecting image at ${StorageHandler.getRelative(storageHandler.mediaDir)}');
                 final result = await FilePicker.platform.pickFiles(
                   dialogTitle: 'Select image',
                   initialDirectory: storageHandler.mediaDir.replaceAll('/', '\\'),
@@ -326,7 +326,7 @@ class _ObstacleManagerState extends State<ObstacleManager> {
 
                 if (result != null) {
                   final p = result.files.single.path!;
-                  selectedMatch.imagePath = storageHandler.getRelative(p);
+                  selectedMatch.imagePath = StorageHandler.getRelative(p);
                   await DataManager.updateQuestions<ObstacleMatch>(selectedMatch);
                   logHandler.info('Chose ${selectedMatch.imagePath}');
                   setState(() {});

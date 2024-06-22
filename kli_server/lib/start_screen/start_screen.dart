@@ -9,8 +9,8 @@ import 'package:url_launcher/url_launcher.dart';
 import '../data_manager/data_manager_page.dart';
 import '../global.dart';
 import '../match_setup/match_data_checker.dart';
-import 'background_manager.dart';
 import 'help_screen.dart';
+import 'sounds_test.dart';
 
 class StartPage extends StatefulWidget {
   const StartPage({super.key});
@@ -73,8 +73,8 @@ class _StartPageState extends State<StartPage> {
                 SideNavigationBarItem(label: 'Hướng dẫn', icon: FontAwesomeIcons.circleQuestion),
                 SideNavigationBarItem(label: 'Quản lý dữ liệu', icon: FontAwesomeIcons.database),
                 SideNavigationBarItem(label: 'Bắt đầu trận', icon: Icons.settings_rounded),
-                SideNavigationBarItem(label: 'Hình nền', icon: FontAwesomeIcons.image),
                 SideNavigationBarItem(label: 'Log', icon: FontAwesomeIcons.solidFile),
+                SideNavigationBarItem(label: 'Sound Test', icon: FontAwesomeIcons.music),
               ],
               onTap: (newIndex) {
                 setState(() => sidebarIndex = newIndex);
@@ -102,7 +102,6 @@ class _StartPageState extends State<StartPage> {
                       );
                     },
                   ),
-                  BackgroundManager(parentSetState: setState),
                   KLIButton(
                     'Open Log File',
                     onPressed: () async {
@@ -110,6 +109,7 @@ class _StartPageState extends State<StartPage> {
                       await launchUrl(Uri.parse(storageHandler.logFile));
                     },
                   ),
+                  SoundTest(assetHandler: assetHandler, audioHandler: audioHandler),
                 ].elementAt(sidebarIndex),
               ),
             ),

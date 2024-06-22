@@ -1,17 +1,13 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:kli_lib/kli_lib.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:side_navigation/side_navigation.dart';
 
-bool useDefaultBackground = false;
 DecorationImage? bgWidget;
 
 late final LogHandler logHandler;
 void initLogHandler() {
-  final rawDir = Platform.resolvedExecutable.split(Platform.executable).first;
-  logHandler = LogHandler(logFile: '$rawDir\\UserData\\log.txt');
+  logHandler = LogHandler(logFile: '${StorageHandler.appRootDirectory}\\UserData\\log.txt');
 }
 
 late final PackageInfo packageInfo;
@@ -22,8 +18,17 @@ Future<void> initPackageInfo() async {
 
 late final StorageHandler storageHandler;
 Future<void> initStorageHandler() async {
-  final rawDir = Platform.resolvedExecutable.split(Platform.executable).first;
-  storageHandler = await StorageHandler.init(rawDir);
+  storageHandler = await StorageHandler.init();
+}
+
+late final AudioHandler audioHandler;
+void initAudioHandler() {
+  audioHandler = AudioHandler.init();
+}
+
+late final AssetHandler assetHandler;
+void initAssetHandler() {
+  assetHandler = AssetHandler.init();
 }
 
 AppBar managerAppBar(BuildContext context, String title) {
@@ -110,6 +115,8 @@ String changelog = """
   0.3.2.1 ({latest}):
   - Updated KLI Lib to 0.4
   - Extracted repeating manager methods to generics
+  - Added sound test page
+  - Added 'feature' that allows user to manage background image and sounds
   
   0.3.2 ({c2fb3d0}):
   - Added Loading screen

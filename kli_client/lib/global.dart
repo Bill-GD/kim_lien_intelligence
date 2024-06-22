@@ -4,13 +4,11 @@ import 'package:flutter/material.dart';
 import 'package:kli_lib/kli_lib.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
-bool useDefaultBackground = false;
 DecorationImage? bgWidget;
 
 late final LogHandler logHandler;
 void initLogHandler() {
-  final parentDir = Platform.resolvedExecutable.split(Platform.executable).first;
-  logHandler = LogHandler(logFile: '$parentDir\\log.txt');
+  logHandler = LogHandler(logFile: '${StorageHandler.appRootDirectory}\\log.txt');
 }
 
 late final PackageInfo packageInfo;
@@ -19,9 +17,20 @@ Future<void> initPackageInfo() async {
   logHandler.info('PackageInfo init: v${packageInfo.version}.${packageInfo.buildNumber}');
 }
 
+late final AssetHandler assetHandler;
+void initAssetHandler() {
+  assetHandler = AssetHandler.init();
+}
+
+late final AudioHandler audioHandler;
+void initAudioHandler() {
+  audioHandler = AudioHandler.init();
+}
+
 String changelog = """
   0.1.2.1 ({latest}):
   - Updated KLI Lib to 0.4
+  - Added 'feature' that allows user to manage background image and sounds
   
   0.1.2 ({c2fb3d0}):
   - Added Loading screen

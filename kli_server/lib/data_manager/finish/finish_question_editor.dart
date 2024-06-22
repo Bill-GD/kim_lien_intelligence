@@ -219,7 +219,7 @@ class _FinishQuestionEditorState extends State<FinishQuestionEditor> {
                         child: const Text('Chọn Video'),
                         onPressed: () async {
                           logHandler.info(
-                            '-- Selecting video at ${storageHandler.getRelative(storageHandler.mediaDir)}',
+                            '-- Selecting video at ${StorageHandler.getRelative(storageHandler.mediaDir)}',
                           );
                           final result = await FilePicker.platform.pickFiles(
                             dialogTitle: 'Select image',
@@ -229,7 +229,7 @@ class _FinishQuestionEditorState extends State<FinishQuestionEditor> {
 
                           if (result != null) {
                             final p = result.files.single.path!;
-                            newMediaPath = storageHandler.getRelative(p);
+                            newMediaPath = StorageHandler.getRelative(p);
                             await changeVideoSource(newMediaPath);
                             logHandler.info('Chose $newMediaPath');
                             setState(() {});

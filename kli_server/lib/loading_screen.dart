@@ -25,8 +25,23 @@ class _LoadingScreenState extends State<LoadingScreen> {
   void initializeApp() async {
     await initPackageInfo();
 
+    try {
+      setState(() => loadingText = 'Checking assets..');
+      initAssetHandler();
+      await Future.delayed(widget.delayMilli);
+    } on Exception catch (e) {
+      logHandler.error('Error initializing app: ${e.toString()}');
+      if (mounted) {
+        await assetErrorDialog(context, message: e.toString(), assetPath: AssetHandler.assetFolder);
+      }
+    }
+
+    setState(() => loadingText = 'Initializing audio handler...');
+    initAudioHandler();
+    await Future.delayed(widget.delayMilli);
+
     setState(() => loadingText = 'Loading background image...');
-    bgWidget = await getBackgroundWidget(useDefaultBackground);
+    bgWidget = await getBackgroundWidget(assetHandler);
     await Future.delayed(widget.delayMilli);
 
     setState(() => loadingText = 'Initializing storage handler...');

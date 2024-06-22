@@ -194,7 +194,7 @@ class _MatchEditorState extends State<MatchEditor> {
             ElevatedButton(
               child: const Text('Chọn ảnh'),
               onPressed: () async {
-                logHandler.info('Selecting image at ${storageHandler.getRelative(storageHandler.mediaDir)}',
+                logHandler.info('Selecting image at ${StorageHandler.getRelative(storageHandler.mediaDir)}',
                     d: 3);
                 final result = await FilePicker.platform.pickFiles(
                   dialogTitle: 'Select image',
@@ -205,7 +205,7 @@ class _MatchEditorState extends State<MatchEditor> {
                 if (result == null) return;
 
                 final p = result.files.single.path!;
-                imagePaths[index] = storageHandler.getRelative(p);
+                imagePaths[index] = StorageHandler.getRelative(p);
                 logHandler.info('Chose ${imagePaths[index]} for player ${index + 1}');
                 setState(() {});
               },

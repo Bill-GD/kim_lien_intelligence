@@ -285,7 +285,7 @@ class _AccelManagerState extends State<AccelManager> {
                 fontSize: fontSizeSmall,
                 onPressed: () async {
                   logHandler
-                      .info('Selecting image at ${storageHandler.getRelative(storageHandler.mediaDir)}');
+                      .info('Selecting image at ${StorageHandler.getRelative(storageHandler.mediaDir)}');
                   final result = await FilePicker.platform.pickFiles(
                     dialogTitle: 'Select Image',
                     initialDirectory: storageHandler.mediaDir.replaceAll('/', '\\'),
@@ -295,12 +295,12 @@ class _AccelManagerState extends State<AccelManager> {
                   if (result == null) return;
 
                   final p = result.files.single.path!;
-                  selectedQuestion.imagePaths.add(storageHandler.getRelative(p));
+                  selectedQuestion.imagePaths.add(StorageHandler.getRelative(p));
                   selectedQuestion.type =
                       AccelQuestion.getTypeFromImageCount(selectedQuestion.imagePaths.length);
                   if (selectedImageIndex < 0) selectedImageIndex = 0;
                   await DataManager.updateQuestions<AccelMatch>(selectedMatch);
-                  logHandler.info('Chose ${storageHandler.getRelative(p)}');
+                  logHandler.info('Chose ${StorageHandler.getRelative(p)}');
                   setState(() {});
                 },
               ),

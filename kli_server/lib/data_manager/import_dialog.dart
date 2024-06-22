@@ -69,7 +69,7 @@ class _ImportQuestionDialogState extends State<ImportQuestionDialog> with Ticker
                     disableDone = false;
 
                     final p = result.files.single.path!;
-                    chosenFile = storageHandler.getRelative(p);
+                    chosenFile = StorageHandler.getRelative(p);
                     logHandler.info('Import: $chosenFile');
 
                     data = await storageHandler.readFromExcel(
