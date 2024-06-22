@@ -61,7 +61,39 @@ class _FinishManagerState extends State<FinishManager> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: managerAppBar(context, 'Quản lý câu hỏi về đích'),
+      appBar: managerAppBar(
+        context,
+        'Quản lý câu hỏi về đích',
+        [
+          KLIIconButton(
+            const Icon(Icons.help_rounded),
+            enabledLabel: 'Help',
+            iconSize: 40,
+            onPressed: () => showHelpDialog(
+              context,
+              content: '''
+              Thông tin câu hỏi: Điểm, câu hỏi, đáp án, giải thích, video (nếu có).
+              
+              Chọn trận đấu: Chọn trận đấu để hiện các câu hỏi.
+
+              Lọc điểm: Lọc câu hỏi theo điểm.
+
+              Thêm câu hỏi: Thêm câu hỏi mới vào trận đấu đang chọn.
+              Nhập từ file: Nhập câu hỏi từ file Excel.
+              Xóa câu hỏi: Xóa toàn bộ câu hỏi của trận đang chọn.
+
+              Bấm vào câu hỏi để chỉnh sửa. Bấm vào nút xóa để xóa câu hỏi.
+              
+              Định dạng file Excel:
+              - Mỗi mức điểm ở 1 sheet (3 mức - 3 sheet)
+              - Cột 1: STT
+              - Cột 2: Câu hỏi
+              - Cột 3: Đáp án
+              - Cột 4: Giải thích''',
+            ),
+          )
+        ],
+      ),
       backgroundColor: Colors.transparent,
       body: isLoading
           ? const Center(child: CircularProgressIndicator())
@@ -159,8 +191,7 @@ class _FinishManagerState extends State<FinishManager> {
             onPressed: () async {
               await confirmDialog(
                 context,
-                message:
-                    'Bạn có muốn xóa tất cả câu hỏi về đích của trận: ${selectedMatch.matchName}?',
+                message: 'Bạn có muốn xóa tất cả câu hỏi về đích của trận: ${selectedMatch.matchName}?',
                 acceptLogMessage: 'Removed all finish questions for match: ${selectedMatch.matchName}',
                 onAccept: () async {
                   if (mounted) {

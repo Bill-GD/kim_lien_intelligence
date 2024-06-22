@@ -31,7 +31,7 @@ void initAssetHandler() {
   assetHandler = AssetHandler.init();
 }
 
-AppBar managerAppBar(BuildContext context, String title) {
+AppBar managerAppBar(BuildContext context, String title, [List<Widget>? actions]) {
   return AppBar(
     title: Text(title),
     backgroundColor: Colors.transparent,
@@ -40,6 +40,7 @@ AppBar managerAppBar(BuildContext context, String title) {
     titleTextStyle: const TextStyle(fontSize: fontSizeXL),
     centerTitle: true,
     toolbarHeight: kToolbarHeight * 1.1,
+    actions: actions,
   );
 }
 
@@ -108,6 +109,52 @@ SideNavigationBarTheme sideNavigationTheme(BuildContext context, [double height 
       showMainDivider: true,
       showFooterDivider: false,
     ),
+  );
+}
+
+Future<void> showHelpDialog(
+  BuildContext context, {
+  required String content,
+  bool centerContent = false,
+}) async {
+  await showGeneralDialog<void>(
+    context: context,
+    transitionDuration: 300.ms,
+    transitionBuilder: (_, anim1, __, child) {
+      return ScaleTransition(
+        scale: anim1.drive(CurveTween(curve: Curves.easeOutQuart)),
+        alignment: Alignment.center,
+        child: child,
+      );
+    },
+    barrierDismissible: true,
+    barrierLabel: '',
+    pageBuilder: (context, _, __) {
+      return AlertDialog(
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.all(Radius.circular(10)),
+        ),
+        title: const Text(
+          'Hướng dẫn',
+          textAlign: TextAlign.center,
+          style: TextStyle(fontSize: fontSizeMedium),
+        ),
+        alignment: Alignment.center,
+        contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+        content: Text(
+          dedent(content),
+          textAlign: centerContent ? TextAlign.center : null,
+          style: const TextStyle(fontSize: 16),
+        ),
+        actionsAlignment: MainAxisAlignment.spaceAround,
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('OK'),
+          ),
+        ],
+      );
+    },
   );
 }
 

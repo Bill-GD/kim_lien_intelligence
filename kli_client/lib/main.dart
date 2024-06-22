@@ -12,6 +12,7 @@ import 'loading_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
   initLogHandler();
   logHandler.info('Starting KLIClient');
 
@@ -25,6 +26,7 @@ void main() async {
     await windowManager.hide();
     await windowManager.ensureInitialized();
   }
+  windowManager.setAlwaysOnTop(true);
   await windowManager.waitUntilReadyToShow(null, () async {
     await windowManager.setFullScreen(true);
     await windowManager.show();

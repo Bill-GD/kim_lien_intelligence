@@ -21,7 +21,7 @@ class _SoundTestState extends State<SoundTest> {
         child: Column(
           children: [
             KLIButton(
-              'Open Asset Folder',
+              'Mở thư mục Assets',
               onPressed: () async {
                 await launchUrl(Uri.parse(AssetHandler.assetFolder));
               },

@@ -74,7 +74,7 @@ class _StartPageState extends State<StartPage> {
                 SideNavigationBarItem(label: 'Quản lý dữ liệu', icon: FontAwesomeIcons.database),
                 SideNavigationBarItem(label: 'Bắt đầu trận', icon: Icons.settings_rounded),
                 SideNavigationBarItem(label: 'Log', icon: FontAwesomeIcons.solidFile),
-                SideNavigationBarItem(label: 'Sound Test', icon: FontAwesomeIcons.music),
+                SideNavigationBarItem(label: 'Âm thanh', icon: FontAwesomeIcons.music),
               ],
               onTap: (newIndex) {
                 setState(() => sidebarIndex = newIndex);

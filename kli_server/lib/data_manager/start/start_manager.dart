@@ -63,7 +63,41 @@ class _StartQuestionManagerState extends State<StartQuestionManager> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: managerAppBar(context, 'Quản lý câu hỏi khởi động'),
+      appBar: managerAppBar(
+        context,
+        'Quản lý câu hỏi khởi động',
+        [
+          KLIIconButton(
+            const Icon(Icons.help_rounded),
+            enabledLabel: 'Help',
+            iconSize: 40,
+            onPressed: () => showHelpDialog(
+              context,
+              content: '''
+              Thông tin câu hỏi: Thứ tự thí sinh, lĩnh vực, nội dung, đáp án.
+
+              Chọn trận đấu: Chọn trận đấu để hiện các câu hỏi.
+              Lọc vị trí: Lọc câu hỏi theo vị trí của thí sinh.
+              Lọc lĩnh vực: Lọc câu hỏi theo lĩnh vực. Có thể kết hợp 2 chế độ lọc.
+
+              Thêm câu hỏi: Thêm câu hỏi mới cho trận đấu đang chọn.
+              Nhập từ file: Nhập câu hỏi từ file Excel.
+              Xóa câu hỏi: Xóa toàn bộ câu hỏi của trận đang chọn.
+
+              Bấm vào câu hỏi để chỉnh sửa. Xóa câu hỏi bằng cách bấm vào biểu tượng xóa.
+
+              Danh sách lĩnh vực: Toán, Vật lý, Hóa học, Sinh học, Văn học, Lịch sử, Địa lý, Tiếng Anh, Thể thao, Nghệ thuật, HBC.
+              
+              Định dạng file Excel:
+              - Mỗi sheet là câu hỏi 1 thí sinh (4 sheet)
+              - Cột 1: STT
+              - Cột 2: Lĩnh vực (cần đúng với danh sách lĩnh vực)
+              - Cột 3: Nội dung câu hỏi
+              - Cột 4: Đáp án''',
+            ),
+          )
+        ],
+      ),
       backgroundColor: Colors.transparent,
       body: isLoading
           ? const Center(child: CircularProgressIndicator())

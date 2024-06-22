@@ -16,13 +16,11 @@ class _HelpScreenState extends State<HelpScreen> {
   final helpController = TextEditingController();
   List<String> sectionNames = [
     'Tổng quan',
-    'Trận đấu',
-    'Khởi động',
-    'Chướng ngại vật',
-    'Tăng tốc',
-    'Về đích',
-    'Câu hỏi phụ',
-    'Server'
+    'Hình nền & âm thanh',
+    'Quản lý dữ liệu',
+    'Dữ liệu từ Excel',
+    'Kiểm tra dữ liệu',
+    'Tạo Server',
   ];
 
   @override
@@ -154,120 +152,74 @@ class _HelpScreenState extends State<HelpScreen> {
     '''
     Phần mềm chia thành 2 phần chính: phần quản lý trận đấu, câu hỏi và host & điều khiển trận đấu đang diễn ra.
 
-    Đây là hướng dẫn nhanh, để xem thông tin và hướng dẫn chi tiết, bấm nút mở file hướng dẫn phía trên.
+    Đây là phần hướng dẫn nhanh về cách sử dụng phần mềm.
 
-    Sau khi mở, phần mềm sẽ tự động tạo thư mục UserData (cùng thư mục cha với phần mềm). Thư mục UserData bao gồm 3 thư mục Media, NewData, SavedData và file "log.txt".
-      - UserData/Media: dùng để chứa các video, hình ảnh liên quan đến trận đấu (ảnh thí sinh, CNV, video về đích)
-      - UserData/NewData: dùng để chứa các file excel (.xlsx) để có thể nhập cùng lúc nhiều câu hỏi cho 1 trận đấu
-      - UserData/SavedData: nơi phần mềm lưu các trận đấu và câu hỏi
-      - log.txt: file lưu các thao tác, tác vụ phần mềm thực hiện, có thể xem file để phát hiện lỗi khi sử dụng phần mềm
+    Giao diện:
+    - Đây là màn hình chính, để chuyển sang các phần của phần mềm, chọn tab tương ứng ở bên trái.
+    - Ở các phần của phần mềm cũng có hướng dẫn cụ thể.
+    - Sử dụng nút mở thư mục chứa phần mềm để truy cập, chỉnh sửa dữ liệu phần mềm nếu cần. Các dữ liệu của phần mềm được lưu ở thư mục 'UserData'.
     
-    Đối với các file Excel, cần có định dạng nhất định, nếu sai thì dữ liệu sẽ không được đọc đúng cách, dẫn đến lỗi. Tổng quan như sau (định dạng chi tiết phụ thuộc vào các phần thi):
-      - Dữ liệu bắt đầu ở ô A1
-      - Các hàng không được gộp (merge) với nhau (mỗi câu hỏi chỉ được 1 hàng).
-      - Không có các hàng, cột trống ở giữa các câu hỏi (nếu có câu hỏi ở hàng 2 và 4 thì bắt buộc phải có ở hàng 3, nếu trống sẽ mất câu hỏi hàng 4)
-      - Các cột cần xếp đúng thứ tự như định dạng.
-    
-    Khi chọn việc nhập câu hỏi từ file Excel, phần mềm sẽ hiển thị giao diện xem trước nội dung sẽ nhập vào. Nếu nội dung khác dự kiến, hãy bấm 'Hủy', ngược lại bấm 'Hoàn tất'.
+    Quản lý dữ liệu:
+    - Mở phần quản lý dữ liệu ở bên trái.
+    - Có thể nhập câu hỏi mỗi phần thi từ file Excel hoặc thêm câu hỏi một cách thủ công. Câu hỏi lưu ở file Excel cần phải đúng định dạng.
 
-    Ở phần bên trái của trang chính (trang hiện tại) có danh sách các phần của phần mềm: hướng dẫn (trang hiện tại), quản lý dữ liệu, tạo server. Khi mở trang quản lý dữ liệu sẽ có nút để mở phần quản lý dữ liệu trên màn hình.
+    Bắt đầu trận:
+    - Mở phần host & điều khiển trận đấu ở bên trái.
+    - Trước khi bắt đầu trận, hệ thống cần xác nhận dữ liệu của trận đấu là đầy đủ (tránh lỗi khi chạy).
 
-    Trang quản lý dữ liệu cũng có danh sách nằm ở bên trái hiển thị các trang quản lý các phần thi khác nhau. Chuyển đến từng trang để quản lý phần tương ứng.''',
+    Hình nền & âm thanh:
+    - Phần mềm cần hình nền và âm thanh để có thể tiếp tục.
+    - Chọn mục âm thanh ở bên trái. Mở thư mục Assets để quản lý.''',
     '''
-    Quản lý trận đấu.
+    Hình nền và âm thanh của phần mềm được lưu ở 'UserData/Assets'.
     
-    Ở phía trên có 3 nút: thêm trận, sửa thông tin, xóa. Khi chưa có trận đấu nào thì chỉ có thể thêm trận.
-    Khi bấm thêm sẽ mở hộp thoại nhập thông tin trận đấu: tên (không được trùng), tên & ảnh thí sinh.
+    Có thể vào trang 'Âm thanh' để kiểm tra âm thanh có trong phần mềm. Ở phía trên có nút mở thư mục 'Assets' để đễ quản lý hình nền và âm thanh.
     
-    Sau khi có ít nhất 1 trận thì có thể sửa hoặc xóa. Để sửa và xóa cần phải chọn 1 trong các trận ở danh sách và bấm nút tương ứng.
-    Sau khi chọn 1 trận, danh sách các thí sinh sẽ hiện ở phía bên phải (không sửa được ở đây).
-    Giao diện sửa thông tin trận giống như khi thêm trận.
+    Vị trí hình nền và âm thanh sẽ dùng chung cho cả bên Server và Client. Tên và vị trí lưu cần chính xác, phần mềm sẽ báo lỗi nếu có sai sót.
     
-    Câu hỏi các phần thi lưu theo trận, nên sẽ cần phải tạo 1 trận đấu.''',
+    Nếu thiếu file (không bị nhầm chỗ) thì có thể tải bản âm thanh, hình nền mặc định.''',
     '''
-    Quản lý câu hỏi khởi động.
+    Ngoài hình nền và âm thanh, loại dữ liệu khác cần quản lý là dữ liệu trận đấu và câu hỏi.
     
-    Sau khi chọn trận thì có thể nhập câu hỏi: 1 câu (Add), dữ liệu Excel (Import). Khi thêm câu hỏi mới cần điền đủ thông tin: vị trí, lĩnh vực, câu hỏi, đáp án. Nhập xong chọn 'Done' để lưu.
-
-    Nút 'Remove' sẽ xóa toàn bộ câu hỏi của trận đấu đang chọn.
-
-    Để sửa câu hỏi thì cần bấm vào câu hỏi tương ứng ở trong danh sách. Để xóa câu hỏi thì bấm hình thùng rác ở phía bên phải của câu hỏi.
-
-    Để nhập câu hỏi từ Excel (xlsx) cần lưu ý:
-      - Chỉ lấy 4 sheet, mỗi sheet là danh sách câu hỏi của 1 thí sinh, theo thứ tự 1 - 4
-      - Hàng đầu tiên là tiêu đề cột (STT, Lĩnh vực, Câu hỏi, Đáp án), các hàng sau là câu hỏi
-      - Cột 1 là STT câu hỏi
-      - Cột 2 (B) là lĩnh vực: Toán, Vật lý, Hóa học, Sinh học, Văn học, Lịch sử, Địa lý, Tiếng Anh, Thể thao, Nghệ thuật, HBC
-      - Tên các lĩnh vực cần đúng như trên.
-      - Cột 3 (C) & 4 (D) là Câu hỏi & Đáp án.
-      - Các cột sau không đọc.
+    Dữ liệu trận đấu và câu hỏi được phần mềm lưu ở 'UserData/SavedData'. Không nên chỉnh sửa nếu không hiểu rõ cấu trúc dữ liệu, điều này có thể gây lỗi dữ liệu khi đọc.
     
-    Ngoài ra, sau khi có danh sách câu hỏi, có thể lọc danh sách câu hỏi theo vị trí thí sinh, lĩnh vực câu hỏi.''',
+    Các file hình ảnh, video được sử dụng cho các trận đấu lưu ở 'UserData/Media' để dễ quản lý.''',
     '''
-    Quản lý câu hỏi vượt chướng ngại vật.
+    Khi nhập dữ liệu câu hỏi, có thể thêm một cách thủ công hoặc nhập từ file Excel.
     
-    Cần chọn trận đấu để có thể xem, sửa, xóa câu hỏi. Nút 'Remove' sẽ xóa toàn bộ câu hỏi của trận đấu đang chọn.
-
-    Phía bên trái là các hàng ngang 1 - 4 và ô trung tâm (5). Bấm vào câu hỏi để sửa.
+    File Excel cần phải đúng định dạng, nếu không có thể gây ra lỗi khi hiển thị câu hỏi. Ngoài ra có thể xem trước dữ liệu đã đọc trước khi xác nhận nhập.
     
-    Bên phải là chướng ngại vật. Nhập CNV vào ô, bấm 'Save' để lưu. Có thể chọn ảnh cho CNV.
-
-    Để nhập câu hỏi từ Excel cần lưu ý:
-      - Chỉ lấy sheet đầu tiên.
-      - Hàng 1 là tiêu đề cột
-      - Hàng 2 - 6 là các câu hỏi, hàng 7 là CNV.
-      - Cột 1 là STT câu hỏi
-      - Cột 2 (B) là số kí tự
-      - Cột 3 (C) & 4 (D) là Câu hỏi & Đáp án.
-      - Cột 5 (E) là giải thích.
-      - Các cột sau không đọc.''',
+    Các file Excel nên lưu ở 'UserData/NewData' nếu muốn lưu trữ cùng với phần mềm.
+    
+    Định dạng chung của dữ liệu lưu trong file Excel:
+    - Bắt đầu từ ô A1.
+    - Không để trống hàng/cột khi vẫn còn dữ liệu. Khi phần mềm sẽ dừng đọc tại hàng trống. Mỗi phần thi có số lượng cột sẽ đọc khác nhau.
+    - Không gộp (merge) các hàng/cột với nhau. Chỉ có hàng/cột đầu tiên của nhóm đã gộp có dữ liệu và sẽ đọc thiếu dữ liệu.
+    - Dòng 1 là tiêu đề cột (STT, câu hỏi, đáp án...).
+    - Một số phần thì cũng có số lượng sheet nhất định. Nếu thừa sẽ không đọc tiếp.''',
     '''
-    Quản lý câu hỏi tăng tốc.
+    Trước khi bắt đầu trận đấu, hệ thống cần xác nhận trận đấu đã chọn có đủ dữ liệu hay không.
     
-    Cần chọn trận đấu để có thể xem, sửa, xóa câu hỏi. Nút 'Remove' sẽ xóa toàn bộ câu hỏi của trận đấu đang chọn.
+    Có thể kiểm tra dữ liệu trận đấu ở phần 'Bắt đầu trận'.
 
-    Phía bên trái là các câu hỏi 1 - 4. Bấm vào câu hỏi để xem hình ảnh, bấm tiếp nút Edit để sửa câu hỏi.
+    Sau khi kiểm tra, mỗi phần dữ liệu sẽ thông báo trạng thái: xanh nếu đủ, đỏ nếu thiếu. Có thể bấm vào từng mục để xem chi tiết kết quả kiểm tra.
     
-    Bên phải là các hình ảnh gợi ý. Bấm 'Add' để thêm hình ảnh vào cuối, 'Remove' để xóa hình ảnh hiện tại. Sử dụng mũi tên phía dưới để chuyển ảnh.
-    Loại câu hỏi sẽ được xác định tự động dựa vào số hình ảnh. Câu hỏi chưa có hình ảnh là 'Không xác định', 1 ảnh là 'IQ', 2 ảnh là 'Sắp xếp', 3+ ảnh là 'Chuỗi hình ảnh'.
-
-    Để nhập câu hỏi từ Excel cần lưu ý:
-      - Chỉ lấy sheet đầu tiên.
-      - Hàng đầu tiên là tiêu đề cột, các hàng sau là câu hỏi
-      - Cột 1 là STT câu hỏi
-      - Cột 2 (B) & 3 (C) là Câu hỏi & Đáp án.
-      - Cột 4 (D) là giải thích.
-      - Các cột sau không đọc.''',
+    Tiêu chí kiểm tra (22-06-2024):
+    - Trận đấu: Cần đủ thông tin 4 thí sinh
+    - Khởi động: Mỗi thí sinh cần có ít nhất 20 câu hỏi và có ít nhất 1 câu hỏi ở tất cả lĩnh vực
+    - Chướng ngại vật: Cần đủ từ khóa, hình ảnh, 5 câu hỏi, ảnh cần được lưu tại vị trí đã nhập
+    - Tăng tốc: Có ít nhất 1 ảnh, có ảnh tại vị trí đã nhập, đủ 4 câu hỏi
+    - Về đích: Ít nhất 12 câu mỗi mức điểm, các video nếu 
+    - Câu hỏi phụ: Có ít nhất 1 câu hỏi''',
     '''
-    Quản lý câu hỏi về đích.
+    Chỉ có thể tạo Server nếu có ít nhất 1 trận đấu vả có đủ dữ liệu cần thiết.
     
-    Cần chọn trận đấu để có thể xem, sửa, xóa câu hỏi. Nút 'Remove' sẽ xóa toàn bộ câu hỏi của trận đấu đang chọn.
+    Server sử dụng IP local và cho phép tối đa 7 máy khác kết nối với các vai trò khác nhau.
     
-    Sau khi chọn trận thì có thể nhập câu hỏi: 1 câu (Add), dữ liệu Excel (Import). Khi thêm câu hỏi mới cần điền đủ thông tin: điểm, câu hỏi, đáp án. Ngoài ra có thể thêm giải thích hoặc video. Nhập xong chọn 'Done' để lưu.
-    Để sửa hãy bấm vào câu hỏi.
+    Trên màn hình sẽ hiện địa chỉ IP (local & public) và danh sách máy kết nối.
     
-    Để nhập câu hỏi từ Excel cần lưu ý:
-      - Chỉ lấy 3 sheet, thứ tự sheet: 10, 20, 30 điểm
-      - Hàng đầu tiên là tiêu đề cột, các hàng sau là câu hỏi
-      - Cột 1 là STT câu hỏi
-      - Cột 2 (B) & 3 (C) là Câu hỏi & Đáp án.
-      - Cột 4 (D) là giải thích.
-      - Các cột sau không đọc.''',
-    '''
-    Quản lý câu hỏi phụ.
+    Có thể mở/đóng Server local. Các máy Client cần nhập địa chỉ IP local để kết nối. Nếu thoát trang thiết lập Server, Server luôn đóng và mọi Client sẽ bị ngắt.
     
-    Cần chọn trận đấu để có thể xem, sửa, xóa câu hỏi. Nút 'Remove' sẽ xóa toàn bộ câu hỏi của trận đấu đang chọn.
-
-    Sau khi chọn trận thì có thể nhập câu hỏi: 1 câu (Add), dữ liệu Excel (Import). Khi thêm câu hỏi mới cần điền đủ thông tin: câu hỏi, đáp án. Nhập xong chọn 'Done' để lưu.
-    
-    Để sửa hãy bấm vào câu hỏi.
-
-    Để nhập câu hỏi từ Excel cần lưu ý:
-      - Chỉ lấy sheet đầu tiên.
-      - Hàng đầu tiên là tiêu đề cột, các hàng sau là câu hỏi
-      - Cột 1 là STT câu hỏi
-      - Cột 2 (B) & 3 (C) là Câu hỏi & Đáp án.
-      - Các cột sau không đọc.''',
-    '''Phần Server chưa được hoàn thành'''
+    Chỉ sau khi mở Server và cả 4 thí sinh đã kết nối mới có thể bắt đầu trận đấu.''',
   ];
 }

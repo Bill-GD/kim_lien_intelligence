@@ -180,7 +180,13 @@ class _MatchDataCheckerState extends State<MatchDataChecker> {
         .map((e) => KLIMatch.fromJson(e))
         .firstWhere((e) => e.name == matchNames[selectedMatchIndex]);
 
-    if (!match.playerList.every((e) => e != null)) errorList.add('Không đủ thông tin 4 thí sinh');
+    if (!match.playerList.every((e) => e != null)) {
+      errorList.add('Không đủ thông tin 4 thí sinh');
+    } else if (!match.playerList.every(
+      (e) => File('${storageHandler.parentFolder}\\${e!.imagePath}').existsSync(),
+    )) {
+      errorList.add('Không tìm thấy ảnh thí sinh');
+    }
 
     return (errorList.isEmpty, errorList);
   }
@@ -233,6 +239,9 @@ class _MatchDataCheckerState extends State<MatchDataChecker> {
 
       if (match.keyword.isEmpty) errorList.add('Không có đáp án CNV');
       if (match.imagePath.isEmpty) errorList.add('Không có ảnh CNV');
+      if (!File('${storageHandler.parentFolder}\\${match.imagePath}').existsSync()) {
+        errorList.add('Không tìm thấy ảnh CNV');
+      }
       if (match.hintQuestions.length < 5) errorList.add('Không đủ số câu hỏi');
     } on StateError {
       return (false, ['Chưa có dữ liệu']);
@@ -283,6 +292,11 @@ class _MatchDataCheckerState extends State<MatchDataChecker> {
         final qCount = match.questions.where((e) => e.point == i * 10).length;
         if (qCount < 12) {
           errorList.add('Mức điểm ${i * 10}: $qCount/12');
+        }
+      }
+      for (final q in match.questions) {
+        if (q.mediaPath.isNotEmpty && !File('${storageHandler.parentFolder}\\${q.mediaPath}').existsSync()) {
+          errorList.add('Không tìm thấy ảnh ${q.mediaPath}');
         }
       }
     } on StateError {

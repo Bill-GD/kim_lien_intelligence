@@ -48,7 +48,36 @@ class _ExtraManagerState extends State<ExtraManager> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: managerAppBar(context, 'Quản lý câu hỏi phụ'),
+      appBar: managerAppBar(
+        context,
+        'Quản lý câu hỏi phụ',
+        [
+          KLIIconButton(
+            const Icon(Icons.help_rounded),
+            enabledLabel: 'Help',
+            iconSize: 40,
+            onPressed: () => showHelpDialog(
+              context,
+              content: '''
+              Thông tin câu hỏi: Nội dung, đáp án.
+              
+              Chọn trận đấu: Chọn trận đấu để hiện các câu hỏi.
+
+              Thêm câu hỏi: Thêm câu hỏi mới cho trận đấu đang chọn.
+              Nhập từ file: Nhập câu hỏi từ file Excel.
+              Xóa câu hỏi: Xóa toàn bộ câu hỏi của trận đang chọn.
+
+              Bấm vào câu hỏi để chỉnh sửa. Bấm vào nút xóa để xóa câu hỏi.
+              
+              Định dạng file Excel:
+              - Chỉ lấy 1 sheet
+              - Cột 1: STT
+              - Cột 2: Câu hỏi
+              - Cột 3: Đáp án''',
+            ),
+          )
+        ],
+      ),
       backgroundColor: Colors.transparent,
       body: isLoading
           ? const Center(child: CircularProgressIndicator())

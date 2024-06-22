@@ -43,7 +43,28 @@ class _MatchManagerState extends State<MatchManager> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: managerAppBar(context, 'Quản lý trận đấu'),
+      appBar: managerAppBar(
+        context,
+        'Quản lý trận đấu',
+        [
+          KLIIconButton(
+            const Icon(Icons.help_rounded),
+            enabledLabel: 'Help',
+            iconSize: 40,
+            onPressed: () => showHelpDialog(
+              context,
+              content: '''
+              Thông tin trận đấu: tên trận, tên thí sinh, ảnh thí sinh.
+              
+              Khi chọn trận, các thí sinh được hiển thị ở bên phải.
+              
+              Thêm trận: Thêm trận đấu mới vào danh sách trận đấu.
+              Sửa trận: Sửa thông tin trận đấu đã chọn.
+              Xóa trận: Xóa trận đấu và tất cả câu hỏi của trận.''',
+            ),
+          )
+        ],
+      ),
       backgroundColor: Colors.transparent,
       body: isLoading
           ? const Center(child: CircularProgressIndicator())

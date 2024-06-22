@@ -71,7 +71,40 @@ class _AccelManagerState extends State<AccelManager> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: managerAppBar(context, 'Quản lý câu hỏi tăng tốc'),
+      appBar: managerAppBar(
+        context,
+        'Quản lý câu hỏi tăng tốc',
+        [
+          KLIIconButton(
+            const Icon(Icons.help_rounded),
+            enabledLabel: 'Help',
+            iconSize: 40,
+            onPressed: () => showHelpDialog(
+              context,
+              content: '''
+              Thông tin câu hỏi: câu hỏi, câu trả lời, giải thích, ảnh (ít nhất 1).
+              
+              Chọn trận đấu: Chọn trận đấu để hiện các câu hỏi.
+
+              Sửa câu hỏi: Sửa câu hỏi đang chọn.
+              Nhập từ file: Nhập câu hỏi từ file Excel.
+              Xóa câu hỏi: Xóa toàn bộ câu hỏi của trận đang chọn.
+              
+              Thêm ảnh: Thêm ảnh của câu hỏi đang chọn. Ảnh được thêm sau được lưu cuối.
+              Xóa ảnh: Xóa ảnh đang xem của câu hỏi đang chọn.
+              Loại câu hỏi được xác định bằng số lượng ảnh. 1 ảnh: IQ, 2 ảnh: Sắp xếp, 3+ ảnh: chuỗi hình ảnh.
+              Có thể xem các ảnh bằng phím mũi tên.
+              
+              Định dạng file Excel:
+              - Chỉ lấy câu hỏi ở sheet đầu
+              - Cột 1: STT
+              - Cột 2: Câu hỏi
+              - Cột 3: Đáp án
+              - Cột 4: Giải thích''',
+            ),
+          )
+        ],
+      ),
       backgroundColor: Colors.transparent,
       body: isLoading
           ? const Center(child: CircularProgressIndicator())

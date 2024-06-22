@@ -80,7 +80,41 @@ class _ObstacleManagerState extends State<ObstacleManager> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: managerAppBar(context, 'Quản lý câu hỏi chướng ngại vật'),
+      appBar: managerAppBar(
+        context,
+        'Quản lý câu hỏi chướng ngại vật',
+        [
+          KLIIconButton(
+            const Icon(Icons.help_rounded),
+            enabledLabel: 'Help',
+            iconSize: 40,
+            onPressed: () => showHelpDialog(
+              context,
+              content: '''
+              Thông tin chướng ngại vật: ảnh & từ khoá.
+              Thông tin câu hỏi: nội dung, đáp án. Số ký tự là các ký tự khác dấu cách, được tính tự động.
+              
+              Chọn trận đấu: Chọn trận đấu để hiện các câu hỏi.
+
+              Nhập từ file: Nhập câu hỏi từ file Excel.
+              Xóa câu hỏi: Xóa toàn bộ câu hỏi của trận đang chọn.
+        
+              Bấm vào câu hỏi để sửa câu hỏi.
+              Thay đổi chướng ngại vật và chọn ảnh chướng ngại vật ở bên phải.
+              
+              Định dạng file Excel:
+              - Chỉ lấy câu hỏi ở sheet đầu tiên
+              - Cột 1: STT
+              - Cột 2: Số ký tự
+              - Cột 3: Nội dung câu hỏi
+              - Cột 4: Đáp án
+              - Cột 5: Giải thích
+              - Hàng 2-6: Câu hỏi hàng ngang & trung tâm
+              - Hàng 7: Chướng ngại vật''',
+            ),
+          )
+        ],
+      ),
       backgroundColor: Colors.transparent,
       body: isLoading
           ? const Center(child: CircularProgressIndicator())
