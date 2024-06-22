@@ -166,7 +166,7 @@ class _ServerSetupState extends State<ServerSetup> {
           disabledLabel: !KLIServer.started ? 'No server exist' : 'Not enough player',
           enableCondition: KLIServer.started && KLIServer.allPlayerConnected,
           onPressed: () {
-            MatchState.instance(widget.matchName);
+            MatchState.instantiate(widget.matchName);
             setState(() {});
           },
         ),

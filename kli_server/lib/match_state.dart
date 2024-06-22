@@ -4,23 +4,23 @@ import 'package:kli_lib/kli_lib.dart';
 
 import 'global.dart';
 
-/// Save a state of the current match. Contains match name, current scores, current section, and current question.<br>
+/// A static class to save a state of the current match. Contains match name, current scores, current section, and current question.<br>
 /// Server will select required info to send to clients when needed.
 class MatchState {
   static MatchState? _inst;
 
-  /// Get the current match state instance.<br>
-  /// Takes optional `matchName`, will be required if no instance exists and will throw.
-  static MatchState instance([String? matchName]) {
-    _inst ??= MatchState._(matchName);
+  /// Get the current match state instance. Will throw if not exists.
+  static MatchState get instance {
+    assert(_inst != null, 'MatchState not initialized');
     return _inst!;
   }
 
+  /// Takes `matchName`. If initialized, does nothing.
+  static void instantiate(String matchName) => _inst ??= MatchState._(matchName);
+
   static void reset() => _inst = null;
 
-  MatchState._(String? matchName) {
-    if (matchName == null) throw Exception('Match name is required');
-
+  MatchState._(String matchName) {
     storageHandler.readFromFile(storageHandler.matchSaveFile).then((value) {
       if (value.isEmpty) return;
 
@@ -31,33 +31,24 @@ class MatchState {
     });
   }
 
-  static void nextSection() {
-    if (_inst == null) throw Exception('Match _inst not initialized');
+  void nextSection() {
+    if (_inst == null) throw Exception('Match state not initialized');
 
-    if (_inst!.currentSection == MatchSection.extra) return;
+    if (currentSection == MatchSection.extra) return;
 
-    _inst!.currentSection = MatchSection.values[(_inst!.currentSection.index + 1)];
-    _inst!.startQuestion = null;
-    _inst!.obstacleQuestion = null;
-    _inst!.accelQuestion = null;
-    _inst!.finishQuestion = null;
-    _inst!.extraQuestion = null;
+    currentSection = MatchSection.values[(currentSection.index + 1)];
+    currentQuestion = null;
   }
 
+  /// When unlocking part, select random 0..3, only unlock if not already unlocked, then set to true
   static void setUnlockedPart(int index) => _inst?.unlockedObstacleParts[index] = true;
 
-  // Overall
+  // These are instance variables
   late final KLIMatch match;
   final scores = <int>[0, 0, 0, 0];
   late final List<KLIPlayer> players;
   MatchSection currentSection = MatchSection.none;
+  BaseQuestion? currentQuestion;
 
-  StartQuestion? startQuestion;
-  ObstacleQuestion? obstacleQuestion;
-  AccelQuestion? accelQuestion;
-  FinishQuestion? finishQuestion;
-  ExtraQuestion? extraQuestion;
-
-  /// When unlocking part, select random 0..3, only unlock if not already unlocked, then set to true
   final unlockedObstacleParts = List<bool>.filled(5, false);
 }
