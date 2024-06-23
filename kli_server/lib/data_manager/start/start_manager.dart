@@ -26,10 +26,10 @@ class _StartQuestionManagerState extends State<StartQuestionManager> {
     logHandler.info('Opened Start Manager', d: 1);
     logHandler.depth = 2;
     selectedMatch = StartMatch.empty();
-    DataManager.getMatchNames().then((value) async {
+    DataManager().getMatchNames().then((value) async {
       if (value.isNotEmpty) matchNames = value;
       setState(() => isLoading = false);
-      await DataManager.removeDeletedMatchQuestions<StartMatch>();
+      await DataManager().removeDeletedMatchQuestions<StartMatch>();
     });
   }
 
@@ -64,7 +64,7 @@ class _StartQuestionManagerState extends State<StartQuestionManager> {
       appBar: managerAppBar(
         context,
         'Quản lý câu hỏi khởi động',
-        [
+        actions: [
           KLIIconButton(
             const Icon(Icons.help_rounded),
             enabledLabel: 'Help',
@@ -118,7 +118,7 @@ class _StartQuestionManagerState extends State<StartQuestionManager> {
           matchSelector(matchNames, (value) async {
             logHandler.info('Selected match: $value');
             hasSelectedMatch = value != null;
-            selectedMatch = await DataManager.getMatchQuestions<StartMatch>(value!);
+            selectedMatch = await DataManager().getMatchQuestions<StartMatch>(value!);
             setState(() {});
           }),
           // sort player pos
@@ -175,7 +175,7 @@ class _StartQuestionManagerState extends State<StartQuestionManager> {
               if (ret == null) return;
 
               selectedMatch.questions.add(ret);
-              await DataManager.updateQuestions<StartMatch>(selectedMatch);
+              await DataManager().updateQuestions<StartMatch>(selectedMatch);
               setState(() {});
             },
           ),
@@ -201,7 +201,7 @@ class _StartQuestionManagerState extends State<StartQuestionManager> {
               if (data == null) return;
 
               await getNewQuestion(data);
-              await DataManager.saveNewQuestions<StartMatch>(selectedMatch);
+              await DataManager().saveNewQuestions<StartMatch>(selectedMatch);
 
               setState(() {});
             },
@@ -219,7 +219,7 @@ class _StartQuestionManagerState extends State<StartQuestionManager> {
                 onAccept: () async {
                   if (mounted) showToastMessage(context, 'Đã xóa (trận: ${selectedMatch.matchName})');
 
-                  await DataManager.removeQuestionsOfMatch<StartMatch>(selectedMatch);
+                  await DataManager().removeQuestionsOfMatch<StartMatch>(selectedMatch);
                   selectedMatch = StartMatch.empty(selectedMatch.matchName);
                   setState(() {});
                 },
@@ -282,7 +282,7 @@ class _StartQuestionManagerState extends State<StartQuestionManager> {
                                 acceptLogMessage: 'Removed start question: pos=${q.pos}, idx=$index',
                                 onAccept: () async {
                                   selectedMatch.questions.removeWhere((e) => e == q);
-                                  await DataManager.updateQuestions<StartMatch>(selectedMatch);
+                                  await DataManager().updateQuestions<StartMatch>(selectedMatch);
                                   setState(() {});
                                 },
                               );
@@ -303,7 +303,7 @@ class _StartQuestionManagerState extends State<StartQuestionManager> {
                         if (ret == null) return;
 
                         selectedMatch.questions[selectedMatch.questions.indexOf(q)] = ret;
-                        await DataManager.updateQuestions<StartMatch>(selectedMatch);
+                        await DataManager().updateQuestions<StartMatch>(selectedMatch);
 
                         setState(() {});
                       },

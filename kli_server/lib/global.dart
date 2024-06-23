@@ -31,13 +31,17 @@ void initAssetHandler() {
   assetHandler = AssetHandler.init();
 }
 
-AppBar managerAppBar(BuildContext context, String title, [List<Widget>? actions]) {
+AppBar managerAppBar(
+  BuildContext context,
+  String title, {
+  List<Widget>? actions,
+  final double fontSize = fontSizeXL,
+}) {
   return AppBar(
     title: Text(title),
     backgroundColor: Colors.transparent,
-    surfaceTintColor: Theme.of(context).colorScheme.background,
     automaticallyImplyLeading: false,
-    titleTextStyle: const TextStyle(fontSize: fontSizeXL),
+    titleTextStyle: TextStyle(fontSize: fontSize),
     centerTitle: true,
     toolbarHeight: kToolbarHeight * 1.1,
     actions: actions,
@@ -159,7 +163,7 @@ Future<void> showHelpDialog(
 }
 
 String changelog = """
-  0.4.0 ({latest}):
+  0.4 ({latest}):
   - Can now see match overview: name, players, scores, current section
 
   0.3.2.1 ({de8a02f}):

@@ -46,7 +46,7 @@ class _MatchManagerState extends State<MatchManager> {
       appBar: managerAppBar(
         context,
         'Quản lý trận đấu',
-        [
+        actions: [
           KLIIconButton(
             const Icon(Icons.help_rounded),
             enabledLabel: 'Help',
@@ -137,7 +137,7 @@ class _MatchManagerState extends State<MatchManager> {
                 matches[currentMatchIndex] = newMatch;
                 await overwriteSave();
                 if (changedName) {
-                  await DataManager.updateAllQuestionMatchName(oldName: oldName, newName: newMatch.name);
+                  await DataManager().updateAllQuestionMatchName(oldName: oldName, newName: newMatch.name);
                 }
                 setState(() {});
               }

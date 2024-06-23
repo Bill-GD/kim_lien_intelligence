@@ -36,7 +36,7 @@ class _MatchDataCheckerState extends State<MatchDataChecker> {
     super.initState();
     logHandler.info('Opening Match Data Checker');
     logHandler.depth = 1;
-    DataManager.getMatchNames().then((value) async {
+    DataManager().getMatchNames().then((value) async {
       if (value.isEmpty) showToastMessage(context, 'No match found');
       if (value.isNotEmpty) matchNames = value;
       setState(() => isLoading = false);
@@ -194,7 +194,7 @@ class _MatchDataCheckerState extends State<MatchDataChecker> {
   Future<(bool, List<String>)> checkStartQuestions() async {
     final errorList = <String>[];
 
-    final saved = await DataManager.getAllSavedQuestions<StartMatch>();
+    final saved = await DataManager().getAllSavedQuestions<StartMatch>();
     if (saved.isEmpty) return (false, ['Chưa có dữ liệu']);
 
     try {
@@ -231,7 +231,7 @@ class _MatchDataCheckerState extends State<MatchDataChecker> {
   Future<(bool, List<String>)> checkObstacleQuestions() async {
     final errorList = <String>[];
 
-    final saved = await DataManager.getAllSavedQuestions<ObstacleMatch>();
+    final saved = await DataManager().getAllSavedQuestions<ObstacleMatch>();
     if (saved.isEmpty) return (false, ['Chưa có dữ liệu']);
 
     try {
@@ -253,7 +253,7 @@ class _MatchDataCheckerState extends State<MatchDataChecker> {
   Future<(bool, List<String>)> checkAccelQuestions() async {
     final errorList = <String>[];
 
-    final saved = await DataManager.getAllSavedQuestions<AccelMatch>();
+    final saved = await DataManager().getAllSavedQuestions<AccelMatch>();
     if (saved.isEmpty) return (false, ['Chưa có dữ liệu']);
 
     try {
@@ -284,7 +284,7 @@ class _MatchDataCheckerState extends State<MatchDataChecker> {
   Future<(bool, List<String>)> checkFinishQuestions() async {
     final errorList = <String>[];
 
-    final saved = await DataManager.getAllSavedQuestions<FinishMatch>();
+    final saved = await DataManager().getAllSavedQuestions<FinishMatch>();
     if (saved.isEmpty) return (false, ['Chưa có dữ liệu']);
 
     try {
@@ -311,7 +311,7 @@ class _MatchDataCheckerState extends State<MatchDataChecker> {
   Future<(bool, List<String>)> checkExtraQuestions() async {
     final errorList = <String>[];
 
-    final saved = await DataManager.getAllSavedQuestions<ExtraMatch>();
+    final saved = await DataManager().getAllSavedQuestions<ExtraMatch>();
     if (saved.isEmpty) return (false, ['Chưa có dữ liệu']);
 
     try {

@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:kli_lib/kli_lib.dart';
 
+import '../data_manager/data_manager.dart';
 import '../global.dart';
 
 class ServerSetup extends StatefulWidget {
@@ -48,7 +49,6 @@ class _ServerSetupState extends State<ServerSetup> {
 
   Future<void> popHandler() async {
     if (!KLIServer.started) {
-      MatchState.reset();
       logHandler.info('Leaving Server Setup page...');
       Navigator.pop(context);
       return;
@@ -156,6 +156,7 @@ class _ServerSetupState extends State<ServerSetup> {
           disabledLabel: 'No server exist',
           enableCondition: KLIServer.started,
           onPressed: () async {
+            MatchState.reset();
             await KLIServer.stop();
             setState(() {});
             if (mounted) {
@@ -168,7 +169,7 @@ class _ServerSetupState extends State<ServerSetup> {
           enableCondition: KLIServer.started && (kDebugMode || KLIServer.allPlayerConnected),
           disabledLabel: !KLIServer.started ? 'No server exist' : 'Not enough player',
           onPressed: () async {
-            await MatchState.instantiate(widget.matchName, storageHandler);
+            await MatchState.instantiate(widget.matchName, storageHandler, DataManager());
             if (mounted) {
               Navigator.of(context).push(
                 MaterialPageRoute<void>(

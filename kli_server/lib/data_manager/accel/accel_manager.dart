@@ -30,10 +30,10 @@ class _AccelManagerState extends State<AccelManager> {
     logHandler.depth = 2;
     selectedMatch = AccelMatch.empty();
     selectedQuestion = AccelQuestion.empty();
-    DataManager.getMatchNames().then((value) async {
+    DataManager().getMatchNames().then((value) async {
       if (value.isNotEmpty) matchNames = value;
       setState(() => isLoading = false);
-      await DataManager.removeDeletedMatchQuestions<AccelMatch>();
+      await DataManager().removeDeletedMatchQuestions<AccelMatch>();
     });
   }
 
@@ -74,7 +74,7 @@ class _AccelManagerState extends State<AccelManager> {
       appBar: managerAppBar(
         context,
         'Quản lý câu hỏi tăng tốc',
-        [
+        actions: [
           KLIIconButton(
             const Icon(Icons.help_rounded),
             enabledLabel: 'Help',
@@ -127,7 +127,7 @@ class _AccelManagerState extends State<AccelManager> {
           matchSelector(matchNames, (value) async {
             logHandler.info('Selected match: $value');
             hasSelectedMatch = value != null;
-            selectedMatch = await DataManager.getMatchQuestions<AccelMatch>(value!);
+            selectedMatch = await DataManager().getMatchQuestions<AccelMatch>(value!);
             selectedQuestionIndex = -1;
             selectedImageIndex = -1;
             setState(() {});
@@ -144,7 +144,7 @@ class _AccelManagerState extends State<AccelManager> {
               ));
               if (newQ != null) {
                 selectedMatch.questions[selectedQuestionIndex] = newQ;
-                await DataManager.updateQuestions<AccelMatch>(selectedMatch);
+                await DataManager().updateQuestions<AccelMatch>(selectedMatch);
               }
               setState(() {});
             },
@@ -171,7 +171,7 @@ class _AccelManagerState extends State<AccelManager> {
               if (data == null) return;
 
               await getNewQuestion(data);
-              await DataManager.saveNewQuestions<AccelMatch>(selectedMatch);
+              await DataManager().saveNewQuestions<AccelMatch>(selectedMatch);
               selectedQuestionIndex = -1;
               selectedImageIndex = -1;
               setState(() {});
@@ -191,7 +191,7 @@ class _AccelManagerState extends State<AccelManager> {
                   if (mounted) {
                     showToastMessage(context, 'Đã xóa (match: ${selectedMatch.matchName})');
                   }
-                  await DataManager.removeQuestionsOfMatch<AccelMatch>(selectedMatch);
+                  await DataManager().removeQuestionsOfMatch<AccelMatch>(selectedMatch);
                   selectedMatch = AccelMatch(
                     matchName: selectedMatch.matchName,
                     questions: List.filled(4, null),
@@ -279,7 +279,7 @@ class _AccelManagerState extends State<AccelManager> {
                       logHandler.info('Selected question is null, creating new question');
                       selectedQuestion = AccelQuestion.empty();
                       selectedMatch.questions[index] = selectedQuestion;
-                      await DataManager.updateQuestions<AccelMatch>(selectedMatch);
+                      await DataManager().updateQuestions<AccelMatch>(selectedMatch);
                     } else {
                       selectedQuestion = q;
                     }
@@ -333,7 +333,7 @@ class _AccelManagerState extends State<AccelManager> {
                   selectedQuestion.type =
                       AccelQuestion.getTypeFromImageCount(selectedQuestion.imagePaths.length);
                   if (selectedImageIndex < 0) selectedImageIndex = 0;
-                  await DataManager.updateQuestions<AccelMatch>(selectedMatch);
+                  await DataManager().updateQuestions<AccelMatch>(selectedMatch);
                   logHandler.info('Chose ${StorageHandler.getRelative(p)}');
                   setState(() {});
                 },
@@ -352,7 +352,7 @@ class _AccelManagerState extends State<AccelManager> {
                   }
                   selectedQuestion.type =
                       AccelQuestion.getTypeFromImageCount(selectedQuestion.imagePaths.length);
-                  await DataManager.updateQuestions<AccelMatch>(selectedMatch);
+                  await DataManager().updateQuestions<AccelMatch>(selectedMatch);
                   setState(() {});
                 },
               ),

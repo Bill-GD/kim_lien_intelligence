@@ -26,7 +26,10 @@ void initAudioHandler() {
 }
 
 String changelog = """
-  0.1.2.1 ({latest}):
+  0.2 ({latest}):
+  - 
+
+  0.1.2.1 ({8b223b0}):
   - Updated KLI Lib to 0.4
   - Added 'feature' that allows user to manage background image and sounds
   
