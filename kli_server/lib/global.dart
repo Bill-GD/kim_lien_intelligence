@@ -3,7 +3,7 @@ import 'package:kli_lib/kli_lib.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:side_navigation/side_navigation.dart';
 
-DecorationImage? bgWidget;
+late final DecorationImage bgWidget;
 
 late final LogHandler logHandler;
 void initLogHandler() {
@@ -159,11 +159,15 @@ Future<void> showHelpDialog(
 }
 
 String changelog = """
-  0.3.2.1 ({latest}):
+  0.4.0 ({latest}):
+  - Can now see match overview: name, players, scores, current section
+
+  0.3.2.1 ({de8a02f}):
   - Updated KLI Lib to 0.4
   - Extracted repeating manager methods to generics
   - Added sound test page
   - Added 'feature' that allows user to manage background image and sounds
+  - Added help menu to Data Managers
   
   0.3.2 ({c2fb3d0}):
   - Added Loading screen

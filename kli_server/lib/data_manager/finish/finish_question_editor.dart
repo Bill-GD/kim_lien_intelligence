@@ -67,7 +67,7 @@ class _FinishQuestionEditorState extends State<FinishQuestionEditor> {
   }
 
   Future<void> changeVideoSource(String relativePath) async {
-    fullVideoPath = '${storageHandler.parentFolder}\\$relativePath';
+    fullVideoPath = '${StorageHandler.appRootDirectory}\\$relativePath';
     final f = File(fullVideoPath);
 
     if (!f.existsSync()) return;

@@ -156,7 +156,7 @@ class _MatchEditorState extends State<MatchEditor> {
     bool imageFound = false;
     String fullPath = '';
     if (imagePaths[index].isNotEmpty) {
-      fullPath = '${storageHandler.parentFolder}\\${imagePaths[index]}';
+      fullPath = '${StorageHandler.appRootDirectory}\\${imagePaths[index]}';
       imageFound = File(fullPath).existsSync();
     }
     return Expanded(

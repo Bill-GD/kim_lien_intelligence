@@ -298,7 +298,8 @@ class _AccelManagerState extends State<AccelManager> {
     bool imageFound = false;
     String fullImagePath = '';
     if (selectedQuestion.imagePaths.isNotEmpty && selectedImageIndex >= 0) {
-      fullImagePath = '${storageHandler.parentFolder}\\${selectedQuestion.imagePaths[selectedImageIndex]}';
+      fullImagePath =
+          '${StorageHandler.appRootDirectory}\\${selectedQuestion.imagePaths[selectedImageIndex]}';
       imageFound = File(fullImagePath).existsSync();
     }
 

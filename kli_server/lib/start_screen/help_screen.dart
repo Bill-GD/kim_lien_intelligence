@@ -42,28 +42,27 @@ class _HelpScreenState extends State<HelpScreen> {
     return Scaffold(
       backgroundColor: Colors.transparent,
       body: Column(
-        // mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        mainAxisSize: MainAxisSize.min,
         children: [
-          const SizedBox(height: 100),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              KLIButton(
-                'Mở thư mục chứa phần mềm',
-                onPressed: () async {
-                  logHandler.info('Opened parent folder: ${storageHandler.parentFolder}');
-                  await launchUrl(Uri.parse(storageHandler.parentFolder));
-                },
-              ),
-              const KLIButton('Mở file thông tin chi tiết'),
-            ],
+          Padding(
+            padding: const EdgeInsets.only(top: 100, bottom: 50),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                KLIButton(
+                  'Mở thư mục chứa phần mềm',
+                  onPressed: () async {
+                    logHandler.info('Opened parent folder: ${StorageHandler.appRootDirectory}');
+                    await launchUrl(Uri.parse(StorageHandler.appRootDirectory));
+                  },
+                ),
+                const KLIButton('Mở file thông tin chi tiết'),
+              ],
+            ),
           ),
-          const SizedBox(height: 50),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            crossAxisAlignment: CrossAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               sectionList(),
               instructions(),
@@ -78,12 +77,9 @@ class _HelpScreenState extends State<HelpScreen> {
     return Flexible(
       child: Column(
         children: [
-          const Padding(
-            padding: EdgeInsets.only(bottom: 16),
-            child: Text('Các phần', style: TextStyle(fontSize: fontSizeMedium)),
-          ),
+          const Text('Các phần', style: TextStyle(fontSize: fontSizeMedium)),
           Container(
-            constraints: const BoxConstraints(maxWidth: 250),
+            constraints: const BoxConstraints(maxWidth: 300),
             child: ListView.separated(
               shrinkWrap: true,
               itemCount: sectionNames.length,
@@ -114,14 +110,12 @@ class _HelpScreenState extends State<HelpScreen> {
     return Flexible(
       child: Column(
         children: [
-          Padding(
-            padding: const EdgeInsets.only(bottom: 16),
-            child: Text(
-              selectedSectionIndex < 0 ? 'Thông tin' : sectionNames[selectedSectionIndex],
-              style: const TextStyle(fontSize: fontSizeMedium),
-            ),
+          Text(
+            selectedSectionIndex < 0 ? 'Thông tin' : sectionNames[selectedSectionIndex],
+            style: const TextStyle(fontSize: fontSizeMedium),
           ),
           Container(
+            margin: const EdgeInsets.only(top: 16),
             padding: const EdgeInsets.only(left: 8),
             decoration: BoxDecoration(
               color: Theme.of(context).colorScheme.background,
@@ -139,9 +133,8 @@ class _HelpScreenState extends State<HelpScreen> {
                     controller: helpController,
                   )
                 : const Material(
-                    child: Center(
-                    child: Text('Chưa chọn phần'),
-                  )),
+                    child: Center(child: Text('Chưa chọn phần')),
+                  ),
           ),
         ],
       ),

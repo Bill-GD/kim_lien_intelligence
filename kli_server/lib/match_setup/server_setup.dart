@@ -1,10 +1,10 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:kli_lib/kli_lib.dart';
 
 import '../global.dart';
-import '../match_state.dart';
 
 class ServerSetup extends StatefulWidget {
   final String matchName;
@@ -48,6 +48,7 @@ class _ServerSetupState extends State<ServerSetup> {
 
   Future<void> popHandler() async {
     if (!KLIServer.started) {
+      MatchState.reset();
       logHandler.info('Leaving Server Setup page...');
       Navigator.pop(context);
       return;
@@ -57,6 +58,7 @@ class _ServerSetupState extends State<ServerSetup> {
       message: 'Bạn có chắc bạn muốn thoát?\nServer sẽ tự động đóng.',
       acceptLogMessage: 'Leaving Server Setup page...',
       onAccept: () async {
+        MatchState.reset();
         await KLIServer.stop();
         if (mounted) Navigator.pop(context);
       },
@@ -163,11 +165,17 @@ class _ServerSetupState extends State<ServerSetup> {
         ),
         KLIButton(
           'Start Match',
+          enableCondition: KLIServer.started && (kDebugMode || KLIServer.allPlayerConnected),
           disabledLabel: !KLIServer.started ? 'No server exist' : 'Not enough player',
-          enableCondition: KLIServer.started && KLIServer.allPlayerConnected,
-          onPressed: () {
-            MatchState.instantiate(widget.matchName);
-            setState(() {});
+          onPressed: () async {
+            await MatchState.instantiate(widget.matchName, storageHandler);
+            if (mounted) {
+              Navigator.of(context).push(
+                MaterialPageRoute<void>(
+                  builder: (context) => MatchOverview(background: bgWidget),
+                ),
+              );
+            }
           },
         ),
       ],

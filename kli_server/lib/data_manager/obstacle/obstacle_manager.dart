@@ -269,7 +269,7 @@ class _ObstacleManagerState extends State<ObstacleManager> {
   Widget obstaclePreview() {
     bool imageFound = false;
     String fullImagePath = '';
-    fullImagePath = '${storageHandler.parentFolder}\\${selectedMatch.imagePath}';
+    fullImagePath = '${StorageHandler.appRootDirectory}\\${selectedMatch.imagePath}';
     imageFound = File(fullImagePath).existsSync();
 
     return Flexible(
