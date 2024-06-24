@@ -75,13 +75,8 @@ class _AccelManagerState extends State<AccelManager> {
         context,
         'Quản lý câu hỏi tăng tốc',
         actions: [
-          KLIIconButton(
-            const Icon(Icons.help_rounded),
-            enabledLabel: 'Help',
-            iconSize: 40,
-            onPressed: () => showHelpDialog(
-              context,
-              content: '''
+          const HelpButton(
+            content: '''
               Thông tin câu hỏi: câu hỏi, câu trả lời, giải thích, ảnh (ít nhất 1).
               
               Chọn trận đấu: Chọn trận đấu để hiện các câu hỏi.
@@ -101,8 +96,7 @@ class _AccelManagerState extends State<AccelManager> {
               - Cột 2: Câu hỏi
               - Cột 3: Đáp án
               - Cột 4: Giải thích''',
-            ),
-          )
+          ),
         ],
       ),
       backgroundColor: Colors.transparent,

@@ -73,6 +73,7 @@ class MatchState {
   late final List<KLIPlayer> players;
   MatchSection currentSection = MatchSection.start;
   BaseMatch? currentQuestionGroup;
-
+  
+  int startPos = 0;
   final unlockedObstacleParts = List<bool>.filled(5, false);
 }

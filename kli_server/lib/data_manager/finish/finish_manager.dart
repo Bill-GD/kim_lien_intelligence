@@ -65,13 +65,8 @@ class _FinishManagerState extends State<FinishManager> {
         context,
         'Quản lý câu hỏi về đích',
         actions: [
-          KLIIconButton(
-            const Icon(Icons.help_rounded),
-            enabledLabel: 'Help',
-            iconSize: 40,
-            onPressed: () => showHelpDialog(
-              context,
-              content: '''
+          const HelpButton(
+            content: '''
               Thông tin câu hỏi: Điểm, câu hỏi, đáp án, giải thích, video (nếu có).
               
               Chọn trận đấu: Chọn trận đấu để hiện các câu hỏi.
@@ -90,8 +85,7 @@ class _FinishManagerState extends State<FinishManager> {
               - Cột 2: Câu hỏi
               - Cột 3: Đáp án
               - Cột 4: Giải thích''',
-            ),
-          )
+          ),
         ],
       ),
       backgroundColor: Colors.transparent,

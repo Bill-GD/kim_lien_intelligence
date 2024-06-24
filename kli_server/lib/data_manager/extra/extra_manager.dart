@@ -52,13 +52,8 @@ class _ExtraManagerState extends State<ExtraManager> {
         context,
         'Quản lý câu hỏi phụ',
         actions: [
-          KLIIconButton(
-            const Icon(Icons.help_rounded),
-            enabledLabel: 'Help',
-            iconSize: 40,
-            onPressed: () => showHelpDialog(
-              context,
-              content: '''
+          const HelpButton(
+            content: '''
               Thông tin câu hỏi: Nội dung, đáp án.
               
               Chọn trận đấu: Chọn trận đấu để hiện các câu hỏi.
@@ -74,8 +69,7 @@ class _ExtraManagerState extends State<ExtraManager> {
               - Cột 1: STT
               - Cột 2: Câu hỏi
               - Cột 3: Đáp án''',
-            ),
-          )
+          ),
         ],
       ),
       backgroundColor: Colors.transparent,

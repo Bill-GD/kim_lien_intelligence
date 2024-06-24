@@ -134,9 +134,8 @@ class _StartSectionScreenState extends State<StartSectionScreen> {
                 ),
                 padding: const EdgeInsets.symmetric(horizontal: 128),
                 alignment: Alignment.center,
-                child: !started
-                    ? null
-                    : Column(
+                child: started
+                    ? Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Text(
@@ -156,7 +155,8 @@ class _StartSectionScreenState extends State<StartSectionScreen> {
                             ),
                           ),
                         ],
-                      ),
+                      )
+                    : null,
               ),
             ),
           ],
@@ -221,19 +221,22 @@ class _StartSectionScreenState extends State<StartSectionScreen> {
           ),
           const SizedBox(height: 128),
           Container(
+            width: 128,
+            height: 128,
+            alignment: Alignment.center,
+            padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               color: Theme.of(context).colorScheme.background,
               border: Border.all(width: 1, color: Theme.of(context).colorScheme.onBackground),
             ),
-            child: Padding(
-              padding: const EdgeInsets.all(24),
-              child: Text(
-                StartQuestion.mapTypeDisplay(currentQuestion.subject),
-                style: const TextStyle(fontSize: fontSizeMedium),
-                textAlign: TextAlign.center,
-              ),
-            ),
+            child: started
+                ? Text(
+                    StartQuestion.mapTypeDisplay(currentQuestion.subject),
+                    style: const TextStyle(fontSize: fontSizeMedium),
+                    textAlign: TextAlign.center,
+                  )
+                : null,
           ),
         ],
       ),

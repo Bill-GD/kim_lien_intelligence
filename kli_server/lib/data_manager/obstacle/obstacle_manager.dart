@@ -84,13 +84,8 @@ class _ObstacleManagerState extends State<ObstacleManager> {
         context,
         'Quản lý câu hỏi chướng ngại vật',
         actions: [
-          KLIIconButton(
-            const Icon(Icons.help_rounded),
-            enabledLabel: 'Help',
-            iconSize: 40,
-            onPressed: () => showHelpDialog(
-              context,
-              content: '''
+          const HelpButton(
+            content: '''
               Thông tin chướng ngại vật: ảnh & từ khoá.
               Thông tin câu hỏi: nội dung, đáp án. Số ký tự là các ký tự khác dấu cách, được tính tự động.
               
@@ -111,8 +106,7 @@ class _ObstacleManagerState extends State<ObstacleManager> {
               - Cột 5: Giải thích
               - Hàng 2-6: Câu hỏi hàng ngang & trung tâm
               - Hàng 7: Chướng ngại vật''',
-            ),
-          )
+          ),
         ],
       ),
       backgroundColor: Colors.transparent,

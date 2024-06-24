@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:kli_lib/kli_lib.dart';
+import 'package:kli_server/global.dart';
 
 import '../data_manager/match_state.dart';
 import 'start.dart';
@@ -28,14 +29,15 @@ class _MatchOverviewState extends State<MatchOverview> {
         image: widget.background,
       ),
       child: Scaffold(
-        appBar: AppBar(
-          title: Text('Match Overview for ${MatchState.i.match.name}'),
-          backgroundColor: Colors.transparent,
-          surfaceTintColor: Theme.of(context).colorScheme.background,
-          automaticallyImplyLeading: kDebugMode,
-          titleTextStyle: const TextStyle(fontSize: 24),
-          centerTitle: true,
-          toolbarHeight: kToolbarHeight * 1.1,
+        appBar: managerAppBar(
+          context,
+          'Match Overview for ${MatchState.i.match.name}',
+          actions: [
+            const HelpButton(
+              content: '''
+                To be determined''',
+            ),
+          ],
         ),
         backgroundColor: Colors.transparent,
         body: Center(
@@ -68,16 +70,17 @@ class _MatchOverviewState extends State<MatchOverview> {
                   MaterialPageRoute(
                     builder: (context) => StartSectionScreen(
                       background: widget.background,
-                      playerPos: 0,
+                      playerPos: MatchState.i.startPos,
                       questions: (MatchState.i.currentQuestionGroup as StartMatch)
                           .questions
-                          .where((e) => e.pos == 1)
+                          .where((e) => e.pos == MatchState.i.startPos + 1)
                           .toList()
                           .reversed
                           .toList(),
                     ),
                   ),
                 );
+                MatchState.i.startPos++;
                 setState(() {});
               }
             },

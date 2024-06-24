@@ -65,13 +65,8 @@ class _StartQuestionManagerState extends State<StartQuestionManager> {
         context,
         'Quản lý câu hỏi khởi động',
         actions: [
-          KLIIconButton(
-            const Icon(Icons.help_rounded),
-            enabledLabel: 'Help',
-            iconSize: 40,
-            onPressed: () => showHelpDialog(
-              context,
-              content: '''
+          const HelpButton(
+            content: '''
               Thông tin câu hỏi: Thứ tự thí sinh, lĩnh vực, nội dung, đáp án.
 
               Chọn trận đấu: Chọn trận đấu để hiện các câu hỏi.
@@ -92,8 +87,7 @@ class _StartQuestionManagerState extends State<StartQuestionManager> {
               - Cột 2: Lĩnh vực (cần đúng với danh sách lĩnh vực)
               - Cột 3: Nội dung câu hỏi
               - Cột 4: Đáp án''',
-            ),
-          )
+          ),
         ],
       ),
       backgroundColor: Colors.transparent,
