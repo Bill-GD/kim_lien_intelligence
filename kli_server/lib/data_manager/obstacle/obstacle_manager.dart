@@ -214,7 +214,7 @@ class _ObstacleManagerState extends State<ObstacleManager> {
             Container(
               alignment: Alignment.center,
               decoration: BoxDecoration(
-                border: Border.all(width: 1, color: Theme.of(context).colorScheme.onBackground),
+                border: Border.all(color: Theme.of(context).colorScheme.onBackground),
               ),
               constraints: const BoxConstraints(maxHeight: 400, maxWidth: 600),
               child: const Material(child: Center(child: Text('Chưa chọn trận đấu'))),
@@ -321,7 +321,7 @@ class _ObstacleManagerState extends State<ObstacleManager> {
             ),
           Container(
             decoration: BoxDecoration(
-              border: Border.all(width: 1, color: Theme.of(context).colorScheme.onBackground),
+              border: Border.all(color: Theme.of(context).colorScheme.onBackground),
             ),
             constraints: const BoxConstraints(maxHeight: 400, maxWidth: 600),
             child: hasSelectedMatch && fullImagePath.isNotEmpty && imageFound

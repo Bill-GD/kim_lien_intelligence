@@ -55,9 +55,10 @@ class MatchState {
         break;
       case MatchSection.obstacle:
         questionList = null;
-        currentObstacleMatch = await DataManager.getMatchQuestions<ObstacleMatch>(match.name);
+        obstacleMatch = await DataManager.getMatchQuestions<ObstacleMatch>(match.name);
         break;
       case MatchSection.accel:
+        obstacleMatch = null;
         await DataManager.getMatchQuestions<AccelMatch>(match.name);
         break;
       case MatchSection.finish:
@@ -113,7 +114,7 @@ class MatchState {
   void modifyScore(int playerIndex, int score) => scores[playerIndex] += score;
 
   /// When unlocking part, select random 0..3, only unlock if not already unlocked, then set to true
-  // static void setUnlockedPart(int index) => _inst?.unlockedObstacleParts[index] = true;
+  // static void setUnlockedPart(int index) => _inst?.revealedObstacleRows[index] = true;
 
   // These are instance variables
   late final KLIMatch match;
@@ -121,12 +122,12 @@ class MatchState {
   late final List<KLIPlayer> players;
   MatchSection section = MatchSection.start;
 
-  /// For Start, Accel, Finish, Extra. FOr Obstacle, use [currentObstacleMatch]
+  /// For Start, Accel, Finish, Extra. FOr Obstacle, use [obstacleMatch]
   List<BaseQuestion>? questionList;
-  ObstacleMatch? currentObstacleMatch;
+  ObstacleMatch? obstacleMatch;
 
   int startOrFinishPos = 0;
-  final unlockedObstacleParts = List<bool>.filled(5, false);
+  final revealedObstacleRows = <bool>[false, false, false, false, false];
   late final List<int> finishOrder;
   final finishPlayerDone = <bool>[false, false, false, false];
 }

@@ -172,6 +172,11 @@ class _ServerSetupState extends State<ServerSetup> {
           enableCondition: KLIServer.started && (kDebugMode || KLIServer.allPlayerConnected),
           disabledLabel: !KLIServer.started ? 'No server exist' : 'Not enough player',
           onPressed: () async {
+            if (!MatchState.initialized) {
+              logHandler.empty();
+              logHandler.info('Starting Match');
+            }
+
             await MatchState.instantiate(widget.matchName);
             if (mounted) {
               Navigator.of(context).push(

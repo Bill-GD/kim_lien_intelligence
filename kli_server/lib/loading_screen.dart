@@ -51,7 +51,8 @@ class _LoadingScreenState extends State<LoadingScreen> {
       await Future.delayed(widget.delayMilli);
 
       logHandler.depth = 0;
-      logHandler.info('Finished initializing app\n');
+      logHandler.info('Finished initializing app');
+      logHandler.empty();
 
       if (mounted) {
         Navigator.of(context).push(

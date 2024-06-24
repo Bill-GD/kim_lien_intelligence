@@ -44,7 +44,8 @@ class _MatchDataCheckerState extends State<MatchDataChecker> {
   }
 
   void exitHandler() {
-    logHandler.info('Closed match data checker\n');
+    logHandler.info('Closed match data checker');
+    logHandler.empty();
     logHandler.depth = 0;
     Navigator.pop(context);
   }
@@ -109,7 +110,7 @@ class _MatchDataCheckerState extends State<MatchDataChecker> {
     if (selectedMatchIndex < 0) {
       return Container(
         decoration: BoxDecoration(
-          border: Border.all(width: 1, color: Theme.of(context).colorScheme.onBackground),
+          border: Border.all(color: Theme.of(context).colorScheme.onBackground),
           color: Theme.of(context).colorScheme.background,
         ),
         height: 600,

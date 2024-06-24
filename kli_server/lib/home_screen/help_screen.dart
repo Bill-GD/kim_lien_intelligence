@@ -119,7 +119,7 @@ class _HelpScreenState extends State<HelpScreen> {
             padding: const EdgeInsets.only(left: 8),
             decoration: BoxDecoration(
               color: Theme.of(context).colorScheme.background,
-              border: Border.all(width: 1, color: Theme.of(context).colorScheme.onBackground),
+              border: Border.all(color: Theme.of(context).colorScheme.onBackground),
             ),
             constraints: const BoxConstraints(minHeight: 600),
             child: selectedSectionIndex >= 0

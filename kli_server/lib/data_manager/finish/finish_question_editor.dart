@@ -168,7 +168,7 @@ class _FinishQuestionEditorState extends State<FinishQuestionEditor> {
                     margin: const EdgeInsets.only(left: 32, bottom: 16),
                     alignment: Alignment.center,
                     decoration: BoxDecoration(
-                      border: Border.all(width: 1, color: Theme.of(context).colorScheme.onBackground),
+                      border: Border.all(color: Theme.of(context).colorScheme.onBackground),
                     ),
                     constraints: const BoxConstraints(maxHeight: 400, maxWidth: 710),
                     child: newMediaPath.isEmpty || !videoFound

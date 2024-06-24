@@ -180,7 +180,7 @@ class _MatchManagerState extends State<MatchManager> {
               child: matches.isEmpty
                   ? Container(
                       decoration: BoxDecoration(
-                        border: Border.all(width: 1, color: Theme.of(context).colorScheme.onPrimary),
+                        border: Border.all(color: Theme.of(context).colorScheme.onPrimary),
                         color: Theme.of(context).colorScheme.background,
                       ),
                       alignment: Alignment.center,
@@ -234,7 +234,7 @@ class _MatchManagerState extends State<MatchManager> {
               child: currentMatchIndex < 0
                   ? Container(
                       decoration: BoxDecoration(
-                        border: Border.all(width: 1, color: Theme.of(context).colorScheme.onBackground),
+                        border: Border.all(color: Theme.of(context).colorScheme.onBackground),
                       ),
                       child: const Material(child: Center(child: Text('Chưa chọn trận đấu'))),
                     )
@@ -277,7 +277,7 @@ class _MatchManagerState extends State<MatchManager> {
                 ? Container(
                     margin: const EdgeInsets.only(bottom: 35),
                     decoration: BoxDecoration(
-                      border: Border.all(width: 1, color: Theme.of(context).colorScheme.onBackground),
+                      border: Border.all(color: Theme.of(context).colorScheme.onBackground),
                       color: Theme.of(context).colorScheme.background,
                     ),
                     alignment: Alignment.center,

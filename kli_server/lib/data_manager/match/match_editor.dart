@@ -180,7 +180,7 @@ class _MatchEditorState extends State<MatchEditor> {
             Container(
               margin: const EdgeInsets.symmetric(vertical: 8),
               decoration: BoxDecoration(
-                border: Border.all(width: 1, color: Theme.of(context).colorScheme.onBackground),
+                border: Border.all(color: Theme.of(context).colorScheme.onBackground),
               ),
               constraints: const BoxConstraints(maxHeight: 400, maxWidth: 300, minHeight: 1, minWidth: 260),
               child: imagePaths[index].isEmpty || !imageFound

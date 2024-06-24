@@ -42,7 +42,8 @@ class _DataManagerPageState extends State<DataManagerPage> {
   }
 
   void exitHandler() {
-    logHandler.info('Closed data manager\n', d: 1);
+    logHandler.info('Closed data manager', d: 1);
+    logHandler.empty();
     logHandler.depth = 0;
     Navigator.pop(context);
   }
