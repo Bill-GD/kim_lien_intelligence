@@ -29,10 +29,10 @@ class _ObstacleManagerState extends State<ObstacleManager> {
     logHandler.info('Opened Obstacle Manager', d: 1);
     logHandler.depth = 2;
     selectedMatch = ObstacleMatch.empty();
-    DataManager().getMatchNames().then((value) async {
+    DataManager.getMatchNames().then((value) async {
       if (value.isNotEmpty) matchNames = value;
       setState(() => isLoading = false);
-      await DataManager().removeDeletedMatchQuestions<ObstacleMatch>();
+      await DataManager.removeDeletedMatchQuestions<ObstacleMatch>();
     });
   }
 
@@ -137,7 +137,7 @@ class _ObstacleManagerState extends State<ObstacleManager> {
           matchSelector(matchNames, (value) async {
             logHandler.info('Selected match: $value');
             hasSelectedMatch = value != null;
-            selectedMatch = await DataManager().getMatchQuestions<ObstacleMatch>(value!);
+            selectedMatch = await DataManager.getMatchQuestions<ObstacleMatch>(value!);
             setState(() {});
           }),
           KLIButton(
@@ -162,7 +162,7 @@ class _ObstacleManagerState extends State<ObstacleManager> {
               if (data == null) return;
 
               await getNewQuestion(data);
-              await DataManager().saveNewQuestions<ObstacleMatch>(selectedMatch);
+              await DataManager.saveNewQuestions<ObstacleMatch>(selectedMatch);
               setState(() {});
             },
           ),
@@ -180,7 +180,7 @@ class _ObstacleManagerState extends State<ObstacleManager> {
                 onAccept: () async {
                   if (mounted) showToastMessage(context, 'Đã xóa (match: ${selectedMatch.matchName})');
 
-                  await DataManager().removeQuestionsOfMatch<ObstacleMatch>(selectedMatch);
+                  await DataManager.removeQuestionsOfMatch<ObstacleMatch>(selectedMatch);
                   selectedMatch = ObstacleMatch.empty(selectedMatch.matchName);
                   setState(() {});
                 },
@@ -255,7 +255,7 @@ class _ObstacleManagerState extends State<ObstacleManager> {
 
                     if (nQ == null) return;
                     selectedMatch.hintQuestions[index] = nQ;
-                    await DataManager().updateQuestions<ObstacleMatch>(selectedMatch);
+                    await DataManager.updateQuestions<ObstacleMatch>(selectedMatch);
                     setState(() {});
                   },
                 );
@@ -316,7 +316,7 @@ class _ObstacleManagerState extends State<ObstacleManager> {
                           selectedMatch.keyword = newO.$1;
                           selectedMatch.explanation = newO.$2;
                           selectedMatch.charCount = newO.$1.replaceAll(' ', '').length;
-                          await DataManager().updateQuestions<ObstacleMatch>(selectedMatch);
+                          await DataManager.updateQuestions<ObstacleMatch>(selectedMatch);
                           setState(() {});
                         },
                       ),
@@ -361,7 +361,7 @@ class _ObstacleManagerState extends State<ObstacleManager> {
                 if (result != null) {
                   final p = result.files.single.path!;
                   selectedMatch.imagePath = StorageHandler.getRelative(p);
-                  await DataManager().updateQuestions<ObstacleMatch>(selectedMatch);
+                  await DataManager.updateQuestions<ObstacleMatch>(selectedMatch);
                   logHandler.info('Chose ${selectedMatch.imagePath}');
                   setState(() {});
                 }

@@ -4,8 +4,9 @@ import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:kli_lib/kli_lib.dart';
 
-import '../data_manager/data_manager.dart';
+import '../data_manager/match_state.dart';
 import '../global.dart';
+import '../ui/overview.dart';
 
 class ServerSetup extends StatefulWidget {
   final String matchName;
@@ -169,7 +170,7 @@ class _ServerSetupState extends State<ServerSetup> {
           enableCondition: KLIServer.started && (kDebugMode || KLIServer.allPlayerConnected),
           disabledLabel: !KLIServer.started ? 'No server exist' : 'Not enough player',
           onPressed: () async {
-            await MatchState.instantiate(widget.matchName, storageHandler, DataManager());
+            await MatchState.instantiate(widget.matchName);
             if (mounted) {
               Navigator.of(context).push(
                 MaterialPageRoute<void>(
