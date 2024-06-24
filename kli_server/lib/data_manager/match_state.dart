@@ -20,20 +20,16 @@ class MatchState {
 
   /// Takes `matchName`. If initialized, does nothing.
   static Future<void> instantiate(String matchName) async {
-    KLIMatch match;
+    if (_inst != null && _inst!.match.name == matchName) return;
 
     final value = await storageHandler.readFromFile(storageHandler.matchSaveFile);
 
-    match = KLIMatch.fromJson((jsonDecode(value) as Iterable).firstWhere(
+    final newMatch = KLIMatch.fromJson((jsonDecode(value) as Iterable).firstWhere(
       (e) => e['name'] == matchName,
       orElse: () => throw Exception('Match not found'),
     ));
 
-    if (_inst == null) {
-      _inst = MatchState._(match);
-      return;
-    }
-    if (_inst!.match.name != matchName) _inst = MatchState._(match);
+    _inst = MatchState._(newMatch);
   }
 
   static void reset() => _inst = null;

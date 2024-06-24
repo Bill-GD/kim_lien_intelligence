@@ -94,19 +94,29 @@ class _StartScreenState extends State<StartScreen> {
       children: [
         for (int i = 0; i < 4; i++)
           Expanded(
-            child: Container(
-              decoration: i > 2
-                  ? null
-                  : BoxDecoration(
-                      border: BorderDirectional(
-                        end: BorderSide(width: 1, color: Theme.of(context).colorScheme.onBackground),
-                      ),
+            child: ClipRRect(
+              borderRadius: BorderRadius.only(
+                topLeft: widget.playerPos == 0 ? const Radius.circular(10) : Radius.zero,
+                topRight: widget.playerPos == 3 ? const Radius.circular(10) : Radius.zero,
+              ),
+              child: Container(
+                decoration: BoxDecoration(
+                  color: i == widget.playerPos
+                      ? Theme.of(context).colorScheme.primaryContainer
+                      : Colors.transparent,
+                  border: BorderDirectional(
+                    end: BorderSide(
+                      width: 1,
+                      color: i > 2 ? Colors.transparent : Theme.of(context).colorScheme.onBackground,
                     ),
-              padding: const EdgeInsets.symmetric(vertical: 16),
-              alignment: Alignment.center,
-              child: Text(
-                '${MatchState.i.players[i].name} (${MatchState.i.scores[i]})',
-                style: const TextStyle(fontSize: fontSizeMedium),
+                  ),
+                ),
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                alignment: Alignment.center,
+                child: Text(
+                  '${MatchState.i.players[i].name} (${MatchState.i.scores[i]})',
+                  style: const TextStyle(fontSize: fontSizeMedium),
+                ),
               ),
             ),
           ),

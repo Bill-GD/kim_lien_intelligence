@@ -62,7 +62,7 @@ class _MatchOverviewState extends State<MatchOverview> {
             enabledLabel: 'To Start',
             disabledLabel: 'Current section: ${MatchState.i.section.name}',
             onPressed: () async {
-              if (MatchState.i.startOrFinishPos >= 3) {
+              if (MatchState.i.startOrFinishPos > 3) {
                 showToastMessage(context, 'All players have finished Start section');
                 return;
               }
@@ -185,5 +185,18 @@ class _MatchOverviewState extends State<MatchOverview> {
   }
 
   final overviewHelp = '''
-    To be determined''';
+    Start section is automatically enabled. Press the corresponding button to start the section.
+    After each section is finished, the next section button will be enabled.
+
+    The game rule is from O21, details as follow:
+    - Start: Player order is 1-4. It will automatically change to the next player after the previous player is done.
+      The seleted player will be highted.
+    - Obstacle: Player order is 1-4. It will automatically change to the next player after the previous player is done.
+      Each player will select 1 question. Middle question (5) is only unlocked after all 4 and keyword isn't answered.
+    - Accel: NA
+    - Finish: The order is determined by the score. The player with the highest score will be selected first.
+      After each player, the player with the next highest score will be selected.
+      If there are two players with the same score, the player whose position is smaller will be selected.
+      The seleted player will be highted. 
+    - Extra: NA''';
 }
