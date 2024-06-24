@@ -3,9 +3,10 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:kli_lib/kli_lib.dart';
-import 'package:kli_server/global.dart';
 
 import '../data_manager/match_state.dart';
+import '../global.dart';
+import 'obstacle_questions.dart';
 import 'start.dart';
 
 class MatchOverview extends StatefulWidget {
@@ -62,11 +63,13 @@ class _MatchOverviewState extends State<MatchOverview> {
             enabledLabel: 'To Start',
             disabledLabel: 'Current section: ${MatchState.i.section.name}',
             onPressed: () async {
+              // this should only show if somehow the condition is not just match section is start
               if (MatchState.i.startOrFinishPos > 3) {
                 showToastMessage(context, 'All players have finished Start section');
                 return;
               }
 
+              logHandler.info('Start section, player ${MatchState.i.startOrFinishPos}', d: 1);
               await MatchState.i.loadQuestions();
 
               if (mounted) {
@@ -93,7 +96,17 @@ class _MatchOverviewState extends State<MatchOverview> {
             enableCondition: MatchState.i.section == MatchSection.obstacle,
             enabledLabel: 'To Obstacle',
             disabledLabel: 'Current section: ${MatchState.i.section.name}',
-            onPressed: () {},
+            onPressed: () async {
+              await MatchState.i.loadQuestions();
+              if (mounted) {
+                await Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) => ObstacleQuestionScreen(background: widget.background),
+                  ),
+                );
+              }
+              setState(() {});
+            },
           ),
           KLIButton(
             'Accel',
@@ -131,9 +144,8 @@ class _MatchOverviewState extends State<MatchOverview> {
   }
 
   Widget playerWidget(int pos, KLIPlayer player) {
-    final bool isCurrentPlayer =
-        (MatchState.i.section == MatchSection.start || MatchState.i.section == MatchSection.finish) &&
-            MatchState.i.startOrFinishPos == pos;
+    final bool isCurrentPlayer = MatchState.i.startOrFinishPos == pos &&
+        (MatchState.i.section == MatchSection.start || MatchState.i.section == MatchSection.finish);
 
     return IntrinsicWidth(
       child: Column(
@@ -142,7 +154,7 @@ class _MatchOverviewState extends State<MatchOverview> {
           Container(
             margin: const EdgeInsets.symmetric(vertical: 8),
             decoration: BoxDecoration(
-              border: Border.all(width: 1, color: Theme.of(context).colorScheme.onBackground),
+              border: Border.all(color: Theme.of(context).colorScheme.onBackground),
               borderRadius: BorderRadius.circular(5),
             ),
             constraints: const BoxConstraints(maxHeight: 600, maxWidth: 450, minHeight: 1, minWidth: 260),
@@ -157,7 +169,7 @@ class _MatchOverviewState extends State<MatchOverview> {
           Container(
             padding: const EdgeInsets.symmetric(vertical: 8),
             decoration: BoxDecoration(
-              border: Border.all(width: 1, color: Theme.of(context).colorScheme.onBackground),
+              border: Border.all(color: Theme.of(context).colorScheme.onBackground),
               color: isCurrentPlayer
                   ? Theme.of(context).colorScheme.primaryContainer
                   : Theme.of(context).colorScheme.background,

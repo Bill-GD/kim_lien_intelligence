@@ -265,9 +265,8 @@ class _StartScreenState extends State<StartScreen> {
                     setState(() {});
                   }
                 });
-                setState(() {
-                  started = true;
-                });
+                started = true;
+                setState(() {});
               },
             ),
           );

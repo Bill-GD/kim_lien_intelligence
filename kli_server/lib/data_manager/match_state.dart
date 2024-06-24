@@ -120,7 +120,7 @@ class MatchState {
   late final KLIMatch match;
   final scores = <int>[0, 0, 0, 0];
   late final List<KLIPlayer> players;
-  MatchSection section = MatchSection.start;
+  MatchSection section = MatchSection.obstacle;
 
   /// For Start, Accel, Finish, Extra. FOr Obstacle, use [obstacleMatch]
   List<BaseQuestion>? questionList;
@@ -128,6 +128,7 @@ class MatchState {
 
   int startOrFinishPos = 0;
   final revealedObstacleRows = <bool>[false, false, false, false, false];
+  final answeredObstacleRows = <bool>[false, false, false, false, false];
   late final List<int> finishOrder;
   final finishPlayerDone = <bool>[false, false, false, false];
 }
