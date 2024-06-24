@@ -26,11 +26,11 @@ class _ServerSetupState extends State<ServerSetup> {
     logHandler.info('Opened Server Setup page');
     logHandler.depth = 2;
     getIpAddresses();
-    // KLIServer.onClientConnectivityChanged.listen((event) {
+    // KLIServer.onConnectionChanged.listen((event) {
     //   logHandler.i('A client connected');
     //   setState(() {});
     // });
-    // KLIServer.onClientMessage.listen((receivedMessage) {
+    // KLIServer.onMessageReceived.listen((receivedMessage) {
     // _clientMessage = '${receivedMessage.senderID}: ${receivedMessage.msg}';
     //   setState(() {});
     // });
@@ -116,7 +116,9 @@ class _ServerSetupState extends State<ServerSetup> {
   Widget serverStatus() {
     const s = TextStyle(fontSize: fontSizeLarge);
     return Text(
-      'Server status: ${KLIServer.started ? '🟢' : '🔴'}\nLocal IP: $localAddress\nPublic IP: $publicAddress',
+      'Server status: ${KLIServer.started ? '🟢' : '🔴'}\n'
+      'Local IP: $localAddress\n',
+      // 'Public IP: $publicAddress',
       textAlign: TextAlign.center,
       style: s,
     );
@@ -134,7 +136,7 @@ class _ServerSetupState extends State<ServerSetup> {
             try {
               await KLIServer.start();
 
-              KLIServer.onClientConnectivityChanged.listen((event) {
+              KLIServer.onConnectionChanged.listen((event) {
                 setState(() {});
               });
 

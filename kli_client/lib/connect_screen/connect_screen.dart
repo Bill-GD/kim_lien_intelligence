@@ -160,7 +160,7 @@ class _ConnectPageState extends State<ConnectPage> {
                 if (mounted) {
                   showToastMessage(
                     context,
-                    'Connected to server as ${KLIClient.clientID} with IP: ${KLIClient.address}',
+                    'Connected to server as ${KLIClient.clientID} with IP: ${KLIClient.remoteAddress}',
                   );
                 }
               },

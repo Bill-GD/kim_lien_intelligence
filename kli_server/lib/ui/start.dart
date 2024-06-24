@@ -6,14 +6,14 @@ import 'package:kli_lib/kli_lib.dart';
 
 import '../data_manager/match_state.dart';
 
-class StartSectionScreen extends StatefulWidget {
+class StartScreen extends StatefulWidget {
   final DecorationImage background;
   final List<StartQuestion> questions;
   final double timeLimitSec = 60;
   final buttonPadding = const EdgeInsets.only(top: 90, bottom: 70);
   final int playerPos;
 
-  const StartSectionScreen({
+  const StartScreen({
     super.key,
     required this.background,
     required this.playerPos,
@@ -21,10 +21,10 @@ class StartSectionScreen extends StatefulWidget {
   });
 
   @override
-  State<StartSectionScreen> createState() => _StartSectionScreenState();
+  State<StartScreen> createState() => _StartScreenState();
 }
 
-class _StartSectionScreenState extends State<StartSectionScreen> {
+class _StartScreenState extends State<StartScreen> {
   double currentTimeSec = 60;
   bool started = false, timeEnded = false;
   late StartQuestion currentQuestion;

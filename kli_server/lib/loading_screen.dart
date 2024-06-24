@@ -5,7 +5,7 @@ import 'package:kli_lib/kli_lib.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import 'global.dart';
-import 'start_screen/start_screen.dart';
+import 'home_screen/home_screen.dart';
 
 class LoadingScreen extends StatefulWidget {
   final delayMilli = const Duration(milliseconds: 150);
@@ -55,7 +55,7 @@ class _LoadingScreenState extends State<LoadingScreen> {
 
       if (mounted) {
         Navigator.of(context).push(
-          MaterialPageRoute(builder: (context) => const StartPage()),
+          MaterialPageRoute(builder: (context) => const HomeScreen()),
         );
       }
     } on Exception catch (e) {

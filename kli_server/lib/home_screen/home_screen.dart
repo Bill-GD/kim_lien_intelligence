@@ -10,16 +10,16 @@ import '../data_manager/data_manager_page.dart';
 import '../global.dart';
 import '../match_setup/match_data_checker.dart';
 import 'help_screen.dart';
-import 'sounds_test.dart';
+import 'sound_test.dart';
 
-class StartPage extends StatefulWidget {
-  const StartPage({super.key});
+class HomeScreen extends StatefulWidget {
+  const HomeScreen({super.key});
 
   @override
-  State<StartPage> createState() => _StartPageState();
+  State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _StartPageState extends State<StartPage> {
+class _HomeScreenState extends State<HomeScreen> {
   int sidebarIndex = 0;
 
   @override

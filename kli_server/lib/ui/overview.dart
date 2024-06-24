@@ -76,7 +76,7 @@ class _MatchOverviewState extends State<MatchOverview> {
               if (mounted) {
                 await Navigator.of(context).push(
                   MaterialPageRoute(
-                    builder: (context) => StartSectionScreen(
+                    builder: (context) => StartScreen(
                       background: widget.background,
                       playerPos: MatchState.i.startPos,
                       questions: MatchState.i.currentQuestionList! as List<StartQuestion>,
