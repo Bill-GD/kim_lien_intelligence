@@ -32,6 +32,7 @@ class _MatchOverviewState extends State<MatchOverview> {
         appBar: managerAppBar(
           context,
           'Match Overview for ${MatchState.i.match.name}',
+          implyLeading: kDebugMode,
           actions: [
             const HelpButton(
               content: '''
@@ -64,25 +65,30 @@ class _MatchOverviewState extends State<MatchOverview> {
             enabledLabel: 'To Start',
             disabledLabel: 'Current section: ${MatchState.i.currentSection.name}',
             onPressed: () async {
+              if (MatchState.i.startPos >= 3) {
+                showToastMessage(context, 'All players have finished Start section');
+                return;
+              }
+
+              MatchState.i.nextPlayer();
               await MatchState.i.loadQuestions();
+
               if (mounted) {
                 await Navigator.of(context).push(
                   MaterialPageRoute(
                     builder: (context) => StartSectionScreen(
                       background: widget.background,
                       playerPos: MatchState.i.startPos,
-                      questions: (MatchState.i.currentQuestionGroup as StartMatch)
-                          .questions
-                          .where((e) => e.pos == MatchState.i.startPos + 1)
-                          .toList()
-                          .reversed
-                          .toList(),
+                      questions: MatchState.i.currentQuestionList! as List<StartQuestion>,
                     ),
                   ),
                 );
-                MatchState.i.startPos++;
-                setState(() {});
               }
+
+              if (MatchState.i.startPos == 3) {
+                MatchState.i.nextSection();
+              }
+              setState(() {});
             },
           ),
           KLIButton(

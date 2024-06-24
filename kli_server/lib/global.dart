@@ -35,12 +35,13 @@ AppBar managerAppBar(
   BuildContext context,
   String title, {
   List<Widget>? actions,
+  bool implyLeading = false,
   final double fontSize = fontSizeXL,
 }) {
   return AppBar(
     title: Text(title),
     backgroundColor: Colors.transparent,
-    automaticallyImplyLeading: false,
+    automaticallyImplyLeading: implyLeading,
     titleTextStyle: TextStyle(fontSize: fontSize),
     centerTitle: true,
     toolbarHeight: kToolbarHeight * 1.1,
