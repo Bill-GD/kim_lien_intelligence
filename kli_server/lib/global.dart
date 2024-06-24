@@ -7,7 +7,7 @@ late final DecorationImage bgWidget;
 
 late final LogHandler logHandler;
 void initLogHandler() {
-  logHandler = LogHandler(logFile: '${StorageHandler.appRootDirectory}\\UserData\\log.txt');
+  logHandler = LogHandler(logFile: StorageHandler.getFullPath('UserData\\log.txt'));
 }
 
 late final PackageInfo packageInfo;

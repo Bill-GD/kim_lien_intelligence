@@ -26,9 +26,7 @@ class _MatchOverviewState extends State<MatchOverview> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: BoxDecoration(
-        image: widget.background,
-      ),
+      decoration: BoxDecoration(image: widget.background),
       child: Scaffold(
         appBar: managerAppBar(
           context,
@@ -161,7 +159,7 @@ class _MatchOverviewState extends State<MatchOverview> {
             child: ClipRRect(
               borderRadius: BorderRadius.circular(5),
               child: Image.file(
-                File('${StorageHandler.appRootDirectory}\\${player.imagePath}'),
+                File(StorageHandler.getFullPath(player.imagePath)),
                 fit: BoxFit.contain,
               ),
             ),

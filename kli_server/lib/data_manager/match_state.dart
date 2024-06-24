@@ -77,9 +77,9 @@ class MatchState {
       case MatchSection.start:
         startOrFinishPos++;
         break;
-      case MatchSection.obstacle:
+      case MatchSection.obstacle: // none, all player at once
         break;
-      case MatchSection.accel:
+      case MatchSection.accel: // none, all player at once
         break;
       case MatchSection.finish:
         if (finishPlayerDone.every((e) => !e)) {
@@ -120,15 +120,17 @@ class MatchState {
   late final KLIMatch match;
   final scores = <int>[0, 0, 0, 0];
   late final List<KLIPlayer> players;
-  MatchSection section = MatchSection.obstacle;
+  MatchSection section = MatchSection.start;
 
   /// For Start, Accel, Finish, Extra. FOr Obstacle, use [obstacleMatch]
   List<BaseQuestion>? questionList;
   ObstacleMatch? obstacleMatch;
 
   int startOrFinishPos = 0;
+  final finishPlayerDone = <bool>[false, false, false, false];
+  late final List<int> finishOrder;
+
   final revealedObstacleRows = <bool>[false, false, false, false, false];
   final answeredObstacleRows = <bool>[false, false, false, false, false];
-  late final List<int> finishOrder;
-  final finishPlayerDone = <bool>[false, false, false, false];
+  late final List<int> imagePartOrder;
 }

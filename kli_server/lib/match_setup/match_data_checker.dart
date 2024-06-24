@@ -184,7 +184,7 @@ class _MatchDataCheckerState extends State<MatchDataChecker> {
     if (!match.playerList.every((e) => e != null)) {
       errorList.add('Không đủ thông tin 4 thí sinh');
     } else if (!match.playerList.every(
-      (e) => File('${StorageHandler.appRootDirectory}\\${e!.imagePath}').existsSync(),
+      (e) => File(StorageHandler.getFullPath(e!.imagePath)).existsSync(),
     )) {
       errorList.add('Không tìm thấy ảnh thí sinh');
     }
@@ -240,7 +240,7 @@ class _MatchDataCheckerState extends State<MatchDataChecker> {
 
       if (match.keyword.isEmpty) errorList.add('Không có đáp án CNV');
       if (match.imagePath.isEmpty) errorList.add('Không có ảnh CNV');
-      if (!File('${StorageHandler.appRootDirectory}\\${match.imagePath}').existsSync()) {
+      if (!File(StorageHandler.getFullPath(match.imagePath)).existsSync()) {
         errorList.add('Không tìm thấy ảnh CNV');
       }
       if (match.hintQuestions.length < 5) errorList.add('Không đủ số câu hỏi');
@@ -268,8 +268,7 @@ class _MatchDataCheckerState extends State<MatchDataChecker> {
 
         if (q.imagePaths.isEmpty) errorList.add('Câu $i: không có ảnh');
 
-        final missing =
-            q.imagePaths.where((e) => !File('${StorageHandler.appRootDirectory}\\$e').existsSync());
+        final missing = q.imagePaths.where((e) => !File(StorageHandler.getFullPath(e)).existsSync());
         if (missing.isNotEmpty) {
           errorList
               .add('Câu $i (${AccelQuestion.mapTypeDisplay(q.type)}): Không tìm thấy ${missing.join(', ')}');
@@ -297,8 +296,7 @@ class _MatchDataCheckerState extends State<MatchDataChecker> {
         }
       }
       for (final q in match.questions) {
-        if (q.mediaPath.isNotEmpty &&
-            !File('${StorageHandler.appRootDirectory}\\${q.mediaPath}').existsSync()) {
+        if (q.mediaPath.isNotEmpty && !File(StorageHandler.getFullPath(q.mediaPath)).existsSync()) {
           errorList.add('Không tìm thấy ảnh ${q.mediaPath}');
         }
       }

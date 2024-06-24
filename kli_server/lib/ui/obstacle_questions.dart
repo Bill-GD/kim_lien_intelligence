@@ -12,6 +12,7 @@ final _key = GlobalKey<ScaffoldState>();
 class ObstacleQuestionScreen extends StatefulWidget {
   final DecorationImage background;
   final double timeLimitSec;
+
   const ObstacleQuestionScreen({super.key, required this.background, this.timeLimitSec = 15});
 
   @override
@@ -21,7 +22,7 @@ class ObstacleQuestionScreen extends StatefulWidget {
 class _ObstacleQuestionScreenState extends State<ObstacleQuestionScreen> {
   int questionIndex = -1;
   double currentTimeSec = 15;
-  bool timeEnded = false;
+  bool timeEnded = false, canShowAnswers = false, canAnnounceAnswer = false, canShowImage = false;
   Timer? timer;
 
   @override
@@ -33,14 +34,18 @@ class _ObstacleQuestionScreenState extends State<ObstacleQuestionScreen> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: BoxDecoration(
-        image: widget.background,
-      ),
+      decoration: BoxDecoration(image: widget.background),
       child: Scaffold(
         key: _key,
-        appBar: managerAppBar(context, 'Obstacle', implyLeading: kDebugMode),
+        appBar: managerAppBar(
+          context,
+          'Obstacle',
+          implyLeading: kDebugMode,
+          actions: [Container()],
+        ),
         backgroundColor: Colors.transparent,
-        endDrawer: Drawer(
+        // TODO extract this to external stateful widget
+        endDrawer: const Drawer(
           width: 800,
           child: Center(
             child: Text('a'),
@@ -104,7 +109,7 @@ class _ObstacleQuestionScreenState extends State<ObstacleQuestionScreen> {
                       enableCondition: !MatchState.i.answeredObstacleRows[i],
                       onPressed: () {
                         questionIndex = i;
-                        timeEnded = false;
+                        timeEnded = canAnnounceAnswer = false;
                         currentTimeSec = widget.timeLimitSec;
                         setState(() {});
                       },
@@ -125,13 +130,14 @@ class _ObstacleQuestionScreenState extends State<ObstacleQuestionScreen> {
         children: [
           KLIButton(
             'Show Image',
-            enableCondition: timeEnded,
+            enableCondition: canShowImage,
             onPressed: () {},
           ),
           KLIButton(
             'Get Middle Row',
             enableCondition: MatchState.i.answeredObstacleRows.take(4).every((e) => e) &&
-                !MatchState.i.answeredObstacleRows[4],
+                !MatchState.i.answeredObstacleRows[4] &&
+                questionIndex != 4,
             onPressed: () {
               questionIndex = 4;
               timeEnded = false;
@@ -141,8 +147,10 @@ class _ObstacleQuestionScreenState extends State<ObstacleQuestionScreen> {
           ),
           KLIButton(
             'Show Answers',
-            enableCondition: timeEnded,
+            enableCondition: canShowAnswers,
             onPressed: () {
+              canAnnounceAnswer = true;
+              setState(() {});
               _key.currentState?.openEndDrawer();
             },
           ),
@@ -155,6 +163,7 @@ class _ObstacleQuestionScreenState extends State<ObstacleQuestionScreen> {
                 if (currentTimeSec <= 0) {
                   timer.cancel();
                   timeEnded = true;
+                  canShowAnswers = true;
                   setState(() {});
                   return;
                 }
@@ -168,21 +177,24 @@ class _ObstacleQuestionScreenState extends State<ObstacleQuestionScreen> {
             children: [
               KLIButton(
                 'Correct',
-                enableCondition: timeEnded,
+                enableCondition: canAnnounceAnswer && questionIndex >= 0,
                 onPressed: () {
                   MatchState.i.revealedObstacleRows[questionIndex] = true;
                   MatchState.i.answeredObstacleRows[questionIndex] = true;
                   questionIndex = -1;
+                  canShowAnswers = false;
+                  canShowImage = true;
                   setState(() {});
                 },
               ),
               KLIButton(
                 'Wrong',
-                enableCondition: timeEnded,
+                enableCondition: canAnnounceAnswer && questionIndex >= 0,
                 onPressed: () {
                   MatchState.i.revealedObstacleRows[questionIndex] = false;
                   MatchState.i.answeredObstacleRows[questionIndex] = true;
                   questionIndex = -1;
+                  canShowAnswers = false;
                   setState(() {});
                 },
               ),
@@ -286,7 +298,7 @@ class _ObstacleRow extends StatelessWidget {
   final int index;
   final String answer;
   final bool revealed;
-  const _ObstacleRow({super.key, required this.index, required this.answer, required this.revealed});
+  const _ObstacleRow({required this.index, required this.answer, required this.revealed});
 
   @override
   Widget build(BuildContext context) {

@@ -253,7 +253,7 @@ class _MatchManagerState extends State<MatchManager> {
       itemBuilder: (_, index) {
         final p = matches[currentMatchIndex].playerList;
 
-        String fullImagePath = '${StorageHandler.appRootDirectory}\\${p[index]?.imagePath}';
+        String fullImagePath = StorageHandler.getFullPath(p[index]?.imagePath ?? '');
 
         bool hasPlayer = p[index] != null, imageFound = false;
         if (hasPlayer) {
