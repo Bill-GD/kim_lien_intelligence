@@ -34,10 +34,7 @@ class _MatchOverviewState extends State<MatchOverview> {
           'Match Overview for ${MatchState.i.match.name}',
           implyLeading: kDebugMode,
           actions: [
-            const HelpButton(
-              content: '''
-                To be determined''',
-            ),
+            HelpButton(content: overviewHelp),
           ],
         ),
         backgroundColor: Colors.transparent,
@@ -61,16 +58,15 @@ class _MatchOverviewState extends State<MatchOverview> {
         children: [
           KLIButton(
             'Start',
-            enableCondition: kDebugMode || MatchState.i.currentSection == MatchSection.start,
+            enableCondition: MatchState.i.section == MatchSection.start,
             enabledLabel: 'To Start',
-            disabledLabel: 'Current section: ${MatchState.i.currentSection.name}',
+            disabledLabel: 'Current section: ${MatchState.i.section.name}',
             onPressed: () async {
-              if (MatchState.i.startPos >= 3) {
+              if (MatchState.i.startOrFinishPos >= 3) {
                 showToastMessage(context, 'All players have finished Start section');
                 return;
               }
 
-              MatchState.i.nextPlayer();
               await MatchState.i.loadQuestions();
 
               if (mounted) {
@@ -78,45 +74,46 @@ class _MatchOverviewState extends State<MatchOverview> {
                   MaterialPageRoute(
                     builder: (context) => StartScreen(
                       background: widget.background,
-                      playerPos: MatchState.i.startPos,
-                      questions: MatchState.i.currentQuestionList! as List<StartQuestion>,
+                      playerPos: MatchState.i.startOrFinishPos,
+                      questions: MatchState.i.questionList! as List<StartQuestion>,
                     ),
                   ),
                 );
               }
 
-              if (MatchState.i.startPos == 3) {
+              if (MatchState.i.startOrFinishPos == 3) {
                 MatchState.i.nextSection();
               }
+              MatchState.i.nextPlayer();
               setState(() {});
             },
           ),
           KLIButton(
             'Obstacle',
-            enableCondition: kDebugMode || MatchState.i.currentSection == MatchSection.obstacle,
+            enableCondition: MatchState.i.section == MatchSection.obstacle,
             enabledLabel: 'To Obstacle',
-            disabledLabel: 'Current section: ${MatchState.i.currentSection.name}',
+            disabledLabel: 'Current section: ${MatchState.i.section.name}',
             onPressed: () {},
           ),
           KLIButton(
             'Accel',
-            enableCondition: kDebugMode || MatchState.i.currentSection == MatchSection.accel,
+            enableCondition: MatchState.i.section == MatchSection.accel,
             enabledLabel: 'To Accel',
-            disabledLabel: 'Current section: ${MatchState.i.currentSection.name}',
+            disabledLabel: 'Current section: ${MatchState.i.section.name}',
             onPressed: () {},
           ),
           KLIButton(
             'Finish',
-            enableCondition: kDebugMode || MatchState.i.currentSection == MatchSection.finish,
+            enableCondition: MatchState.i.section == MatchSection.finish,
             enabledLabel: 'To Finish',
-            disabledLabel: 'Current section: ${MatchState.i.currentSection.name}',
+            disabledLabel: 'Current section: ${MatchState.i.section.name}',
             onPressed: () {},
           ),
           KLIButton(
             'Extra',
-            enableCondition: kDebugMode || MatchState.i.currentSection == MatchSection.extra,
+            enableCondition: MatchState.i.section == MatchSection.extra,
             enabledLabel: 'To Extra',
-            disabledLabel: 'Current section: ${MatchState.i.currentSection.name}',
+            disabledLabel: 'Current section: ${MatchState.i.section.name}',
             onPressed: () {},
           ),
         ],
@@ -134,6 +131,10 @@ class _MatchOverviewState extends State<MatchOverview> {
   }
 
   Widget playerWidget(int pos, KLIPlayer player) {
+    final bool isCurrentPlayer =
+        (MatchState.i.section == MatchSection.start || MatchState.i.section == MatchSection.finish) &&
+            MatchState.i.startOrFinishPos == pos;
+
     return IntrinsicWidth(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -157,7 +158,9 @@ class _MatchOverviewState extends State<MatchOverview> {
             padding: const EdgeInsets.symmetric(vertical: 8),
             decoration: BoxDecoration(
               border: Border.all(width: 1, color: Theme.of(context).colorScheme.onBackground),
-              color: Theme.of(context).colorScheme.background,
+              color: isCurrentPlayer
+                  ? Theme.of(context).colorScheme.primaryContainer
+                  : Theme.of(context).colorScheme.background,
               borderRadius: BorderRadius.circular(5),
             ),
             child: Column(
@@ -180,4 +183,7 @@ class _MatchOverviewState extends State<MatchOverview> {
       ),
     );
   }
+
+  final overviewHelp = '''
+    To be determined''';
 }

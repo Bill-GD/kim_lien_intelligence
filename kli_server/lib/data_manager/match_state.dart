@@ -44,21 +44,21 @@ class MatchState {
   }
 
   void nextSection() {
-    if (currentSection == MatchSection.extra) return;
+    if (section == MatchSection.extra) return;
 
-    currentSection = MatchSection.values[(currentSection.index + 1)];
+    section = MatchSection.values[(section.index + 1)];
   }
 
   Future<void> loadQuestions() async {
-    switch (currentSection) {
+    switch (section) {
       case MatchSection.start:
-        currentQuestionList = (await DataManager.getMatchQuestions<StartMatch>(match.name))
+        questionList = (await DataManager.getMatchQuestions<StartMatch>(match.name))
             .questions
-            .where((e) => e.pos == startPos + 1)
+            .where((e) => e.pos == startOrFinishPos + 1)
             .toList();
         break;
       case MatchSection.obstacle:
-        currentQuestionList = null;
+        questionList = null;
         currentObstacleMatch = await DataManager.getMatchQuestions<ObstacleMatch>(match.name);
         break;
       case MatchSection.accel:
@@ -76,15 +76,35 @@ class MatchState {
   }
 
   void nextPlayer() {
-    switch (currentSection) {
+    switch (section) {
       case MatchSection.start:
-        startPos++;
+        startOrFinishPos++;
         break;
       case MatchSection.obstacle:
         break;
       case MatchSection.accel:
         break;
       case MatchSection.finish:
+        if (finishPlayerDone.every((e) => !e)) {
+          startOrFinishPos = (<int>[0, 1, 2, 3]..sort((a, b) => scores[b].compareTo(scores[a])))[0];
+          finishPlayerDone[startOrFinishPos] = true;
+        } else {
+          final nonFinishedPlayers = List<int>.generate(4, (i) => i)
+              .where((pos) => !finishPlayerDone[pos]) //
+              .toList()
+            ..sort((a, b) => scores[b].compareTo(scores[a]));
+
+          if (nonFinishedPlayers.length == 1) {
+            startOrFinishPos = nonFinishedPlayers[0];
+          } else if (scores[nonFinishedPlayers[0]] == scores[nonFinishedPlayers[1]]) {
+            startOrFinishPos = nonFinishedPlayers[0] < nonFinishedPlayers[1]
+                ? nonFinishedPlayers[0] //
+                : nonFinishedPlayers[1];
+          }
+
+          startOrFinishPos = nonFinishedPlayers[0];
+          finishPlayerDone[startOrFinishPos] = true;
+        }
         break;
       case MatchSection.extra:
         break;
@@ -103,12 +123,14 @@ class MatchState {
   late final KLIMatch match;
   final scores = <int>[0, 0, 0, 0];
   late final List<KLIPlayer> players;
-  MatchSection currentSection = MatchSection.start;
+  MatchSection section = MatchSection.start;
 
   /// For Start, Accel, Finish, Extra. FOr Obstacle, use [currentObstacleMatch]
-  List<BaseQuestion>? currentQuestionList;
+  List<BaseQuestion>? questionList;
   ObstacleMatch? currentObstacleMatch;
 
-  int startPos = -1;
+  int startOrFinishPos = 0;
   final unlockedObstacleParts = List<bool>.filled(5, false);
+  late final List<int> finishOrder;
+  final finishPlayerDone = <bool>[false, false, false, false];
 }
