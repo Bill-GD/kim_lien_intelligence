@@ -26,8 +26,8 @@ class _ObstacleManagerState extends State<ObstacleManager> {
   @override
   void initState() {
     super.initState();
-    logHandler.info('Opened Obstacle Manager', d: 1);
-    logHandler.depth = 2;
+    logHandler.info('Opened Obstacle Manager');
+
     selectedMatch = ObstacleMatch.empty();
     DataManager.getMatchNames().then((value) async {
       if (value.isNotEmpty) matchNames = value;
@@ -71,7 +71,7 @@ class _ObstacleManagerState extends State<ObstacleManager> {
       );
     } on RangeError catch (e, stack) {
       showToastMessage(context, 'Sai định dạng (không đủ cột/hàng)');
-      logHandler.error('$e', stackTrace: stack, d: 3);
+      logHandler.error('$e', stackTrace: stack);
       return;
     }
     logHandler.info('Loaded ${selectedMatch.matchName} (${selectedMatch.keyword})');
@@ -344,7 +344,6 @@ class _ObstacleManagerState extends State<ObstacleManager> {
             ElevatedButton(
               child: const Text('Chọn ảnh'),
               onPressed: () async {
-                logHandler.depth = 3;
                 logHandler.info('Selecting image at ${StorageHandler.getRelative(storageHandler.mediaDir)}');
                 final result = await FilePicker.platform.pickFiles(
                   dialogTitle: 'Select image',

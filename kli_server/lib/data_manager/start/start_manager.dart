@@ -23,8 +23,8 @@ class _StartQuestionManagerState extends State<StartQuestionManager> {
   @override
   void initState() {
     super.initState();
-    logHandler.info('Opened Start Manager', d: 1);
-    logHandler.depth = 2;
+    logHandler.info('Opened Start Manager');
+
     selectedMatch = StartMatch.empty();
     DataManager.getMatchNames().then((value) async {
       if (value.isNotEmpty) matchNames = value;

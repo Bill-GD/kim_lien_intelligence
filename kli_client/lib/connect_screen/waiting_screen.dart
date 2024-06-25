@@ -14,7 +14,7 @@ class WaitingScreen extends StatefulWidget {
 class _WaitingScreenState extends State<WaitingScreen> {
   @override
   void initState() {
-    logHandler.info('Waiting screen', d: 0);
+    logHandler.info('Waiting screen');
     KLIClient.onMessageReceived.listen((newMessage) {
       if (newMessage.type == KLIMessageType.disconnect) {
         KLIClient.disconnect();
@@ -30,7 +30,7 @@ class _WaitingScreenState extends State<WaitingScreen> {
     return CallbackShortcuts(
       bindings: <ShortcutActivator, VoidCallback>{
         const SingleActivator(LogicalKeyboardKey.escape): () {
-          logHandler.info('Leaving waiting room', d: 0);
+          logHandler.info('Leaving waiting room');
           Navigator.pop(context);
         },
       },

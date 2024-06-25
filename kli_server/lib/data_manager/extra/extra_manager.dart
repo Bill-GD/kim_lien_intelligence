@@ -21,8 +21,8 @@ class _ExtraManagerState extends State<ExtraManager> {
   @override
   void initState() {
     super.initState();
-    logHandler.info('Opened Extra Manager', d: 1);
-    logHandler.depth = 2;
+    logHandler.info('Opened Extra Manager');
+
     selectedMatch = ExtraMatch.empty();
     DataManager.getMatchNames().then((value) async {
       if (value.isNotEmpty) matchNames = value;

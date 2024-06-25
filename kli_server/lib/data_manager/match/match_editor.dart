@@ -33,7 +33,7 @@ class _MatchEditorState extends State<MatchEditor> {
     super.initState();
     disableDone = setNewMatch = widget.match == null;
     logHandler.info('Match editor: ${setNewMatch ? 'New match' : 'Modify ${widget.match?.name}'}');
-    logHandler.depth = 3;
+
     if (setNewMatch) return;
 
     matchNameController.text = widget.match!.name;
@@ -48,7 +48,6 @@ class _MatchEditorState extends State<MatchEditor> {
     for (var c in [matchNameController, ...playerNameControllers]) {
       c.dispose();
     }
-    logHandler.depth = 2;
     super.dispose();
   }
 
@@ -194,8 +193,7 @@ class _MatchEditorState extends State<MatchEditor> {
             ElevatedButton(
               child: const Text('Chọn ảnh'),
               onPressed: () async {
-                logHandler.info('Selecting image at ${StorageHandler.getRelative(storageHandler.mediaDir)}',
-                    d: 3);
+                logHandler.info('Selecting image at ${StorageHandler.getRelative(storageHandler.mediaDir)}');
                 final result = await FilePicker.platform.pickFiles(
                   dialogTitle: 'Select image',
                   initialDirectory: storageHandler.mediaDir.replaceAll('/', '\\'),

@@ -23,8 +23,8 @@ class _FinishManagerState extends State<FinishManager> {
   @override
   void initState() {
     super.initState();
-    logHandler.info('Opened Finish Manager', d: 1);
-    logHandler.depth = 2;
+    logHandler.info('Opened Finish Manager');
+
     selectedMatch = FinishMatch.empty();
     DataManager.getMatchNames().then((value) async {
       if (value.isNotEmpty) matchNames = value;

@@ -27,13 +27,11 @@ class _HelpScreenState extends State<HelpScreen> {
   void initState() {
     super.initState();
     logHandler.info('Viewing help screen');
-    logHandler.depth = 1;
   }
 
   @override
   void dispose() {
     helpController.dispose();
-    logHandler.depth = 0;
     super.dispose();
   }
 

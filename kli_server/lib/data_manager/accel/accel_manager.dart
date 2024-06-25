@@ -26,8 +26,8 @@ class _AccelManagerState extends State<AccelManager> {
   @override
   void initState() {
     super.initState();
-    logHandler.info('Opened Accel Manager', d: 1);
-    logHandler.depth = 2;
+    logHandler.info('Opened Accel Manager');
+
     selectedMatch = AccelMatch.empty();
     selectedQuestion = AccelQuestion.empty();
     DataManager.getMatchNames().then((value) async {

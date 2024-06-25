@@ -67,7 +67,7 @@ class _MatchOverviewState extends State<MatchOverview> {
                 return;
               }
 
-              logHandler.info('Start section, player ${MatchState.i.startOrFinishPos}', d: 1);
+              logHandler.info('Start section, player ${MatchState.i.startOrFinishPos}');
               await MatchState.i.loadQuestions();
 
               if (mounted) {
@@ -103,6 +103,7 @@ class _MatchOverviewState extends State<MatchOverview> {
                   ),
                 );
               }
+              if (MatchState.i.answeredObstacleRows.every((e) => e)) MatchState.i.nextSection();
               setState(() {});
             },
           ),

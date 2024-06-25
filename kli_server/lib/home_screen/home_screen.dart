@@ -24,7 +24,6 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   void initState() {
-    logHandler.depth = 0;
     super.initState();
   }
 
@@ -37,7 +36,7 @@ class _HomeScreenState extends State<HomeScreen> {
         automaticallyImplyLeading: false,
         actions: [
           CloseButton(onPressed: () {
-            logHandler.info('Exiting app', d: 0);
+            logHandler.info('Exiting app');
             exit(0);
           }),
         ],

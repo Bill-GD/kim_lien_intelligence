@@ -20,7 +20,7 @@ class _ObstacleEditorState extends State<ObstacleEditor> {
   void initState() {
     super.initState();
     logHandler.info('Opened Obstacle Editor');
-    logHandler.depth = 3;
+
     disableDone = keywordController.text.isEmpty || explanationController.text.isEmpty;
     keywordController.text = widget.keyword;
     explanationController.text = widget.explanation;
@@ -30,7 +30,6 @@ class _ObstacleEditorState extends State<ObstacleEditor> {
   void dispose() {
     keywordController.dispose();
     explanationController.dispose();
-    logHandler.depth = 2;
     super.dispose();
   }
 

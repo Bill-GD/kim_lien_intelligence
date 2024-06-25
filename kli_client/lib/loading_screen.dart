@@ -23,7 +23,6 @@ class _LoadingScreenState extends State<LoadingScreen> {
   @override
   void initState() {
     super.initState();
-    logHandler.depth = 1;
     initializeApp();
   }
 
@@ -45,7 +44,6 @@ class _LoadingScreenState extends State<LoadingScreen> {
 
       setState(() => loadingText = 'Finished initialization');
       await Future.delayed(widget.delayMilli);
-      logHandler.depth = 0;
 
       if (mounted) {
         Navigator.of(context).push(

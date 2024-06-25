@@ -24,7 +24,6 @@ class _ServerSetupState extends State<ServerSetup> {
     KLIServer.stop();
     super.initState();
     logHandler.info('Opened Server Setup page');
-    logHandler.depth = 2;
     getIpAddresses();
     // KLIServer.onConnectionChanged.listen((event) {
     //   logHandler.i('A client connected');
@@ -38,7 +37,6 @@ class _ServerSetupState extends State<ServerSetup> {
 
   @override
   void dispose() {
-    logHandler.depth = 1;
     super.dispose();
   }
 

@@ -29,7 +29,7 @@ class DataManager {
   }
 
   static Future<void> updateQuestions<T extends BaseMatch>(T match) async {
-    logHandler.info('Updating questions of match: ${match.matchName}', d: 3);
+    logHandler.info('Updating questions of match: ${match.matchName}');
     final saved = await getAllSavedQuestions<T>();
     saved.removeWhere((e) => e.matchName == match.matchName);
     saved.add(match);
@@ -39,7 +39,6 @@ class DataManager {
   static Future<void> updateAllQuestionMatchName({required String oldName, required String newName}) async {
     logHandler.info(
       'Match name update detected. Updating match name of all questions (\'$oldName\' -> \'$newName\')',
-      d: 1,
     );
 
     List<Type> types = [StartMatch, ObstacleMatch, AccelMatch, FinishMatch, ExtraMatch];
@@ -72,7 +71,7 @@ class DataManager {
   }
 
   static Future<void> saveNewQuestions<T extends BaseMatch>(T selectedMatch) async {
-    logHandler.info('Saving new questions of match: ${selectedMatch.matchName}', d: 3);
+    logHandler.info('Saving new questions of match: ${selectedMatch.matchName}');
     final saved = await getAllSavedQuestions<T>();
     saved.removeWhere((e) => e.matchName == selectedMatch.matchName);
     saved.add(selectedMatch);
@@ -80,14 +79,14 @@ class DataManager {
   }
 
   static Future<void> removeDeletedMatchQuestions<T extends BaseMatch>() async {
-    logHandler.info('Removing questions of deleted matches', d: 3);
+    logHandler.info('Removing questions of deleted matches');
     final matchNames = await getMatchNames();
     final saved = (await getAllSavedQuestions<T>()).where((e) => matchNames.contains(e.matchName)).toList();
     await overwriteSave(saved, _mapTypeToFile(T));
   }
 
   static Future<void> removeQuestionsOfMatch<T extends BaseMatch>(T match) async {
-    logHandler.info('Removing all questions of match: ${match.matchName}', d: 3);
+    logHandler.info('Removing all questions of match: ${match.matchName}');
     final saved = (await getAllSavedQuestions<T>())..removeWhere((e) => e.matchName == match.matchName);
     await overwriteSave(saved, _mapTypeToFile(T));
   }
@@ -100,7 +99,7 @@ class DataManager {
 
     try {
       selectedMatch = saved.firstWhere((e) => e.matchName == matchName);
-      logHandler.info("Loaded questions of $T named '$matchName'", d: 2);
+      logHandler.info("Loaded questions of $T named '$matchName'");
     } on StateError {
       logHandler.info("$T named '$matchName' not found, temp empty match created");
       selectedMatch = BaseMatch.empty<T>(matchName);

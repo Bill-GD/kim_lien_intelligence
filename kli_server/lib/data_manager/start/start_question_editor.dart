@@ -25,7 +25,7 @@ class _StartQuestionEditorState extends State<StartQuestionEditor> {
   void initState() {
     super.initState();
     logHandler.info('Opened Start Question Editor');
-    logHandler.depth = 3;
+
     if (widget.question != null) {
       logHandler.info('Modify start question');
       questionController.text = widget.question!.question;
@@ -43,7 +43,6 @@ class _StartQuestionEditorState extends State<StartQuestionEditor> {
   void dispose() {
     questionController.dispose();
     answerController.dispose();
-    logHandler.depth = 2;
     super.dispose();
   }
 

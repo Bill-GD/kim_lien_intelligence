@@ -32,7 +32,6 @@ class _ImportQuestionDialogState extends State<ImportQuestionDialog> with Ticker
   @override
   void initState() {
     logHandler.info('Import question dialog: ${widget.matchName}');
-    logHandler.depth = 3;
     tabController = TabController(length: sheetCount, vsync: this);
     super.initState();
   }
@@ -121,7 +120,6 @@ class _ImportQuestionDialogState extends State<ImportQuestionDialog> with Ticker
             ),
             onPressed: () {
               logHandler.info('Cancelled');
-              logHandler.depth = 2;
               Navigator.of(context).pop();
             },
           ),

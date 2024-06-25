@@ -34,7 +34,7 @@ class _FinishQuestionEditorState extends State<FinishQuestionEditor> {
   void initState() {
     super.initState();
     logHandler.info('Opened Finish Question Editor');
-    logHandler.depth = 3;
+
     if (widget.question == null) {
       logHandler.info('Create new finish question');
       createNew = true;
@@ -62,7 +62,6 @@ class _FinishQuestionEditorState extends State<FinishQuestionEditor> {
     answerController.dispose();
     explanationController.dispose();
     if (vidControlInit) vidController.dispose();
-    logHandler.depth = 2;
     super.dispose();
   }
 

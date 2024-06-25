@@ -22,7 +22,7 @@ class _ExtraQuestionEditorState extends State<ExtraQuestionEditor> {
   void initState() {
     super.initState();
     logHandler.info('Opened Extra Question Editor');
-    logHandler.depth = 3;
+
     if (widget.question != null) {
       logHandler.info('Objective: Modify extra question');
       questionController.text = widget.question!.question;
@@ -40,7 +40,6 @@ class _ExtraQuestionEditorState extends State<ExtraQuestionEditor> {
   void dispose() {
     questionController.dispose();
     answerController.dispose();
-    logHandler.depth = 2;
     super.dispose();
   }
 

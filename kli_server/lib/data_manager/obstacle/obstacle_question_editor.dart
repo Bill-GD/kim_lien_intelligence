@@ -22,7 +22,7 @@ class _ObstacleQuestionEditorState extends State<ObstacleQuestionEditor> {
   void initState() {
     super.initState();
     logHandler.info('Opened Obstacle Question Editor');
-    logHandler.depth = 3;
+
     if (widget.question != null) {
       disableDone = questionController.text.isEmpty || answerController.text.isEmpty;
       questionController.text = widget.question!.question;
@@ -34,7 +34,6 @@ class _ObstacleQuestionEditorState extends State<ObstacleQuestionEditor> {
   void dispose() {
     questionController.dispose();
     answerController.dispose();
-    logHandler.depth = 2;
     super.dispose();
   }
 

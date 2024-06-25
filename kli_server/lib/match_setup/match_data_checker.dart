@@ -35,7 +35,7 @@ class _MatchDataCheckerState extends State<MatchDataChecker> {
   void initState() {
     super.initState();
     logHandler.info('Opening Match Data Checker');
-    logHandler.depth = 1;
+
     DataManager.getMatchNames().then((value) async {
       if (value.isEmpty) showToastMessage(context, 'No match found');
       if (value.isNotEmpty) matchNames = value;
@@ -46,7 +46,6 @@ class _MatchDataCheckerState extends State<MatchDataChecker> {
   void exitHandler() {
     logHandler.info('Closed match data checker');
     logHandler.empty();
-    logHandler.depth = 0;
     Navigator.pop(context);
   }
 

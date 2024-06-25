@@ -25,7 +25,6 @@ class _ConnectPageState extends State<ConnectPage> {
 
   @override
   void initState() {
-    logHandler.depth = 1;
     super.initState();
   }
 
@@ -55,7 +54,7 @@ class _ConnectPageState extends State<ConnectPage> {
         centerTitle: true,
         actions: [
           CloseButton(onPressed: () {
-            logHandler.info('Exiting app', d: 0);
+            logHandler.info('Exiting app');
             exit(0);
           }),
         ],

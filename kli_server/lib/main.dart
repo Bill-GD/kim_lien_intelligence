@@ -15,9 +15,9 @@ void main() async {
 
   initLogHandler();
   logMessageStream.listen((m) {
-    if (m.$1 == LogType.info) logHandler.info(m.$2, d: m.$3);
-    if (m.$1 == LogType.warn) logHandler.warn(m.$2, d: m.$3);
-    if (m.$1 == LogType.error) logHandler.error(m.$2, d: m.$3);
+    if (m.$1 == LogType.info) logHandler.info(m.$2);
+    if (m.$1 == LogType.warn) logHandler.warn(m.$2);
+    if (m.$1 == LogType.error) logHandler.error(m.$2);
   });
   logHandler.info('Starting KLIServer');
 

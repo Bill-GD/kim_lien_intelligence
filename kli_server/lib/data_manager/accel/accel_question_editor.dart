@@ -24,7 +24,7 @@ class _AccelQuestionEditorState extends State<AccelQuestionEditor> {
   void initState() {
     super.initState();
     logHandler.info('Opened Accel Question Editor');
-    logHandler.depth = 3;
+
     if (widget.question != null) {
       logHandler.info('Objective: Modify accel question');
       questionController.text = widget.question!.question;
@@ -46,7 +46,6 @@ class _AccelQuestionEditorState extends State<AccelQuestionEditor> {
     questionController.dispose();
     answerController.dispose();
     explanationController.dispose();
-    logHandler.depth = 2;
     super.dispose();
   }
 

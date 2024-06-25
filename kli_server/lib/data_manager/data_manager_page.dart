@@ -29,7 +29,7 @@ class _DataManagerPageState extends State<DataManagerPage> {
   void initState() {
     super.initState();
     logHandler.info('Opened Data Manager');
-    logHandler.depth = 1;
+
     contentPages = [
       const MatchManager(),
       const StartQuestionManager(),
@@ -42,9 +42,8 @@ class _DataManagerPageState extends State<DataManagerPage> {
   }
 
   void exitHandler() {
-    logHandler.info('Closed data manager', d: 1);
+    logHandler.info('Closed data manager');
     logHandler.empty();
-    logHandler.depth = 0;
     Navigator.pop(context);
   }
 
