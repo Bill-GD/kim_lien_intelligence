@@ -75,7 +75,7 @@ class _AccelManagerState extends State<AccelManager> {
         context,
         'Quản lý câu hỏi tăng tốc',
         actions: [
-          const HelpButton(
+          const KLIHelpButton(
             content: '''
               Thông tin câu hỏi: câu hỏi, câu trả lời, giải thích, ảnh (ít nhất 1).
               

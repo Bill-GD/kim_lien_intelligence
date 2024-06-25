@@ -33,7 +33,7 @@ class _MatchOverviewState extends State<MatchOverview> {
           'Match Overview for ${MatchState.i.match.name}',
           implyLeading: kDebugMode,
           actions: [
-            HelpButton(content: overviewHelp),
+            KLIHelpButton(content: overviewHelp),
           ],
         ),
         backgroundColor: Colors.transparent,

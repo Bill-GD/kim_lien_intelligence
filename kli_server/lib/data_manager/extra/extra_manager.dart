@@ -52,7 +52,7 @@ class _ExtraManagerState extends State<ExtraManager> {
         context,
         'Quản lý câu hỏi phụ',
         actions: [
-          const HelpButton(
+          const KLIHelpButton(
             content: '''
               Thông tin câu hỏi: Nội dung, đáp án.
               

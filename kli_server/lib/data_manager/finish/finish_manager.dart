@@ -65,7 +65,7 @@ class _FinishManagerState extends State<FinishManager> {
         context,
         'Quản lý câu hỏi về đích',
         actions: [
-          const HelpButton(
+          const KLIHelpButton(
             content: '''
               Thông tin câu hỏi: Điểm, câu hỏi, đáp án, giải thích, video (nếu có).
               

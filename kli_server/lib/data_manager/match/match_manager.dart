@@ -47,7 +47,7 @@ class _MatchManagerState extends State<MatchManager> {
         context,
         'Quản lý trận đấu',
         actions: [
-          const HelpButton(
+          const KLIHelpButton(
             content: '''
               Thông tin trận đấu: tên trận, tên thí sinh, ảnh thí sinh.
               

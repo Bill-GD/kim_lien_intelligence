@@ -65,7 +65,7 @@ class _StartQuestionManagerState extends State<StartQuestionManager> {
         context,
         'Quản lý câu hỏi khởi động',
         actions: [
-          const HelpButton(
+          const KLIHelpButton(
             content: '''
               Thông tin câu hỏi: Thứ tự thí sinh, lĩnh vực, nội dung, đáp án.
 
