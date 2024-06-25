@@ -6,6 +6,7 @@ import 'package:kli_lib/kli_lib.dart';
 
 import '../data_manager/match_state.dart';
 import '../global.dart';
+import 'obstacle_image.dart';
 
 final _key = GlobalKey<ScaffoldState>();
 
@@ -21,9 +22,19 @@ class ObstacleQuestionScreen extends StatefulWidget {
 
 class _ObstacleQuestionScreenState extends State<ObstacleQuestionScreen> {
   int questionIndex = -1;
-  double currentTimeSec = 15;
-  bool timeEnded = false, canShowAnswers = false, canAnnounceAnswer = false, canShowImage = false;
+  late double currentTimeSec;
+  bool timeEnded = false,
+      canShowAnswers = false,
+      canAnnounceAnswer = false,
+      canShowImage = false,
+      canSelectQuestion = true;
   Timer? timer;
+
+  @override
+  void initState() {
+    currentTimeSec = widget.timeLimitSec;
+    super.initState();
+  }
 
   @override
   void dispose() {
@@ -81,7 +92,7 @@ class _ObstacleQuestionScreenState extends State<ObstacleQuestionScreen> {
   }
 
   Widget obstacleRows() {
-    return Flexible(
+    return Expanded(
       flex: 4,
       child: Container(
         decoration: BoxDecoration(
@@ -95,26 +106,19 @@ class _ObstacleQuestionScreenState extends State<ObstacleQuestionScreen> {
             for (int i = 0; i < 4; i++)
               Padding(
                 padding: const EdgeInsets.only(bottom: 16),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    _ObstacleRow(
-                      index: i,
-                      answer: MatchState.i.obstacleMatch!.hintQuestions[i]!.answer,
-                      revealed: MatchState.i.revealedObstacleRows[i],
-                    ),
-                    const SizedBox(width: 32),
-                    KLIIconButton(
-                      const Icon(Icons.arrow_back),
-                      enableCondition: !MatchState.i.answeredObstacleRows[i],
-                      onPressed: () {
-                        questionIndex = i;
-                        timeEnded = canAnnounceAnswer = false;
-                        currentTimeSec = widget.timeLimitSec;
-                        setState(() {});
-                      },
-                    )
-                  ],
+                child: _ObstacleRow(
+                  index: i,
+                  answer: MatchState.i.obstacleMatch!.hintQuestions[i]!.answer,
+                  revealed: MatchState.i.revealedObstacleRows[i],
+                  answered: MatchState.i.answeredObstacleRows[i],
+                  onTap: canSelectQuestion
+                      ? () {
+                          questionIndex = i;
+                          timeEnded = canAnnounceAnswer = false;
+                          currentTimeSec = widget.timeLimitSec;
+                          setState(() {});
+                        }
+                      : null,
                 ),
               )
           ],
@@ -131,7 +135,18 @@ class _ObstacleQuestionScreenState extends State<ObstacleQuestionScreen> {
           KLIButton(
             'Show Image',
             enableCondition: canShowImage,
-            onPressed: () {},
+            onPressed: () async {
+              await Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => ObstacleImageScreen(
+                    background: widget.background,
+                  ),
+                ),
+              );
+              canShowImage = false;
+              canSelectQuestion = true;
+              setState(() {});
+            },
           ),
           KLIButton(
             'Get Middle Row',
@@ -155,23 +170,6 @@ class _ObstacleQuestionScreenState extends State<ObstacleQuestionScreen> {
             },
           ),
           const SizedBox(height: 32),
-          KLIButton(
-            'Start',
-            enableCondition: questionIndex >= 0 && !timeEnded && !(timer?.isActive == true),
-            onPressed: () {
-              timer = Timer.periodic(1.seconds, (timer) {
-                if (currentTimeSec <= 0) {
-                  timer.cancel();
-                  timeEnded = true;
-                  canShowAnswers = true;
-                  setState(() {});
-                  return;
-                }
-                currentTimeSec--;
-                setState(() {});
-              });
-            },
-          ),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
@@ -195,17 +193,42 @@ class _ObstacleQuestionScreenState extends State<ObstacleQuestionScreen> {
                   MatchState.i.answeredObstacleRows[questionIndex] = true;
                   questionIndex = -1;
                   canShowAnswers = false;
+                  canSelectQuestion = true;
                   setState(() {});
                 },
               ),
             ],
           ),
-          KLIButton(
-            'End',
-            enableCondition: MatchState.i.answeredObstacleRows.every((e) => e),
-            onPressed: () {
-              Navigator.of(context).pop();
-            },
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              KLIButton(
+                'Start',
+                enableCondition: questionIndex >= 0 && !timeEnded && !(timer?.isActive == true),
+                onPressed: () {
+                  canSelectQuestion = false;
+                  timer = Timer.periodic(1.seconds, (timer) {
+                    if (currentTimeSec <= 0) {
+                      timer.cancel();
+                      timeEnded = true;
+                      canShowAnswers = true;
+                      setState(() {});
+                      return;
+                    }
+                    currentTimeSec--;
+                    setState(() {});
+                  });
+                  setState(() {});
+                },
+              ),
+              KLIButton(
+                'End',
+                enableCondition: MatchState.i.answeredObstacleRows.every((e) => e),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
           ),
         ],
       ),
@@ -294,43 +317,66 @@ class _ObstacleQuestionScreenState extends State<ObstacleQuestionScreen> {
   }
 }
 
-class _ObstacleRow extends StatelessWidget {
+class _ObstacleRow extends StatefulWidget {
   final int index;
   final String answer;
   final bool revealed;
-  const _ObstacleRow({required this.index, required this.answer, required this.revealed});
+  final bool answered;
+  final void Function()? onTap;
+
+  const _ObstacleRow({
+    required this.index,
+    required this.answer,
+    required this.revealed,
+    required this.answered,
+    required this.onTap,
+  });
 
   @override
-  Widget build(BuildContext context) {
-    final borderColor = revealed
-        ? Theme.of(context).colorScheme.onPrimaryContainer
-        : MatchState.i.answeredObstacleRows[index]
-            ? Theme.of(context).colorScheme.error
-            : Colors.grey;
+  State<_ObstacleRow> createState() => _ObstacleRowState();
+}
 
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        for (final c in answer.toUpperCase().split('').where((e) => e != ' '))
-          Container(
-            width: 50,
-            height: 50,
-            alignment: Alignment.center,
-            decoration: BoxDecoration(
-              border: Border.all(
-                color: borderColor,
-              ),
-              color: Theme.of(context).colorScheme.background,
-            ),
-            child: Text(
-              c,
-              style: TextStyle(
-                color: revealed ? Colors.white : Colors.transparent,
-                fontSize: fontSizeMedium,
-              ),
-            ),
-          )
-      ],
+class _ObstacleRowState extends State<_ObstacleRow> {
+  @override
+  Widget build(BuildContext context) {
+    final Color borderColor = widget.revealed
+        ? Colors.lightGreenAccent[700]!
+        : (widget.answered ? Theme.of(context).colorScheme.error : Colors.grey);
+
+    return Tooltip(
+      message: widget.answered ? '' : 'Question ${widget.index + 1}',
+      child: GestureDetector(
+        onTap: widget.answered ? null : widget.onTap,
+        child: MouseRegion(
+          cursor: widget.answered || widget.onTap == null
+              ? SystemMouseCursors.forbidden
+              : SystemMouseCursors.click,
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              for (final c in widget.answer.toUpperCase().split('').where((e) => e != ' '))
+                Container(
+                  width: 50,
+                  height: 50,
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(
+                    border: Border.all(
+                      color: borderColor,
+                    ),
+                    color: Theme.of(context).colorScheme.background,
+                  ),
+                  child: Text(
+                    c,
+                    style: TextStyle(
+                      color: widget.revealed ? Colors.white : Colors.transparent,
+                      fontSize: fontSizeMedium,
+                    ),
+                  ),
+                )
+            ],
+          ),
+        ),
+      ),
     );
   }
 }
