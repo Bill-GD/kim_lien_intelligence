@@ -69,37 +69,39 @@ class _MatchDataCheckerState extends State<MatchDataChecker> {
               forceMaterialTransparency: true,
               leading: BackButton(onPressed: exitHandler),
             ),
-            body: Padding(
-              padding: const EdgeInsets.only(left: 512, right: 512, top: 80, bottom: 128),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      matchSelector(matchNames, (value) async {
-                        selectedMatchIndex = matchNames.indexOf(value!);
-                        logHandler.info('Selected match: ${matchNames[selectedMatchIndex]}');
-                        questionCheckResults = await checkMatchQuestions();
-                        disableServerSetup = !questionCheckResults.every((e) => e.$1 == true);
-                        setState(() {});
-                      }),
-                      KLIButton(
-                        'Mở phần thiết lập Server',
-                        enableCondition: !disableServerSetup,
-                        disabledLabel: 'Trận đấu chưa đủ thông tin',
-                        onPressed: () {
-                          Navigator.of(context).push(MaterialPageRoute(
-                            builder: (context) => ServerSetup(matchNames[selectedMatchIndex]),
-                          ));
-                        },
-                      ),
-                    ],
+            body: isLoading
+                ? const Center(child: CircularProgressIndicator())
+                : Padding(
+                    padding: const EdgeInsets.only(left: 512, right: 512, top: 80, bottom: 128),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            matchSelector(matchNames, (value) async {
+                              selectedMatchIndex = matchNames.indexOf(value!);
+                              logHandler.info('Selected match: ${matchNames[selectedMatchIndex]}');
+                              questionCheckResults = await checkMatchQuestions();
+                              disableServerSetup = !questionCheckResults.every((e) => e.$1 == true);
+                              setState(() {});
+                            }),
+                            KLIButton(
+                              'Mở phần thiết lập Server',
+                              enableCondition: !disableServerSetup,
+                              disabledLabel: 'Trận đấu chưa đủ thông tin',
+                              onPressed: () {
+                                Navigator.of(context).push(MaterialPageRoute(
+                                  builder: (context) => ServerSetup(matchNames[selectedMatchIndex]),
+                                ));
+                              },
+                            ),
+                          ],
+                        ),
+                        matchQuestionChecker(),
+                      ],
+                    ),
                   ),
-                  matchQuestionChecker(),
-                ],
-              ),
-            ),
           ),
         ),
       ),
