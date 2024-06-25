@@ -30,6 +30,7 @@ class MatchState {
     ));
 
     _inst = MatchState._(newMatch);
+    if (_inst!.section == MatchSection.obstacle) _inst!.imagePartOrder.shuffle();
   }
 
   static void reset() => _inst = null;
@@ -51,6 +52,8 @@ class MatchState {
         questionList = (await DataManager.getMatchQuestions<StartMatch>(match.name))
             .questions
             .where((e) => e.pos == startOrFinishPos + 1)
+            .toList()
+            .reversed
             .toList();
         break;
       case MatchSection.obstacle:
@@ -120,9 +123,9 @@ class MatchState {
   late final KLIMatch match;
   final scores = <int>[0, 0, 0, 0];
   late final List<KLIPlayer> players;
-  MatchSection section = MatchSection.start;
+  MatchSection section = MatchSection.obstacle;
 
-  /// For Start, Accel, Finish, Extra. FOr Obstacle, use [obstacleMatch]
+  /// For Start, Accel, Finish, Extra. For Obstacle, use [obstacleMatch]
   List<BaseQuestion>? questionList;
   ObstacleMatch? obstacleMatch;
 
@@ -132,5 +135,5 @@ class MatchState {
 
   final revealedObstacleRows = <bool>[false, false, false, false, false];
   final answeredObstacleRows = <bool>[false, false, false, false, false];
-  late final List<int> imagePartOrder;
+  late final List<int> imagePartOrder = <int>[0, 1, 2, 3];
 }

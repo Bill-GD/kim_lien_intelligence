@@ -28,7 +28,7 @@ class _ObstacleImageScreenState extends State<ObstacleImageScreen> {
       child: Scaffold(
         appBar: managerAppBar(
           context,
-          'Obstacle: ${MatchState.i.obstacleMatch!.keyword}',
+          'Obstacle',
           implyLeading: true,
         ),
         backgroundColor: Colors.transparent,

@@ -9,7 +9,6 @@ import '../global.dart';
 
 class StartScreen extends StatefulWidget {
   final DecorationImage background;
-  final List<StartQuestion> questions;
   final double timeLimitSec = 60;
   final buttonPadding = const EdgeInsets.only(top: 90, bottom: 70);
   final int playerPos;
@@ -18,7 +17,6 @@ class StartScreen extends StatefulWidget {
     super.key,
     required this.background,
     required this.playerPos,
-    required this.questions,
   });
 
   @override
@@ -34,7 +32,7 @@ class _StartScreenState extends State<StartScreen> {
   @override
   void initState() {
     super.initState();
-    currentQuestion = widget.questions.last;
+    currentQuestion = MatchState.i.questionList!.last as StartQuestion;
   }
 
   @override
@@ -136,7 +134,7 @@ class _StartScreenState extends State<StartScreen> {
                         Text(
                           currentQuestion.question,
                           textAlign: TextAlign.center,
-                          textWidthBasis: TextWidthBasis.longestLine,
+                          // textWidthBasis: TextWidthBasis.longestLine,
                           style: const TextStyle(fontSize: fontSizeLarge),
                         ),
                         const SizedBox(height: 16),
@@ -192,12 +190,12 @@ class _StartScreenState extends State<StartScreen> {
   }
 
   void nextQuestion() {
-    if (widget.questions.isEmpty) {
+    if (MatchState.i.questionList!.isEmpty) {
       timer?.cancel();
       timeEnded = true;
       return;
     }
-    currentQuestion = widget.questions.removeLast();
+    currentQuestion = MatchState.i.questionList!.removeLast() as StartQuestion;
   }
 
   Widget questionInfo() {

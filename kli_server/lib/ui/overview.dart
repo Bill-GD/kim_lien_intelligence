@@ -33,7 +33,23 @@ class _MatchOverviewState extends State<MatchOverview> {
           'Match Overview for ${MatchState.i.match.name}',
           implyLeading: kDebugMode,
           actions: [
-            KLIHelpButton(content: overviewHelp),
+            const KLIHelpButton(
+              content: '''
+                Start section is automatically enabled. Press the corresponding button to start the section.
+                After each section is finished, the next section button will be enabled.
+
+                The game rule is from O21, details as follow:
+                - Start: Player order is 1-4. It will automatically change to the next player after the previous player is done.
+                  The seleted player will be highted.
+                - Obstacle: All players participate at the same time. Each player will select 1 question.
+                  Middle question (5) is only unlocked after all 4 and keyword isn't answered.
+                - Accel: NA
+                - Finish: The order is determined by the score. The player with the highest score will be selected first.
+                  After each player, the player with the next highest score will be selected.
+                  If there are two players with the same score, the player whose position is smaller will be selected.
+                  The seleted player will be highted. 
+                - Extra: NA''',
+            ),
           ],
         ),
         backgroundColor: Colors.transparent,
@@ -76,7 +92,6 @@ class _MatchOverviewState extends State<MatchOverview> {
                     builder: (context) => StartScreen(
                       background: widget.background,
                       playerPos: MatchState.i.startOrFinishPos,
-                      questions: MatchState.i.questionList! as List<StartQuestion>,
                     ),
                   ),
                 );
@@ -128,6 +143,16 @@ class _MatchOverviewState extends State<MatchOverview> {
             disabledLabel: 'Current section: ${MatchState.i.section.name}',
             onPressed: () {},
           ),
+          if (kDebugMode)
+            KLIButton(
+              'Reset',
+              onPressed: () {
+                final matchName = MatchState.i.match.name;
+                MatchState.reset();
+                MatchState.instantiate(matchName);
+                setState(() {});
+              },
+            ),
         ],
       ),
     );
@@ -194,20 +219,4 @@ class _MatchOverviewState extends State<MatchOverview> {
       ),
     );
   }
-
-  final overviewHelp = '''
-    Start section is automatically enabled. Press the corresponding button to start the section.
-    After each section is finished, the next section button will be enabled.
-
-    The game rule is from O21, details as follow:
-    - Start: Player order is 1-4. It will automatically change to the next player after the previous player is done.
-      The seleted player will be highted.
-    - Obstacle: Player order is 1-4. It will automatically change to the next player after the previous player is done.
-      Each player will select 1 question. Middle question (5) is only unlocked after all 4 and keyword isn't answered.
-    - Accel: NA
-    - Finish: The order is determined by the score. The player with the highest score will be selected first.
-      After each player, the player with the next highest score will be selected.
-      If there are two players with the same score, the player whose position is smaller will be selected.
-      The seleted player will be highted. 
-    - Extra: NA''';
 }

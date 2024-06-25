@@ -27,7 +27,8 @@ class _ObstacleQuestionScreenState extends State<ObstacleQuestionScreen> {
       canShowAnswers = false,
       canAnnounceAnswer = false,
       canShowImage = false,
-      canSelectQuestion = true;
+      canSelectQuestion = true,
+      keywordAnswered = false;
   Timer? timer;
 
   @override
@@ -50,7 +51,7 @@ class _ObstacleQuestionScreenState extends State<ObstacleQuestionScreen> {
         key: _key,
         appBar: managerAppBar(
           context,
-          'Obstacle',
+          'Obstacle: ${MatchState.i.obstacleMatch!.keyword}',
           implyLeading: kDebugMode,
           actions: [Container()],
         ),
@@ -76,7 +77,7 @@ class _ObstacleQuestionScreenState extends State<ObstacleQuestionScreen> {
                 ),
               ),
               const SizedBox(height: 72),
-              Expanded(
+              Flexible(
                 child: Row(
                   children: [
                     questionContainer(),
@@ -134,7 +135,7 @@ class _ObstacleQuestionScreenState extends State<ObstacleQuestionScreen> {
         children: [
           KLIButton(
             'Show Image',
-            enableCondition: canShowImage,
+            // enableCondition: canShowImage,
             onPressed: () async {
               await Navigator.of(context).push(
                 MaterialPageRoute(
@@ -157,6 +158,7 @@ class _ObstacleQuestionScreenState extends State<ObstacleQuestionScreen> {
               questionIndex = 4;
               timeEnded = false;
               currentTimeSec = widget.timeLimitSec;
+              canAnnounceAnswer = false;
               setState(() {});
             },
           ),
@@ -193,6 +195,7 @@ class _ObstacleQuestionScreenState extends State<ObstacleQuestionScreen> {
                   MatchState.i.answeredObstacleRows[questionIndex] = true;
                   questionIndex = -1;
                   canShowAnswers = false;
+                  canShowImage = true;
                   canSelectQuestion = true;
                   setState(() {});
                 },
@@ -223,7 +226,7 @@ class _ObstacleQuestionScreenState extends State<ObstacleQuestionScreen> {
               ),
               KLIButton(
                 'End',
-                enableCondition: MatchState.i.answeredObstacleRows.every((e) => e),
+                enableCondition: keywordAnswered || MatchState.i.answeredObstacleRows.every((e) => e),
                 onPressed: () {
                   Navigator.of(context).pop();
                 },
@@ -253,14 +256,11 @@ class _ObstacleQuestionScreenState extends State<ObstacleQuestionScreen> {
                   Text(
                     MatchState.i.obstacleMatch!.hintQuestions[questionIndex]!.question,
                     textAlign: TextAlign.center,
-                    textWidthBasis: TextWidthBasis.longestLine,
                     style: const TextStyle(fontSize: fontSizeLarge),
                   ),
                   const SizedBox(height: 16),
                   Text(
                     MatchState.i.obstacleMatch!.hintQuestions[questionIndex]!.answer,
-                    softWrap: true,
-                    textAlign: TextAlign.end,
                     style: const TextStyle(
                       fontSize: fontSizeMedium,
                       fontStyle: FontStyle.italic,
@@ -282,33 +282,29 @@ class _ObstacleQuestionScreenState extends State<ObstacleQuestionScreen> {
 
     return Expanded(
       child: Container(
+        padding: const EdgeInsets.only(top: 32, bottom: 64),
         decoration: BoxDecoration(
           border: Border.all(color: Colors.white),
           color: Theme.of(context).colorScheme.background,
           borderRadius: const BorderRadius.horizontal(right: Radius.circular(10)),
         ),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            const SizedBox(),
             Text(
               qDisplay,
               style: const TextStyle(fontSize: fontSizeMedium),
             ),
-            Container(
-              padding: const EdgeInsets.symmetric(vertical: 68, horizontal: 77),
-              decoration: const BoxDecoration(
-                border: BorderDirectional(top: BorderSide(color: Colors.white)),
-              ),
-              child: AnimatedCircularProgressBar(
-                currentTimeSec: currentTimeSec,
-                totalTimeSec: widget.timeLimitSec,
-                textSize: fontSizeLarge,
-                valueColor: const Color(0xFF00A906),
-                backgroundColor: Colors.red,
-                strokeWidth: 40,
-                dimension: 200,
-              ),
+            const Divider(color: Colors.white),
+            const SizedBox(),
+            AnimatedCircularProgressBar(
+              currentTimeSec: currentTimeSec,
+              totalTimeSec: widget.timeLimitSec,
+              textSize: fontSizeLarge,
+              valueColor: const Color(0xFF00A906),
+              backgroundColor: Colors.red,
+              strokeWidth: 40,
+              dimension: 200,
             ),
           ],
         ),
