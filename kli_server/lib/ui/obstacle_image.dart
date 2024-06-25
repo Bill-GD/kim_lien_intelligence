@@ -16,11 +16,6 @@ class ObstacleImageScreen extends StatefulWidget {
 }
 
 class _ObstacleImageScreenState extends State<ObstacleImageScreen> {
-  final image = Image.file(
-    File(StorageHandler.getFullPath(MatchState.i.obstacleMatch!.imagePath)),
-    fit: BoxFit.contain,
-  );
-
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -32,17 +27,22 @@ class _ObstacleImageScreenState extends State<ObstacleImageScreen> {
           implyLeading: true,
         ),
         backgroundColor: Colors.transparent,
-        body: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 32),
-          child: Stack(
-            alignment: Alignment.center,
-            fit: StackFit.expand,
-            children: [
-              Container(
-                color: Colors.white54,
-              ),
-              image,
-            ],
+        body: Center(
+          child: Container(
+            constraints: BoxConstraints.loose(const Size(1600, 900)),
+            child: Stack(
+              children: [
+                Image.file(
+                  File(StorageHandler.getFullPath(MatchState.i.obstacleMatch!.imagePath)),
+                  fit: BoxFit.contain,
+                ),
+                Positioned.fill(
+                  child: Container(
+                    color: Colors.amber.withOpacity(0.7),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),

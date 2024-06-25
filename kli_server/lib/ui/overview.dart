@@ -143,16 +143,6 @@ class _MatchOverviewState extends State<MatchOverview> {
             disabledLabel: 'Current section: ${MatchState.i.section.name}',
             onPressed: () {},
           ),
-          if (kDebugMode)
-            KLIButton(
-              'Reset',
-              onPressed: () {
-                final matchName = MatchState.i.match.name;
-                MatchState.reset();
-                MatchState.instantiate(matchName);
-                setState(() {});
-              },
-            ),
         ],
       ),
     );

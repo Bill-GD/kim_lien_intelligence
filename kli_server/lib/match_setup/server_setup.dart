@@ -185,6 +185,17 @@ class _ServerSetupState extends State<ServerSetup> {
             }
           },
         ),
+        if (kDebugMode)
+          KLIButton(
+            'Reset',
+            onPressed: () {
+              final matchName = MatchState.i.match.name;
+              MatchState.reset();
+              MatchState.instantiate(matchName);
+              debugPrint('Match reset');
+              setState(() {});
+            },
+          ),
       ],
     );
   }
