@@ -33,6 +33,7 @@ class _ObstacleQuestionScreenState extends State<ObstacleQuestionScreen> {
 
   @override
   void initState() {
+    debugPrint('${MatchState.i.imagePartOrder}');
     currentTimeSec = widget.timeLimitSec;
     super.initState();
   }
@@ -179,6 +180,7 @@ class _ObstacleQuestionScreenState extends State<ObstacleQuestionScreen> {
                 'Correct',
                 enableCondition: canAnnounceAnswer && questionIndex >= 0,
                 onPressed: () {
+                  MatchState.i.revealedImageParts[MatchState.i.imagePartOrder.indexOf(questionIndex)] = true;
                   MatchState.i.revealedObstacleRows[questionIndex] = true;
                   MatchState.i.answeredObstacleRows[questionIndex] = true;
                   questionIndex = -1;
@@ -191,7 +193,6 @@ class _ObstacleQuestionScreenState extends State<ObstacleQuestionScreen> {
                 'Wrong',
                 enableCondition: canAnnounceAnswer && questionIndex >= 0,
                 onPressed: () {
-                  MatchState.i.revealedObstacleRows[questionIndex] = false;
                   MatchState.i.answeredObstacleRows[questionIndex] = true;
                   questionIndex = -1;
                   canShowAnswers = false;

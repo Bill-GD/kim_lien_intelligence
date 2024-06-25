@@ -16,6 +16,19 @@ class ObstacleImageScreen extends StatefulWidget {
 }
 
 class _ObstacleImageScreenState extends State<ObstacleImageScreen> {
+  Size imageSize = const Size(0, 0);
+
+  @override
+  void initState() {
+    FileImage(
+      File(StorageHandler.getFullPath(MatchState.i.obstacleMatch!.imagePath)),
+    ).resolve(const ImageConfiguration()).addListener(ImageStreamListener((image, _) {
+      imageSize = Size(image.image.width.toDouble(), image.image.height.toDouble());
+      setState(() {});
+    }));
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -37,13 +50,53 @@ class _ObstacleImageScreenState extends State<ObstacleImageScreen> {
                   fit: BoxFit.contain,
                 ),
                 Positioned.fill(
-                  child: Container(
-                    color: Colors.amber.withOpacity(0.7),
+                  child: Stack(
+                    children: [
+                      for (var i = 0; i < 5; i++)
+                        if (!MatchState.i.revealedImageParts[i]) ImageCover(id: i + 1, size: imageSize),
+                    ],
                   ),
                 ),
               ],
             ),
           ),
+        ),
+      ),
+    );
+  }
+}
+
+class ImageCover extends StatelessWidget {
+  final int id;
+  final Size size;
+  const ImageCover({super.key, required this.id, required this.size});
+
+  @override
+  Widget build(BuildContext context) {
+    final (start, end, top, bottom) = switch (id) {
+      1 => (0, 0.5, 0, 0.5),
+      2 => (0.5, 0, 0, 0.5),
+      3 => (0, 0.5, 0.5, 0),
+      4 => (0.5, 0, 0.5, 0),
+      5 => (0.3, 0.3, 0.3, 0.3),
+      _ => throw Exception('Invalid id: $id'),
+    };
+
+    return Positioned.fill(
+      left: size.width * start,
+      right: size.width * end,
+      top: size.height * top,
+      bottom: size.height * bottom,
+      child: Container(
+        alignment: Alignment.center,
+        decoration: BoxDecoration(
+          color: Theme.of(context).colorScheme.background,
+          border: Border.all(color: Colors.white),
+        ),
+        child: Text(
+          '$id',
+          textAlign: TextAlign.center,
+          style: const TextStyle(fontSize: fontSizeLarge),
         ),
       ),
     );

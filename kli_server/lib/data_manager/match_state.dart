@@ -30,7 +30,10 @@ class MatchState {
     ));
 
     _inst = MatchState._(newMatch);
-    if (_inst!.section == MatchSection.obstacle) _inst!.imagePartOrder.shuffle();
+    if (_inst!.section == MatchSection.obstacle) {
+      _inst!.imagePartOrder.shuffle();
+      _inst!.imagePartOrder.add(4);
+    }
   }
 
   static void reset() => _inst = null;
@@ -136,4 +139,5 @@ class MatchState {
   final revealedObstacleRows = <bool>[false, false, false, false, false];
   final answeredObstacleRows = <bool>[false, false, false, false, false];
   late final List<int> imagePartOrder = <int>[0, 1, 2, 3];
+  final revealedImageParts = <bool>[false, false, false, false, false];
 }
