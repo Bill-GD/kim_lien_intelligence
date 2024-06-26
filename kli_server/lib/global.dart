@@ -119,6 +119,7 @@ SideNavigationBarTheme sideNavigationTheme(BuildContext context, [double height 
 
 String changelog = """
   0.4 ({latest}):
+  - Added error message to loading screen
   - Added overview UI: name, players, scores, current section, timer
   - Added Obstacle UI: (correctly/wrongly answered) questions, answers, timer, image, image covers
 

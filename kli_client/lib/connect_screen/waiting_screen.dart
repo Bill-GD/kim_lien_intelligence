@@ -1,4 +1,8 @@
+import 'dart:async';
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:kli_client/match_data.dart';
 import 'package:kli_lib/kli_lib.dart';
 
 import '../global.dart';
@@ -12,17 +16,25 @@ class WaitingScreen extends StatefulWidget {
 }
 
 class _WaitingScreenState extends State<WaitingScreen> {
+  late final StreamSubscription<KLISocketMessage> messageSubscription;
+
   @override
   void initState() {
+    super.initState();
     logHandler.info('Waiting screen');
-    KLIClient.onMessageReceived.listen((newMessage) {
+    messageSubscription = KLIClient.onMessageReceived.listen((newMessage) {
       if (newMessage.type == KLIMessageType.disconnect) {
         KLIClient.disconnect();
         logHandler.info('Message from Host: ${newMessage.message}');
         Navigator.pop(context);
       }
     });
-    super.initState();
+  }
+
+  @override
+  void dispose() {
+    messageSubscription.cancel();
+    super.dispose();
   }
 
   @override
@@ -44,7 +56,7 @@ class _WaitingScreenState extends State<WaitingScreen> {
             // mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
               Text(
-                'Connected to: ${KLIClient.socket!.address.address}',
+                'Connected to: ${KLIClient.remoteAddress}',
                 style: const TextStyle(fontSize: fontSizeLarge),
               ),
               const SizedBox(height: 64),
@@ -74,11 +86,19 @@ class _WaitingScreenState extends State<WaitingScreen> {
                         message: 'Request players info',
                         type: KLIMessageType.players,
                       ));
-                      Navigator.of(context).push(
-                        MaterialPageRoute<void>(
-                          builder: (context) => const Overview(),
-                        ),
-                      );
+
+                      int i = 0;
+                      KLIClient.onMessageReceived.listen((m) {
+                        if (m.type == KLIMessageType.players) {
+                          MatchData().players.add(jsonDecode(m.message) as Map<String, dynamic>);
+                          i++;
+                          if (i == 4) {
+                            Navigator.of(context).push(
+                              MaterialPageRoute<void>(builder: (context) => const Overview()),
+                            );
+                          }
+                        }
+                      });
                     },
                   ),
                 ],

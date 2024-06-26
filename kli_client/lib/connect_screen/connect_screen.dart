@@ -31,6 +31,7 @@ class _ConnectPageState extends State<ConnectPage> {
   @override
   void dispose() {
     ipTextController.dispose();
+    newMessageSubscription?.cancel();
     super.dispose();
   }
 
@@ -122,7 +123,7 @@ class _ConnectPageState extends State<ConnectPage> {
           'Connect',
           disabledLabel: 'Already connected',
           enableCondition: !isConnecting && !isConnected,
-          onPressed: () {
+          onPressed: () async {
             final ip = ipTextController.value.text.trim();
             if (ip.isEmpty) {
               showToastMessage(context, 'Please enter an IP');
@@ -134,18 +135,16 @@ class _ConnectPageState extends State<ConnectPage> {
             }
             logHandler.info('Selected role: ${KLIClient.clientID}');
 
-            runZonedGuarded(
-              () async {
-                setState(() => isConnecting = true);
-                await KLIClient.init(ip, KLIClient.clientID!);
-                setState(() {
-                  isConnecting = false;
-                  isConnected = true;
-                });
+            try {
+              setState(() => isConnecting = true);
+              await KLIClient.init(ip, KLIClient.clientID!);
+              setState(() {
+                isConnecting = false;
+                isConnected = true;
+              });
 
-                newMessageSubscription = KLIClient.onMessageReceived.listen((newMessage) {
-                  if (newMessage.type != KLIMessageType.disconnect) return;
-
+              newMessageSubscription = KLIClient.onMessageReceived.listen((newMessage) {
+                if (newMessage.type == KLIMessageType.disconnect) {
                   isConnected = false;
                   KLIClient.disconnect();
                   clientTextController.text = '';
@@ -154,28 +153,25 @@ class _ConnectPageState extends State<ConnectPage> {
                   newMessageSubscription = null;
 
                   setState(() {});
-                });
+                }
+              });
 
-                if (mounted) {
-                  showToastMessage(
-                    context,
-                    'Connected to server as ${KLIClient.clientID} with IP: ${KLIClient.remoteAddress}',
-                  );
-                }
-              },
-              (e, stack) {
-                logHandler.error('Error when trying to connect: $e', stackTrace: stack);
-                if (e is SocketException) {
-                  showToastMessage(context, 'Host (ip=$ip) not known');
-                } else {
-                  showToastMessage(context, 'An error occurred, please check log to see what happened');
-                }
-                setState(() {
-                  isConnected = false;
-                  isConnecting = false;
-                });
-              },
-            );
+              // if (mounted) {
+              //   showToastMessage(
+              //     context,
+              //     'Connected to server as ${KLIClient.clientID} with IP: ${KLIClient.remoteAddress}',
+              //   );
+              // }
+            } on Exception catch (e, stack) {
+              logHandler.error('Error when trying to connect: $e', stackTrace: stack);
+              if (e is SocketException) {
+                if (mounted) showToastMessage(context, 'Host (ip=$ip) not known');
+              }
+              setState(() {
+                isConnected = false;
+                isConnecting = false;
+              });
+            }
           },
         ),
         const SizedBox(width: 20),

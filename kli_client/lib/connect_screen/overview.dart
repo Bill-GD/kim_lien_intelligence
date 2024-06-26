@@ -1,7 +1,9 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:kli_client/global.dart';
 import 'package:kli_lib/kli_lib.dart';
+
+import '../global.dart';
+import '../match_data.dart';
 
 class Overview extends StatefulWidget {
   const Overview({super.key});
@@ -27,27 +29,58 @@ class _OverviewState extends State<Overview> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              ElevatedButton(
-                onPressed: () {
-                  Navigator.pushNamed(context, '/waiting_screen');
-                },
-                child: const Text('Connect to server'),
-              ),
-              ElevatedButton(
-                onPressed: () {
-                  Navigator.pushNamed(context, '/start_screen');
-                },
-                child: const Text('Start screen'),
-              ),
-              ElevatedButton(
-                onPressed: () {
-                  Navigator.pushNamed(context, '/obstacle_image_screen');
-                },
-                child: const Text('Obstacle image screen'),
-              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  for (int i = 0; i < 4; i++) playerWidget(i),
+                ],
+              )
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  Widget playerWidget(int pos) {
+    final bool isCurrentPlayer = KLIClient.clientID!.name.contains('player') &&
+        int.parse(Networking.getClientDisplayID(KLIClient.clientID!).split(' ').last) == pos;
+
+    return IntrinsicWidth(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Container(
+            margin: const EdgeInsets.symmetric(vertical: 8),
+            decoration: BoxDecoration(
+              border: Border.all(color: Theme.of(context).colorScheme.onBackground),
+              borderRadius: BorderRadius.circular(5),
+            ),
+            constraints: const BoxConstraints(maxHeight: 600, maxWidth: 450, minHeight: 1, minWidth: 260),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(5),
+              child: Image.memory(
+                Networking.decodeMedia(MatchData().players[pos]['image']),
+                fit: BoxFit.contain,
+              ),
+            ),
+          ),
+          Container(
+            padding: const EdgeInsets.symmetric(vertical: 8),
+            decoration: BoxDecoration(
+              border: Border.all(color: Theme.of(context).colorScheme.onBackground),
+              color: isCurrentPlayer
+                  ? Theme.of(context).colorScheme.primaryContainer
+                  : Theme.of(context).colorScheme.background,
+              borderRadius: BorderRadius.circular(5),
+            ),
+            child: Text(
+              MatchData().players[pos]['name'],
+              textAlign: TextAlign.center,
+              style: const TextStyle(fontSize: fontSizeMedium),
+            ),
+          ),
+        ],
       ),
     );
   }

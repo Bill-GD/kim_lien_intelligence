@@ -1,3 +1,6 @@
+import 'dart:async';
+import 'dart:convert';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -25,19 +28,6 @@ class _ServerSetupState extends State<ServerSetup> {
     super.initState();
     logHandler.info('Opened Server Setup page');
     getIpAddresses();
-    // KLIServer.onConnectionChanged.listen((event) {
-    //   logHandler.i('A client connected');
-    //   setState(() {});
-    // });
-    // KLIServer.onMessageReceived.listen((receivedMessage) {
-    // _clientMessage = '${receivedMessage.senderID}: ${receivedMessage.message}';
-    //   setState(() {});
-    // });
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
   }
 
   void getIpAddresses() async {
@@ -134,8 +124,34 @@ class _ServerSetupState extends State<ServerSetup> {
             try {
               await KLIServer.start();
 
+              if (!MatchState.initialized) {
+                logHandler.empty();
+                logHandler.info('Match initialized');
+              }
+
+              await MatchState.instantiate(widget.matchName);
+
               KLIServer.onConnectionChanged.listen((event) {
                 setState(() {});
+              });
+
+              KLIServer.onMessageReceived.listen((m) {
+                if (m.type == KLIMessageType.players) {
+                  logHandler.info('Sending player list');
+                  for (final p in MatchState().players) {
+                    KLIServer.sendMessage(
+                      m.senderID,
+                      KLISocketMessage(
+                        senderID: ConnectionID.host,
+                        type: KLIMessageType.players,
+                        message: jsonEncode({
+                          'name': p.name,
+                          'image': Networking.encodeMedia(StorageHandler.getFullPath(p.imagePath)),
+                        }),
+                      ),
+                    );
+                  }
+                }
               });
 
               setState(() {});
@@ -170,12 +186,6 @@ class _ServerSetupState extends State<ServerSetup> {
           enableCondition: KLIServer.started && (kDebugMode || KLIServer.allPlayerConnected),
           disabledLabel: !KLIServer.started ? 'No server exist' : 'Not enough player',
           onPressed: () async {
-            if (!MatchState.initialized) {
-              logHandler.empty();
-              logHandler.info('Starting Match');
-            }
-
-            await MatchState.instantiate(widget.matchName);
             if (mounted) {
               Navigator.of(context).push(
                 MaterialPageRoute<void>(
@@ -189,7 +199,7 @@ class _ServerSetupState extends State<ServerSetup> {
           KLIButton(
             'Reset',
             onPressed: () {
-              final matchName = MatchState.i.match.name;
+              final matchName = MatchState().match.name;
               MatchState.reset();
               MatchState.instantiate(matchName);
               debugPrint('Match reset');

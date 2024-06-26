@@ -27,7 +27,9 @@ void initAudioHandler() {
 
 String changelog = """
   0.2 ({latest}):
-  - 
+  - Added error message to loading screen
+  - App is now always on top unless is in debug mode
+  - Added overview screen that shows players
 
   0.1.2.1 ({8b223b0}):
   - Updated KLI Lib to 0.4
