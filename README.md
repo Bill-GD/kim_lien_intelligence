@@ -1,7 +1,8 @@
 # kim_lien_intelligence
 
 ![GitHub repo size](https://img.shields.io/github/repo-size/Bill-GD/kim_lien_intelligence?style=plastic) ![GitHub repo size](https://img.shields.io/github/languages/code-size/Bill-GD/kim_lien_intelligence?style=plastic)  
-[![wakatime](https://wakatime.com/badge/github/Bill-GD/kim_lien_intelligence.svg)](https://wakatime.com/badge/github/Bill-GD/kim_lien_intelligence)
+[![wakatime](https://wakatime.com/badge/github/Bill-GD/kim_lien_intelligence.svg)](https://wakatime.com/badge/github/Bill-GD/kim_lien_intelligence)  
+[![wakatime](https://wakatime.com/badge/github/Bill-GD/kli_lib.svg)](https://wakatime.com/badge/github/Bill-GD/kli_lib) &rarr; Different workspace
 
 A set of 2 apps. The library is private.  
 Date created: 01/04/2024

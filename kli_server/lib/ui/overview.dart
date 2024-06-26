@@ -10,8 +10,7 @@ import 'obstacle_questions.dart';
 import 'start.dart';
 
 class MatchOverview extends StatefulWidget {
-  final DecorationImage background;
-  const MatchOverview({super.key, required this.background});
+  const MatchOverview({super.key});
 
   @override
   State<MatchOverview> createState() => _MatchOverviewState();
@@ -26,7 +25,7 @@ class _MatchOverviewState extends State<MatchOverview> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: BoxDecoration(image: widget.background),
+      decoration: BoxDecoration(image: bgWidget),
       child: Scaffold(
         appBar: managerAppBar(
           context,
@@ -38,16 +37,21 @@ class _MatchOverviewState extends State<MatchOverview> {
                 Start section is automatically enabled. Press the corresponding button to start the section.
                 After each section is finished, the next section button will be enabled.
 
-                The game rule is from O21, details as follow:
-                - Start: Player order is 1-4. It will automatically change to the next player after the previous player is done.
-                  The seleted player will be highted.
-                - Obstacle: All players participate at the same time. Each player will select 1 question.
-                  Middle question (5) is only unlocked after all 4 and keyword isn't answered.
+                - Start: Automatically change to the next player after the previous player is done.
+                  The seleted player will be highlighted.
+                  Press 'Start' to start the timer and show the questions.
+                  If player answered all questions, or the timer is up, all functions will be locked.
+                  Press 'End' finish the section.
+                - Obstacle: First select question. Press 'Start' to start the timer and it'll lock question selection.
+                  After time is up, Press 'Show answers' to show the answer and time.
+                  Press 'Show image' to show the image after announcing the result.
+                  Repeat until all 4 question are selected. Press 'Middle question' to show the middle question.
+                  If all questions are selected, press 'End' to finish the section.
                 - Accel: NA
                 - Finish: The order is determined by the score. The player with the highest score will be selected first.
                   After each player, the player with the next highest score will be selected.
                   If there are two players with the same score, the player whose position is smaller will be selected.
-                  The seleted player will be highted. 
+                  The seleted player will be highlighted. 
                 - Extra: NA''',
             ),
           ],
@@ -90,7 +94,6 @@ class _MatchOverviewState extends State<MatchOverview> {
                 await Navigator.of(context).push(
                   MaterialPageRoute(
                     builder: (context) => StartScreen(
-                      background: widget.background,
                       playerPos: MatchState.i.startOrFinishPos,
                     ),
                   ),
@@ -114,7 +117,7 @@ class _MatchOverviewState extends State<MatchOverview> {
               if (mounted) {
                 await Navigator.of(context).push(
                   MaterialPageRoute(
-                    builder: (context) => ObstacleQuestionScreen(background: widget.background),
+                    builder: (context) => const ObstacleQuestionScreen(),
                   ),
                 );
               }

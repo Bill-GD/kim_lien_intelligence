@@ -119,9 +119,6 @@ class MatchState {
   /// [score] can be negative.
   void modifyScore(int playerIndex, int score) => scores[playerIndex] += score;
 
-  /// When unlocking part, select random 0..3, only unlock if not already unlocked, then set to true
-  // static void setUnlockedPart(int index) => _inst?.revealedObstacleRows[index] = true;
-
   // These are instance variables
   late final KLIMatch match;
   final scores = <int>[0, 0, 0, 0];
@@ -132,10 +129,12 @@ class MatchState {
   List<BaseQuestion>? questionList;
   ObstacleMatch? obstacleMatch;
 
+  // start & finish
   int startOrFinishPos = 0;
   final finishPlayerDone = <bool>[false, false, false, false];
   late final List<int> finishOrder;
 
+  // obstacle
   final revealedObstacleRows = <bool>[false, false, false, false, false];
   final answeredObstacleRows = <bool>[false, false, false, false, false];
   late final List<int> imagePartOrder = <int>[0, 1, 2, 3];

@@ -30,7 +30,7 @@ class _ServerSetupState extends State<ServerSetup> {
     //   setState(() {});
     // });
     // KLIServer.onMessageReceived.listen((receivedMessage) {
-    // _clientMessage = '${receivedMessage.senderID}: ${receivedMessage.msg}';
+    // _clientMessage = '${receivedMessage.senderID}: ${receivedMessage.message}';
     //   setState(() {});
     // });
   }
@@ -179,7 +179,7 @@ class _ServerSetupState extends State<ServerSetup> {
             if (mounted) {
               Navigator.of(context).push(
                 MaterialPageRoute<void>(
-                  builder: (context) => MatchOverview(background: bgWidget),
+                  builder: (context) => const MatchOverview(),
                 ),
               );
             }

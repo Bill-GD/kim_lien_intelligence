@@ -119,8 +119,8 @@ SideNavigationBarTheme sideNavigationTheme(BuildContext context, [double height 
 
 String changelog = """
   0.4 ({latest}):
-  - Added overview UI: name, players, scores, current section
-  - Added Obstacle UI: (correctly/wrongly answered) questions, answers
+  - Added overview UI: name, players, scores, current section, timer
+  - Added Obstacle UI: (correctly/wrongly answered) questions, answers, timer, image, image covers
 
   0.3.2.1 ({de8a02f}):
   - Updated KLI Lib to 0.4

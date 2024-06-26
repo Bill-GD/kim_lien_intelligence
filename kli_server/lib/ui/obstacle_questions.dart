@@ -11,10 +11,9 @@ import 'obstacle_image.dart';
 final _key = GlobalKey<ScaffoldState>();
 
 class ObstacleQuestionScreen extends StatefulWidget {
-  final DecorationImage background;
   final double timeLimitSec;
 
-  const ObstacleQuestionScreen({super.key, required this.background, this.timeLimitSec = 15});
+  const ObstacleQuestionScreen({super.key, this.timeLimitSec = 15});
 
   @override
   State<ObstacleQuestionScreen> createState() => _ObstacleQuestionScreenState();
@@ -47,7 +46,7 @@ class _ObstacleQuestionScreenState extends State<ObstacleQuestionScreen> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: BoxDecoration(image: widget.background),
+      decoration: BoxDecoration(image: bgWidget),
       child: Scaffold(
         key: _key,
         appBar: managerAppBar(
@@ -140,9 +139,7 @@ class _ObstacleQuestionScreenState extends State<ObstacleQuestionScreen> {
             onPressed: () async {
               await Navigator.of(context).push(
                 MaterialPageRoute(
-                  builder: (context) => ObstacleImageScreen(
-                    background: widget.background,
-                  ),
+                  builder: (context) => const ObstacleImageScreen(),
                 ),
               );
               canShowImage = false;
@@ -183,6 +180,7 @@ class _ObstacleQuestionScreenState extends State<ObstacleQuestionScreen> {
                   MatchState.i.revealedImageParts[MatchState.i.imagePartOrder.indexOf(questionIndex)] = true;
                   MatchState.i.revealedObstacleRows[questionIndex] = true;
                   MatchState.i.answeredObstacleRows[questionIndex] = true;
+                  obstacleWait();
                   questionIndex = -1;
                   canShowAnswers = false;
                   canShowImage = true;
@@ -194,6 +192,7 @@ class _ObstacleQuestionScreenState extends State<ObstacleQuestionScreen> {
                 enableCondition: canAnnounceAnswer && questionIndex >= 0,
                 onPressed: () {
                   MatchState.i.answeredObstacleRows[questionIndex] = true;
+                  obstacleWait();
                   questionIndex = -1;
                   canShowAnswers = false;
                   canShowImage = true;
@@ -237,6 +236,22 @@ class _ObstacleQuestionScreenState extends State<ObstacleQuestionScreen> {
         ],
       ),
     );
+  }
+
+  void obstacleWait() {
+    if (questionIndex == 4) {
+      currentTimeSec = 15;
+      timer = Timer.periodic(1.seconds, (timer) {
+        if (currentTimeSec <= 0) {
+          timer.cancel();
+          timeEnded = true;
+          setState(() {});
+          return;
+        }
+        currentTimeSec--;
+        setState(() {});
+      });
+    }
   }
 
   Widget questionContainer() {

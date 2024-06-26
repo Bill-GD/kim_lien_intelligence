@@ -7,9 +7,7 @@ import 'package:kli_server/global.dart';
 import '../data_manager/match_state.dart';
 
 class ObstacleImageScreen extends StatefulWidget {
-  final DecorationImage background;
-
-  const ObstacleImageScreen({super.key, required this.background});
+  const ObstacleImageScreen({super.key});
 
   @override
   State<ObstacleImageScreen> createState() => _ObstacleImageScreenState();
@@ -32,7 +30,7 @@ class _ObstacleImageScreenState extends State<ObstacleImageScreen> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: BoxDecoration(image: widget.background),
+      decoration: BoxDecoration(image: bgWidget),
       child: Scaffold(
         appBar: managerAppBar(
           context,

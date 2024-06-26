@@ -149,7 +149,7 @@ class _ConnectPageState extends State<ConnectPage> {
                   isConnected = false;
                   KLIClient.disconnect();
                   clientTextController.text = '';
-                  if (mounted) showToastMessage(context, newMessage.msg);
+                  if (mounted) showToastMessage(context, newMessage.message);
                   newMessageSubscription!.cancel();
                   newMessageSubscription = null;
 

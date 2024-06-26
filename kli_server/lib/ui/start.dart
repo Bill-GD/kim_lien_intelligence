@@ -8,16 +8,11 @@ import '../data_manager/match_state.dart';
 import '../global.dart';
 
 class StartScreen extends StatefulWidget {
-  final DecorationImage background;
   final double timeLimitSec = 60;
   final buttonPadding = const EdgeInsets.only(top: 90, bottom: 70);
   final int playerPos;
 
-  const StartScreen({
-    super.key,
-    required this.background,
-    required this.playerPos,
-  });
+  const StartScreen({super.key, required this.playerPos});
 
   @override
   State<StartScreen> createState() => _StartScreenState();
@@ -44,7 +39,7 @@ class _StartScreenState extends State<StartScreen> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: BoxDecoration(image: widget.background),
+      decoration: BoxDecoration(image: bgWidget),
       child: Scaffold(
         appBar: managerAppBar(context, 'Start', implyLeading: kDebugMode),
         backgroundColor: Colors.transparent,
