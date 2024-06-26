@@ -19,7 +19,7 @@ class _ObstacleImageScreenState extends State<ObstacleImageScreen> {
   @override
   void initState() {
     FileImage(
-      File(StorageHandler.getFullPath(MatchState.i.obstacleMatch!.imagePath)),
+      File(StorageHandler.getFullPath(MatchState().obstacleMatch!.imagePath)),
     ).resolve(const ImageConfiguration()).addListener(ImageStreamListener((image, _) {
       imageSize = Size(image.image.width.toDouble(), image.image.height.toDouble());
       setState(() {});
@@ -44,14 +44,14 @@ class _ObstacleImageScreenState extends State<ObstacleImageScreen> {
             child: Stack(
               children: [
                 Image.file(
-                  File(StorageHandler.getFullPath(MatchState.i.obstacleMatch!.imagePath)),
+                  File(StorageHandler.getFullPath(MatchState().obstacleMatch!.imagePath)),
                   fit: BoxFit.contain,
                 ),
                 Positioned.fill(
                   child: Stack(
                     children: [
                       for (var i = 0; i < 5; i++)
-                        if (!MatchState.i.revealedImageParts[i]) ImageCover(id: i + 1, size: imageSize),
+                        if (!MatchState().revealedImageParts[i]) ImageCover(id: i + 1, size: imageSize),
                     ],
                   ),
                 ),

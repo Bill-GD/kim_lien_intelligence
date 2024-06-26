@@ -102,7 +102,7 @@ class _FinishScreenState extends State<FinishScreen> {
                 padding: const EdgeInsets.symmetric(vertical: 16),
                 alignment: Alignment.center,
                 child: Text(
-                  '${MatchState.i.players[i].name} (${MatchState.i.scores[i]})',
+                  '${MatchState().players[i].name} (${MatchState().scores[i]})',
                   style: const TextStyle(fontSize: fontSizeMedium),
                 ),
               ),
@@ -172,7 +172,7 @@ class _FinishScreenState extends State<FinishScreen> {
               enableCondition: !timeEnded && started,
               disabledLabel: "Can't answer now",
               onPressed: () {
-                MatchState.i.modifyScore(widget.playerPos, 10);
+                MatchState().modifyScore(widget.playerPos, 10);
                 nextQuestion();
                 setState(() {});
               },

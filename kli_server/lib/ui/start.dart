@@ -27,7 +27,7 @@ class _StartScreenState extends State<StartScreen> {
   @override
   void initState() {
     super.initState();
-    currentQuestion = MatchState.i.questionList!.last as StartQuestion;
+    currentQuestion = MatchState().questionList!.last as StartQuestion;
   }
 
   @override
@@ -93,7 +93,7 @@ class _StartScreenState extends State<StartScreen> {
                 padding: const EdgeInsets.symmetric(vertical: 16),
                 alignment: Alignment.center,
                 child: Text(
-                  '${MatchState.i.players[i].name} (${MatchState.i.scores[i]})',
+                  '${MatchState().players[i].name} (${MatchState().scores[i]})',
                   style: const TextStyle(fontSize: fontSizeMedium),
                 ),
               ),
@@ -162,7 +162,7 @@ class _StartScreenState extends State<StartScreen> {
             enableCondition: !timeEnded && started,
             disabledLabel: "Can't answer now",
             onPressed: () {
-              MatchState.i.modifyScore(widget.playerPos, 10);
+              MatchState().modifyScore(widget.playerPos, 10);
               nextQuestion();
               setState(() {});
             },
@@ -185,12 +185,12 @@ class _StartScreenState extends State<StartScreen> {
   }
 
   void nextQuestion() {
-    if (MatchState.i.questionList!.isEmpty) {
+    if (MatchState().questionList!.isEmpty) {
       timer?.cancel();
       timeEnded = true;
       return;
     }
-    currentQuestion = MatchState.i.questionList!.removeLast() as StartQuestion;
+    currentQuestion = MatchState().questionList!.removeLast() as StartQuestion;
   }
 
   Widget questionInfo() {

@@ -13,9 +13,13 @@ class MatchState {
   static MatchState? _inst;
 
   /// Get the current match state instance. Will throw if not exists.
-  static MatchState get i {
+  factory MatchState() {
     assert(_inst != null, 'MatchState not initialized');
     return _inst!;
+  }
+
+  MatchState._internal(this.match) {
+    players = match.playerList.map((e) => e!).toList();
   }
 
   /// Takes `matchName`. If initialized, does nothing.
@@ -29,7 +33,7 @@ class MatchState {
       orElse: () => throw Exception('Match not found'),
     ));
 
-    _inst = MatchState._(newMatch);
+    _inst = MatchState._internal(newMatch);
     if (_inst!.section == MatchSection.obstacle) {
       _inst!.imagePartOrder.shuffle();
       _inst!.imagePartOrder.add(4);
@@ -38,10 +42,6 @@ class MatchState {
 
   static void reset() => _inst = null;
   static bool get initialized => _inst != null;
-
-  MatchState._(this.match) {
-    players = match.playerList.map((e) => e!).toList();
-  }
 
   void nextSection() {
     if (section == MatchSection.extra) return;

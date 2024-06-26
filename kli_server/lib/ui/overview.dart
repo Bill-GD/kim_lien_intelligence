@@ -18,18 +18,13 @@ class MatchOverview extends StatefulWidget {
 
 class _MatchOverviewState extends State<MatchOverview> {
   @override
-  void initState() {
-    super.initState();
-  }
-
-  @override
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(image: bgWidget),
       child: Scaffold(
         appBar: managerAppBar(
           context,
-          'Match Overview for ${MatchState.i.match.name}',
+          'Match Overview for ${MatchState().match.name}',
           implyLeading: kDebugMode,
           actions: [
             const KLIHelpButton(
@@ -77,43 +72,43 @@ class _MatchOverviewState extends State<MatchOverview> {
         children: [
           KLIButton(
             'Start',
-            enableCondition: MatchState.i.section == MatchSection.start,
+            enableCondition: MatchState().section == MatchSection.start,
             enabledLabel: 'To Start',
-            disabledLabel: 'Current section: ${MatchState.i.section.name}',
+            disabledLabel: 'Current section: ${MatchState().section.name}',
             onPressed: () async {
               // this should only show if somehow the condition is not just match section is start
-              if (MatchState.i.startOrFinishPos > 3) {
+              if (MatchState().startOrFinishPos > 3) {
                 showToastMessage(context, 'All players have finished Start section');
                 return;
               }
 
-              logHandler.info('Start section, player ${MatchState.i.startOrFinishPos}');
-              await MatchState.i.loadQuestions();
+              logHandler.info('Start section, player ${MatchState().startOrFinishPos}');
+              await MatchState().loadQuestions();
 
               if (mounted) {
                 await Navigator.of(context).push(
                   MaterialPageRoute(
                     builder: (context) => StartScreen(
-                      playerPos: MatchState.i.startOrFinishPos,
+                      playerPos: MatchState().startOrFinishPos,
                     ),
                   ),
                 );
               }
 
-              if (MatchState.i.startOrFinishPos == 3) {
-                MatchState.i.nextSection();
+              if (MatchState().startOrFinishPos == 3) {
+                MatchState().nextSection();
               }
-              MatchState.i.nextPlayer();
+              MatchState().nextPlayer();
               setState(() {});
             },
           ),
           KLIButton(
             'Obstacle',
-            enableCondition: MatchState.i.section == MatchSection.obstacle,
+            enableCondition: MatchState().section == MatchSection.obstacle,
             enabledLabel: 'To Obstacle',
-            disabledLabel: 'Current section: ${MatchState.i.section.name}',
+            disabledLabel: 'Current section: ${MatchState().section.name}',
             onPressed: () async {
-              await MatchState.i.loadQuestions();
+              await MatchState().loadQuestions();
               if (mounted) {
                 await Navigator.of(context).push(
                   MaterialPageRoute(
@@ -121,29 +116,29 @@ class _MatchOverviewState extends State<MatchOverview> {
                   ),
                 );
               }
-              if (MatchState.i.answeredObstacleRows.every((e) => e)) MatchState.i.nextSection();
+              if (MatchState().answeredObstacleRows.every((e) => e)) MatchState().nextSection();
               setState(() {});
             },
           ),
           KLIButton(
             'Accel',
-            enableCondition: MatchState.i.section == MatchSection.accel,
+            enableCondition: MatchState().section == MatchSection.accel,
             enabledLabel: 'To Accel',
-            disabledLabel: 'Current section: ${MatchState.i.section.name}',
+            disabledLabel: 'Current section: ${MatchState().section.name}',
             onPressed: () {},
           ),
           KLIButton(
             'Finish',
-            enableCondition: MatchState.i.section == MatchSection.finish,
+            enableCondition: MatchState().section == MatchSection.finish,
             enabledLabel: 'To Finish',
-            disabledLabel: 'Current section: ${MatchState.i.section.name}',
+            disabledLabel: 'Current section: ${MatchState().section.name}',
             onPressed: () {},
           ),
           KLIButton(
             'Extra',
-            enableCondition: MatchState.i.section == MatchSection.extra,
+            enableCondition: MatchState().section == MatchSection.extra,
             enabledLabel: 'To Extra',
-            disabledLabel: 'Current section: ${MatchState.i.section.name}',
+            disabledLabel: 'Current section: ${MatchState().section.name}',
             onPressed: () {},
           ),
         ],
@@ -155,14 +150,14 @@ class _MatchOverviewState extends State<MatchOverview> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
-        for (int i = 0; i < 4; i++) playerWidget(i, MatchState.i.players[i]),
+        for (int i = 0; i < 4; i++) playerWidget(i),
       ],
     );
   }
 
-  Widget playerWidget(int pos, KLIPlayer player) {
-    final bool isCurrentPlayer = MatchState.i.startOrFinishPos == pos &&
-        (MatchState.i.section == MatchSection.start || MatchState.i.section == MatchSection.finish);
+  Widget playerWidget(int pos) {
+    final bool isCurrentPlayer = MatchState().startOrFinishPos == pos &&
+        (MatchState().section == MatchSection.start || MatchState().section == MatchSection.finish);
 
     return IntrinsicWidth(
       child: Column(
@@ -178,7 +173,7 @@ class _MatchOverviewState extends State<MatchOverview> {
             child: ClipRRect(
               borderRadius: BorderRadius.circular(5),
               child: Image.file(
-                File(StorageHandler.getFullPath(player.imagePath)),
+                File(StorageHandler.getFullPath(MatchState().players[pos].imagePath)),
                 fit: BoxFit.contain,
               ),
             ),
@@ -195,13 +190,13 @@ class _MatchOverviewState extends State<MatchOverview> {
             child: Column(
               children: [
                 Text(
-                  player.name,
+                  MatchState().players[pos].name,
                   textAlign: TextAlign.center,
                   style: const TextStyle(fontSize: fontSizeMedium),
                 ),
                 const Divider(color: Colors.white),
                 Text(
-                  MatchState.i.scores[pos].toString(),
+                  MatchState().scores[pos].toString(),
                   textAlign: TextAlign.center,
                   style: const TextStyle(fontSize: fontSizeMedium),
                 ),

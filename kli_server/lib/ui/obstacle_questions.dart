@@ -32,7 +32,7 @@ class _ObstacleQuestionScreenState extends State<ObstacleQuestionScreen> {
 
   @override
   void initState() {
-    debugPrint('${MatchState.i.imagePartOrder}');
+    debugPrint('${MatchState().imagePartOrder}');
     currentTimeSec = widget.timeLimitSec;
     super.initState();
   }
@@ -51,7 +51,7 @@ class _ObstacleQuestionScreenState extends State<ObstacleQuestionScreen> {
         key: _key,
         appBar: managerAppBar(
           context,
-          'Obstacle: ${MatchState.i.obstacleMatch!.keyword}',
+          'Obstacle: ${MatchState().obstacleMatch!.keyword}',
           implyLeading: kDebugMode,
           actions: [Container()],
         ),
@@ -109,9 +109,9 @@ class _ObstacleQuestionScreenState extends State<ObstacleQuestionScreen> {
                 padding: const EdgeInsets.only(bottom: 16),
                 child: _ObstacleRow(
                   index: i,
-                  answer: MatchState.i.obstacleMatch!.hintQuestions[i]!.answer,
-                  revealed: MatchState.i.revealedObstacleRows[i],
-                  answered: MatchState.i.answeredObstacleRows[i],
+                  answer: MatchState().obstacleMatch!.hintQuestions[i]!.answer,
+                  revealed: MatchState().revealedObstacleRows[i],
+                  answered: MatchState().answeredObstacleRows[i],
                   onTap: canSelectQuestion
                       ? () {
                           questionIndex = i;
@@ -149,8 +149,8 @@ class _ObstacleQuestionScreenState extends State<ObstacleQuestionScreen> {
           ),
           KLIButton(
             'Get Middle Row',
-            enableCondition: MatchState.i.answeredObstacleRows.take(4).every((e) => e) &&
-                !MatchState.i.answeredObstacleRows[4] &&
+            enableCondition: MatchState().answeredObstacleRows.take(4).every((e) => e) &&
+                !MatchState().answeredObstacleRows[4] &&
                 questionIndex != 4,
             onPressed: () {
               questionIndex = 4;
@@ -177,9 +177,9 @@ class _ObstacleQuestionScreenState extends State<ObstacleQuestionScreen> {
                 'Correct',
                 enableCondition: canAnnounceAnswer && questionIndex >= 0,
                 onPressed: () {
-                  MatchState.i.revealedImageParts[MatchState.i.imagePartOrder.indexOf(questionIndex)] = true;
-                  MatchState.i.revealedObstacleRows[questionIndex] = true;
-                  MatchState.i.answeredObstacleRows[questionIndex] = true;
+                  MatchState().revealedImageParts[MatchState().imagePartOrder.indexOf(questionIndex)] = true;
+                  MatchState().revealedObstacleRows[questionIndex] = true;
+                  MatchState().answeredObstacleRows[questionIndex] = true;
                   obstacleWait();
                   questionIndex = -1;
                   canShowAnswers = false;
@@ -191,7 +191,7 @@ class _ObstacleQuestionScreenState extends State<ObstacleQuestionScreen> {
                 'Wrong',
                 enableCondition: canAnnounceAnswer && questionIndex >= 0,
                 onPressed: () {
-                  MatchState.i.answeredObstacleRows[questionIndex] = true;
+                  MatchState().answeredObstacleRows[questionIndex] = true;
                   obstacleWait();
                   questionIndex = -1;
                   canShowAnswers = false;
@@ -226,7 +226,7 @@ class _ObstacleQuestionScreenState extends State<ObstacleQuestionScreen> {
               ),
               KLIButton(
                 'End',
-                enableCondition: keywordAnswered || MatchState.i.answeredObstacleRows.every((e) => e),
+                enableCondition: keywordAnswered || MatchState().answeredObstacleRows.every((e) => e),
                 onPressed: () {
                   Navigator.of(context).pop();
                 },
@@ -270,13 +270,13 @@ class _ObstacleQuestionScreenState extends State<ObstacleQuestionScreen> {
           children: questionIndex >= 0
               ? [
                   Text(
-                    MatchState.i.obstacleMatch!.hintQuestions[questionIndex]!.question,
+                    MatchState().obstacleMatch!.hintQuestions[questionIndex]!.question,
                     textAlign: TextAlign.center,
                     style: const TextStyle(fontSize: fontSizeLarge),
                   ),
                   const SizedBox(height: 16),
                   Text(
-                    MatchState.i.obstacleMatch!.hintQuestions[questionIndex]!.answer,
+                    MatchState().obstacleMatch!.hintQuestions[questionIndex]!.answer,
                     style: const TextStyle(
                       fontSize: fontSizeMedium,
                       fontStyle: FontStyle.italic,
