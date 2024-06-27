@@ -27,8 +27,21 @@ class _OverviewState extends State<Overview> {
         backgroundColor: Colors.transparent,
         body: Center(
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            // mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
+              const SizedBox(height: 64),
+              const Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  CircularProgressIndicator(),
+                  Text(
+                    '   Waiting for host to start the game   ',
+                    style: TextStyle(fontSize: fontSizeLarge),
+                  ),
+                  CircularProgressIndicator(),
+                ],
+              ),
+              const SizedBox(height: 64),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
@@ -44,7 +57,7 @@ class _OverviewState extends State<Overview> {
 
   Widget playerWidget(int pos) {
     final bool isCurrentPlayer = KLIClient.clientID!.name.contains('player') &&
-        int.parse(Networking.getClientDisplayID(KLIClient.clientID!).split(' ').last) == pos;
+        int.parse(Networking.getClientDisplayID(KLIClient.clientID!).split(' ').last) - 1 == pos;
 
     return IntrinsicWidth(
       child: Column(
@@ -60,7 +73,7 @@ class _OverviewState extends State<Overview> {
             child: ClipRRect(
               borderRadius: BorderRadius.circular(5),
               child: Image.memory(
-                Networking.decodeMedia(MatchData().players[pos]['image']),
+                MatchData().players[pos]['imageBytes'],
                 fit: BoxFit.contain,
               ),
             ),
@@ -68,9 +81,13 @@ class _OverviewState extends State<Overview> {
           Container(
             padding: const EdgeInsets.symmetric(vertical: 8),
             decoration: BoxDecoration(
-              border: Border.all(color: Theme.of(context).colorScheme.onBackground),
+              border: Border.all(
+                color: isCurrentPlayer
+                    ? Colors.lightGreenAccent //
+                    : Theme.of(context).colorScheme.onBackground,
+              ),
               color: isCurrentPlayer
-                  ? Theme.of(context).colorScheme.primaryContainer
+                  ? Colors.green[800] //
                   : Theme.of(context).colorScheme.background,
               borderRadius: BorderRadius.circular(5),
             ),

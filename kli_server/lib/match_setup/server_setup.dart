@@ -138,19 +138,23 @@ class _ServerSetupState extends State<ServerSetup> {
               KLIServer.onMessageReceived.listen((m) {
                 if (m.type == KLIMessageType.players) {
                   logHandler.info('Sending player list');
+
+                  final data = <Map<String, dynamic>>[];
                   for (final p in MatchState().players) {
-                    KLIServer.sendMessage(
-                      m.senderID,
-                      KLISocketMessage(
-                        senderID: ConnectionID.host,
-                        type: KLIMessageType.players,
-                        message: jsonEncode({
-                          'name': p.name,
-                          'image': Networking.encodeMedia(StorageHandler.getFullPath(p.imagePath)),
-                        }),
-                      ),
-                    );
+                    data.add({
+                      'name': p.name,
+                      'image': Networking.encodeMedia(p.imagePath),
+                    });
                   }
+
+                  KLIServer.sendMessage(
+                    m.senderID,
+                    KLISocketMessage(
+                      senderID: ConnectionID.host,
+                      type: KLIMessageType.players,
+                      message: jsonEncode(data),
+                    ),
+                  );
                 }
               });
 

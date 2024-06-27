@@ -7,7 +7,7 @@ class MatchData {
   MatchData._internal();
 
   // a list of players
-  final List<Map<String, dynamic>> players = [];
+  final players = [];
   Question? currentQuestion;
 }
 

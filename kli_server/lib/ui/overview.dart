@@ -181,9 +181,13 @@ class _MatchOverviewState extends State<MatchOverview> {
           Container(
             padding: const EdgeInsets.symmetric(vertical: 8),
             decoration: BoxDecoration(
-              border: Border.all(color: Theme.of(context).colorScheme.onBackground),
+              border: Border.all(
+                color: isCurrentPlayer
+                    ? Colors.lightGreenAccent //
+                    : Theme.of(context).colorScheme.onBackground,
+              ),
               color: isCurrentPlayer
-                  ? Theme.of(context).colorScheme.primaryContainer
+                  ? Colors.green[800] //
                   : Theme.of(context).colorScheme.background,
               borderRadius: BorderRadius.circular(5),
             ),
