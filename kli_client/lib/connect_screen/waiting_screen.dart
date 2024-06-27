@@ -85,21 +85,25 @@ class _WaitingScreenState extends State<WaitingScreen> {
                         );
                         return;
                       }
+                      receivingData = true;
+                      setState(() {});
 
                       KLIClient.sendMessage(KLISocketMessage(
                         senderID: KLIClient.clientID!,
                         message: 'Request players info',
                         type: KLIMessageType.players,
                       ));
-                      receivingData = true;
-                      setState(() {});
 
                       KLIClient.onMessageReceived.listen((m) {
                         if (m.type == KLIMessageType.players) {
-                          final d = (jsonDecode(m.message)).map(
-                            (e) => {
-                              'name': e['name'] as String,
-                              'imageBytes': Networking.decodeMedia(e['image']),
+                          int i = 0;
+                          final d = (jsonDecode(m.message) as Iterable).map(
+                            (e) {
+                              return Player(
+                                pos: i++,
+                                name: e['name'] as String,
+                                imageBytes: Networking.decodeMedia(e['image']),
+                              );
                             },
                           );
 
@@ -114,7 +118,12 @@ class _WaitingScreenState extends State<WaitingScreen> {
                     },
                   ),
                 ],
-              )
+              ),
+              if (receivingData)
+                const Padding(
+                  padding: EdgeInsets.symmetric(vertical: 32),
+                  child: CircularProgressIndicator(),
+                )
             ],
           ),
         ),

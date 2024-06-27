@@ -29,7 +29,7 @@ String changelog = """
   0.2 ({latest}):
   - Added error message to loading screen
   - App is now always on top unless is in debug mode
-  - Request player list from server
+  - Request player list from server, parses to Player objects
   - Added overview screen that shows players
 
   0.1.2.1 ({8b223b0}):

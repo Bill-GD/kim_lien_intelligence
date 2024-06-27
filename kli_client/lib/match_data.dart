@@ -7,13 +7,21 @@ class MatchData {
   MatchData._internal();
 
   // a list of players
-  final players = [];
+  final players = <Player>[];
   Question? currentQuestion;
 }
 
+class Player {
+  final int pos;
+  final String name;
+  final Uint8List imageBytes;
+
+  Player({required this.pos, required this.name, required this.imageBytes});
+}
+
 class Question {
-  String question;
-  Uint8List? mediaBytes;
+  final String question;
+  final Uint8List? mediaBytes;
 
   Question(this.question, {this.mediaBytes});
 }

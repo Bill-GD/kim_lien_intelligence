@@ -59,6 +59,8 @@ class _OverviewState extends State<Overview> {
     final bool isCurrentPlayer = KLIClient.clientID!.name.contains('player') &&
         int.parse(Networking.getClientDisplayID(KLIClient.clientID!).split(' ').last) - 1 == pos;
 
+    final p = MatchData().players[pos];
+
     return IntrinsicWidth(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -73,7 +75,7 @@ class _OverviewState extends State<Overview> {
             child: ClipRRect(
               borderRadius: BorderRadius.circular(5),
               child: Image.memory(
-                MatchData().players[pos]['imageBytes'],
+                p.imageBytes,
                 fit: BoxFit.contain,
               ),
             ),
@@ -92,7 +94,7 @@ class _OverviewState extends State<Overview> {
               borderRadius: BorderRadius.circular(5),
             ),
             child: Text(
-              MatchData().players[pos]['name'],
+              '${p.pos + 1} - ${p.name}',
               textAlign: TextAlign.center,
               style: const TextStyle(fontSize: fontSizeMedium),
             ),
