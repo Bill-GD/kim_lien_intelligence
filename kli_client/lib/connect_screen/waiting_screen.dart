@@ -108,11 +108,11 @@ class _WaitingScreenState extends State<WaitingScreen> {
                           );
 
                           MatchData().players.addAll(d);
+                          receivingData = false;
+                          setState(() {});
                           Navigator.of(context).push(
                             MaterialPageRoute<void>(builder: (context) => const Overview()),
                           );
-                          receivingData = false;
-                          setState(() {});
                         }
                       });
                     },
@@ -122,7 +122,14 @@ class _WaitingScreenState extends State<WaitingScreen> {
               if (receivingData)
                 const Padding(
                   padding: EdgeInsets.symmetric(vertical: 32),
-                  child: CircularProgressIndicator(),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text('Requesting match data from host'),
+                      SizedBox(width: 16),
+                      CircularProgressIndicator(),
+                    ],
+                  ),
                 )
             ],
           ),
