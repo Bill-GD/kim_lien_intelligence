@@ -21,7 +21,7 @@ class _ConnectPageState extends State<ConnectPage> {
   final clientTextController = TextEditingController(), ipTextController = TextEditingController();
   bool isConnecting = false, isConnected = false;
 
-  StreamSubscription<KLISocketMessage>? newMessageSubscription;
+  StreamSubscription<void>? messageSubscription;
 
   @override
   void initState() {
@@ -31,7 +31,7 @@ class _ConnectPageState extends State<ConnectPage> {
   @override
   void dispose() {
     ipTextController.dispose();
-    newMessageSubscription?.cancel();
+    messageSubscription?.cancel();
     super.dispose();
   }
 
@@ -143,17 +143,12 @@ class _ConnectPageState extends State<ConnectPage> {
                 isConnected = true;
               });
 
-              newMessageSubscription = KLIClient.onMessageReceived.listen((newMessage) {
-                if (newMessage.type == KLIMessageType.disconnect) {
-                  isConnected = false;
-                  KLIClient.disconnect();
-                  clientTextController.text = '';
-                  if (mounted) showToastMessage(context, newMessage.message);
-                  newMessageSubscription!.cancel();
-                  newMessageSubscription = null;
-
-                  setState(() {});
-                }
+              messageSubscription = KLIClient.onDisconnected.listen((_) {
+                isConnected = false;
+                clientTextController.text = '';
+                messageSubscription!.cancel();
+                messageSubscription = null;
+                setState(() {});
               });
 
               // if (mounted) {

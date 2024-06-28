@@ -17,20 +17,15 @@ class WaitingScreen extends StatefulWidget {
 }
 
 class _WaitingScreenState extends State<WaitingScreen> {
-  late final StreamSubscription<KLISocketMessage> messageSubscription;
+  late final StreamSubscription<void> messageSubscription;
   bool receivingData = false;
 
   @override
   void initState() {
     super.initState();
     logHandler.info('Waiting screen');
-    messageSubscription = KLIClient.onMessageReceived.listen((newMessage) {
-      if (newMessage.type == KLIMessageType.disconnect) {
-        KLIClient.disconnect();
-        logHandler.info('Message from Host: ${newMessage.message}');
-        Navigator.pop(context);
-      }
-    });
+
+    messageSubscription = KLIClient.onDisconnected.listen((_) => Navigator.pop(context));
   }
 
   @override
@@ -78,6 +73,7 @@ class _WaitingScreenState extends State<WaitingScreen> {
                   KLIButton(
                     'Ready',
                     enableCondition: !receivingData,
+                    enabledLabel: 'No turning back',
                     onPressed: () {
                       if (MatchData().players.isNotEmpty) {
                         Navigator.of(context).push(

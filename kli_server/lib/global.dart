@@ -123,6 +123,9 @@ String changelog = """
   - Added overview UI: name, players, scores, current section, timer
   - Added Obstacle UI: (correctly/wrongly answered) questions, answers, timer, image, image covers
   - Can receive Player info request from clients and respond
+  - Receives and sends ready signal from/to players, can only start match if all is ready
+  - Fixed wrong log messages
+  - All player pos is now 0-based
 
   0.3.2.1 ({de8a02f}):
   - Updated KLI Lib to 0.4

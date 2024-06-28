@@ -6,6 +6,13 @@ class MatchData {
   factory MatchData() => _singleton;
   MatchData._internal();
 
+  void setPlayerReady(int pos) => players
+      .firstWhere(
+        (element) => element.pos == pos,
+        orElse: () => throw Exception('No player found'),
+      )
+      .ready = true;
+
   // a list of players
   final players = <Player>[];
   Question? currentQuestion;
@@ -15,6 +22,7 @@ class Player {
   final int pos;
   final String name;
   final Uint8List imageBytes;
+  bool ready = false;
 
   Player({required this.pos, required this.name, required this.imageBytes});
 }

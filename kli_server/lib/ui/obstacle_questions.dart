@@ -57,10 +57,18 @@ class _ObstacleQuestionScreenState extends State<ObstacleQuestionScreen> {
         ),
         backgroundColor: Colors.transparent,
         // TODO extract this to external stateful widget
-        endDrawer: const Drawer(
+        endDrawer: Drawer(
           width: 800,
+          backgroundColor: Colors.transparent,
           child: Center(
-            child: Text('a'),
+            child: Container(
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.background,
+                border: Border.all(color: Colors.white),
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: const Text('a'),
+            ),
           ),
         ),
         body: Container(
@@ -149,9 +157,8 @@ class _ObstacleQuestionScreenState extends State<ObstacleQuestionScreen> {
           ),
           KLIButton(
             'Get Middle Row',
-            enableCondition: MatchState().answeredObstacleRows.take(4).every((e) => e) &&
-                !MatchState().answeredObstacleRows[4] &&
-                questionIndex != 4,
+            enableCondition:
+                MatchState().allRowsAnswered && !MatchState().answeredObstacleRows[4] && questionIndex != 4,
             onPressed: () {
               questionIndex = 4;
               timeEnded = false;
@@ -226,7 +233,7 @@ class _ObstacleQuestionScreenState extends State<ObstacleQuestionScreen> {
               ),
               KLIButton(
                 'End',
-                enableCondition: keywordAnswered || MatchState().answeredObstacleRows.every((e) => e),
+                enableCondition: keywordAnswered || MatchState().allQuestionsAnswered,
                 onPressed: () {
                   Navigator.of(context).pop();
                 },

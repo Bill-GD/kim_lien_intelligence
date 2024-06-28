@@ -20,7 +20,8 @@ class ServerSetup extends StatefulWidget {
 }
 
 class _ServerSetupState extends State<ServerSetup> {
-  String localAddress = '', publicAddress = '';
+  String localAddress = '';
+  // String publicAddress = '';
 
   @override
   void initState() {
@@ -32,7 +33,7 @@ class _ServerSetupState extends State<ServerSetup> {
 
   void getIpAddresses() async {
     localAddress = await Networking.getLocalIP();
-    publicAddress = await Networking.getPublicIP();
+    // publicAddress = await Networking.getPublicIP();
     setState(() {});
   }
 
@@ -187,7 +188,7 @@ class _ServerSetupState extends State<ServerSetup> {
         ),
         KLIButton(
           'Start Match',
-          enableCondition: KLIServer.started && (kDebugMode || KLIServer.allPlayerConnected),
+          enableCondition: KLIServer.started && (kDebugMode || MatchState().allPlayerReady),
           disabledLabel: !KLIServer.started ? 'No server exist' : 'Not enough player',
           onPressed: () async {
             if (mounted) {

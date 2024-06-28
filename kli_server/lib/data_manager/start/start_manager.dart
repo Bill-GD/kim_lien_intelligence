@@ -42,7 +42,7 @@ class _StartQuestionManagerState extends State<StartQuestionManager> {
         try {
           final v = r.values;
           questions.add(StartQuestion(
-            pos: idx + 1,
+            pos: idx,
             subject: StartQuestion.mapTypeValue(v.elementAt(1)),
             question: v.elementAt(2),
             answer: v.elementAt(3),
@@ -122,10 +122,10 @@ class _StartQuestionManagerState extends State<StartQuestionManager> {
             enabled: hasSelectedMatch,
             dropdownMenuEntries: [
               const DropdownMenuEntry(value: -1, label: 'Tất cả'),
-              for (var i = 1; i <= 4; i++)
+              for (var i = 0; i < 4; i++)
                 DropdownMenuEntry(
                   value: i,
-                  label: '$i',
+                  label: '${i + 1}',
                 )
             ],
             onSelected: (value) async {
@@ -262,7 +262,7 @@ class _StartQuestionManagerState extends State<StartQuestionManager> {
                     return customListTile(
                       context,
                       columns: [
-                        (Text('${q.pos}', textAlign: TextAlign.center), widthRatios[0]),
+                        (Text('${q.pos + 1}', textAlign: TextAlign.center), widthRatios[0]),
                         (Text(StartQuestion.mapTypeDisplay(q.subject)), widthRatios[1]),
                         (Text(q.question, textAlign: TextAlign.left), widthRatios[2]),
                         (Text(q.answer, textAlign: TextAlign.right), widthRatios[3]),

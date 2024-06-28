@@ -128,7 +128,7 @@ class _FinishManagerState extends State<FinishManager> {
             ],
             onSelected: (value) async {
               sortPoint = value!;
-              logHandler.info('Sort position: $value');
+              logHandler.info('Sort point: $value');
               setState(() {});
             },
           ),

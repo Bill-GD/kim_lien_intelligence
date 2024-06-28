@@ -63,10 +63,10 @@ class _StartQuestionEditorState extends State<StartQuestionEditor> {
                 textStyle: const TextStyle(fontSize: fontSizeMSmall),
                 initialSelection: pos,
                 dropdownMenuEntries: [
-                  for (var i = 1; i <= 4; i++)
+                  for (var i = 0; i < 4; i++)
                     DropdownMenuEntry(
                       value: i,
-                      label: '$i',
+                      label: '${i + 1}',
                     )
                 ],
                 onSelected: (value) async {

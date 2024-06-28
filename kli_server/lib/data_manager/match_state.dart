@@ -54,7 +54,7 @@ class MatchState {
       case MatchSection.start:
         questionList = (await DataManager.getMatchQuestions<StartMatch>(match.name))
             .questions
-            .where((e) => e.pos == startOrFinishPos + 1)
+            .where((e) => e.pos == startOrFinishPos)
             .toList()
             .reversed
             .toList();
@@ -68,6 +68,7 @@ class MatchState {
         await DataManager.getMatchQuestions<AccelMatch>(match.name);
         break;
       case MatchSection.finish:
+        startOrFinishPos = 0;
         await DataManager.getMatchQuestions<FinishMatch>(match.name);
         break;
       case MatchSection.extra:
@@ -123,6 +124,8 @@ class MatchState {
   late final KLIMatch match;
   final scores = <int>[0, 0, 0, 0];
   late final List<KLIPlayer> players;
+  final playerReady = <bool>[false, false, false, false];
+  bool get allPlayerReady => playerReady.every((e) => e);
   MatchSection section = MatchSection.obstacle;
 
   /// For Start, Accel, Finish, Extra. For Obstacle, use [obstacleMatch]
@@ -139,4 +142,6 @@ class MatchState {
   final answeredObstacleRows = <bool>[false, false, false, false, false];
   late final List<int> imagePartOrder = <int>[0, 1, 2, 3];
   final revealedImageParts = <bool>[false, false, false, false, false];
+  bool get allRowsAnswered => answeredObstacleRows.take(4).every((e) => e);
+  bool get allQuestionsAnswered => answeredObstacleRows.every((e) => e);
 }

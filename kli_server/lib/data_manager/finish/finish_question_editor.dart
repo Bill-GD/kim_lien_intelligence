@@ -218,7 +218,7 @@ class _FinishQuestionEditorState extends State<FinishQuestionEditor> {
                         child: const Text('Chọn Video'),
                         onPressed: () async {
                           logHandler.info(
-                            '-- Selecting video at ${StorageHandler.getRelative(storageHandler.mediaDir)}',
+                            'Selecting video at ${StorageHandler.getRelative(storageHandler.mediaDir)}',
                           );
                           final result = await FilePicker.platform.pickFiles(
                             dialogTitle: 'Select image',

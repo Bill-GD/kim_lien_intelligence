@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:kli_lib/kli_lib.dart';
@@ -13,6 +15,25 @@ class Overview extends StatefulWidget {
 }
 
 class _OverviewState extends State<Overview> {
+  late final StreamSubscription<void> messageSubscription;
+
+  @override
+  void initState() {
+    super.initState();
+
+    messageSubscription = KLIClient.onDisconnected.listen((_) => Navigator.pop(context));
+
+    KLIClient.sendMessage(
+      KLISocketMessage(senderID: KLIClient.clientID!, message: 'ready', type: KLIMessageType.playerReady),
+    );
+  }
+
+  @override
+  void dispose() {
+    messageSubscription.cancel();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -56,9 +77,6 @@ class _OverviewState extends State<Overview> {
   }
 
   Widget playerWidget(int pos) {
-    final bool isCurrentPlayer = KLIClient.clientID!.name.contains('player') &&
-        int.parse(Networking.getClientDisplayID(KLIClient.clientID!).split(' ').last) - 1 == pos;
-
     final p = MatchData().players[pos];
 
     return IntrinsicWidth(
@@ -84,11 +102,11 @@ class _OverviewState extends State<Overview> {
             padding: const EdgeInsets.symmetric(vertical: 8),
             decoration: BoxDecoration(
               border: Border.all(
-                color: isCurrentPlayer
+                color: p.ready
                     ? Colors.lightGreenAccent //
                     : Theme.of(context).colorScheme.onBackground,
               ),
-              color: isCurrentPlayer
+              color: p.ready
                   ? Colors.green[800] //
                   : Theme.of(context).colorScheme.background,
               borderRadius: BorderRadius.circular(5),
