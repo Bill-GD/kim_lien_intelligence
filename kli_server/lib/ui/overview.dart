@@ -101,10 +101,10 @@ class _MatchOverviewState extends State<MatchOverview> {
                 );
               }
 
+              MatchState().nextPlayer();
               if (MatchState().startOrFinishPos == 3) {
                 MatchState().nextSection();
               }
-              MatchState().nextPlayer();
               setState(() {});
             },
           ),

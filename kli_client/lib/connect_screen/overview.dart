@@ -32,8 +32,12 @@ class _OverviewState extends State<Overview> {
           playerReady[int.parse(m.message)] = true;
           setState(() {});
           break;
+        case KLIMessageType.section:
+          overviewMessage = 'Section: ${m.message}';
+          setState(() {});
+          break;
         case KLIMessageType.startMatch:
-          overviewMessage = 'Section: Start';
+          overviewMessage = 'Section: start';
           started = true;
           setState(() {});
           break;
@@ -41,6 +45,7 @@ class _OverviewState extends State<Overview> {
           await Navigator.of(context).push(
             MaterialPageRoute(builder: (_) => PlayerStartScreen(playerPos: int.parse(m.message))),
           );
+          setState(() {});
           break;
         default:
           break;
@@ -103,7 +108,6 @@ class _OverviewState extends State<Overview> {
 
   Widget playerWidget(int pos) {
     final p = MatchData().players[pos];
-    final isReady = playerReady[pos];
 
     return IntrinsicWidth(
       child: Column(
@@ -128,13 +132,9 @@ class _OverviewState extends State<Overview> {
             padding: const EdgeInsets.symmetric(vertical: 8),
             decoration: BoxDecoration(
               border: Border.all(
-                color: isReady
-                    ? Colors.lightGreenAccent //
-                    : Theme.of(context).colorScheme.onBackground,
+                color: Theme.of(context).colorScheme.onBackground,
               ),
-              color: isReady
-                  ? Colors.green[800] //
-                  : Theme.of(context).colorScheme.background,
+              color: Theme.of(context).colorScheme.background,
               borderRadius: BorderRadius.circular(5),
             ),
             child: Column(
@@ -144,7 +144,7 @@ class _OverviewState extends State<Overview> {
                   textAlign: TextAlign.center,
                   style: const TextStyle(fontSize: fontSizeMedium),
                 ),
-                Divider(color: isReady ? Colors.lightGreenAccent : Colors.white),
+                const Divider(color: Colors.white),
                 Text(
                   p.point.toString(),
                   textAlign: TextAlign.center,

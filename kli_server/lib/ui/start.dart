@@ -24,11 +24,12 @@ class _StartScreenState extends State<StartScreen> {
   bool started = false, timeEnded = false;
   late StartQuestion currentQuestion;
   Timer? timer;
+  int questionNum = 0;
 
   @override
   void initState() {
     super.initState();
-    currentQuestion = MatchState().questionList!.last as StartQuestion;
+    // currentQuestion = MatchState().questionList!.last as StartQuestion;
   }
 
   @override
@@ -195,6 +196,7 @@ class _StartScreenState extends State<StartScreen> {
       timeEnded = true;
       return;
     }
+    questionNum++;
     currentQuestion = MatchState().questionList!.removeLast() as StartQuestion;
     KLIServer.sendToAllClients(
       KLISocketMessage(
@@ -207,34 +209,53 @@ class _StartScreenState extends State<StartScreen> {
 
   Widget questionInfo() {
     return Expanded(
-      child: Column(children: [
-        AnimatedCircularProgressBar(
-          currentTimeSec: currentTimeSec,
-          totalTimeSec: widget.timeLimitSec,
-          strokeWidth: 20,
-          valueColor: const Color(0xFF00A906),
-          backgroundColor: Colors.red,
-        ),
-        const SizedBox(height: 128),
-        Container(
-          width: 128,
-          height: 128,
-          alignment: Alignment.center,
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            color: Theme.of(context).colorScheme.background,
-            border: Border.all(color: Colors.white),
+      child: Column(
+        children: [
+          AnimatedCircularProgressBar(
+            currentTimeSec: currentTimeSec,
+            totalTimeSec: widget.timeLimitSec,
+            strokeWidth: 20,
+            valueColor: const Color(0xFF00A906),
+            backgroundColor: Colors.red,
           ),
-          child: started
-              ? Text(
-                  StartQuestion.mapTypeDisplay(currentQuestion.subject),
-                  style: const TextStyle(fontSize: fontSizeMedium),
-                  textAlign: TextAlign.center,
-                )
-              : null,
-        ),
-      ]),
+          const SizedBox(height: 128),
+          Container(
+            width: 128,
+            height: 128,
+            alignment: Alignment.center,
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: Theme.of(context).colorScheme.background,
+              border: Border.all(color: Colors.white),
+            ),
+            child: started
+                ? Text(
+                    StartQuestion.mapTypeDisplay(currentQuestion.subject),
+                    style: const TextStyle(fontSize: fontSizeMedium),
+                    textAlign: TextAlign.center,
+                  )
+                : null,
+          ),
+          const SizedBox(height: 128),
+          Container(
+            width: 128,
+            height: 128,
+            alignment: Alignment.center,
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: Theme.of(context).colorScheme.background,
+              border: Border.all(color: Colors.white),
+            ),
+            child: Text(
+              '$questionNum',
+              style: const TextStyle(fontSize: fontSizeMedium),
+              textAlign: TextAlign.center,
+            ),
+          ),
+        ],
+      ),
     );
   }
 

@@ -23,6 +23,7 @@ class _StartScreenState extends State<PlayerStartScreen> {
   late StartQuestion currentQuestion;
   Timer? timer;
   late final StreamSubscription<KLISocketMessage> messageSubscription;
+  int questionNum = 0;
 
   @override
   void initState() {
@@ -42,6 +43,7 @@ class _StartScreenState extends State<PlayerStartScreen> {
             setState(() {});
           });
         }
+        questionNum++;
         currentQuestion = StartQuestion.fromJson(jsonDecode(m.message));
         started = true;
         setState(() {});
@@ -189,6 +191,23 @@ class _StartScreenState extends State<PlayerStartScreen> {
           ),
           child: Text(
             '${MatchData().players[widget.playerPos].point}',
+            style: const TextStyle(fontSize: fontSizeMedium),
+            textAlign: TextAlign.center,
+          ),
+        ),
+        const SizedBox(height: 128),
+        Container(
+          width: 128,
+          height: 128,
+          alignment: Alignment.center,
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color: Theme.of(context).colorScheme.background,
+            border: Border.all(color: Colors.white),
+          ),
+          child: Text(
+            '$questionNum',
             style: const TextStyle(fontSize: fontSizeMedium),
             textAlign: TextAlign.center,
           ),

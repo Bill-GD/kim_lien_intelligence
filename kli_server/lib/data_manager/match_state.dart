@@ -47,6 +47,12 @@ class MatchState {
     if (section == MatchSection.extra) return;
 
     section = MatchSection.values[(section.index + 1)];
+
+    KLIServer.sendToAllClients(KLISocketMessage(
+      senderID: ConnectionID.host,
+      message: section.name,
+      type: KLIMessageType.section,
+    ));
   }
 
   Future<void> loadQuestions() async {
