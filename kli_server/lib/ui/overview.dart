@@ -82,6 +82,12 @@ class _MatchOverviewState extends State<MatchOverview> {
                 return;
               }
 
+              KLIServer.sendToAllClients(KLISocketMessage(
+                senderID: ConnectionID.host,
+                message: '${MatchState().startOrFinishPos}',
+                type: KLIMessageType.enterStart,
+              ));
+
               logHandler.info('Start section, player ${MatchState().startOrFinishPos}');
               await MatchState().loadQuestions();
 
@@ -198,7 +204,7 @@ class _MatchOverviewState extends State<MatchOverview> {
                   textAlign: TextAlign.center,
                   style: const TextStyle(fontSize: fontSizeMedium),
                 ),
-                const Divider(color: Colors.white),
+                Divider(color: isCurrentPlayer ? Colors.lightGreenAccent : Colors.white),
                 Text(
                   MatchState().scores[pos].toString(),
                   textAlign: TextAlign.center,

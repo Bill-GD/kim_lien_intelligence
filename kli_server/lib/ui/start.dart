@@ -162,15 +162,12 @@ class _StartScreenState extends State<StartScreen> {
             enableCondition: !timeEnded && started,
             disabledLabel: "Can't answer now",
             onPressed: () {
-              KLIServer.sendToPlayer(
-                widget.playerPos,
-                KLISocketMessage(
-                  senderID: ConnectionID.host,
-                  message: 'correct',
-                  type: KLIMessageType.correctAnswer,
-                ),
-              );
               MatchState().modifyScore(widget.playerPos, 10);
+              KLIServer.sendToAllClients(KLISocketMessage(
+                senderID: ConnectionID.host,
+                message: MatchState().scores[widget.playerPos].toString(),
+                type: KLIMessageType.correctStartAnswer,
+              ));
               nextQuestion();
               setState(() {});
             },
@@ -199,8 +196,7 @@ class _StartScreenState extends State<StartScreen> {
       return;
     }
     currentQuestion = MatchState().questionList!.removeLast() as StartQuestion;
-    KLIServer.sendToPlayer(
-      widget.playerPos,
+    KLIServer.sendToAllClients(
       KLISocketMessage(
         senderID: ConnectionID.host,
         message: jsonEncode(currentQuestion.toJson()),
@@ -251,6 +247,11 @@ class _StartScreenState extends State<StartScreen> {
               enableCondition: timeEnded,
               disabledLabel: 'Currently ongoing',
               onPressed: () {
+                KLIServer.sendToAllClients(KLISocketMessage(
+                  senderID: ConnectionID.host,
+                  message: MatchState().scores[widget.playerPos].toString(),
+                  type: KLIMessageType.endSection,
+                ));
                 Navigator.of(context).pop();
               },
             ),

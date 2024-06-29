@@ -18,21 +18,32 @@ class Overview extends StatefulWidget {
 class _OverviewState extends State<Overview> {
   final List<StreamSubscription<void>> messageSubscriptions = [];
   final playerReady = <bool>[false, false, false, false];
+  String overviewMessage = '   Waiting for host to start the game   ';
+  bool started = false;
 
   @override
   void initState() {
     super.initState();
 
     messageSubscriptions.add(KLIClient.onDisconnected.listen((_) => Navigator.pop(context)));
-    messageSubscriptions.add(KLIClient.onMessageReceived.listen((m) {
-      if (m.type == KLIMessageType.playerReady) {
-        playerReady[int.parse(m.message)] = true;
-        setState(() {});
-      }
-      if (m.type == KLIMessageType.startMatch) {
-        Navigator.of(context).push(
-          MaterialPageRoute(builder: (_) => PlayerStartScreen(playerPos: MatchData().playerPos)),
-        );
+    messageSubscriptions.add(KLIClient.onMessageReceived.listen((m) async {
+      switch (m.type) {
+        case KLIMessageType.playerReady:
+          playerReady[int.parse(m.message)] = true;
+          setState(() {});
+          break;
+        case KLIMessageType.startMatch:
+          overviewMessage = 'Section: Start';
+          started = true;
+          setState(() {});
+          break;
+        case KLIMessageType.enterStart:
+          await Navigator.of(context).push(
+            MaterialPageRoute(builder: (_) => PlayerStartScreen(playerPos: int.parse(m.message))),
+          );
+          break;
+        default:
+          break;
       }
     }));
 
@@ -63,18 +74,17 @@ class _OverviewState extends State<Overview> {
         backgroundColor: Colors.transparent,
         body: Center(
           child: Column(
-            // mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
               const SizedBox(height: 64),
-              const Row(
+              Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  CircularProgressIndicator(),
+                  if (!started) const CircularProgressIndicator(),
                   Text(
-                    '   Waiting for host to start the game   ',
-                    style: TextStyle(fontSize: fontSizeLarge),
+                    overviewMessage,
+                    style: const TextStyle(fontSize: fontSizeLarge),
                   ),
-                  CircularProgressIndicator(),
+                  if (!started) const CircularProgressIndicator(),
                 ],
               ),
               const SizedBox(height: 64),
@@ -127,10 +137,20 @@ class _OverviewState extends State<Overview> {
                   : Theme.of(context).colorScheme.background,
               borderRadius: BorderRadius.circular(5),
             ),
-            child: Text(
-              '${p.pos + 1} - ${p.name}',
-              textAlign: TextAlign.center,
-              style: const TextStyle(fontSize: fontSizeMedium),
+            child: Column(
+              children: [
+                Text(
+                  '${p.pos + 1} - ${p.name}',
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(fontSize: fontSizeMedium),
+                ),
+                Divider(color: isReady ? Colors.lightGreenAccent : Colors.white),
+                Text(
+                  p.point.toString(),
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(fontSize: fontSizeMedium),
+                ),
+              ],
             ),
           ),
         ],

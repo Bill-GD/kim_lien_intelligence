@@ -46,9 +46,12 @@ class _StartScreenState extends State<PlayerStartScreen> {
         started = true;
         setState(() {});
       }
-      if (m.type == KLIMessageType.correctAnswer) {
-        MatchData().players[widget.playerPos].point += 10;
+      if (m.type == KLIMessageType.correctStartAnswer) {
+        MatchData().players[widget.playerPos].point = int.parse(m.message);
         setState(() {});
+      }
+      if (m.type == KLIMessageType.endSection) {
+        Navigator.of(context).pop();
       }
     });
   }
