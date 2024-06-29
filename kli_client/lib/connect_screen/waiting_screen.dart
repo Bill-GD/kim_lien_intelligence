@@ -81,6 +81,7 @@ class _WaitingScreenState extends State<WaitingScreen> {
                         );
                         return;
                       }
+                      MatchData().setPos(KLIClient.clientID!.index - 1);
                       receivingData = true;
                       setState(() {});
 
@@ -106,7 +107,7 @@ class _WaitingScreenState extends State<WaitingScreen> {
                           MatchData().players.addAll(d);
                           receivingData = false;
                           setState(() {});
-                          Navigator.of(context).push(
+                          Navigator.of(context).pushReplacement(
                             MaterialPageRoute<void>(builder: (context) => const Overview()),
                           );
                         }

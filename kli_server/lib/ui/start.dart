@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -45,24 +46,26 @@ class _StartScreenState extends State<StartScreen> {
         backgroundColor: Colors.transparent,
         body: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 64, vertical: 64),
-          child: Row(children: [
-            Expanded(
-              flex: 9,
-              child: Column(children: [
-                questionContainer(),
-                answerButtons(),
-              ]),
-            ),
-            Flexible(
-              child: Padding(
-                padding: const EdgeInsets.only(left: 48),
+          child: Row(
+            children: [
+              Expanded(
+                flex: 9,
                 child: Column(children: [
-                  questionInfo(),
-                  startEndButton(),
+                  questionContainer(),
+                  answerButtons(),
                 ]),
               ),
-            ),
-          ]),
+              Flexible(
+                child: Padding(
+                  padding: const EdgeInsets.only(left: 48),
+                  child: Column(children: [
+                    questionInfo(),
+                    startEndButton(),
+                  ]),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -85,7 +88,6 @@ class _StartScreenState extends State<StartScreen> {
                       : Colors.transparent,
                   border: BorderDirectional(
                     end: BorderSide(
-                      width: 1,
                       color: i > 2 ? Colors.transparent : Theme.of(context).colorScheme.onBackground,
                     ),
                   ),
@@ -116,9 +118,7 @@ class _StartScreenState extends State<StartScreen> {
           Expanded(
             child: Container(
               decoration: const BoxDecoration(
-                border: BorderDirectional(
-                  top: BorderSide(width: 1, color: Colors.white),
-                ),
+                border: BorderDirectional(top: BorderSide(color: Colors.white)),
               ),
               padding: const EdgeInsets.symmetric(horizontal: 128),
               alignment: Alignment.center,
@@ -162,6 +162,14 @@ class _StartScreenState extends State<StartScreen> {
             enableCondition: !timeEnded && started,
             disabledLabel: "Can't answer now",
             onPressed: () {
+              KLIServer.sendToPlayer(
+                widget.playerPos,
+                KLISocketMessage(
+                  senderID: ConnectionID.host,
+                  message: 'correct',
+                  type: KLIMessageType.correctAnswer,
+                ),
+              );
               MatchState().modifyScore(widget.playerPos, 10);
               nextQuestion();
               setState(() {});
@@ -191,6 +199,14 @@ class _StartScreenState extends State<StartScreen> {
       return;
     }
     currentQuestion = MatchState().questionList!.removeLast() as StartQuestion;
+    KLIServer.sendToPlayer(
+      widget.playerPos,
+      KLISocketMessage(
+        senderID: ConnectionID.host,
+        message: jsonEncode(currentQuestion.toJson()),
+        type: KLIMessageType.startQuestion,
+      ),
+    );
   }
 
   Widget questionInfo() {

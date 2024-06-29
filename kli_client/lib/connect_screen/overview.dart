@@ -6,6 +6,7 @@ import 'package:kli_lib/kli_lib.dart';
 
 import '../global.dart';
 import '../match_data.dart';
+import '../ui/player/start.dart';
 
 class Overview extends StatefulWidget {
   const Overview({super.key});
@@ -15,13 +16,25 @@ class Overview extends StatefulWidget {
 }
 
 class _OverviewState extends State<Overview> {
-  late final StreamSubscription<void> messageSubscription;
+  final List<StreamSubscription<void>> messageSubscriptions = [];
+  final playerReady = <bool>[false, false, false, false];
 
   @override
   void initState() {
     super.initState();
 
-    messageSubscription = KLIClient.onDisconnected.listen((_) => Navigator.pop(context));
+    messageSubscriptions.add(KLIClient.onDisconnected.listen((_) => Navigator.pop(context)));
+    messageSubscriptions.add(KLIClient.onMessageReceived.listen((m) {
+      if (m.type == KLIMessageType.playerReady) {
+        playerReady[int.parse(m.message)] = true;
+        setState(() {});
+      }
+      if (m.type == KLIMessageType.startMatch) {
+        Navigator.of(context).push(
+          MaterialPageRoute(builder: (_) => PlayerStartScreen(playerPos: MatchData().playerPos)),
+        );
+      }
+    }));
 
     KLIClient.sendMessage(
       KLISocketMessage(senderID: KLIClient.clientID!, message: 'ready', type: KLIMessageType.playerReady),
@@ -30,7 +43,9 @@ class _OverviewState extends State<Overview> {
 
   @override
   void dispose() {
-    messageSubscription.cancel();
+    for (var e in messageSubscriptions) {
+      e.cancel();
+    }
     super.dispose();
   }
 
@@ -78,6 +93,7 @@ class _OverviewState extends State<Overview> {
 
   Widget playerWidget(int pos) {
     final p = MatchData().players[pos];
+    final isReady = playerReady[pos];
 
     return IntrinsicWidth(
       child: Column(
@@ -102,11 +118,11 @@ class _OverviewState extends State<Overview> {
             padding: const EdgeInsets.symmetric(vertical: 8),
             decoration: BoxDecoration(
               border: Border.all(
-                color: p.ready
+                color: isReady
                     ? Colors.lightGreenAccent //
                     : Theme.of(context).colorScheme.onBackground,
               ),
-              color: p.ready
+              color: isReady
                   ? Colors.green[800] //
                   : Theme.of(context).colorScheme.background,
               borderRadius: BorderRadius.circular(5),

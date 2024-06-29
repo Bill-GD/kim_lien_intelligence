@@ -204,7 +204,7 @@ class _MatchDataCheckerState extends State<MatchDataChecker> {
 
       if (match.questions.isEmpty) return (false, ['Chưa có câu hỏi']);
 
-      for (int i = 1; i <= 4; i++) {
+      for (int i = 0; i < 4; i++) {
         try {
           final qList = match.questions.where((v) => v.pos == i);
           final misingSubjects = <String>[];

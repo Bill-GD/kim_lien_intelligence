@@ -132,32 +132,7 @@ class _ServerSetupState extends State<ServerSetup> {
 
               await MatchState.instantiate(widget.matchName);
 
-              KLIServer.onConnectionChanged.listen((event) {
-                setState(() {});
-              });
-
-              KLIServer.onMessageReceived.listen((m) {
-                if (m.type == KLIMessageType.players) {
-                  logHandler.info('Sending player list');
-
-                  final data = <Map<String, dynamic>>[];
-                  for (final p in MatchState().players) {
-                    data.add({
-                      'name': p.name,
-                      'image': Networking.encodeMedia(p.imagePath),
-                    });
-                  }
-
-                  KLIServer.sendMessage(
-                    m.senderID,
-                    KLISocketMessage(
-                      senderID: ConnectionID.host,
-                      type: KLIMessageType.players,
-                      message: jsonEncode(data),
-                    ),
-                  );
-                }
-              });
+              addClientListeners();
 
               setState(() {});
             } on Exception catch (error, stack) {
@@ -188,14 +163,17 @@ class _ServerSetupState extends State<ServerSetup> {
         ),
         KLIButton(
           'Start Match',
-          enableCondition: KLIServer.started && (kDebugMode || MatchState().allPlayerReady),
+          enableCondition: KLIServer.started,
           disabledLabel: !KLIServer.started ? 'No server exist' : 'Not enough player',
           onPressed: () async {
+            KLIServer.sendToAllClients(KLISocketMessage(
+              senderID: ConnectionID.host,
+              message: 'start',
+              type: KLIMessageType.startMatch,
+            ));
             if (mounted) {
               Navigator.of(context).push(
-                MaterialPageRoute<void>(
-                  builder: (context) => const MatchOverview(),
-                ),
+                MaterialPageRoute<void>(builder: (context) => const MatchOverview()),
               );
             }
           },
@@ -213,6 +191,46 @@ class _ServerSetupState extends State<ServerSetup> {
           ),
       ],
     );
+  }
+
+  void addClientListeners() {
+    KLIServer.onConnectionChanged.listen((event) {
+      setState(() {});
+    });
+
+    KLIServer.onMessageReceived.listen((m) {
+      if (m.type == KLIMessageType.players) {
+        logHandler.info('Sending player list');
+
+        final data = <Map<String, dynamic>>[];
+        for (final p in MatchState().players) {
+          data.add({
+            'name': p.name,
+            'image': Networking.encodeMedia(p.imagePath),
+          });
+        }
+
+        KLIServer.sendMessage(
+          m.senderID,
+          KLISocketMessage(
+            senderID: ConnectionID.host,
+            type: KLIMessageType.players,
+            message: jsonEncode(data),
+          ),
+        );
+      }
+
+      if (m.type == KLIMessageType.playerReady) {
+        final pos = m.senderID.index - 1;
+        assert(pos >= 0 && pos < 4, 'Invalid player position: $pos');
+        MatchState().playerReady[pos] = true;
+
+        KLIServer.sendToAllClients(
+          KLISocketMessage(senderID: ConnectionID.host, message: '$pos', type: KLIMessageType.playerReady),
+        );
+        setState(() {});
+      }
+    });
   }
 
   Widget clientList() {

@@ -126,7 +126,7 @@ class MatchState {
   late final List<KLIPlayer> players;
   final playerReady = <bool>[false, false, false, false];
   bool get allPlayerReady => playerReady.every((e) => e);
-  MatchSection section = MatchSection.obstacle;
+  MatchSection section = MatchSection.start;
 
   /// For Start, Accel, Finish, Extra. For Obstacle, use [obstacleMatch]
   List<BaseQuestion>? questionList;

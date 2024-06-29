@@ -94,7 +94,6 @@ class _FinishScreenState extends State<FinishScreen> {
                       : Colors.transparent,
                   border: BorderDirectional(
                     end: BorderSide(
-                      width: 1,
                       color: i > 2 ? Colors.transparent : Theme.of(context).colorScheme.onBackground,
                     ),
                   ),
