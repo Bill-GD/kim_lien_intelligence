@@ -29,14 +29,14 @@ class _MatchOverviewState extends State<MatchOverview> {
           actions: [
             const KLIHelpButton(
               content: '''
-                Start section is automatically enabled. Press the corresponding button to start the section.
-                After each section is finished, the next section button will be enabled.
-
-                - Start: Automatically change to the next player after the previous player is done.
-                  The seleted player will be highlighted.
-                  Press 'Start' to start the timer and show the questions.
-                  If player answered all questions, or the timer is up, all functions will be locked.
-                  Press 'End' finish the section.
+                Phần thi khởi động sẽ tự động kích hoạt. Nhấn nút tương ứng để bắt đầu phần thi.
+                Sau khi mỗi phần thi kết thúc, phần thi tiếp theo sẽ được kích hoạt.
+                
+                - Khởi động: Chuyển tự động sang người chơi tiếp theo sau khi người chơi trước hoàn thành.
+                  Người chơi được chọn sẽ được đánh dấu màu xanh.
+                  Nhấn 'Start' để bắt đầu đếm giờ và hiển thị câu hỏi.
+                  Nếu người chơi trả lời hết câu hỏi, hoặc hết giờ, tất cả chức năng sẽ bị khóa.
+                  Nhấn 'End' để kết thúc phần thi.
                 - Obstacle: First select question. Press 'Start' to start the timer and it'll lock question selection.
                   After time is up, Press 'Show answers' to show the answer and time.
                   Press 'Show image' to show the image after announcing the result.
@@ -114,6 +114,12 @@ class _MatchOverviewState extends State<MatchOverview> {
             enabledLabel: 'To Obstacle',
             disabledLabel: 'Current section: ${MatchState().section.name}',
             onPressed: () async {
+              KLIServer.sendToAllClients(KLISocketMessage(
+                senderID: ConnectionID.host,
+                message: '${MatchState().startOrFinishPos}',
+                type: KLIMessageType.enterObstacle,
+              ));
+
               await MatchState().loadQuestions();
               if (mounted) {
                 await Navigator.of(context).push(
@@ -162,8 +168,9 @@ class _MatchOverviewState extends State<MatchOverview> {
   }
 
   Widget playerWidget(int pos) {
-    final bool isCurrentPlayer = MatchState().startOrFinishPos == pos &&
-        (MatchState().section == MatchSection.start || MatchState().section == MatchSection.finish);
+    final bool isCurrentPlayer =
+        (MatchState().section == MatchSection.start || MatchState().section == MatchSection.finish) &&
+            MatchState().startOrFinishPos == pos;
 
     return IntrinsicWidth(
       child: Column(

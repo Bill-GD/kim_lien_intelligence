@@ -50,6 +50,9 @@ class _MatchManagerState extends State<MatchManager> {
           const KLIHelpButton(
             content: '''
               Thông tin trận đấu: tên trận, tên thí sinh, ảnh thí sinh.
+
+              Khi bắt đầu trận, ảnh sẽ được gửi sang Client nên ảnh với kích thước lớn sẽ tốn thời gian gửi hơn.
+              Ảnh với dung lượng 0.7-1MB sẽ đảm bảo cả chất lượng và tốc độ.
               
               Khi chọn trận, các thí sinh được hiển thị ở bên phải.
               

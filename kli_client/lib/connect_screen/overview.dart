@@ -18,7 +18,7 @@ class Overview extends StatefulWidget {
 class _OverviewState extends State<Overview> {
   final List<StreamSubscription<void>> messageSubscriptions = [];
   final playerReady = <bool>[false, false, false, false];
-  String overviewMessage = '   Waiting for host to start the game   ';
+  String overviewMessage = '   Chờ máy chủ bắt đầu trận đấu   ';
   bool started = false;
 
   @override
@@ -33,11 +33,11 @@ class _OverviewState extends State<Overview> {
           setState(() {});
           break;
         case KLIMessageType.section:
-          overviewMessage = 'Section: ${m.message}';
+          overviewMessage = 'Phần thi: ${m.message}';
           setState(() {});
           break;
         case KLIMessageType.startMatch:
-          overviewMessage = 'Section: start';
+          overviewMessage = 'Phần thi: khởi động';
           started = true;
           setState(() {});
           break;
@@ -72,7 +72,7 @@ class _OverviewState extends State<Overview> {
       child: Scaffold(
         appBar: AppBar(
           centerTitle: true,
-          title: const Text('Overview', style: TextStyle(fontSize: fontSizeLarge)),
+          title: const Text('Tổng quan', style: TextStyle(fontSize: fontSizeLarge)),
           forceMaterialTransparency: true,
           automaticallyImplyLeading: kDebugMode,
         ),

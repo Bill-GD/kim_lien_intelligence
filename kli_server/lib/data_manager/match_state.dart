@@ -5,7 +5,7 @@ import 'package:kli_lib/kli_lib.dart';
 import '../global.dart';
 import 'data_manager.dart';
 
-enum MatchSection { intro, start, obstacle, accel, finish, extra }
+enum MatchSection { start, obstacle, accel, finish, extra }
 
 /// A static class to save a state of the current match. Contains match name, current scores, current section, and current question.<br>
 /// Server will select required info to send to clients when needed.
@@ -50,7 +50,7 @@ class MatchState {
 
     KLIServer.sendToAllClients(KLISocketMessage(
       senderID: ConnectionID.host,
-      message: section.name,
+      message: _sectionDisplay(section),
       type: KLIMessageType.section,
     ));
   }
@@ -120,6 +120,21 @@ class MatchState {
         break;
       default:
         throw Exception('Invalid section, this should not happen.');
+    }
+  }
+
+  String _sectionDisplay(MatchSection section) {
+    switch (section) {
+      case MatchSection.start:
+        return 'Khởi động';
+      case MatchSection.obstacle:
+        return 'Vượt chướng ngại vật';
+      case MatchSection.accel:
+        return 'Tăng tốc';
+      case MatchSection.finish:
+        return 'Về đích';
+      case MatchSection.extra:
+        return 'Câu hỏi phụ';
     }
   }
 
