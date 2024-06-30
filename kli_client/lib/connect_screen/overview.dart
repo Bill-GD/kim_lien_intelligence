@@ -42,7 +42,7 @@ class _OverviewState extends State<Overview> {
           setState(() {});
           break;
         case KLIMessageType.enterStart:
-          await Navigator.of(context).push(
+          await Navigator.of(context).push<void>(
             MaterialPageRoute(builder: (_) => PlayerStartScreen(playerPos: int.parse(m.message))),
           );
           setState(() {});

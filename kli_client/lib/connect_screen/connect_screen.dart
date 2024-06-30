@@ -108,6 +108,7 @@ class _ConnectPageState extends State<ConnectPage> {
           readOnly: isConnected,
           controller: ipTextController,
           constraints: const BoxConstraints(maxWidth: 250),
+          maxLines: 1,
           labelText: 'Host IP',
           hintText: 'Enter Host IP',
         ),
@@ -184,7 +185,7 @@ class _ConnectPageState extends State<ConnectPage> {
         const SizedBox(width: 20),
         KLIButton(
           'To waiting room',
-          enabledLabel: 'When you\'re ready',
+          enabledLabel: "When you're ready",
           disabledLabel: 'Not connected',
           enableCondition: isConnected,
           onPressed: () {

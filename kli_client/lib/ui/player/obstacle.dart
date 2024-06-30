@@ -7,35 +7,36 @@ import 'package:kli_lib/kli_lib.dart';
 
 import '../../global.dart';
 
-class PlayerStartScreen extends StatefulWidget {
-  final double timeLimitSec = 60;
+class PlayerObstacleScreen extends StatefulWidget {
+  final double timeLimitSec = 15;
   final int playerPos;
 
-  const PlayerStartScreen({super.key, required this.playerPos});
+  const PlayerObstacleScreen({super.key, required this.playerPos});
 
   @override
-  State<PlayerStartScreen> createState() => _PlayerStartScreenState();
+  State<PlayerObstacleScreen> createState() => _PlayerObstacleScreenState();
 }
 
-class _PlayerStartScreenState extends State<PlayerStartScreen> {
-  double currentTimeSec = 60;
+class _PlayerObstacleScreenState extends State<PlayerObstacleScreen> {
+  double currentTimeSec = 15;
   bool started = false, timeEnded = false;
-  late StartQuestion currentQuestion;
+  late ObstacleQuestion currentQuestion;
   Timer? timer;
   late final StreamSubscription<KLISocketMessage> messageSubscription;
-  int questionNum = 0;
+  final answerTextController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
     messageSubscription = KLIClient.onMessageReceived.listen((m) {
-      if (m.type == KLIMessageType.startQuestion) {
+      if (m.type == KLIMessageType.obstacleQuestion) {
         if (timeEnded) return;
         if (!started) {
           timer = Timer.periodic(1.seconds, (timer) {
             if (currentTimeSec <= 0) {
               timer.cancel();
               timeEnded = true;
+              started = false;
               setState(() {});
               return;
             }
@@ -43,15 +44,14 @@ class _PlayerStartScreenState extends State<PlayerStartScreen> {
             setState(() {});
           });
         }
-        questionNum++;
-        currentQuestion = StartQuestion.fromJson(jsonDecode(m.message));
+        currentQuestion = ObstacleQuestion.fromJson(jsonDecode(m.message));
         started = true;
         setState(() {});
       }
-      if (m.type == KLIMessageType.correctStartAnswer) {
-        MatchData().players[widget.playerPos].point = int.parse(m.message);
-        setState(() {});
-      }
+      // if (m.type == KLIMessageType.correctStartAnswer) {
+      //   MatchData().players[widget.playerPos].point = int.parse(m.message);
+      //   setState(() {});
+      // }
       if (m.type == KLIMessageType.endSection) {
         Navigator.of(context).pop();
       }
@@ -76,11 +76,16 @@ class _PlayerStartScreenState extends State<PlayerStartScreen> {
             children: [
               Expanded(
                 flex: 9,
-                child: questionContainer(),
+                child: Column(
+                  children: [
+                    questionContainer(),
+                    answerInput(),
+                  ],
+                ),
               ),
               Padding(
                 padding: const EdgeInsets.only(left: 48),
-                child: playerInfo(),
+                child: questionInfo(),
               ),
             ],
           ),
@@ -89,7 +94,7 @@ class _PlayerStartScreenState extends State<PlayerStartScreen> {
     );
   }
 
-  Widget questionInfo() {
+  Widget players() {
     return Row(
       children: [
         Expanded(
@@ -105,7 +110,7 @@ class _PlayerStartScreenState extends State<PlayerStartScreen> {
               padding: const EdgeInsets.symmetric(vertical: 16),
               alignment: Alignment.center,
               child: Text(
-                'Question $questionNum',
+                MatchData().players[widget.playerPos].name,
                 style: const TextStyle(fontSize: fontSizeMedium),
               ),
             ),
@@ -125,7 +130,7 @@ class _PlayerStartScreenState extends State<PlayerStartScreen> {
               alignment: Alignment.center,
               child: started
                   ? Text(
-                      StartQuestion.mapTypeDisplay(currentQuestion.subject),
+                      'Question ${currentQuestion.id}',
                       style: const TextStyle(fontSize: fontSizeMedium),
                     )
                   : null,
@@ -144,7 +149,7 @@ class _PlayerStartScreenState extends State<PlayerStartScreen> {
         borderRadius: BorderRadius.circular(10),
       ),
       child: Column(children: [
-        questionInfo(),
+        players(),
         Expanded(
           child: Container(
             decoration: const BoxDecoration(
@@ -168,7 +173,18 @@ class _PlayerStartScreenState extends State<PlayerStartScreen> {
     );
   }
 
-  Widget playerInfo() {
+  Widget answerInput() {
+    return KLITextField(
+      readOnly: started && !timeEnded,
+      controller: answerTextController,
+      constraints: const BoxConstraints(maxWidth: 250),
+      maxLines: 1,
+      labelText: 'Host IP',
+      hintText: 'Enter Host IP',
+    );
+  }
+
+  Widget questionInfo() {
     return Column(
       children: [
         AnimatedCircularProgressBar(

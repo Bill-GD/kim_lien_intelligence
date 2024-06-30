@@ -92,7 +92,7 @@ class _MatchOverviewState extends State<MatchOverview> {
               await MatchState().loadQuestions();
 
               if (mounted) {
-                await Navigator.of(context).push(
+                await Navigator.of(context).push<void>(
                   MaterialPageRoute(
                     builder: (context) => StartScreen(
                       playerPos: MatchState().startOrFinishPos,
@@ -116,14 +116,14 @@ class _MatchOverviewState extends State<MatchOverview> {
             onPressed: () async {
               KLIServer.sendToAllClients(KLISocketMessage(
                 senderID: ConnectionID.host,
-                message: '${MatchState().startOrFinishPos}',
+                message: '',
                 type: KLIMessageType.enterObstacle,
               ));
 
               await MatchState().loadQuestions();
               if (mounted) {
                 await Navigator.of(context).push(
-                  MaterialPageRoute(
+                  MaterialPageRoute<void>(
                     builder: (context) => const ObstacleQuestionScreen(),
                   ),
                 );
@@ -137,21 +137,39 @@ class _MatchOverviewState extends State<MatchOverview> {
             enableCondition: MatchState().section == MatchSection.accel,
             enabledLabel: 'To Accel',
             disabledLabel: 'Current section: ${MatchState().section.name}',
-            onPressed: () {},
+            onPressed: () {
+              KLIServer.sendToAllClients(KLISocketMessage(
+                senderID: ConnectionID.host,
+                message: '',
+                type: KLIMessageType.enterObstacle,
+              ));
+            },
           ),
           KLIButton(
             'Finish',
             enableCondition: MatchState().section == MatchSection.finish,
             enabledLabel: 'To Finish',
             disabledLabel: 'Current section: ${MatchState().section.name}',
-            onPressed: () {},
+            onPressed: () {
+              KLIServer.sendToAllClients(KLISocketMessage(
+                senderID: ConnectionID.host,
+                message: '',
+                type: KLIMessageType.enterFinish,
+              ));
+            },
           ),
           KLIButton(
             'Extra',
             enableCondition: MatchState().section == MatchSection.extra,
             enabledLabel: 'To Extra',
             disabledLabel: 'Current section: ${MatchState().section.name}',
-            onPressed: () {},
+            onPressed: () {
+              KLIServer.sendToAllClients(KLISocketMessage(
+                senderID: ConnectionID.host,
+                message: '',
+                type: KLIMessageType.enterExtra,
+              ));
+            },
           ),
         ],
       ),
