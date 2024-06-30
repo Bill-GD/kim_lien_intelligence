@@ -27,7 +27,9 @@ void initAudioHandler() {
 
 String changelog = """
   0.2.1 ({latest}):
-  - 
+  - Fixed loading error scroll view overflows
+  - Updated lower SDK to 3.0
+  - Removed some unnecessary messages content
 
   0.2 ({34c61cd}):
   - Added error message to loading screen

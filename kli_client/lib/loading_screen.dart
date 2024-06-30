@@ -66,8 +66,13 @@ class _LoadingScreenState extends State<LoadingScreen> {
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
                   const Text('Missing assets', style: TextStyle(fontSize: fontSizeLarge)),
-                  SingleChildScrollView(
-                    child: Text(errorMessage, style: const TextStyle(fontSize: fontSizeMedium)),
+                  Flexible(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      child: SingleChildScrollView(
+                        child: Text(errorMessage, style: const TextStyle(fontSize: fontSizeMedium)),
+                      ),
+                    ),
                   ),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,

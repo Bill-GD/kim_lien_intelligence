@@ -87,7 +87,7 @@ class _WaitingScreenState extends State<WaitingScreen> {
 
                       KLIClient.sendMessage(KLISocketMessage(
                         senderID: KLIClient.clientID!,
-                        message: 'Request players info',
+                        message: '',
                         type: KLIMessageType.players,
                       ));
 
