@@ -75,7 +75,7 @@ class _LoadingScreenState extends State<LoadingScreen> {
                   const Text('Missing assets', style: TextStyle(fontSize: fontSizeLarge)),
                   Flexible(
                     child: Padding(
-                      padding: const EdgeInsets.all(8.0),
+                      padding: const EdgeInsets.symmetric(vertical: 16),
                       child: SingleChildScrollView(
                         child: Text(errorMessage, style: const TextStyle(fontSize: fontSizeMedium)),
                       ),

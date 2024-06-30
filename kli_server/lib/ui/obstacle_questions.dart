@@ -115,7 +115,7 @@ class _ObstacleQuestionScreenState extends State<ObstacleQuestionScreen> {
             for (int i = 0; i < 4; i++)
               Padding(
                 padding: const EdgeInsets.only(bottom: 16),
-                child: _ObstacleRow(
+                child: ObstacleRow(
                   index: i,
                   answer: MatchState().obstacleMatch!.hintQuestions[i]!.answer,
                   revealed: MatchState().revealedObstacleRows[i],
@@ -330,70 +330,6 @@ class _ObstacleQuestionScreenState extends State<ObstacleQuestionScreen> {
               dimension: 200,
             ),
           ],
-        ),
-      ),
-    );
-  }
-}
-
-class _ObstacleRow extends StatefulWidget {
-  final int index;
-  final String answer;
-  final bool revealed;
-  final bool answered;
-  final void Function()? onTap;
-
-  const _ObstacleRow({
-    required this.index,
-    required this.answer,
-    required this.revealed,
-    required this.answered,
-    required this.onTap,
-  });
-
-  @override
-  State<_ObstacleRow> createState() => _ObstacleRowState();
-}
-
-class _ObstacleRowState extends State<_ObstacleRow> {
-  @override
-  Widget build(BuildContext context) {
-    final Color borderColor = widget.revealed
-        ? Colors.lightGreenAccent[700]!
-        : (widget.answered ? Theme.of(context).colorScheme.error : Colors.grey);
-
-    return Tooltip(
-      message: widget.answered ? '' : 'Question ${widget.index + 1}',
-      child: GestureDetector(
-        onTap: widget.answered ? null : widget.onTap,
-        child: MouseRegion(
-          cursor: widget.answered || widget.onTap == null
-              ? SystemMouseCursors.forbidden
-              : SystemMouseCursors.click,
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              for (final c in widget.answer.toUpperCase().split('').where((e) => e != ' '))
-                Container(
-                  width: 50,
-                  height: 50,
-                  alignment: Alignment.center,
-                  decoration: BoxDecoration(
-                    border: Border.all(
-                      color: borderColor,
-                    ),
-                    color: Theme.of(context).colorScheme.background,
-                  ),
-                  child: Text(
-                    c,
-                    style: TextStyle(
-                      color: widget.revealed ? Colors.white : Colors.transparent,
-                      fontSize: fontSizeMedium,
-                    ),
-                  ),
-                )
-            ],
-          ),
         ),
       ),
     );

@@ -46,21 +46,26 @@ class _PlayerStartScreenState extends State<PlayerStartScreen> {
         questionNum++;
         currentQuestion = StartQuestion.fromJson(jsonDecode(m.message));
         started = true;
-        setState(() {});
       }
       if (m.type == KLIMessageType.correctStartAnswer) {
         MatchData().players[widget.playerPos].point = int.parse(m.message);
-        setState(() {});
+      }
+      if (m.type == KLIMessageType.stopTimer) {
+        timer?.cancel();
+        // started = false; // add to hide question after time ended
       }
       if (m.type == KLIMessageType.endSection) {
         Navigator.of(context).pop();
       }
+
+      if (mounted) setState(() {});
     });
   }
 
   @override
   void dispose() {
     timer?.cancel();
+    messageSubscription.cancel();
     super.dispose();
   }
 
@@ -105,7 +110,7 @@ class _PlayerStartScreenState extends State<PlayerStartScreen> {
               padding: const EdgeInsets.symmetric(vertical: 16),
               alignment: Alignment.center,
               child: Text(
-                'Question $questionNum',
+                started ? 'Câu hỏi $questionNum' : '',
                 style: const TextStyle(fontSize: fontSizeMedium),
               ),
             ),
@@ -123,12 +128,10 @@ class _PlayerStartScreenState extends State<PlayerStartScreen> {
               ),
               padding: const EdgeInsets.symmetric(vertical: 16),
               alignment: Alignment.center,
-              child: started
-                  ? Text(
-                      StartQuestion.mapTypeDisplay(currentQuestion.subject),
-                      style: const TextStyle(fontSize: fontSizeMedium),
-                    )
-                  : null,
+              child: Text(
+                started ? StartQuestion.mapTypeDisplay(currentQuestion.subject) : '',
+                style: const TextStyle(fontSize: fontSizeMedium),
+              ),
             ),
           ),
         ),
@@ -154,14 +157,11 @@ class _PlayerStartScreenState extends State<PlayerStartScreen> {
             ),
             padding: const EdgeInsets.symmetric(horizontal: 128),
             alignment: Alignment.center,
-            child: started
-                ? Text(
-                    currentQuestion.question,
-                    textAlign: TextAlign.center,
-                    // textWidthBasis: TextWidthBasis.longestLine,
-                    style: const TextStyle(fontSize: fontSizeLarge),
-                  )
-                : null,
+            child: Text(
+              started ? currentQuestion.question : '',
+              textAlign: TextAlign.center,
+              style: const TextStyle(fontSize: fontSizeLarge),
+            ),
           ),
         ),
       ]),

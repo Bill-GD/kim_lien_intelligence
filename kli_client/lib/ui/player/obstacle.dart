@@ -9,9 +9,8 @@ import '../../global.dart';
 
 class PlayerObstacleScreen extends StatefulWidget {
   final double timeLimitSec = 15;
-  final int playerPos;
 
-  const PlayerObstacleScreen({super.key, required this.playerPos});
+  const PlayerObstacleScreen({super.key});
 
   @override
   State<PlayerObstacleScreen> createState() => _PlayerObstacleScreenState();
@@ -85,7 +84,7 @@ class _PlayerObstacleScreenState extends State<PlayerObstacleScreen> {
               ),
               Padding(
                 padding: const EdgeInsets.only(left: 48),
-                child: questionInfo(),
+                child: playerInfo(),
               ),
             ],
           ),
@@ -94,7 +93,7 @@ class _PlayerObstacleScreenState extends State<PlayerObstacleScreen> {
     );
   }
 
-  Widget players() {
+  Widget questionInfo() {
     return Row(
       children: [
         Expanded(
@@ -110,7 +109,7 @@ class _PlayerObstacleScreenState extends State<PlayerObstacleScreen> {
               padding: const EdgeInsets.symmetric(vertical: 16),
               alignment: Alignment.center,
               child: Text(
-                MatchData().players[widget.playerPos].name,
+                MatchData().players[MatchData().playerPos].name,
                 style: const TextStyle(fontSize: fontSizeMedium),
               ),
             ),
@@ -128,12 +127,10 @@ class _PlayerObstacleScreenState extends State<PlayerObstacleScreen> {
               ),
               padding: const EdgeInsets.symmetric(vertical: 16),
               alignment: Alignment.center,
-              child: started
-                  ? Text(
-                      'Question ${currentQuestion.id}',
-                      style: const TextStyle(fontSize: fontSizeMedium),
-                    )
-                  : null,
+              child: Text(
+                started ? 'Question ${currentQuestion.id}' : '',
+                style: const TextStyle(fontSize: fontSizeMedium),
+              ),
             ),
           ),
         ),
@@ -149,7 +146,7 @@ class _PlayerObstacleScreenState extends State<PlayerObstacleScreen> {
         borderRadius: BorderRadius.circular(10),
       ),
       child: Column(children: [
-        players(),
+        questionInfo(),
         Expanded(
           child: Container(
             decoration: const BoxDecoration(
@@ -177,14 +174,12 @@ class _PlayerObstacleScreenState extends State<PlayerObstacleScreen> {
     return KLITextField(
       readOnly: started && !timeEnded,
       controller: answerTextController,
-      constraints: const BoxConstraints(maxWidth: 250),
       maxLines: 1,
-      labelText: 'Host IP',
-      hintText: 'Enter Host IP',
+      hintText: 'Enter Answer',
     );
   }
 
-  Widget questionInfo() {
+  Widget playerInfo() {
     return Column(
       children: [
         AnimatedCircularProgressBar(
@@ -206,7 +201,7 @@ class _PlayerObstacleScreenState extends State<PlayerObstacleScreen> {
             border: Border.all(color: Colors.white),
           ),
           child: Text(
-            '${MatchData().players[widget.playerPos].point}',
+            '${MatchData().players[MatchData().playerPos].point}',
             style: const TextStyle(fontSize: fontSizeMedium),
             textAlign: TextAlign.center,
           ),

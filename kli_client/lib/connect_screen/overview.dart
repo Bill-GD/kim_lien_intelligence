@@ -6,6 +6,7 @@ import 'package:kli_lib/kli_lib.dart';
 
 import '../global.dart';
 import '../match_data.dart';
+import '../ui/player/obstacle.dart';
 import '../ui/player/start.dart';
 
 class Overview extends StatefulWidget {
@@ -44,6 +45,12 @@ class _OverviewState extends State<Overview> {
         case KLIMessageType.enterStart:
           await Navigator.of(context).push<void>(
             MaterialPageRoute(builder: (_) => PlayerStartScreen(playerPos: int.parse(m.message))),
+          );
+          setState(() {});
+          break;
+        case KLIMessageType.enterObstacle:
+          await Navigator.of(context).push<void>(
+            MaterialPageRoute(builder: (_) => const PlayerObstacleScreen()),
           );
           setState(() {});
           break;

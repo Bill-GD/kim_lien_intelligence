@@ -194,17 +194,21 @@ class _StartScreenState extends State<StartScreen> {
     if (MatchState().questionList!.isEmpty) {
       timer?.cancel();
       timeEnded = true;
+
+      KLIServer.sendToAllClients(KLISocketMessage(
+        senderID: ConnectionID.host,
+        type: KLIMessageType.stopTimer,
+        message: '',
+      ));
       return;
     }
     questionNum++;
     currentQuestion = MatchState().questionList!.removeLast() as StartQuestion;
-    KLIServer.sendToAllClients(
-      KLISocketMessage(
-        senderID: ConnectionID.host,
-        message: jsonEncode(currentQuestion.toJson()),
-        type: KLIMessageType.startQuestion,
-      ),
-    );
+    KLIServer.sendToAllClients(KLISocketMessage(
+      senderID: ConnectionID.host,
+      type: KLIMessageType.startQuestion,
+      message: jsonEncode(currentQuestion.toJson()),
+    ));
   }
 
   Widget questionInfo() {
@@ -229,13 +233,11 @@ class _StartScreenState extends State<StartScreen> {
               color: Theme.of(context).colorScheme.background,
               border: Border.all(color: Colors.white),
             ),
-            child: started
-                ? Text(
-                    StartQuestion.mapTypeDisplay(currentQuestion.subject),
-                    style: const TextStyle(fontSize: fontSizeMedium),
-                    textAlign: TextAlign.center,
-                  )
-                : null,
+            child: Text(
+              started ? StartQuestion.mapTypeDisplay(currentQuestion.subject) : '',
+              style: const TextStyle(fontSize: fontSizeMedium),
+              textAlign: TextAlign.center,
+            ),
           ),
           const SizedBox(height: 128),
           Container(
@@ -249,7 +251,7 @@ class _StartScreenState extends State<StartScreen> {
               border: Border.all(color: Colors.white),
             ),
             child: Text(
-              '$questionNum',
+              started ? '$questionNum' : '',
               style: const TextStyle(fontSize: fontSizeMedium),
               textAlign: TextAlign.center,
             ),

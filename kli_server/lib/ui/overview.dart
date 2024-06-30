@@ -24,7 +24,8 @@ class _MatchOverviewState extends State<MatchOverview> {
       child: Scaffold(
         appBar: managerAppBar(
           context,
-          'Match Overview for ${MatchState().match.name}',
+          fontSize: fontSizeLarge,
+          'Tổng quan trận ${MatchState().match.name}',
           implyLeading: kDebugMode,
           actions: [
             const KLIHelpButton(
@@ -101,10 +102,10 @@ class _MatchOverviewState extends State<MatchOverview> {
                 );
               }
 
-              MatchState().nextPlayer();
               if (MatchState().startOrFinishPos == 3) {
                 MatchState().nextSection();
               }
+              MatchState().nextPlayer();
               setState(() {});
             },
           ),

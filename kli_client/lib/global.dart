@@ -30,6 +30,7 @@ String changelog = """
   - Fixed loading error scroll view overflows
   - Updated lower SDK to 3.0
   - Removed some unnecessary messages content
+  - Fixed some Start screen issues: doesn't stop timer, too many setState calls
 
   0.2 ({34c61cd}):
   - Added error message to loading screen
