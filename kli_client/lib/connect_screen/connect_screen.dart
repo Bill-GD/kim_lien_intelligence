@@ -47,7 +47,7 @@ class _ConnectPageState extends State<ConnectPage> {
             const Text('Client', style: TextStyle(fontSize: fontSizeLarge)),
             ChangelogPanel(
               changelog: changelog,
-              versionString: 'v${packageInfo.version}.${packageInfo.buildNumber}',
+              versionString: appVersionString,
               appName: 'KLI Client',
             ),
           ],

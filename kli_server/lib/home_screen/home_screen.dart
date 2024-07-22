@@ -64,7 +64,7 @@ class _HomeScreenState extends State<HomeScreen> {
               footer: SideNavigationBarFooter(
                 label: ChangelogPanel(
                   changelog: changelog,
-                  versionString: 'v${packageInfo.version}.${packageInfo.buildNumber}',
+                  versionString: appVersionString,
                   appName: 'KLI Server',
                 ),
               ),

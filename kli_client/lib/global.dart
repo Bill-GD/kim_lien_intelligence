@@ -9,10 +9,11 @@ void initLogHandler() {
   logHandler = LogHandler(logFile: StorageHandler.getFullPath('log.txt'));
 }
 
-late final PackageInfo packageInfo;
+late final String appVersionString;
 Future<void> initPackageInfo() async {
-  packageInfo = await PackageInfo.fromPlatform();
-  logHandler.info('PackageInfo init: v${packageInfo.version}.${packageInfo.buildNumber}');
+  final packageInfo = await PackageInfo.fromPlatform();
+  appVersionString = 'v${packageInfo.version}.${packageInfo.buildNumber}';
+  logHandler.info('PackageInfo init: $appVersionString');
 }
 
 late final AssetHandler assetHandler;
@@ -25,18 +26,20 @@ void initAudioHandler() {
   audioHandler = AudioHandler.init();
 }
 
-String changelog = """
+const String changelog = """
   0.2.1 ({latest}):
   - Fixed loading error scroll view overflows
   - Updated lower SDK to 3.0
   - Removed some unnecessary messages content
   - Fixed some Start screen issues: doesn't stop timer, too many setState calls
+  - Now save PackageInfo (version) as string
 
   0.2 ({34c61cd}):
   - Added error message to loading screen
   - App is now always on top unless is in debug mode
   - Request player list from server, parses to Player objects
   - Added overview screen that shows players, highlight player if ready
+  - Added start screen: question, score, subject, timer
   - Added a disconnect stream
 
   0.1.2.1 ({8b223b0}):

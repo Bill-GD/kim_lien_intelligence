@@ -10,10 +10,11 @@ void initLogHandler() {
   logHandler = LogHandler(logFile: StorageHandler.getFullPath('UserData\\log.txt'));
 }
 
-late final PackageInfo packageInfo;
+late final String appVersionString;
 Future<void> initPackageInfo() async {
-  packageInfo = await PackageInfo.fromPlatform();
-  logHandler.info('PackageInfo init: v${packageInfo.version}.${packageInfo.buildNumber}');
+  final packageInfo = await PackageInfo.fromPlatform();
+  appVersionString = 'v${packageInfo.version}.${packageInfo.buildNumber}';
+  logHandler.info('PackageInfo init: $appVersionString');
 }
 
 late final StorageHandler storageHandler;
@@ -117,12 +118,13 @@ SideNavigationBarTheme sideNavigationTheme(BuildContext context, [double height 
   );
 }
 
-String changelog = """
+const String changelog = """
   0.4.1 ({latest}):
   - Start match button enabled when players are ready (only 1 needed if debug)
   - Moved ObstacleRow to lib
   - Reverted start pos check after start
   - Send stopTimer message if all timer not finished but done already
+  - Now save PackageInfo (version) as string
 
   0.4 ({34c61cd}):
   - Added error message to loading screen
