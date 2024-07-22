@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:kli_lib/kli_lib.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
-DecorationImage? bgWidget;
+DecorationImage? bgDecorationImage;
 
 late final LogHandler logHandler;
 void initLogHandler() {

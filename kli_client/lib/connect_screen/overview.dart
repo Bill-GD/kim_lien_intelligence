@@ -75,7 +75,7 @@ class _OverviewState extends State<Overview> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: BoxDecoration(image: bgWidget),
+      decoration: BoxDecoration(image: bgDecorationImage),
       child: Scaffold(
         appBar: AppBar(
           centerTitle: true,

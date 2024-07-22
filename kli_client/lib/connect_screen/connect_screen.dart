@@ -62,7 +62,7 @@ class _ConnectPageState extends State<ConnectPage> {
         forceMaterialTransparency: true,
       ),
       body: Container(
-        decoration: BoxDecoration(image: bgWidget),
+        decoration: BoxDecoration(image: bgDecorationImage),
         alignment: Alignment.center,
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,

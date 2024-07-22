@@ -3,7 +3,7 @@ import 'package:kli_lib/kli_lib.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:side_navigation/side_navigation.dart';
 
-late final DecorationImage bgWidget;
+late final DecorationImage bgDecorationImage;
 
 late final LogHandler logHandler;
 void initLogHandler() {

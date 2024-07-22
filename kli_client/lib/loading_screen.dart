@@ -39,7 +39,7 @@ class _LoadingScreenState extends State<LoadingScreen> {
       await Future.delayed(widget.delayMilli);
 
       setState(() => loadingText = 'Loading background image...');
-      bgWidget = await getBackgroundWidget(assetHandler);
+      bgDecorationImage = await getBackgroundWidget(assetHandler);
       await Future.delayed(widget.delayMilli);
 
       setState(() => loadingText = 'Finished initialization');

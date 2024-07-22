@@ -20,7 +20,7 @@ class _MatchOverviewState extends State<MatchOverview> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: BoxDecoration(image: bgWidget),
+      decoration: BoxDecoration(image: bgDecorationImage),
       child: Scaffold(
         appBar: managerAppBar(
           context,

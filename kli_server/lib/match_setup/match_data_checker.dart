@@ -58,7 +58,7 @@ class _MatchDataCheckerState extends State<MatchDataChecker> {
       child: Focus(
         autofocus: true,
         child: Container(
-          decoration: BoxDecoration(image: bgWidget),
+          decoration: BoxDecoration(image: bgDecorationImage),
           child: Scaffold(
             backgroundColor: Colors.transparent,
             extendBodyBehindAppBar: true,

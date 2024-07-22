@@ -58,7 +58,7 @@ class _DataManagerPageState extends State<DataManagerPage> {
         child: Scaffold(
           backgroundColor: Colors.transparent,
           body: Container(
-            decoration: BoxDecoration(image: bgWidget),
+            decoration: BoxDecoration(image: bgDecorationImage),
             child: Row(
               children: [
                 SideNavigationBar(

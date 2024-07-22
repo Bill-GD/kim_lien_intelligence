@@ -72,7 +72,7 @@ class _PlayerStartScreenState extends State<PlayerStartScreen> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: BoxDecoration(image: bgWidget),
+      decoration: BoxDecoration(image: bgDecorationImage),
       child: Scaffold(
         backgroundColor: Colors.transparent,
         body: Padding(

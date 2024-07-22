@@ -46,7 +46,7 @@ class _ObstacleQuestionScreenState extends State<ObstacleQuestionScreen> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: BoxDecoration(image: bgWidget),
+      decoration: BoxDecoration(image: bgDecorationImage),
       child: Scaffold(
         key: _key,
         appBar: managerAppBar(

@@ -73,7 +73,7 @@ class _ServerSetupState extends State<ServerSetup> {
             extendBodyBehindAppBar: true,
             appBar: AppBar(forceMaterialTransparency: true),
             body: Container(
-              decoration: BoxDecoration(image: bgWidget),
+              decoration: BoxDecoration(image: bgDecorationImage),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [

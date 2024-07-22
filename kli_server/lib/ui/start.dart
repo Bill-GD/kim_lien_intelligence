@@ -41,7 +41,7 @@ class _StartScreenState extends State<StartScreen> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: BoxDecoration(image: bgWidget),
+      decoration: BoxDecoration(image: bgDecorationImage),
       child: Scaffold(
         appBar: managerAppBar(context, 'Start', implyLeading: kDebugMode),
         backgroundColor: Colors.transparent,

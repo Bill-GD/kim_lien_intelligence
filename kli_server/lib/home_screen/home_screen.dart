@@ -43,7 +43,7 @@ class _HomeScreenState extends State<HomeScreen> {
         forceMaterialTransparency: true,
       ),
       body: Container(
-        decoration: BoxDecoration(image: bgWidget),
+        decoration: BoxDecoration(image: bgDecorationImage),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
