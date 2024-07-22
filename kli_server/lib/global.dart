@@ -119,12 +119,19 @@ SideNavigationBarTheme sideNavigationTheme(BuildContext context, [double height 
 }
 
 const String changelog = """
-  0.4.1 ({latest}):
+  0.4.2 ({latest}):
+  - Some error shows a popup message
+  - Loading screen is replaced
+  - Widget error screen now show stack, can turn back
+  - SoundTest screen no longer requires globals as params
+
+  0.4.1 ({cfc575a}):
   - Start match button enabled when players are ready (only 1 needed if debug)
   - Moved ObstacleRow to lib
   - Reverted start pos check after start
   - Send stopTimer message if all timer not finished but done already
   - Now save PackageInfo (version) as string
+  - Better widget error screen
 
   0.4 ({34c61cd}):
   - Added error message to loading screen

@@ -122,26 +122,17 @@ class _ServerSetupState extends State<ServerSetup> {
           enableCondition: !KLIServer.started,
           disabledLabel: 'Server already started',
           onPressed: () async {
-            try {
-              await KLIServer.start();
+            await KLIServer.start();
 
-              if (!MatchState.initialized) {
-                logHandler.empty();
-                logHandler.info('Match initialized');
-              }
-
-              await MatchState.instantiate(widget.matchName);
-
-              addClientListeners();
-
-              setState(() {});
-            } on Exception catch (error, stack) {
-              if (mounted) {
-                showToastMessage(context, error.toString());
-              }
-              logHandler.error('$error', stackTrace: stack);
-              return;
+            if (!MatchState.initialized) {
+              logHandler.empty();
+              logHandler.info('Match initialized');
             }
+
+            await MatchState.instantiate(widget.matchName);
+
+            addClientListeners();
+            setState(() {});
 
             if (mounted) {
               showToastMessage(context, 'Started a server');

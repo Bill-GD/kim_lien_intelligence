@@ -79,8 +79,7 @@ class _MatchOverviewState extends State<MatchOverview> {
             onPressed: () async {
               // this should only show if somehow the condition is not just match section is start
               if (MatchState().startOrFinishPos > 3) {
-                showToastMessage(context, 'All players have finished Start section');
-                return;
+                throw KLIException('Start is done', 'All players have finished Start section');
               }
 
               KLIServer.sendToAllClients(KLISocketMessage(

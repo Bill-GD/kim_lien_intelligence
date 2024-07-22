@@ -53,7 +53,7 @@ class _LoadingScreenState extends State<LoadingScreen> {
       logHandler.empty();
 
       if (mounted) {
-        Navigator.of(context).push(
+        Navigator.of(context).pushReplacement(
           MaterialPageRoute(builder: (context) => const HomeScreen()),
         );
       }

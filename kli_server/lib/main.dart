@@ -3,6 +3,7 @@ import 'dart:ui';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:kli_lib/kli_lib.dart';
 import 'package:theme_provider/theme_provider.dart';
 import 'package:window_manager/window_manager.dart';
@@ -12,6 +13,29 @@ import 'loading_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  RenderErrorBox.backgroundColor = Colors.transparent;
+  final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+
+  PlatformDispatcher.instance.onError = (e, s) {
+    logHandler.error(e.toString(), stackTrace: s);
+    if (e is! KLIException) {
+      showPopupMessage(
+        navigatorKey.currentContext!,
+        title: e.toString().substring(11),
+        content: s.toString(),
+        centerContent: false,
+      );
+      return true;
+    }
+
+    showPopupMessage(
+      navigatorKey.currentContext!,
+      title: e.formatTitle(),
+      content: e.message,
+    );
+    return true;
+  };
 
   initLogHandler();
   logMessageStream.listen((m) {
@@ -31,11 +55,12 @@ void main() async {
     await windowManager.focus();
   });
 
-  runApp(const KliServerApp());
+  runApp(KliServerApp(navKey: navigatorKey));
 }
 
 class KliServerApp extends StatelessWidget {
-  const KliServerApp({super.key});
+  final GlobalKey<NavigatorState> navKey;
+  const KliServerApp({super.key, required this.navKey});
 
   @override
   Widget build(BuildContext context) {
@@ -60,6 +85,13 @@ class KliServerApp extends StatelessWidget {
       child: ThemeConsumer(
         child: Builder(builder: (context) {
           return MaterialApp(
+            navigatorKey: navKey,
+            builder: (context, child) {
+              ErrorWidget.builder = (errorDetails) => WidgetErrorScreen(e: errorDetails);
+
+              if (child != null) return child;
+              throw StateError('widget is null');
+            },
             scrollBehavior: const MaterialScrollBehavior().copyWith(dragDevices: {PointerDeviceKind.mouse}),
             theme: ThemeProvider.themeOf(context).data,
             home: const LoadingScreen(),

@@ -55,8 +55,7 @@ class _ObstacleManagerState extends State<ObstacleManager> {
           charCount: int.parse(sheet[i].values.elementAt(1)),
         ));
       } on FormatException {
-        showToastMessage(context, 'Sai định dạng (số ký tự)');
-        break;
+        throw KLIException('context', 'Sai định dạng (số ký tự)');
       }
     }
 
@@ -69,10 +68,8 @@ class _ObstacleManagerState extends State<ObstacleManager> {
         explanation: sheet[5].values.elementAt(4),
         hintQuestions: qL,
       );
-    } on RangeError catch (e, stack) {
-      showToastMessage(context, 'Sai định dạng (không đủ cột/hàng)');
-      logHandler.error('$e', stackTrace: stack);
-      return;
+    } on RangeError {
+      throw KLIException('context',  'Sai định dạng (không đủ cột/hàng)');
     }
     logHandler.info('Loaded ${selectedMatch.matchName} (${selectedMatch.keyword})');
   }

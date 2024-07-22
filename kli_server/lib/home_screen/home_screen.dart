@@ -83,7 +83,6 @@ class _HomeScreenState extends State<HomeScreen> {
             Expanded(
               child: Center(
                 child: [
-                  // Help screen
                   const HelpScreen(),
                   KLIButton(
                     'Mở phần quản lý dữ liệu',
@@ -108,7 +107,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       await launchUrl(Uri.parse(storageHandler.logFile));
                     },
                   ),
-                  SoundTest(assetHandler: assetHandler, audioHandler: audioHandler),
+                  const SoundTest(),
                 ].elementAt(sidebarIndex),
               ),
             ),

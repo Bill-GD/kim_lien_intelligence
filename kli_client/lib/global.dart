@@ -27,12 +27,19 @@ void initAudioHandler() {
 }
 
 const String changelog = """
-  0.2.1 ({latest}):
+  0.2.2 ({latest}):
+  - Some error shows a popup message
+  - Loading screen is replaced
+  - Global error handling using PlatformDispatcher
+  - Widget error screen now show stack, can turn back
+
+  0.2.1 ({cfc575a}):
   - Fixed loading error scroll view overflows
   - Updated lower SDK to 3.0
   - Removed some unnecessary messages content
   - Fixed some Start screen issues: doesn't stop timer, too many setState calls
   - Now save PackageInfo (version) as string
+  - Better widget error screen
 
   0.2 ({34c61cd}):
   - Added error message to loading screen

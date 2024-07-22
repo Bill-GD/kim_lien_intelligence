@@ -48,8 +48,7 @@ class _StartQuestionManagerState extends State<StartQuestionManager> {
             answer: v.elementAt(3),
           ));
         } on StateError {
-          showToastMessage(context, 'Sai định dạng (lĩnh vực)');
-          break;
+          throw KLIException('context', 'Sai định dạng (lĩnh vực)');
         }
       }
       idx++;

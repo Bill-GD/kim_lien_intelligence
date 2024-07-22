@@ -126,16 +126,16 @@ class _ConnectPageState extends State<ConnectPage> {
           enableCondition: !isConnecting && !isConnected,
           onPressed: () async {
             final ip = ipTextController.value.text.trim();
-            if (ip.isEmpty) {
-              showToastMessage(context, 'Please enter an IP');
+            if (ip.isEmpty || KLIClient.clientID == null) {
+              showPopupMessage(
+                context,
+                title: 'Client ID and Host IP',
+                content: 'Client ID or host IP not specified',
+              );
               return;
             }
-            if (KLIClient.clientID == null) {
-              showToastMessage(context, 'Please select a player ID');
-              return;
-            }
-            logHandler.info('Selected role: ${KLIClient.clientID}');
 
+            logHandler.info('Selected role: ${KLIClient.clientID}');
             try {
               setState(() => isConnecting = true);
               await KLIClient.init(ip, KLIClient.clientID!);
@@ -144,24 +144,22 @@ class _ConnectPageState extends State<ConnectPage> {
                 isConnected = true;
               });
 
-              messageSubscription = KLIClient.onDisconnected.listen((_) {
+              messageSubscription = KLIClient.onDisconnected.listen((m) {
                 isConnected = false;
                 clientTextController.text = '';
                 messageSubscription!.cancel();
                 messageSubscription = null;
+
+                showPopupMessage(context, title: 'Forced disconnection', content: m);
                 setState(() {});
               });
-
-              // if (mounted) {
-              //   showToastMessage(
-              //     context,
-              //     'Connected to server as ${KLIClient.clientID} with IP: ${KLIClient.remoteAddress}',
-              //   );
-              // }
             } on Exception catch (e, stack) {
               logHandler.error('Error when trying to connect: $e', stackTrace: stack);
               if (e is SocketException) {
-                if (mounted) showToastMessage(context, 'Host (ip=$ip) not known');
+                throw KLIException(
+                  'Connection problem',
+                  'Please make sure host IP ($ip) is correct or the server has started',
+                );
               }
               setState(() {
                 isConnected = false;
@@ -179,7 +177,6 @@ class _ConnectPageState extends State<ConnectPage> {
             KLIClient.disconnect();
             clientTextController.text = '';
             setState(() => isConnected = false);
-            if (mounted) showToastMessage(context, 'Disconnected from server');
           },
         ),
         const SizedBox(width: 20),

@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:kli_lib/kli_lib.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../global.dart';
+
 class SoundTest extends StatefulWidget {
-  final AssetHandler assetHandler;
-  final AudioHandler audioHandler;
-  const SoundTest({super.key, required this.assetHandler, required this.audioHandler});
+  const SoundTest({super.key});
 
   @override
   State<SoundTest> createState() => _SoundTestState();
@@ -28,15 +28,13 @@ class _SoundTestState extends State<SoundTest> {
             ),
             Flexible(
               child: ListView.builder(
-                itemCount: widget.assetHandler.soundCount,
+                itemCount: assetHandler.soundCount,
                 itemBuilder: (context, index) {
-                  final sound = widget.assetHandler.soundList[index];
+                  final sound = assetHandler.soundList[index];
                   return ListTile(
                     title: Text(sound),
                     trailing: ElevatedButton(
-                      onPressed: () {
-                        widget.audioHandler.play(sound);
-                      },
+                      onPressed: () => audioHandler.play(sound),
                       child: const Text('Play'),
                     ),
                   );
