@@ -31,7 +31,7 @@ class _PlayerObstacleScreenState extends State<PlayerObstacleScreen> {
       if (m.type == KLIMessageType.obstacleQuestion) {
         if (timeEnded) return;
         if (!started) {
-          timer = Timer.periodic(1.seconds, (timer) {
+          timer = Timer.periodic(10.ms, (timer) {
             if (currentTimeSec <= 0) {
               timer.cancel();
               timeEnded = true;
@@ -39,7 +39,7 @@ class _PlayerObstacleScreenState extends State<PlayerObstacleScreen> {
               setState(() {});
               return;
             }
-            currentTimeSec -= 1;
+            currentTimeSec -= .01;
             setState(() {});
           });
         }
@@ -175,7 +175,7 @@ class _PlayerObstacleScreenState extends State<PlayerObstacleScreen> {
       readOnly: started && !timeEnded,
       controller: answerTextController,
       maxLines: 1,
-      hintText: 'Enter Answer',
+      hintText: 'Enter Answer and press Enter to submit',
     );
   }
 

@@ -11,9 +11,9 @@ import 'obstacle_image.dart';
 final _key = GlobalKey<ScaffoldState>();
 
 class ObstacleQuestionScreen extends StatefulWidget {
-  final double timeLimitSec;
+  final double timeLimitSec = 15;
 
-  const ObstacleQuestionScreen({super.key, this.timeLimitSec = 15});
+  const ObstacleQuestionScreen({super.key});
 
   @override
   State<ObstacleQuestionScreen> createState() => _ObstacleQuestionScreenState();
@@ -21,7 +21,7 @@ class ObstacleQuestionScreen extends StatefulWidget {
 
 class _ObstacleQuestionScreenState extends State<ObstacleQuestionScreen> {
   int questionIndex = -1;
-  late double currentTimeSec;
+  double currentTimeSec = 15;
   bool timeEnded = false,
       canShowAnswers = false,
       canAnnounceAnswer = false,
@@ -33,7 +33,6 @@ class _ObstacleQuestionScreenState extends State<ObstacleQuestionScreen> {
   @override
   void initState() {
     debugPrint('${MatchState().imagePartOrder}');
-    currentTimeSec = widget.timeLimitSec;
     super.initState();
   }
 

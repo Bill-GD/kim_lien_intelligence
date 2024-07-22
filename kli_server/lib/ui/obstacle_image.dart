@@ -51,7 +51,7 @@ class _ObstacleImageScreenState extends State<ObstacleImageScreen> {
                   child: Stack(
                     children: [
                       for (var i = 0; i < 5; i++)
-                        if (!MatchState().revealedImageParts[i]) ImageCover(id: i + 1, size: imageSize),
+                        if (!MatchState().revealedImageParts[i]) _ImageCover(id: i + 1, size: imageSize),
                     ],
                   ),
                 ),
@@ -64,10 +64,10 @@ class _ObstacleImageScreenState extends State<ObstacleImageScreen> {
   }
 }
 
-class ImageCover extends StatelessWidget {
+class _ImageCover extends StatelessWidget {
   final int id;
   final Size size;
-  const ImageCover({super.key, required this.id, required this.size});
+  const _ImageCover({required this.id, required this.size});
 
   @override
   Widget build(BuildContext context) {
