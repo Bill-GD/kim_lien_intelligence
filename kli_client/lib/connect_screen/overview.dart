@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -31,32 +32,33 @@ class _OverviewState extends State<Overview> {
       switch (m.type) {
         case KLIMessageType.playerReady:
           playerReady[int.parse(m.message)] = true;
-          setState(() {});
+          break;
+        case KLIMessageType.scores:
+          for (int s in jsonDecode(m.message) as List) {
+            MatchData().players[int.parse(m.message)].point = s;
+          }
           break;
         case KLIMessageType.section:
           overviewMessage = 'Phần thi: ${m.message}';
-          setState(() {});
           break;
         case KLIMessageType.startMatch:
           overviewMessage = 'Phần thi: khởi động';
           started = true;
-          setState(() {});
           break;
         case KLIMessageType.enterStart:
           await Navigator.of(context).push<void>(
             MaterialPageRoute(builder: (_) => PlayerStartScreen(playerPos: int.parse(m.message))),
           );
-          setState(() {});
           break;
         case KLIMessageType.enterObstacle:
           await Navigator.of(context).push<void>(
             MaterialPageRoute(builder: (_) => const PlayerObstacleScreen()),
           );
-          setState(() {});
           break;
         default:
           break;
       }
+      setState(() {});
     }));
 
     KLIClient.sendMessage(

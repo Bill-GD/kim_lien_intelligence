@@ -19,6 +19,7 @@ class PlayerObstacleScreen extends StatefulWidget {
 class _PlayerObstacleScreenState extends State<PlayerObstacleScreen> {
   double currentTimeSec = 15;
   bool started = false, timeEnded = false;
+  String submittedAnswer = '';
   late ObstacleQuestion currentQuestion;
   Timer? timer;
   late final StreamSubscription<KLISocketMessage> messageSubscription;
@@ -73,11 +74,12 @@ class _PlayerObstacleScreenState extends State<PlayerObstacleScreen> {
           padding: const EdgeInsets.symmetric(horizontal: 64, vertical: 64),
           child: Row(
             children: [
-              Expanded(
+              Flexible(
                 flex: 9,
                 child: Column(
                   children: [
                     questionContainer(),
+                    const SizedBox(height: 32),
                     answerInput(),
                   ],
                 ),
@@ -139,43 +141,70 @@ class _PlayerObstacleScreenState extends State<PlayerObstacleScreen> {
   }
 
   Widget questionContainer() {
-    return Container(
-      decoration: BoxDecoration(
-        border: Border.all(color: Colors.white),
-        color: Theme.of(context).colorScheme.background,
-        borderRadius: BorderRadius.circular(10),
-      ),
-      child: Column(children: [
-        questionInfo(),
-        Expanded(
-          child: Container(
-            decoration: const BoxDecoration(
-              border: BorderDirectional(
-                top: BorderSide(color: Colors.white),
+    return Flexible(
+      child: Container(
+        decoration: BoxDecoration(
+          border: Border.all(color: Colors.white),
+          color: Theme.of(context).colorScheme.background,
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: Column(
+          children: [
+            questionInfo(),
+            Expanded(
+              child: Container(
+                decoration: const BoxDecoration(
+                  border: BorderDirectional(
+                    top: BorderSide(color: Colors.white),
+                  ),
+                ),
+                padding: const EdgeInsets.symmetric(horizontal: 128),
+                alignment: Alignment.center,
+                child: started
+                    ? Text(
+                        currentQuestion.question,
+                        textAlign: TextAlign.center,
+                        // textWidthBasis: TextWidthBasis.longestLine,
+                        style: const TextStyle(fontSize: fontSizeLarge),
+                      )
+                    : null,
               ),
             ),
-            padding: const EdgeInsets.symmetric(horizontal: 128),
-            alignment: Alignment.center,
-            child: started
-                ? Text(
-                    currentQuestion.question,
-                    textAlign: TextAlign.center,
-                    // textWidthBasis: TextWidthBasis.longestLine,
-                    style: const TextStyle(fontSize: fontSizeLarge),
-                  )
-                : null,
-          ),
+          ],
         ),
-      ]),
+      ),
     );
   }
 
   Widget answerInput() {
-    return KLITextField(
-      readOnly: started && !timeEnded,
-      controller: answerTextController,
-      maxLines: 1,
-      hintText: 'Enter Answer and press Enter to submit',
+    return Stack(
+      children: [
+        Positioned(
+          right: -80,
+          child: Text(
+            submittedAnswer.isNotEmpty ? 'Submitted:\n$submittedAnswer' : '',
+            style: const TextStyle(fontSize: fontSizeMedium),
+            textAlign: TextAlign.center,
+          ),
+        ),
+        KLITextField(
+          readOnly: started && !timeEnded,
+          controller: answerTextController,
+          maxLines: 1,
+          hintText: 'Enter Answer and press Enter to submit',
+          onSubmitted: (text) {
+            // if (text == currentQuestion.answer) {
+            //   KLIClient.sendMessage(KLISocketMessage(
+            //     senderID: ConnectionID.player1,
+            //     type: KLIMessageType.correctStartAnswer,
+            //     message: '1',
+            //   ));
+            // }
+            submittedAnswer = text;
+            showPopupMessage(context, title: 'Submitted answer', content: text);
+          },
+        ),
+      ],
     );
   }
 

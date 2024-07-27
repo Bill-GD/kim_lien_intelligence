@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:kli_lib/kli_lib.dart';
 
 import '../data_manager/data_manager.dart';
+import '../data_manager/match_state.dart';
 import '../global.dart';
 import 'server_setup.dart';
 
@@ -89,10 +90,13 @@ class _MatchDataCheckerState extends State<MatchDataChecker> {
                               'Mở phần thiết lập Server',
                               enableCondition: !disableServerSetup,
                               disabledLabel: 'Trận đấu chưa đủ thông tin',
-                              onPressed: () {
-                                Navigator.of(context).push(MaterialPageRoute(
-                                  builder: (context) => ServerSetup(matchNames[selectedMatchIndex]),
-                                ));
+                              onPressed: () async {
+                                await MatchState.instantiate(matchNames[selectedMatchIndex]);
+                                if (context.mounted) {
+                                  Navigator.of(context).push(MaterialPageRoute(
+                                    builder: (context) => ServerSetup(matchNames[selectedMatchIndex]),
+                                  ));
+                                }
                               },
                             ),
                           ],

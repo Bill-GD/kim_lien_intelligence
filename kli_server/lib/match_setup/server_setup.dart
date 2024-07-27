@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -129,8 +128,6 @@ class _ServerSetupState extends State<ServerSetup> {
               logHandler.info('Match initialized');
             }
 
-            await MatchState.instantiate(widget.matchName);
-
             addClientListeners();
             setState(() {});
 
@@ -160,8 +157,8 @@ class _ServerSetupState extends State<ServerSetup> {
           onPressed: () async {
             KLIServer.sendToAllClients(KLISocketMessage(
               senderID: ConnectionID.host,
-              message: 'start',
               type: KLIMessageType.startMatch,
+              message: '',
             ));
             if (mounted) {
               Navigator.of(context).push(
@@ -192,24 +189,7 @@ class _ServerSetupState extends State<ServerSetup> {
 
     KLIServer.onMessageReceived.listen((m) {
       if (m.type == KLIMessageType.players) {
-        logHandler.info('Sending player list');
-
-        final data = <Map<String, dynamic>>[];
-        for (final p in MatchState().players) {
-          data.add({
-            'name': p.name,
-            'image': Networking.encodeMedia(p.imagePath),
-          });
-        }
-
-        KLIServer.sendMessage(
-          m.senderID,
-          KLISocketMessage(
-            senderID: ConnectionID.host,
-            type: KLIMessageType.players,
-            message: jsonEncode(data),
-          ),
-        );
+        MatchState.sendPlayerData(m);
       }
 
       if (m.type == KLIMessageType.playerReady) {
@@ -233,31 +213,43 @@ class _ServerSetupState extends State<ServerSetup> {
       final clientConnected = client != null;
       String ip = clientConnected ? '${client.remoteAddress.address}:${client.remotePort}' : 'Not connected';
 
-      clients.add(ListTile(
-        title: Text(Networking.getClientDisplayID(ConnectionID.values[index + 1])),
-        subtitle: Text(ip),
-        subtitleTextStyle: TextStyle(
-          fontSize: fontSizeMSmall,
-          color: clientConnected ? Colors.greenAccent : Colors.redAccent,
+      String t = Networking.getClientDisplayID(ConnectionID.values[index + 1]);
+      Widget w = Text(t);
+      if (index < 4) {
+        t += MatchState.initialized && MatchState().playerReady[index] ? '  ✔️' : '  ❌';
+        w = Tooltip(
+          message: MatchState().playerReady[index] ? 'Ready' : 'Not ready',
+          child: Text(t),
+        );
+      }
+
+      clients.add(
+        ListTile(
+          title: w,
+          subtitle: Text(ip),
+          subtitleTextStyle: TextStyle(
+            fontSize: fontSizeMSmall,
+            color: clientConnected ? Colors.greenAccent : Colors.redAccent,
+          ),
+          trailing: KLIIconButton(
+            const FaIcon(FontAwesomeIcons.linkSlash),
+            enableCondition: clientConnected,
+            enabledLabel: 'Disconnect ${Networking.getClientDisplayID(ConnectionID.values[index + 1])}',
+            disabledLabel: 'Not connected',
+            onPressed: () async {
+              await confirmDialog(
+                context,
+                message: 'Disconnect client?',
+                acceptLogMessage: 'Forced disconnect Client: ${ConnectionID.values[index + 1]}',
+                onAccept: () async {
+                  KLIServer.disconnectClient(ConnectionID.values[index + 1], 'Server forced disconnection');
+                  if (clientConnected) client.destroy();
+                },
+              );
+            },
+          ),
         ),
-        trailing: KLIIconButton(
-          const FaIcon(FontAwesomeIcons.linkSlash),
-          enableCondition: clientConnected,
-          enabledLabel: 'Disconnect ${Networking.getClientDisplayID(ConnectionID.values[index + 1])}',
-          disabledLabel: 'Not connected',
-          onPressed: () async {
-            await confirmDialog(
-              context,
-              message: 'Disconnect client?',
-              acceptLogMessage: 'Forced disconnect Client: ${ConnectionID.values[index + 1]}',
-              onAccept: () async {
-                KLIServer.disconnectClient(ConnectionID.values[index + 1], 'Server forced disconnection');
-                if (clientConnected) client.destroy();
-              },
-            );
-          },
-        ),
-      ));
+      );
     }
 
     return ListView.separated(

@@ -18,6 +18,16 @@ class MatchOverview extends StatefulWidget {
 
 class _MatchOverviewState extends State<MatchOverview> {
   @override
+  void initState() {
+    super.initState();
+    KLIServer.onMessageReceived.listen((m) {
+      if (m.type == KLIMessageType.reconnect) {
+        MatchState.handleReconnection(m);
+      }
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(image: bgDecorationImage),
@@ -77,6 +87,8 @@ class _MatchOverviewState extends State<MatchOverview> {
             enabledLabel: 'To Start',
             disabledLabel: 'Current section: ${MatchState().section.name}',
             onPressed: () async {
+              if (!KLIServer.acceptReconnect) KLIServer.acceptReconnect = true;
+
               // this should only show if somehow the condition is not just match section is start
               if (MatchState().startOrFinishPos > 3) {
                 throw KLIException('Start is done', 'All players have finished Start section');

@@ -11,6 +11,7 @@ enum MatchSection { start, obstacle, accel, finish, extra }
 /// Server will select required info to send to clients when needed.
 class MatchState {
   static MatchState? _inst;
+  static bool get initialized => _inst != null;
 
   /// Get the current match state instance. Will throw if not exists.
   factory MatchState() {
@@ -41,7 +42,60 @@ class MatchState {
   }
 
   static void reset() => _inst = null;
-  static bool get initialized => _inst != null;
+
+  static void sendPlayerData(KLISocketMessage m) {
+    assert(initialized, 'MatchState not initialized');
+
+    logHandler.info('Sending player list');
+
+    final data = <Map<String, dynamic>>[];
+    for (final p in MatchState().players) {
+      data.add({
+        'name': p.name,
+        'image': Networking.encodeMedia(p.imagePath),
+      });
+    }
+
+    KLIServer.sendMessage(
+      m.senderID,
+      KLISocketMessage(
+        senderID: ConnectionID.host,
+        type: KLIMessageType.players,
+        message: jsonEncode(data),
+      ),
+    );
+  }
+
+  static void handleReconnection(KLISocketMessage m) async {
+    assert(initialized, 'MatchState not initialized');
+
+    await KLIServer.sendMessage(
+      m.senderID,
+      KLISocketMessage(
+        senderID: ConnectionID.host,
+        message: '',
+        type: KLIMessageType.startMatch,
+      ),
+    );
+
+    await KLIServer.sendMessage(
+      m.senderID,
+      KLISocketMessage(
+        senderID: ConnectionID.host,
+        type: KLIMessageType.section,
+        message: _inst!._sectionDisplay(_inst!.section),
+      ),
+    );
+
+    await KLIServer.sendMessage(
+      m.senderID,
+      KLISocketMessage(
+        senderID: ConnectionID.host,
+        type: KLIMessageType.scores,
+        message: jsonEncode(_inst!.scores),
+      ),
+    );
+  }
 
   void nextSection() {
     if (section == MatchSection.extra) return;
