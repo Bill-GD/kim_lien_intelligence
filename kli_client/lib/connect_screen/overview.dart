@@ -30,9 +30,9 @@ class _OverviewState extends State<Overview> {
     messageSubscriptions.add(KLIClient.onDisconnected.listen((_) => Navigator.pop(context)));
     messageSubscriptions.add(KLIClient.onMessageReceived.listen((m) async {
       switch (m.type) {
-        case KLIMessageType.playerReady:
-          playerReady[int.parse(m.message)] = true;
-          break;
+        // case KLIMessageType.playerReady:
+        //   playerReady[int.parse(m.message)] = true;
+        //   break;
         case KLIMessageType.scores:
           for (int s in jsonDecode(m.message) as List) {
             MatchData().players[int.parse(m.message)].point = s;

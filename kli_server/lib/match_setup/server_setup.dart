@@ -20,7 +20,7 @@ class ServerSetup extends StatefulWidget {
 
 class _ServerSetupState extends State<ServerSetup> {
   String localAddress = '';
-  // String publicAddress = '';
+  final List<StreamSubscription> subscriptions = [];
 
   @override
   void initState() {
@@ -32,7 +32,6 @@ class _ServerSetupState extends State<ServerSetup> {
 
   void getIpAddresses() async {
     localAddress = await Networking.getLocalIP();
-    // publicAddress = await Networking.getPublicIP();
     setState(() {});
   }
 
@@ -52,6 +51,14 @@ class _ServerSetupState extends State<ServerSetup> {
         if (mounted) Navigator.pop(context);
       },
     );
+  }
+
+  @override
+  void dispose() {
+    for (final sub in subscriptions) {
+      sub.cancel();
+    }
+    super.dispose();
   }
 
   @override
@@ -106,7 +113,6 @@ class _ServerSetupState extends State<ServerSetup> {
     return Text(
       'Server status: ${KLIServer.started ? '🟢' : '🔴'}\n'
       'Local IP: $localAddress\n',
-      // 'Public IP: $publicAddress',
       textAlign: TextAlign.center,
       style: s,
     );
@@ -122,11 +128,6 @@ class _ServerSetupState extends State<ServerSetup> {
           disabledLabel: 'Server already started',
           onPressed: () async {
             await KLIServer.start();
-
-            if (!MatchState.initialized) {
-              logHandler.empty();
-              logHandler.info('Match initialized');
-            }
 
             addClientListeners();
             setState(() {});
@@ -144,9 +145,6 @@ class _ServerSetupState extends State<ServerSetup> {
             MatchState.reset();
             await KLIServer.stop();
             setState(() {});
-            if (mounted) {
-              showToastMessage(context, 'Closed server.');
-            }
           },
         ),
         KLIButton(
@@ -160,6 +158,13 @@ class _ServerSetupState extends State<ServerSetup> {
               type: KLIMessageType.startMatch,
               message: '',
             ));
+
+            KLIServer.sendToAllClients(KLISocketMessage(
+              senderID: ConnectionID.host,
+              message: MatchState().sectionDisplay(MatchState().section),
+              type: KLIMessageType.section,
+            ));
+
             if (mounted) {
               Navigator.of(context).push(
                 MaterialPageRoute<void>(builder: (context) => const MatchOverview()),
@@ -183,11 +188,11 @@ class _ServerSetupState extends State<ServerSetup> {
   }
 
   void addClientListeners() {
-    KLIServer.onConnectionChanged.listen((event) {
+    subscriptions.add(KLIServer.onConnectionChanged.listen((event) {
       setState(() {});
-    });
+    }));
 
-    KLIServer.onMessageReceived.listen((m) {
+    subscriptions.add(KLIServer.onMessageReceived.listen((m) {
       if (m.type == KLIMessageType.players) {
         MatchState.sendPlayerData(m);
       }
@@ -197,12 +202,17 @@ class _ServerSetupState extends State<ServerSetup> {
         assert(pos >= 0 && pos < 4, 'Invalid player position: $pos');
         MatchState().playerReady[pos] = true;
 
-        KLIServer.sendToAllClients(
-          KLISocketMessage(senderID: ConnectionID.host, message: '$pos', type: KLIMessageType.playerReady),
+        KLIServer.sendMessage(
+          m.senderID,
+          KLISocketMessage(
+            senderID: ConnectionID.host,
+            message: '',
+            type: KLIMessageType.playerReady,
+          ),
         );
         setState(() {});
       }
-    });
+    }));
   }
 
   Widget clientList() {

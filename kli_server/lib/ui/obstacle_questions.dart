@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -33,6 +34,12 @@ class _ObstacleQuestionScreenState extends State<ObstacleQuestionScreen> {
   @override
   void initState() {
     debugPrint('${MatchState().imagePartOrder}');
+    KLIServer.onMessageReceived.listen((m) {
+      if (m.type != KLIMessageType.obstacleRowAnswer) return;
+      final pos = m.senderID.index - 1;
+      final split = m.message.split('|');
+      MatchState().rowAnswers[pos] = (split.first, double.parse(split.last));
+    });
     super.initState();
   }
 
@@ -55,20 +62,12 @@ class _ObstacleQuestionScreenState extends State<ObstacleQuestionScreen> {
           actions: [Container()],
         ),
         backgroundColor: Colors.transparent,
-        // TODO extract this to external stateful widget
-        endDrawer: Drawer(
-          width: 800,
-          backgroundColor: Colors.transparent,
-          child: Center(
-            child: Container(
-              decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.background,
-                border: Border.all(color: Colors.white),
-                borderRadius: BorderRadius.circular(16),
-              ),
-              child: const Text('a'),
-            ),
-          ),
+        endDrawer: AnswerDrawer(
+          MatchState().rowAnswers.asMap().entries.map((e) => (
+                MatchState().players[e.key].name,
+                e.value.$1,
+                e.value.$2,
+              )),
         ),
         body: Container(
           alignment: Alignment.center,
@@ -124,6 +123,7 @@ class _ObstacleQuestionScreenState extends State<ObstacleQuestionScreen> {
                           questionIndex = i;
                           timeEnded = canAnnounceAnswer = false;
                           currentTimeSec = widget.timeLimitSec;
+                          MatchState().rowAnswers.fillRange(0, 4, ('', -1));
                           setState(() {});
                         }
                       : null,
@@ -216,6 +216,14 @@ class _ObstacleQuestionScreenState extends State<ObstacleQuestionScreen> {
                 enableCondition: questionIndex >= 0 && !timeEnded && !(timer?.isActive == true),
                 onPressed: () {
                   canSelectQuestion = false;
+                  KLIServer.sendToAllClients(
+                    KLISocketMessage(
+                      senderID: ConnectionID.host,
+                      type: KLIMessageType.obstacleQuestion,
+                      message: jsonEncode(MatchState().obstacleMatch!.hintQuestions[questionIndex]!.toJson()),
+                    ),
+                  );
+
                   timer = Timer.periodic(1.seconds, (timer) {
                     if (currentTimeSec <= 0) {
                       timer.cancel();

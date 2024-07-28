@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:kli_client/match_data.dart';
 import 'package:kli_lib/kli_lib.dart';
@@ -18,7 +19,7 @@ class PlayerObstacleScreen extends StatefulWidget {
 
 class _PlayerObstacleScreenState extends State<PlayerObstacleScreen> {
   double currentTimeSec = 15;
-  bool started = false, timeEnded = false;
+  bool canShowQuestion = false, canAnswer = false;
   String submittedAnswer = '';
   late ObstacleQuestion currentQuestion;
   Timer? timer;
@@ -30,22 +31,26 @@ class _PlayerObstacleScreenState extends State<PlayerObstacleScreen> {
     super.initState();
     messageSubscription = KLIClient.onMessageReceived.listen((m) {
       if (m.type == KLIMessageType.obstacleQuestion) {
-        if (timeEnded) return;
-        if (!started) {
-          timer = Timer.periodic(10.ms, (timer) {
-            if (currentTimeSec <= 0) {
-              timer.cancel();
-              timeEnded = true;
-              started = false;
-              setState(() {});
-              return;
-            }
-            currentTimeSec -= .01;
+        // if (timeEnded) return;
+        answerTextController.text = '';
+        submittedAnswer = '';
+        currentTimeSec = 15;
+        // if (!canShowQuestion) {
+        timer = Timer.periodic(10.ms, (timer) {
+          if (currentTimeSec <= 0) {
+            timer.cancel();
+            canAnswer = false;
+            // canShowQuestion = false;
             setState(() {});
-          });
-        }
+            return;
+          }
+          currentTimeSec -= .01;
+          setState(() {});
+        });
+        // }
         currentQuestion = ObstacleQuestion.fromJson(jsonDecode(m.message));
-        started = true;
+        canAnswer = true;
+        canShowQuestion = true;
         setState(() {});
       }
       // if (m.type == KLIMessageType.correctStartAnswer) {
@@ -61,6 +66,7 @@ class _PlayerObstacleScreenState extends State<PlayerObstacleScreen> {
   @override
   void dispose() {
     timer?.cancel();
+    messageSubscription.cancel();
     super.dispose();
   }
 
@@ -70,23 +76,41 @@ class _PlayerObstacleScreenState extends State<PlayerObstacleScreen> {
       decoration: BoxDecoration(image: bgDecorationImage),
       child: Scaffold(
         backgroundColor: Colors.transparent,
+        extendBodyBehindAppBar: kDebugMode,
+        appBar: AppBar(
+          automaticallyImplyLeading: kDebugMode,
+          backgroundColor: Colors.transparent,
+        ),
         body: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 64, vertical: 64),
-          child: Row(
+          child: Stack(
             children: [
-              Flexible(
-                flex: 9,
-                child: Column(
-                  children: [
-                    questionContainer(),
-                    const SizedBox(height: 32),
-                    answerInput(),
-                  ],
-                ),
+              Row(
+                children: [
+                  Flexible(
+                    flex: 9,
+                    child: Column(
+                      children: [
+                        questionContainer(),
+                        const SizedBox(height: 32),
+                        answerInput(),
+                      ],
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(left: 48),
+                    child: playerInfo(),
+                  ),
+                ],
               ),
-              Padding(
-                padding: const EdgeInsets.only(left: 48),
-                child: playerInfo(),
+              Positioned(
+                right: 0,
+                bottom: 0,
+                child: Text(
+                  submittedAnswer.isNotEmpty ? 'Submitted:\n$submittedAnswer' : '',
+                  style: const TextStyle(fontSize: fontSizeMedium),
+                  textAlign: TextAlign.center,
+                ),
               ),
             ],
           ),
@@ -130,7 +154,7 @@ class _PlayerObstacleScreenState extends State<PlayerObstacleScreen> {
               padding: const EdgeInsets.symmetric(vertical: 16),
               alignment: Alignment.center,
               child: Text(
-                started ? 'Question ${currentQuestion.id}' : '',
+                canShowQuestion ? 'Question ${currentQuestion.id + 1}' : '',
                 style: const TextStyle(fontSize: fontSizeMedium),
               ),
             ),
@@ -160,11 +184,10 @@ class _PlayerObstacleScreenState extends State<PlayerObstacleScreen> {
                 ),
                 padding: const EdgeInsets.symmetric(horizontal: 128),
                 alignment: Alignment.center,
-                child: started
+                child: canShowQuestion
                     ? Text(
                         currentQuestion.question,
                         textAlign: TextAlign.center,
-                        // textWidthBasis: TextWidthBasis.longestLine,
                         style: const TextStyle(fontSize: fontSizeLarge),
                       )
                     : null,
@@ -177,34 +200,21 @@ class _PlayerObstacleScreenState extends State<PlayerObstacleScreen> {
   }
 
   Widget answerInput() {
-    return Stack(
-      children: [
-        Positioned(
-          right: -80,
-          child: Text(
-            submittedAnswer.isNotEmpty ? 'Submitted:\n$submittedAnswer' : '',
-            style: const TextStyle(fontSize: fontSizeMedium),
-            textAlign: TextAlign.center,
-          ),
-        ),
-        KLITextField(
-          readOnly: started && !timeEnded,
-          controller: answerTextController,
-          maxLines: 1,
-          hintText: 'Enter Answer and press Enter to submit',
-          onSubmitted: (text) {
-            // if (text == currentQuestion.answer) {
-            //   KLIClient.sendMessage(KLISocketMessage(
-            //     senderID: ConnectionID.player1,
-            //     type: KLIMessageType.correctStartAnswer,
-            //     message: '1',
-            //   ));
-            // }
-            submittedAnswer = text;
-            showPopupMessage(context, title: 'Submitted answer', content: text);
-          },
-        ),
-      ],
+    return KLITextField(
+      readOnly: !canAnswer,
+      controller: answerTextController,
+      maxLines: 1,
+      hintText: 'Enter Answer and press Enter to submit',
+      onSubmitted: (text) {
+        submittedAnswer = text;
+        showPopupMessage(context,
+            title: 'Answered', content: 'Time: ${(15 - currentTimeSec).toStringAsPrecision(3)}');
+        KLIClient.sendMessage(KLISocketMessage(
+          senderID: KLIClient.clientID!,
+          type: KLIMessageType.obstacleRowAnswer,
+          message: '$text|${(15 - currentTimeSec).toStringAsPrecision(3)}',
+        ));
+      },
     );
   }
 

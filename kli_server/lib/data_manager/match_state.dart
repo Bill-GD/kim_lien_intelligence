@@ -35,10 +35,10 @@ class MatchState {
     ));
 
     _inst = MatchState._internal(newMatch);
-    if (_inst!.section == MatchSection.obstacle) {
-      _inst!.imagePartOrder.shuffle();
-      _inst!.imagePartOrder.add(4);
-    }
+    _inst!.imagePartOrder.shuffle();
+    _inst!.imagePartOrder.add(4);
+    logHandler.empty();
+    logHandler.info('Match initialized');
   }
 
   static void reset() => _inst = null;
@@ -83,7 +83,7 @@ class MatchState {
       KLISocketMessage(
         senderID: ConnectionID.host,
         type: KLIMessageType.section,
-        message: _inst!._sectionDisplay(_inst!.section),
+        message: _inst!.sectionDisplay(_inst!.section),
       ),
     );
 
@@ -104,7 +104,7 @@ class MatchState {
 
     KLIServer.sendToAllClients(KLISocketMessage(
       senderID: ConnectionID.host,
-      message: _sectionDisplay(section),
+      message: sectionDisplay(section),
       type: KLIMessageType.section,
     ));
   }
@@ -177,7 +177,7 @@ class MatchState {
     }
   }
 
-  String _sectionDisplay(MatchSection section) {
+  String sectionDisplay(MatchSection section) {
     switch (section) {
       case MatchSection.start:
         return 'Khởi động';
@@ -216,6 +216,7 @@ class MatchState {
   final revealedObstacleRows = <bool>[false, false, false, false, false];
   final answeredObstacleRows = <bool>[false, false, false, false, false];
   late final List<int> imagePartOrder = <int>[0, 1, 2, 3];
+  final List<(String, double)> rowAnswers = List.generate(4, (_) => ('', -1));
   final revealedImageParts = <bool>[false, false, false, false, false];
   bool get allRowsAnswered => answeredObstacleRows.take(4).every((e) => e);
   bool get allQuestionsAnswered => answeredObstacleRows.every((e) => e);
