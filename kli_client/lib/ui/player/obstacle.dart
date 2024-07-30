@@ -31,10 +31,6 @@ class _PlayerObstacleScreenState extends State<PlayerObstacleScreen> {
     super.initState();
     messageSubscription = KLIClient.onMessageReceived.listen((m) {
       if (m.type == KLIMessageType.obstacleQuestion) {
-        // if (timeEnded) return;
-        answerTextController.text = '';
-        submittedAnswer = '';
-        currentTimeSec = 15;
         timer = Timer.periodic(10.ms, (timer) {
           if (currentTimeSec <= 0) {
             timer.cancel();
@@ -54,6 +50,13 @@ class _PlayerObstacleScreenState extends State<PlayerObstacleScreen> {
       //   MatchData().players[widget.playerPos].point = int.parse(m.message);
       //   setState(() {});
       // }
+      if (m.type == KLIMessageType.hideQuestion) {
+        answerTextController.text = '';
+        submittedAnswer = '';
+        canShowQuestion = false;
+        currentTimeSec = 15;
+        setState(() {});
+      }
       if (m.type == KLIMessageType.endSection) {
         Navigator.of(context).pop();
       }
@@ -104,7 +107,7 @@ class _PlayerObstacleScreenState extends State<PlayerObstacleScreen> {
                 right: 0,
                 bottom: 0,
                 child: Text(
-                  submittedAnswer.isNotEmpty ? 'Submitted:\n$submittedAnswer' : '',
+                  'Submitted:\n$submittedAnswer',
                   style: const TextStyle(fontSize: fontSizeMedium),
                   textAlign: TextAlign.center,
                 ),
@@ -204,8 +207,11 @@ class _PlayerObstacleScreenState extends State<PlayerObstacleScreen> {
       hintText: 'Enter Answer and press Enter to submit',
       onSubmitted: (text) {
         submittedAnswer = text;
-        showPopupMessage(context,
-            title: 'Answered', content: 'Time: ${(15 - currentTimeSec).toStringAsPrecision(3)}');
+        showPopupMessage(
+          context,
+          title: 'Answered',
+          content: 'Time: ${(15 - currentTimeSec).toStringAsPrecision(3)}',
+        );
         KLIClient.sendMessage(KLISocketMessage(
           senderID: KLIClient.clientID!,
           type: KLIMessageType.obstacleRowAnswer,
@@ -216,33 +222,47 @@ class _PlayerObstacleScreenState extends State<PlayerObstacleScreen> {
   }
 
   Widget playerInfo() {
-    return Column(
-      children: [
-        AnimatedCircularProgressBar(
-          currentTimeSec: currentTimeSec,
-          totalTimeSec: widget.timeLimitSec,
-          strokeWidth: 20,
-          valueColor: const Color(0xFF00A906),
-          backgroundColor: Colors.red,
-        ),
-        const SizedBox(height: 128),
-        Container(
-          width: 128,
-          height: 128,
-          alignment: Alignment.center,
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            color: Theme.of(context).colorScheme.background,
-            border: Border.all(color: Colors.white),
+    return Padding(
+      padding: const EdgeInsets.only(top: 16, bottom: 100),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          AnimatedCircularProgressBar(
+            currentTimeSec: currentTimeSec,
+            totalTimeSec: widget.timeLimitSec,
+            strokeWidth: 20,
+            valueColor: const Color(0xFF00A906),
+            backgroundColor: Colors.red,
           ),
-          child: Text(
-            '${MatchData().players[MatchData().playerPos].point}',
-            style: const TextStyle(fontSize: fontSizeMedium),
-            textAlign: TextAlign.center,
+          Container(
+            width: 128,
+            height: 128,
+            alignment: Alignment.center,
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: Theme.of(context).colorScheme.background,
+              border: Border.all(color: Colors.white),
+            ),
+            child: Text(
+              '${MatchData().players[MatchData().playerPos].point}',
+              style: const TextStyle(fontSize: fontSizeMedium),
+              textAlign: TextAlign.center,
+            ),
           ),
-        ),
-      ],
+          const SizedBox(height: 128),
+          KLIButton(
+            'Obstacle',
+            onPressed: () {
+              KLIClient.sendMessage(KLISocketMessage(
+                senderID: KLIClient.clientID!,
+                type: KLIMessageType.guessObstacle,
+                message: '',
+              ));
+            },
+          ),
+        ],
+      ),
     );
   }
 }

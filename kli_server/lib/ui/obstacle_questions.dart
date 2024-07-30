@@ -30,6 +30,7 @@ class _ObstacleQuestionScreenState extends State<ObstacleQuestionScreen> {
       canSelectQuestion = true,
       keywordAnswered = false;
   Timer? timer;
+  final List<bool?> answerResults = List.filled(4, null);
 
   @override
   void initState() {
@@ -63,11 +64,40 @@ class _ObstacleQuestionScreenState extends State<ObstacleQuestionScreen> {
         ),
         backgroundColor: Colors.transparent,
         endDrawer: AnswerDrawer(
+          answerResult: answerResults,
           answers: MatchState().rowAnswers.asMap().entries.map((e) => (
                 MatchState().players[e.key].name,
                 e.value.$1,
                 e.value.$2,
               )),
+          actions: [
+            KLIButton(
+              'Announce Result',
+              enableCondition: canAnnounceAnswer && questionIndex >= 0,
+              onPressed: () {
+                obstacleWait();
+                for (int i = 0; i < 4; i++) {
+                  answerResults[i] = MatchState().rowAnswers[i].$1.toLowerCase() ==
+                      MatchState().obstacleMatch!.hintQuestions[questionIndex]!.answer.toLowerCase();
+                  MatchState().modifyScore(i, 10);
+                  setState(() {});
+                }
+                KLIServer.sendToAllClients(KLISocketMessage(
+                  senderID: ConnectionID.host,
+                  type: KLIMessageType.hideQuestion,
+                  message: '',
+                ));
+                MatchState().answeredObstacleRows[questionIndex] = true;
+                MatchState().revealedImageParts[MatchState().imagePartOrder.indexOf(questionIndex)] =
+                    MatchState().revealedObstacleRows[questionIndex] = answerResults.any((e) => e == true);
+                questionIndex = -1;
+                canShowAnswers = false;
+                canShowImage = true;
+                canSelectQuestion = true;
+                setState(() {});
+              },
+            ),
+          ],
         ),
         body: Container(
           alignment: Alignment.center,
@@ -124,6 +154,7 @@ class _ObstacleQuestionScreenState extends State<ObstacleQuestionScreen> {
                           timeEnded = canAnnounceAnswer = false;
                           currentTimeSec = widget.timeLimitSec;
                           MatchState().rowAnswers.fillRange(0, 4, ('', -1));
+                          answerResults.fillRange(0, 4, null);
                           setState(() {});
                         }
                       : null,
@@ -176,38 +207,6 @@ class _ObstacleQuestionScreenState extends State<ObstacleQuestionScreen> {
             },
           ),
           const SizedBox(height: 32),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              KLIButton(
-                'Correct',
-                enableCondition: canAnnounceAnswer && questionIndex >= 0,
-                onPressed: () {
-                  MatchState().revealedImageParts[MatchState().imagePartOrder.indexOf(questionIndex)] = true;
-                  MatchState().revealedObstacleRows[questionIndex] = true;
-                  MatchState().answeredObstacleRows[questionIndex] = true;
-                  obstacleWait();
-                  questionIndex = -1;
-                  canShowAnswers = false;
-                  canShowImage = true;
-                  setState(() {});
-                },
-              ),
-              KLIButton(
-                'Wrong',
-                enableCondition: canAnnounceAnswer && questionIndex >= 0,
-                onPressed: () {
-                  MatchState().answeredObstacleRows[questionIndex] = true;
-                  obstacleWait();
-                  questionIndex = -1;
-                  canShowAnswers = false;
-                  canShowImage = true;
-                  canSelectQuestion = true;
-                  setState(() {});
-                },
-              ),
-            ],
-          ),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [

@@ -165,6 +165,8 @@ class _ServerSetupState extends State<ServerSetup> {
               type: KLIMessageType.section,
             ));
 
+            logHandler.empty();
+            logHandler.info('Match started');
             if (mounted) {
               Navigator.of(context).push(
                 MaterialPageRoute<void>(builder: (context) => const MatchOverview()),
