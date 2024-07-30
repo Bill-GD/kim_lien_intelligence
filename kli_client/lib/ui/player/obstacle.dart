@@ -35,19 +35,16 @@ class _PlayerObstacleScreenState extends State<PlayerObstacleScreen> {
         answerTextController.text = '';
         submittedAnswer = '';
         currentTimeSec = 15;
-        // if (!canShowQuestion) {
         timer = Timer.periodic(10.ms, (timer) {
           if (currentTimeSec <= 0) {
             timer.cancel();
             canAnswer = false;
-            // canShowQuestion = false;
             setState(() {});
             return;
           }
           currentTimeSec -= .01;
           setState(() {});
         });
-        // }
         currentQuestion = ObstacleQuestion.fromJson(jsonDecode(m.message));
         canAnswer = true;
         canShowQuestion = true;

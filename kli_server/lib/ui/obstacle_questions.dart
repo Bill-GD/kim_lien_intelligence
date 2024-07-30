@@ -63,7 +63,7 @@ class _ObstacleQuestionScreenState extends State<ObstacleQuestionScreen> {
         ),
         backgroundColor: Colors.transparent,
         endDrawer: AnswerDrawer(
-          MatchState().rowAnswers.asMap().entries.map((e) => (
+          answers: MatchState().rowAnswers.asMap().entries.map((e) => (
                 MatchState().players[e.key].name,
                 e.value.$1,
                 e.value.$2,
