@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:kli_client/match_data.dart';
 import 'package:kli_lib/kli_lib.dart';
 
+import '../../connect_screen/overview.dart';
 import '../../global.dart';
 
 class PlayerStartScreen extends StatefulWidget {
@@ -55,7 +56,10 @@ class _PlayerStartScreenState extends State<PlayerStartScreen> {
         // started = false; // add to hide question after time ended
       }
       if (m.type == KLIMessageType.endSection) {
-        Navigator.of(context).pop();
+        // Navigator.of(context).pop();
+        Navigator.of(context).pushReplacement<void, void>(
+          MaterialPageRoute(builder: (_) => const Overview()),
+        );
       }
 
       if (mounted) setState(() {});

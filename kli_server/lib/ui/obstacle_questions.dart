@@ -48,33 +48,39 @@ class _ObstacleQuestionScreenState extends State<ObstacleQuestionScreen> {
         ));
         timer?.cancel();
 
-        await dialogWithActions<void>(
-          context,
-          title: 'Guess Obstacle',
-          content: 'Player ${Networking.getClientDisplayID(m.senderID)} has decided to guess the obstacle.',
-          time: 150.ms,
-          actions: [
-            KLIButton(
-              'Correct',
-              onPressed: () {
-                MatchState().modifyScore(
-                  m.senderID.index - 1,
-                  MatchState.obstaclePoints[MatchState().answeredObstacleRows.where((e) => e).length],
-                );
-              },
-            ),
-            KLIButton(
-              'Wrong',
-              onPressed: () {
-                KLIServer.sendToAllClients(KLISocketMessage(
-                  senderID: ConnectionID.host,
-                  type: KLIMessageType.continueTimer,
-                ));
-                createTimer();
-              },
-            ),
-          ],
-        );
+        if (mounted) {
+          await dialogWithActions<void>(
+            context,
+            title: 'Guess Obstacle',
+            content: 'Player ${Networking.getClientDisplayID(m.senderID)} has decided to guess the obstacle.',
+            time: 150.ms,
+            actions: [
+              KLIButton(
+                'Correct',
+                onPressed: () {
+                  MatchState().modifyScore(
+                    m.senderID.index - 1,
+                    MatchState.obstaclePoints[MatchState().answeredObstacleRows.where((e) => e).length],
+                  );
+                  Navigator.of(context).pop();
+                  keywordAnswered = true;
+                  setState(() {});
+                },
+              ),
+              KLIButton(
+                'Wrong',
+                onPressed: () {
+                  KLIServer.sendToAllClients(KLISocketMessage(
+                    senderID: ConnectionID.host,
+                    type: KLIMessageType.continueTimer,
+                  ));
+                  createTimer();
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          );
+        }
       }
     });
     super.initState();
@@ -115,13 +121,9 @@ class _ObstacleQuestionScreenState extends State<ObstacleQuestionScreen> {
                 for (int i = 0; i < 4; i++) {
                   answerResults[i] = MatchState().rowAnswers[i].$1.toLowerCase() ==
                       MatchState().obstacleMatch!.hintQuestions[questionIndex]!.answer.toLowerCase();
-                  MatchState().modifyScore(i, 10);
+                  if (answerResults[i] == true) MatchState().modifyScore(i, 10);
                   setState(() {});
                 }
-                KLIServer.sendToAllClients(KLISocketMessage(
-                  senderID: ConnectionID.host,
-                  type: KLIMessageType.hideQuestion,
-                ));
 
                 MatchState().answeredObstacleRows[questionIndex] = true;
                 MatchState().revealedImageParts[MatchState().imagePartOrder.indexOf(questionIndex)] =
@@ -130,6 +132,11 @@ class _ObstacleQuestionScreenState extends State<ObstacleQuestionScreen> {
                 canShowAnswers = false;
                 canShowImage = true;
                 canSelectQuestion = true;
+
+                KLIServer.sendToAllClients(KLISocketMessage(
+                  senderID: ConnectionID.host,
+                  type: KLIMessageType.hideQuestion,
+                ));
                 setState(() {});
               },
             ),

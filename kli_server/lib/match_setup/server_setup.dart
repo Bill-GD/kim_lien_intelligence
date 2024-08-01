@@ -142,7 +142,7 @@ class _ServerSetupState extends State<ServerSetup> {
           disabledLabel: 'No server exist',
           enableCondition: KLIServer.started,
           onPressed: () async {
-            MatchState.reset();
+            // MatchState.reset();
             await KLIServer.stop();
             setState(() {});
           },
@@ -150,7 +150,7 @@ class _ServerSetupState extends State<ServerSetup> {
         KLIButton(
           'Start Match',
           enableCondition: KLIServer.started &&
-              ((kDebugMode && MatchState().playerReady.any((e) => e)) || MatchState().allPlayerReady),
+              ((kDebugMode && MatchState.playerReady.any((e) => e)) || MatchState().allPlayerReady),
           disabledLabel: !KLIServer.started ? 'No server exist' : 'Not enough player',
           onPressed: () async {
             KLIServer.sendToAllClients(KLISocketMessage(
@@ -189,7 +189,10 @@ class _ServerSetupState extends State<ServerSetup> {
   }
 
   void addClientListeners() {
-    subscriptions.add(KLIServer.onConnectionChanged.listen((event) {
+    subscriptions.add(KLIServer.onConnectionChanged.listen((e) {
+      if (e >= 0) {
+        MatchState.playerReady[e] = false;
+      }
       setState(() {});
     }));
 
@@ -201,7 +204,7 @@ class _ServerSetupState extends State<ServerSetup> {
       if (m.type == KLIMessageType.playerReady) {
         final pos = m.senderID.index - 1;
         assert(pos >= 0 && pos < 4, 'Invalid player position: $pos');
-        MatchState().playerReady[pos] = true;
+        MatchState.playerReady[pos] = true;
 
         KLIServer.sendMessage(
           m.senderID,
@@ -226,9 +229,9 @@ class _ServerSetupState extends State<ServerSetup> {
       String t = Networking.getClientDisplayID(ConnectionID.values[index + 1]);
       Widget w = Text(t);
       if (index < 4) {
-        t += MatchState.initialized && MatchState().playerReady[index] ? '  ✔️' : '  ❌';
+        t += MatchState.initialized && MatchState.playerReady[index] ? '  ✔️' : '  ❌';
         w = Tooltip(
-          message: MatchState().playerReady[index] ? 'Ready' : 'Not ready',
+          message: MatchState.playerReady[index] ? 'Ready' : 'Not ready',
           child: Text(t),
         );
       }

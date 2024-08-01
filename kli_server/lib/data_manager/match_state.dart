@@ -204,7 +204,7 @@ class MatchState {
   late final KLIMatch match;
   final scores = <int>[0, 0, 0, 0];
   late final List<KLIPlayer> players;
-  final playerReady = <bool>[false, false, false, false];
+  static final playerReady = <bool>[false, false, false, false];
   bool get allPlayerReady => playerReady.every((e) => e);
   MatchSection section = MatchSection.obstacle;
 

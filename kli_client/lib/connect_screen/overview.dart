@@ -20,7 +20,7 @@ class Overview extends StatefulWidget {
 class _OverviewState extends State<Overview> {
   final List<StreamSubscription<void>> messageSubscriptions = [];
   final playerReady = <bool>[false, false, false, false];
-  String overviewMessage = '   Chờ máy chủ bắt đầu trận đấu   ';
+  String overviewMessage = 'Chờ máy chủ bắt đầu trận đấu';
   bool started = false;
 
   @override
@@ -28,14 +28,13 @@ class _OverviewState extends State<Overview> {
     super.initState();
 
     messageSubscriptions.add(KLIClient.onDisconnected.listen((_) => Navigator.pop(context)));
-    messageSubscriptions.add(KLIClient.onMessageReceived.listen((m) async {
+    messageSubscriptions.add(KLIClient.onMessageReceived.listen((m) {
       switch (m.type) {
-        // case KLIMessageType.playerReady:
-        //   playerReady[int.parse(m.message)] = true;
-        //   break;
         case KLIMessageType.scores:
+          int i = 0;
           for (int s in jsonDecode(m.message) as List) {
-            MatchData().players[int.parse(m.message)].point = s;
+            MatchData().players[i].point = s;
+            i++;
           }
           break;
         case KLIMessageType.section:
@@ -46,12 +45,12 @@ class _OverviewState extends State<Overview> {
           started = true;
           break;
         case KLIMessageType.enterStart:
-          await Navigator.of(context).push<void>(
+          Navigator.of(context).pushReplacement<void, void>(
             MaterialPageRoute(builder: (_) => PlayerStartScreen(playerPos: int.parse(m.message))),
           );
           break;
         case KLIMessageType.enterObstacle:
-          await Navigator.of(context).push<void>(
+          Navigator.of(context).pushReplacement<void, void>(
             MaterialPageRoute(builder: (_) => const PlayerObstacleScreen()),
           );
           break;
@@ -93,12 +92,12 @@ class _OverviewState extends State<Overview> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  if (!started) const CircularProgressIndicator(),
+                  // if (!started) const CircularProgressIndicator(),
                   Text(
                     overviewMessage,
                     style: const TextStyle(fontSize: fontSizeLarge),
                   ),
-                  if (!started) const CircularProgressIndicator(),
+                  // if (!started) const CircularProgressIndicator(),
                 ],
               ),
               const SizedBox(height: 64),

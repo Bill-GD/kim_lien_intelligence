@@ -155,16 +155,16 @@ class _ConnectPageState extends State<ConnectPage> {
               });
             } on Exception catch (e, stack) {
               logHandler.error('Error when trying to connect: $e', stackTrace: stack);
+              setState(() {
+                isConnected = false;
+                isConnecting = false;
+              });
               if (e is SocketException) {
                 throw KLIException(
                   'Connection problem',
                   'Please make sure host IP ($ip) is correct or the server has started',
                 );
               }
-              setState(() {
-                isConnected = false;
-                isConnecting = false;
-              });
             }
           },
         ),

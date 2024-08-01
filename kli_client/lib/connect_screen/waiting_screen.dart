@@ -106,7 +106,7 @@ class _WaitingScreenState extends State<WaitingScreen> {
                           MatchData().players.addAll(d);
                           receivingData = false;
                           setState(() {});
-                          Navigator.of(context).pushReplacement(
+                          Navigator.of(context).pushReplacement<void, void>(
                             MaterialPageRoute<void>(builder: (context) => const Overview()),
                           );
                         }
