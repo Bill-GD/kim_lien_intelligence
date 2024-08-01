@@ -62,7 +62,7 @@ class _OverviewState extends State<Overview> {
     }));
 
     KLIClient.sendMessage(
-      KLISocketMessage(senderID: KLIClient.clientID!, message: '', type: KLIMessageType.playerReady),
+      KLISocketMessage(senderID: KLIClient.clientID!, type: KLIMessageType.playerReady),
     );
   }
 

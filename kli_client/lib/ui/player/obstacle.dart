@@ -31,31 +31,24 @@ class _PlayerObstacleScreenState extends State<PlayerObstacleScreen> {
     super.initState();
     messageSubscription = KLIClient.onMessageReceived.listen((m) {
       if (m.type == KLIMessageType.obstacleQuestion) {
-        timer = Timer.periodic(10.ms, (timer) {
-          if (currentTimeSec <= 0) {
-            timer.cancel();
-            canAnswer = false;
-            setState(() {});
-            return;
-          }
-          currentTimeSec -= .01;
-          setState(() {});
-        });
+        createTimer();
         currentQuestion = ObstacleQuestion.fromJson(jsonDecode(m.message));
         canAnswer = true;
         canShowQuestion = true;
         setState(() {});
       }
-      // if (m.type == KLIMessageType.correctStartAnswer) {
-      //   MatchData().players[widget.playerPos].point = int.parse(m.message);
-      //   setState(() {});
-      // }
       if (m.type == KLIMessageType.hideQuestion) {
         answerTextController.text = '';
         submittedAnswer = '';
         canShowQuestion = false;
         currentTimeSec = 15;
         setState(() {});
+      }
+      if (m.type == KLIMessageType.stopTimer) {
+        timer?.cancel();
+      }
+      if (m.type == KLIMessageType.continueTimer) {
+        createTimer();
       }
       if (m.type == KLIMessageType.endSection) {
         Navigator.of(context).pop();
@@ -68,6 +61,19 @@ class _PlayerObstacleScreenState extends State<PlayerObstacleScreen> {
     timer?.cancel();
     messageSubscription.cancel();
     super.dispose();
+  }
+
+  void createTimer() {
+    timer = Timer.periodic(10.ms, (timer) {
+      if (currentTimeSec <= 0) {
+        timer.cancel();
+        canAnswer = false;
+        setState(() {});
+        return;
+      }
+      currentTimeSec -= .01;
+      setState(() {});
+    });
   }
 
   @override
@@ -252,12 +258,11 @@ class _PlayerObstacleScreenState extends State<PlayerObstacleScreen> {
           ),
           const SizedBox(height: 128),
           KLIButton(
-            'Obstacle',
+            'Guess Obstacle',
             onPressed: () {
               KLIClient.sendMessage(KLISocketMessage(
                 senderID: KLIClient.clientID!,
                 type: KLIMessageType.guessObstacle,
-                message: '',
               ));
             },
           ),

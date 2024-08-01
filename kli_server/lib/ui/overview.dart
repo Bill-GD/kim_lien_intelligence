@@ -128,7 +128,6 @@ class _MatchOverviewState extends State<MatchOverview> {
             onPressed: () async {
               KLIServer.sendToAllClients(KLISocketMessage(
                 senderID: ConnectionID.host,
-                message: '',
                 type: KLIMessageType.enterObstacle,
               ));
 
@@ -152,7 +151,6 @@ class _MatchOverviewState extends State<MatchOverview> {
             onPressed: () {
               KLIServer.sendToAllClients(KLISocketMessage(
                 senderID: ConnectionID.host,
-                message: '',
                 type: KLIMessageType.enterObstacle,
               ));
             },
@@ -165,7 +163,6 @@ class _MatchOverviewState extends State<MatchOverview> {
             onPressed: () {
               KLIServer.sendToAllClients(KLISocketMessage(
                 senderID: ConnectionID.host,
-                message: '',
                 type: KLIMessageType.enterFinish,
               ));
             },
@@ -178,7 +175,6 @@ class _MatchOverviewState extends State<MatchOverview> {
             onPressed: () {
               KLIServer.sendToAllClients(KLISocketMessage(
                 senderID: ConnectionID.host,
-                message: '',
                 type: KLIMessageType.enterExtra,
               ));
             },

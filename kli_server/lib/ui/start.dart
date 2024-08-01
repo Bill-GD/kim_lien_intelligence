@@ -198,7 +198,6 @@ class _StartScreenState extends State<StartScreen> {
       KLIServer.sendToAllClients(KLISocketMessage(
         senderID: ConnectionID.host,
         type: KLIMessageType.stopTimer,
-        message: '',
       ));
       return;
     }
@@ -272,7 +271,6 @@ class _StartScreenState extends State<StartScreen> {
               onPressed: () {
                 KLIServer.sendToAllClients(KLISocketMessage(
                   senderID: ConnectionID.host,
-                  message: MatchState().scores[widget.playerPos].toString(),
                   type: KLIMessageType.endSection,
                 ));
                 Navigator.of(context).pop();

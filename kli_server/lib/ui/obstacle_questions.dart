@@ -35,11 +35,47 @@ class _ObstacleQuestionScreenState extends State<ObstacleQuestionScreen> {
   @override
   void initState() {
     debugPrint('${MatchState().imagePartOrder}');
-    KLIServer.onMessageReceived.listen((m) {
-      if (m.type != KLIMessageType.obstacleRowAnswer) return;
-      final pos = m.senderID.index - 1;
-      final split = m.message.split('|');
-      MatchState().rowAnswers[pos] = (split.first, double.parse(split.last));
+    KLIServer.onMessageReceived.listen((m) async {
+      if (m.type == KLIMessageType.obstacleRowAnswer) {
+        final pos = m.senderID.index - 1;
+        final split = m.message.split('|');
+        MatchState().rowAnswers[pos] = (split.first, double.parse(split.last));
+      }
+      if (m.type == KLIMessageType.guessObstacle) {
+        KLIServer.sendToAllClients(KLISocketMessage(
+          senderID: ConnectionID.host,
+          type: KLIMessageType.stopTimer,
+        ));
+        timer?.cancel();
+
+        await dialogWithActions<void>(
+          context,
+          title: 'Guess Obstacle',
+          content: 'Player ${Networking.getClientDisplayID(m.senderID)} has decided to guess the obstacle.',
+          time: 150.ms,
+          actions: [
+            KLIButton(
+              'Correct',
+              onPressed: () {
+                MatchState().modifyScore(
+                  m.senderID.index - 1,
+                  MatchState.obstaclePoints[MatchState().answeredObstacleRows.where((e) => e).length],
+                );
+              },
+            ),
+            KLIButton(
+              'Wrong',
+              onPressed: () {
+                KLIServer.sendToAllClients(KLISocketMessage(
+                  senderID: ConnectionID.host,
+                  type: KLIMessageType.continueTimer,
+                ));
+                createTimer();
+              },
+            ),
+          ],
+        );
+      }
     });
     super.initState();
   }
@@ -85,8 +121,8 @@ class _ObstacleQuestionScreenState extends State<ObstacleQuestionScreen> {
                 KLIServer.sendToAllClients(KLISocketMessage(
                   senderID: ConnectionID.host,
                   type: KLIMessageType.hideQuestion,
-                  message: '',
                 ));
+
                 MatchState().answeredObstacleRows[questionIndex] = true;
                 MatchState().revealedImageParts[MatchState().imagePartOrder.indexOf(questionIndex)] =
                     MatchState().revealedObstacleRows[questionIndex] = answerResults.any((e) => e == true);
@@ -223,17 +259,7 @@ class _ObstacleQuestionScreenState extends State<ObstacleQuestionScreen> {
                     ),
                   );
 
-                  timer = Timer.periodic(1.seconds, (timer) {
-                    if (currentTimeSec <= 0) {
-                      timer.cancel();
-                      timeEnded = true;
-                      canShowAnswers = true;
-                      setState(() {});
-                      return;
-                    }
-                    currentTimeSec--;
-                    setState(() {});
-                  });
+                  createTimer();
                   setState(() {});
                 },
               ),
@@ -241,6 +267,10 @@ class _ObstacleQuestionScreenState extends State<ObstacleQuestionScreen> {
                 'End',
                 enableCondition: keywordAnswered || MatchState().allQuestionsAnswered,
                 onPressed: () {
+                  KLIServer.sendToAllClients(KLISocketMessage(
+                    senderID: ConnectionID.host,
+                    type: KLIMessageType.endSection,
+                  ));
                   Navigator.of(context).pop();
                 },
               ),
@@ -339,5 +369,19 @@ class _ObstacleQuestionScreenState extends State<ObstacleQuestionScreen> {
         ),
       ),
     );
+  }
+
+  void createTimer() {
+    timer = Timer.periodic(1.seconds, (timer) {
+      if (currentTimeSec <= 0) {
+        timer.cancel();
+        timeEnded = true;
+        canShowAnswers = true;
+        setState(() {});
+        return;
+      }
+      currentTimeSec--;
+      setState(() {});
+    });
   }
 }

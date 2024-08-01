@@ -156,7 +156,6 @@ class _ServerSetupState extends State<ServerSetup> {
             KLIServer.sendToAllClients(KLISocketMessage(
               senderID: ConnectionID.host,
               type: KLIMessageType.startMatch,
-              message: '',
             ));
 
             KLIServer.sendToAllClients(KLISocketMessage(
@@ -208,7 +207,6 @@ class _ServerSetupState extends State<ServerSetup> {
           m.senderID,
           KLISocketMessage(
             senderID: ConnectionID.host,
-            message: '',
             type: KLIMessageType.playerReady,
           ),
         );

@@ -73,7 +73,6 @@ class MatchState {
       m.senderID,
       KLISocketMessage(
         senderID: ConnectionID.host,
-        message: '',
         type: KLIMessageType.startMatch,
       ),
     );
@@ -116,8 +115,7 @@ class MatchState {
             .questions
             .where((e) => e.pos == startOrFinishPos)
             .toList()
-            .reversed
-            .toList();
+            ..shuffle();
         break;
       case MatchSection.obstacle:
         questionList = null;
@@ -222,6 +220,7 @@ class MatchState {
   // obstacle
   final revealedObstacleRows = <bool>[false, false, false, false, false];
   final answeredObstacleRows = <bool>[false, false, false, false, false];
+  static const obstaclePoints = <int>[100, 80, 60, 40, 20, 10];
   late final List<int> imagePartOrder = <int>[0, 1, 2, 3];
   final List<(String, double)> rowAnswers = List.generate(4, (_) => ('', -1));
   final revealedImageParts = <bool>[false, false, false, false, false];
