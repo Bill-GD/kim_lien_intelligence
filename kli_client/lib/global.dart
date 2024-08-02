@@ -28,12 +28,10 @@ void initAudioHandler() {
 
 const String changelog = """
   0.2.2 ({latest}):
-  - Added Obstacle screen
-  - Some error shows a popup message
-  - Loading screen route is replaced
-  - Global error handling using PlatformDispatcher
-  - Widget error screen now show stack, can turn back
-  - Overview receives scores
+  - Added Obstacle screen: question, score, can guess, answer
+  - Some errors show a popup message
+  - Some routes are replaced
+  - Global error handling using PlatformDispatcher, widget error screen now show stack, can turn back
   - Fixed cut error title
 
   0.2.1 ({cfc575a}):

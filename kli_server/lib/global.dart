@@ -120,16 +120,16 @@ SideNavigationBarTheme sideNavigationTheme(BuildContext context, [double height 
 
 const String changelog = """
   0.4.2 ({latest}):
-  - Some error shows a popup message
-  - Loading screen route is replaced
-  - Widget error screen now show stack, can turn back
+  - Obstacle improvements: received/show answers and obs guesses, properly send points, keep track of eliminated, scores, ans results...
+  - Some errors show a popup message
+  - Some routes are replaced
+  - Global error handling using PlatformDispatcher, widget error screen now show stack, can turn back
   - SoundTest screen no longer requires globals as params
   - Fixed cut error title
-  - Reconnection (WIP)
   - Initialize MatchState in data checker
   - Show ready status for players (may revert)
   - Properly cancel streams when disposing
-  - Obstacle screen receives answers
+  - Start questions are shuffled
 
   0.4.1 ({cfc575a}):
   - Start match button enabled when players are ready (only 1 needed if debug)
