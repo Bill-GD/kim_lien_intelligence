@@ -46,7 +46,7 @@ class MatchState {
   static void sendPlayerData(KLISocketMessage m) {
     assert(initialized, 'MatchState not initialized');
 
-    logHandler.info('Sending player list');
+    // logHandler.info('Sending player list');
 
     final data = <Map<String, dynamic>>[];
     for (final p in MatchState().players) {
@@ -115,7 +115,7 @@ class MatchState {
             .questions
             .where((e) => e.pos == startOrFinishPos)
             .toList()
-            ..shuffle();
+          ..shuffle();
         break;
       case MatchSection.obstacle:
         questionList = null;
@@ -200,6 +200,14 @@ class MatchState {
     ));
   }
 
+  void eliminateObstaclePlayer(int pos) {
+    eliminatedPlayers[pos] = true;
+    KLIServer.sendToPlayer(
+      pos,
+      KLISocketMessage(senderID: ConnectionID.host, type: KLIMessageType.eliminated),
+    );
+  }
+
   // These are instance variables
   late final KLIMatch match;
   final scores = <int>[0, 0, 0, 0];
@@ -226,4 +234,5 @@ class MatchState {
   final revealedImageParts = <bool>[false, false, false, false, false];
   bool get allRowsAnswered => answeredObstacleRows.take(4).every((e) => e);
   bool get allQuestionsAnswered => answeredObstacleRows.every((e) => e);
+  final List<bool> eliminatedPlayers = <bool>[false, false, false, false];
 }

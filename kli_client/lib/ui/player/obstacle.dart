@@ -20,7 +20,7 @@ class PlayerObstacleScreen extends StatefulWidget {
 
 class _PlayerObstacleScreenState extends State<PlayerObstacleScreen> {
   double currentTimeSec = 15;
-  bool canShowQuestion = false, canAnswer = false, obstacleGuessed = false;
+  bool canShowQuestion = false, canAnswer = false, canGuessObstacle = true, eliminated = false;
   String submittedAnswer = '';
   late ObstacleQuestion currentQuestion;
   Timer? timer;
@@ -31,41 +31,64 @@ class _PlayerObstacleScreenState extends State<PlayerObstacleScreen> {
   void initState() {
     super.initState();
     messageSubscription = KLIClient.onMessageReceived.listen((m) {
-      if (m.type == KLIMessageType.scores) {
-        int i = 0;
-        for (int s in jsonDecode(m.message) as List) {
-          MatchData().players[i].point = s;
-          i++;
-        }
-        setState(() {});
-      }
-      if (m.type == KLIMessageType.obstacleQuestion) {
-        createTimer();
-        currentQuestion = ObstacleQuestion.fromJson(jsonDecode(m.message));
-        canAnswer = true;
-        canShowQuestion = true;
-        setState(() {});
-      }
-      if (m.type == KLIMessageType.hideQuestion) {
-        answerTextController.text = '';
-        submittedAnswer = '';
-        canShowQuestion = false;
-        currentTimeSec = 15;
-        setState(() {});
-      }
-      if (m.type == KLIMessageType.stopTimer) {
-        timer?.cancel();
-        setState(() {});
-      }
-      if (m.type == KLIMessageType.continueTimer) {
-        createTimer();
-      }
       if (m.type == KLIMessageType.endSection) {
         // Navigator.of(context).pop();
         Navigator.of(context).pushReplacement<void, void>(
           MaterialPageRoute(builder: (_) => const Overview()),
         );
       }
+      if (m.type == KLIMessageType.eliminated) {
+        eliminated = true;
+        canAnswer = canGuessObstacle = false;
+        currentTimeSec = 0;
+        timer?.cancel();
+        setState(() {});
+      }
+
+      if (m.type == KLIMessageType.scores) {
+        int i = 0;
+        for (int s in jsonDecode(m.message) as List) {
+          MatchData().players[i].point = s;
+          i++;
+        }
+      }
+      if (m.type == KLIMessageType.obstacleQuestion) {
+        if (canAnswer) return;
+
+        currentQuestion = ObstacleQuestion.fromJson(jsonDecode(m.message));
+        canShowQuestion = true;
+
+        if (eliminated) return;
+        createTimer();
+        canAnswer = true;
+      }
+      if (m.type == KLIMessageType.hideQuestion) {
+        answerTextController.text = '';
+        submittedAnswer = '';
+        canShowQuestion = false;
+        if (!eliminated) currentTimeSec = 15;
+      }
+
+      if (eliminated) {
+        setState(() {});
+        return;
+      }
+
+      if (m.type == KLIMessageType.stopTimer) {
+        timer?.cancel();
+      }
+      if (m.type == KLIMessageType.continueTimer) {
+        canGuessObstacle = true;
+        createTimer();
+      }
+      if (m.type == KLIMessageType.disableGuessObstacle) {
+        canGuessObstacle = false;
+      }
+      if (m.type == KLIMessageType.correctObstacleAnswer) {
+        canAnswer = canGuessObstacle = false;
+        timer?.cancel();
+      }
+      setState(() {});
     });
   }
 
@@ -261,13 +284,15 @@ class _PlayerObstacleScreenState extends State<PlayerObstacleScreen> {
           const SizedBox(height: 128),
           KLIButton(
             'Obstacle',
-            enableCondition: !obstacleGuessed,
+            enableCondition: canGuessObstacle,
             onPressed: () {
+              timer?.cancel();
               KLIClient.sendMessage(KLISocketMessage(
                 senderID: KLIClient.clientID!,
                 type: KLIMessageType.guessObstacle,
               ));
-              obstacleGuessed = true;
+              canGuessObstacle = false;
+              setState(() {});
             },
           ),
           Text(

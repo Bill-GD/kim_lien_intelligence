@@ -13,7 +13,6 @@ final _key = GlobalKey<ScaffoldState>();
 
 class ObstacleQuestionScreen extends StatefulWidget {
   final double timeLimitSec = 15;
-
   const ObstacleQuestionScreen({super.key});
 
   @override
@@ -28,7 +27,8 @@ class _ObstacleQuestionScreenState extends State<ObstacleQuestionScreen> {
       canAnnounceAnswer = false,
       canShowImage = false,
       canSelectQuestion = true,
-      keywordAnswered = false;
+      keywordAnswered = false,
+      canEnd = false;
   Timer? timer;
   final List<bool?> answerResults = List.filled(4, null);
 
@@ -39,17 +39,25 @@ class _ObstacleQuestionScreenState extends State<ObstacleQuestionScreen> {
       if (m.type == KLIMessageType.obstacleRowAnswer) {
         final pos = m.senderID.index - 1;
         final split = m.message.split('|');
-        MatchState().rowAnswers[pos] = (split.first, double.parse(split.last));
+        MatchState().rowAnswers[pos] = MatchState().eliminatedPlayers[pos] //
+            ? ('', 0)
+            : (split.first, double.parse(split.last));
       }
+
       if (m.type == KLIMessageType.guessObstacle) {
+        final playerPos = m.senderID.index - 1;
         KLIServer.sendToAllClients(KLISocketMessage(
           senderID: ConnectionID.host,
           type: KLIMessageType.stopTimer,
         ));
+        KLIServer.sendToAllClients(KLISocketMessage(
+          senderID: ConnectionID.host,
+          type: KLIMessageType.disableGuessObstacle,
+        ));
         timer?.cancel();
 
         if (mounted) {
-          await dialogWithActions<void>(
+          final res = await dialogWithActions<bool>(
             context,
             title: 'Guess Obstacle',
             content: 'Player ${Networking.getClientDisplayID(m.senderID)} has decided to guess the obstacle.',
@@ -58,27 +66,35 @@ class _ObstacleQuestionScreenState extends State<ObstacleQuestionScreen> {
               KLIButton(
                 'Correct',
                 onPressed: () {
-                  MatchState().modifyScore(
-                    m.senderID.index - 1,
-                    MatchState.obstaclePoints[MatchState().answeredObstacleRows.where((e) => e).length],
-                  );
-                  Navigator.of(context).pop();
-                  keywordAnswered = true;
-                  setState(() {});
+                  Navigator.of(context).pop(true);
                 },
               ),
               KLIButton(
                 'Wrong',
                 onPressed: () {
-                  KLIServer.sendToAllClients(KLISocketMessage(
-                    senderID: ConnectionID.host,
-                    type: KLIMessageType.continueTimer,
-                  ));
-                  createTimer();
-                  Navigator.of(context).pop();
+                  Navigator.of(context).pop(false);
                 },
               ),
             ],
+          );
+
+          if (res == true) {
+            MatchState().modifyScore(
+              playerPos,
+              MatchState.obstaclePoints[MatchState().answeredObstacleRows.where((e) => e).length],
+            );
+            keywordAnswered = true;
+            KLIServer.sendToAllClients(
+                KLISocketMessage(senderID: ConnectionID.host, type: KLIMessageType.correctObstacleAnswer));
+            setState(() {});
+            return;
+          }
+
+          MatchState().eliminateObstaclePlayer(playerPos);
+          createTimer();
+          KLIServer.sendToAllExcept(
+            m.senderID,
+            KLISocketMessage(senderID: ConnectionID.host, type: KLIMessageType.continueTimer),
           );
         }
       }
@@ -119,6 +135,11 @@ class _ObstacleQuestionScreenState extends State<ObstacleQuestionScreen> {
               onPressed: () {
                 obstacleWait();
                 for (int i = 0; i < 4; i++) {
+                  if (MatchState().eliminatedPlayers[i]) {
+                    answerResults[i] = false;
+                    continue;
+                  }
+
                   answerResults[i] = MatchState().rowAnswers[i].$1.toLowerCase() ==
                       MatchState().obstacleMatch!.hintQuestions[questionIndex]!.answer.toLowerCase();
                   if (answerResults[i] == true) MatchState().modifyScore(i, 10);
@@ -233,10 +254,10 @@ class _ObstacleQuestionScreenState extends State<ObstacleQuestionScreen> {
             enableCondition:
                 MatchState().allRowsAnswered && !MatchState().answeredObstacleRows[4] && questionIndex != 4,
             onPressed: () {
+              answerResults.fillRange(0, 4, null);
               questionIndex = 4;
-              timeEnded = false;
+              timeEnded = canAnnounceAnswer = false;
               currentTimeSec = widget.timeLimitSec;
-              canAnnounceAnswer = false;
               setState(() {});
             },
           ),
@@ -272,7 +293,7 @@ class _ObstacleQuestionScreenState extends State<ObstacleQuestionScreen> {
               ),
               KLIButton(
                 'End',
-                enableCondition: keywordAnswered || MatchState().allQuestionsAnswered,
+                enableCondition: canEnd,
                 onPressed: () {
                   KLIServer.sendToAllClients(KLISocketMessage(
                     senderID: ConnectionID.host,
@@ -295,6 +316,7 @@ class _ObstacleQuestionScreenState extends State<ObstacleQuestionScreen> {
         if (currentTimeSec <= 0) {
           timer.cancel();
           timeEnded = true;
+          canEnd = true;
           setState(() {});
           return;
         }

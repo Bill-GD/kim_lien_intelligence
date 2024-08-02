@@ -151,7 +151,7 @@ class _MatchOverviewState extends State<MatchOverview> {
             onPressed: () {
               KLIServer.sendToAllClients(KLISocketMessage(
                 senderID: ConnectionID.host,
-                type: KLIMessageType.enterObstacle,
+                type: KLIMessageType.enterAccel,
               ));
             },
           ),
