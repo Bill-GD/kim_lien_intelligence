@@ -27,7 +27,9 @@ void initAudioHandler() {
 }
 
 const String changelog = """
-  0.2.2 ({latest}):
+  0.2.3 ({latest}):
+
+  0.2.2 ({363f0c6}):
   - Added Obstacle screen: question, score, can guess, answer
   - Some errors show a popup message
   - Some routes are replaced

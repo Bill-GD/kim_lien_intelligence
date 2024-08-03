@@ -6,6 +6,7 @@ import 'package:kli_lib/kli_lib.dart';
 
 import '../data_manager/match_state.dart';
 import '../global.dart';
+import 'accel.dart';
 import 'obstacle_questions.dart';
 import 'start.dart';
 
@@ -148,11 +149,23 @@ class _MatchOverviewState extends State<MatchOverview> {
             enableCondition: MatchState().section == MatchSection.accel,
             enabledLabel: 'To Accel',
             disabledLabel: 'Current section: ${MatchState().section.name}',
-            onPressed: () {
+            onPressed: () async {
               KLIServer.sendToAllClients(KLISocketMessage(
                 senderID: ConnectionID.host,
                 type: KLIMessageType.enterAccel,
               ));
+
+              await MatchState().loadQuestions();
+
+              if (mounted) {
+                await Navigator.of(context).push<void>(
+                  MaterialPageRoute(
+                    builder: (context) => const AccelScreen(),
+                  ),
+                );
+              }
+
+              setState(() {});
             },
           ),
           KLIButton(

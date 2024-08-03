@@ -2,9 +2,9 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:kli_lib/kli_lib.dart';
-import 'package:kli_server/global.dart';
 
 import '../data_manager/match_state.dart';
+import '../global.dart';
 
 class ObstacleImageScreen extends StatefulWidget {
   const ObstacleImageScreen({super.key});

@@ -8,28 +8,26 @@ import 'package:kli_lib/kli_lib.dart';
 import '../data_manager/match_state.dart';
 import '../global.dart';
 
-class StartScreen extends StatefulWidget {
-  final double timeLimitSec = 60;
+class AccelScreen extends StatefulWidget {
+  final double timeLimitSec = 30;
   final buttonPadding = const EdgeInsets.only(top: 90, bottom: 70);
-  final int playerPos;
 
-  const StartScreen({super.key, required this.playerPos});
+  const AccelScreen({super.key});
 
   @override
-  State<StartScreen> createState() => _StartScreenState();
+  State<AccelScreen> createState() => _AccelScreenState();
 }
 
-class _StartScreenState extends State<StartScreen> {
-  double currentTimeSec = 60;
+class _AccelScreenState extends State<AccelScreen> {
+  double currentTimeSec = 30;
   bool started = false, timeEnded = false;
-  late StartQuestion currentQuestion;
+  late AccelQuestion currentQuestion;
   Timer? timer;
   int questionNum = 0;
 
   @override
   void initState() {
     super.initState();
-    // currentQuestion = MatchState().questionList!.last as StartQuestion;
   }
 
   @override
@@ -51,18 +49,17 @@ class _StartScreenState extends State<StartScreen> {
             children: [
               Expanded(
                 flex: 9,
-                child: Column(children: [
-                  questionContainer(),
-                  answerButtons(),
-                ]),
+                child: questionContainer(),
               ),
               Flexible(
                 child: Padding(
                   padding: const EdgeInsets.only(left: 48),
-                  child: Column(children: [
-                    questionInfo(),
-                    startEndButton(),
-                  ]),
+                  child: Column(
+                    children: [
+                      questionInfo(),
+                      startEndButton(),
+                    ],
+                  ),
                 ),
               ),
             ],
@@ -72,36 +69,65 @@ class _StartScreenState extends State<StartScreen> {
     );
   }
 
-  Widget players() {
+  Widget questionContainerTop() {
     return Row(
       children: [
-        for (int i = 0; i < 4; i++)
-          Expanded(
-            child: ClipRRect(
-              borderRadius: BorderRadius.only(
-                topLeft: widget.playerPos == 0 ? const Radius.circular(10) : Radius.zero,
-                topRight: widget.playerPos == 3 ? const Radius.circular(10) : Radius.zero,
+        Expanded(
+          child: ClipRRect(
+            borderRadius: const BorderRadius.only(topLeft: Radius.circular(10)),
+            child: Container(
+              decoration: BoxDecoration(
+                color: Colors.transparent,
+                border: BorderDirectional(
+                  end: BorderSide(color: Theme.of(context).colorScheme.onBackground),
+                ),
               ),
-              child: Container(
-                decoration: BoxDecoration(
-                  color: i == widget.playerPos
-                      ? Theme.of(context).colorScheme.primaryContainer
-                      : Colors.transparent,
-                  border: BorderDirectional(
-                    end: BorderSide(
-                      color: i > 2 ? Colors.transparent : Theme.of(context).colorScheme.onBackground,
-                    ),
-                  ),
-                ),
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                alignment: Alignment.center,
-                child: Text(
-                  '${MatchState().players[i].name} (${MatchState().scores[i]})',
-                  style: const TextStyle(fontSize: fontSizeMedium),
-                ),
+              padding: const EdgeInsets.symmetric(vertical: 16),
+              alignment: Alignment.center,
+              child: Text(
+                'Question $questionNum',
+                style: const TextStyle(fontSize: fontSizeMedium),
               ),
             ),
           ),
+        ),
+        Expanded(
+          child: ClipRRect(
+            child: Container(
+              decoration: BoxDecoration(
+                color: Colors.transparent,
+                border: BorderDirectional(
+                  end: BorderSide(color: Theme.of(context).colorScheme.onBackground),
+                ),
+              ),
+              padding: const EdgeInsets.symmetric(vertical: 16),
+              alignment: Alignment.center,
+              child: Text(
+                currentQuestion.question,
+                style: const TextStyle(fontSize: fontSizeMedium),
+              ),
+            ),
+          ),
+        ),
+        Expanded(
+          child: ClipRRect(
+            borderRadius: const BorderRadius.only(topRight: Radius.circular(10)),
+            child: Container(
+              decoration: BoxDecoration(
+                color: Colors.transparent,
+                border: BorderDirectional(
+                  end: BorderSide(color: Theme.of(context).colorScheme.onBackground),
+                ),
+              ),
+              padding: const EdgeInsets.symmetric(vertical: 16),
+              alignment: Alignment.center,
+              child: Text(
+                currentQuestion.answer,
+                style: const TextStyle(fontSize: fontSizeMedium),
+              ),
+            ),
+          ),
+        ),
       ],
     );
   }
@@ -116,7 +142,8 @@ class _StartScreenState extends State<StartScreen> {
         ),
         child: Column(
           children: [
-            players(),
+            questionContainerTop(),
+            // TODO (sequence of) image(s) here
             Expanded(
               child: Container(
                 decoration: const BoxDecoration(
@@ -131,7 +158,6 @@ class _StartScreenState extends State<StartScreen> {
                           Text(
                             currentQuestion.question,
                             textAlign: TextAlign.center,
-                            // textWidthBasis: TextWidthBasis.longestLine,
                             style: const TextStyle(fontSize: fontSizeLarge),
                           ),
                           const SizedBox(height: 16),
@@ -155,43 +181,6 @@ class _StartScreenState extends State<StartScreen> {
     );
   }
 
-  Widget answerButtons() {
-    return Padding(
-      padding: widget.buttonPadding,
-      child: Row(children: [
-        Expanded(
-          child: KLIButton(
-            'Correct',
-            enableCondition: !timeEnded && started,
-            disabledLabel: "Can't answer now",
-            onPressed: () {
-              MatchState().modifyScore(widget.playerPos, 10);
-              KLIServer.sendToAllClients(KLISocketMessage(
-                senderID: ConnectionID.host,
-                message: MatchState().scores[widget.playerPos].toString(),
-                type: KLIMessageType.correctStartAnswer,
-              ));
-              nextQuestion();
-              setState(() {});
-            },
-          ),
-        ),
-        const SizedBox(width: 16),
-        Expanded(
-          child: KLIButton(
-            'Incorrect',
-            enableCondition: !timeEnded && started,
-            disabledLabel: "Can't answer now",
-            onPressed: () {
-              nextQuestion();
-              setState(() {});
-            },
-          ),
-        ),
-      ]),
-    );
-  }
-
   void nextQuestion() {
     if (MatchState().questionList!.isEmpty) {
       timer?.cancel();
@@ -204,7 +193,7 @@ class _StartScreenState extends State<StartScreen> {
       return;
     }
     questionNum++;
-    currentQuestion = MatchState().questionList!.removeLast() as StartQuestion;
+    currentQuestion = MatchState().questionList!.removeLast() as AccelQuestion;
     KLIServer.sendToAllClients(KLISocketMessage(
       senderID: ConnectionID.host,
       type: KLIMessageType.startQuestion,
@@ -223,40 +212,7 @@ class _StartScreenState extends State<StartScreen> {
             valueColor: const Color(0xFF00A906),
             backgroundColor: Colors.red,
           ),
-          const SizedBox(height: 128),
-          Container(
-            width: 128,
-            height: 128,
-            alignment: Alignment.center,
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: Theme.of(context).colorScheme.background,
-              border: Border.all(color: Colors.white),
-            ),
-            child: Text(
-              started ? StartQuestion.mapTypeDisplay(currentQuestion.subject) : '',
-              style: const TextStyle(fontSize: fontSizeMedium),
-              textAlign: TextAlign.center,
-            ),
-          ),
-          const SizedBox(height: 128),
-          Container(
-            width: 128,
-            height: 128,
-            alignment: Alignment.center,
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: Theme.of(context).colorScheme.background,
-              border: Border.all(color: Colors.white),
-            ),
-            child: Text(
-              started ? '$questionNum' : '',
-              style: const TextStyle(fontSize: fontSizeMedium),
-              textAlign: TextAlign.center,
-            ),
-          ),
+          // TODO add buttons here: next question, show answer (like obs)
         ],
       ),
     );

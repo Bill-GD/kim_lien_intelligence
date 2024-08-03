@@ -119,7 +119,9 @@ SideNavigationBarTheme sideNavigationTheme(BuildContext context, [double height 
 }
 
 const String changelog = """
-  0.4.2 ({latest}):
+  0.4.3 ({latest}):
+
+  0.4.2 ({363f0c6}):
   - Obstacle improvements: received/show answers and obs guesses, properly send points, keep track of eliminated, scores, ans results...
   - Some errors show a popup message
   - Some routes are replaced

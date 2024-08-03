@@ -38,10 +38,7 @@ class _ObstacleQuestionScreenState extends State<ObstacleQuestionScreen> {
     KLIServer.onMessageReceived.listen((m) async {
       if (m.type == KLIMessageType.obstacleRowAnswer) {
         final pos = m.senderID.index - 1;
-        final split = m.message.split('|');
-        MatchState().rowAnswers[pos] = MatchState().eliminatedPlayers[pos] //
-            ? ('', 0)
-            : (split.first, double.parse(split.last));
+        MatchState().rowAnswers[pos] = MatchState().eliminatedPlayers[pos] ? '' : m.message;
       }
 
       if (m.type == KLIMessageType.guessObstacle) {
@@ -123,11 +120,11 @@ class _ObstacleQuestionScreenState extends State<ObstacleQuestionScreen> {
         backgroundColor: Colors.transparent,
         endDrawer: AnswerDrawer(
           answerResult: answerResults,
-          answers: MatchState().rowAnswers.asMap().entries.map((e) => (
-                MatchState().players[e.key].name,
-                e.value.$1,
-                e.value.$2,
-              )),
+          answers: MatchState()
+              .rowAnswers
+              .asMap()
+              .entries
+              .map((e) => (MatchState().players[e.key].name, e.value, -1)),
           actions: [
             KLIButton(
               'Announce Result',
@@ -140,7 +137,7 @@ class _ObstacleQuestionScreenState extends State<ObstacleQuestionScreen> {
                     continue;
                   }
 
-                  answerResults[i] = MatchState().rowAnswers[i].$1.toLowerCase() ==
+                  answerResults[i] = MatchState().rowAnswers[i].toLowerCase() ==
                       MatchState().obstacleMatch!.hintQuestions[questionIndex]!.answer.toLowerCase();
                   if (answerResults[i] == true) MatchState().modifyScore(i, 10);
                   setState(() {});
@@ -217,7 +214,7 @@ class _ObstacleQuestionScreenState extends State<ObstacleQuestionScreen> {
                           questionIndex = i;
                           timeEnded = canAnnounceAnswer = false;
                           currentTimeSec = widget.timeLimitSec;
-                          MatchState().rowAnswers.fillRange(0, 4, ('', -1));
+                          MatchState().rowAnswers.fillRange(0, 4, '');
                           answerResults.fillRange(0, 4, null);
                           setState(() {});
                         }

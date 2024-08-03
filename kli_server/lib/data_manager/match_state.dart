@@ -123,7 +123,7 @@ class MatchState {
         break;
       case MatchSection.accel:
         obstacleMatch = null;
-        await DataManager.getMatchQuestions<AccelMatch>(match.name);
+        questionList = (await DataManager.getMatchQuestions<AccelMatch>(match.name)).questions as List<AccelQuestion>;
         break;
       case MatchSection.finish:
         startOrFinishPos = 0;
@@ -137,6 +137,7 @@ class MatchState {
     }
   }
 
+  /// Only for start, finish
   void nextPlayer() {
     switch (section) {
       case MatchSection.start:
@@ -168,7 +169,7 @@ class MatchState {
           finishPlayerDone[startOrFinishPos] = true;
         }
         break;
-      case MatchSection.extra:
+      case MatchSection.extra: // all at once
         break;
       default:
         throw Exception('Invalid section, this should not happen.');
@@ -230,7 +231,7 @@ class MatchState {
   final answeredObstacleRows = <bool>[false, false, false, false, false];
   static const obstaclePoints = <int>[100, 80, 60, 40, 20, 10];
   late final List<int> imagePartOrder = <int>[0, 1, 2, 3];
-  final List<(String, double)> rowAnswers = List.generate(4, (_) => ('', -1));
+  final List<String> rowAnswers = List.generate(4, (_) => '');
   final revealedImageParts = <bool>[false, false, false, false, false];
   bool get allRowsAnswered => answeredObstacleRows.take(4).every((e) => e);
   bool get allQuestionsAnswered => answeredObstacleRows.every((e) => e);

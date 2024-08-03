@@ -7,6 +7,7 @@ import 'package:kli_lib/kli_lib.dart';
 
 import '../global.dart';
 import '../match_data.dart';
+import '../ui/player/accel.dart';
 import '../ui/player/obstacle.dart';
 import '../ui/player/start.dart';
 
@@ -53,6 +54,15 @@ class _OverviewState extends State<Overview> {
           Navigator.of(context).pushReplacement<void, void>(
             MaterialPageRoute(builder: (_) => const PlayerObstacleScreen()),
           );
+          break;
+        case KLIMessageType.enterAccel:
+          Navigator.of(context).pushReplacement<void, void>(
+            MaterialPageRoute(builder: (_) => const PlayerAccelScreen()),
+          );
+          break;
+        case KLIMessageType.enterFinish:
+          break;
+        case KLIMessageType.enterExtra:
           break;
         default:
           break;
