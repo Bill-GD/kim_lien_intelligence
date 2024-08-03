@@ -123,7 +123,10 @@ class MatchState {
         break;
       case MatchSection.accel:
         obstacleMatch = null;
-        questionList = (await DataManager.getMatchQuestions<AccelMatch>(match.name)).questions as List<AccelQuestion>;
+        questionList = (await DataManager.getMatchQuestions<AccelMatch>(match.name))
+            .questions
+            .whereType<AccelQuestion>()
+            .toList();
         break;
       case MatchSection.finish:
         startOrFinishPos = 0;

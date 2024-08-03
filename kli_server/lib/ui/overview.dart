@@ -150,13 +150,12 @@ class _MatchOverviewState extends State<MatchOverview> {
             enabledLabel: 'To Accel',
             disabledLabel: 'Current section: ${MatchState().section.name}',
             onPressed: () async {
+              await MatchState().loadQuestions();
+
               KLIServer.sendToAllClients(KLISocketMessage(
                 senderID: ConnectionID.host,
                 type: KLIMessageType.enterAccel,
               ));
-
-              await MatchState().loadQuestions();
-
               if (mounted) {
                 await Navigator.of(context).push<void>(
                   MaterialPageRoute(

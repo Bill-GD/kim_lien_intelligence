@@ -8,6 +8,8 @@ import 'package:kli_lib/kli_lib.dart';
 import '../data_manager/match_state.dart';
 import '../global.dart';
 
+final _key = GlobalKey<ScaffoldState>();
+
 class AccelScreen extends StatefulWidget {
   final double timeLimitSec = 30;
   final buttonPadding = const EdgeInsets.only(top: 90, bottom: 70);
@@ -20,14 +22,30 @@ class AccelScreen extends StatefulWidget {
 
 class _AccelScreenState extends State<AccelScreen> {
   double currentTimeSec = 30;
-  bool started = false, timeEnded = false;
+  bool canNext = true,
+      canStart = false,
+      started = false,
+      canShowQuestion = false,
+      canAnnounceAnswer = false,
+      timeEnded = false,
+      canEnd = false,
+      hideAns = false;
   late AccelQuestion currentQuestion;
+  List<bool?> answerResults = [null, null, null, null];
+  List<(int, String, double)> answers = List.generate(4, (i) => (i, '', -1));
   Timer? timer;
   int questionNum = 0;
 
   @override
   void initState() {
     super.initState();
+    KLIServer.onMessageReceived.listen((m) {
+      if (m.type == KLIMessageType.accelAnswer) {
+        final split = m.message.split('|');
+        final playerIndex = m.senderID.index - 1;
+        answers[playerIndex] = (playerIndex, split[0], double.parse(split[1]));
+      }
+    });
   }
 
   @override
@@ -41,8 +59,40 @@ class _AccelScreenState extends State<AccelScreen> {
     return Container(
       decoration: BoxDecoration(image: bgDecorationImage),
       child: Scaffold(
-        appBar: managerAppBar(context, 'Start', implyLeading: kDebugMode),
+        key: _key,
+        appBar: managerAppBar(
+          context,
+          'Accel',
+          implyLeading: kDebugMode,
+          actions: [Container()],
+        ),
         backgroundColor: Colors.transparent,
+        endDrawer: AnswerDrawer(
+          answerResult: answerResults,
+          answers: answers.asMap().entries.map((e) => (e.value.$2, e.value.$3)),
+          playerNames: Iterable.generate(4, (i) => MatchState().players[answers[i].$1].name),
+          actions: [
+            KLIButton(
+              'Announce Result',
+              enableCondition: canAnnounceAnswer,
+              onPressed: () {
+                for (int i = 0; i < 4; i++) {
+                  if (answers[i].$3 < 0) {
+                    answerResults[i] = false;
+                    continue;
+                  }
+
+                  answerResults[i] = answers[i].$2.toLowerCase() == currentQuestion.answer.toLowerCase();
+                  if (answerResults[i] == true) MatchState().modifyScore(i, (4 - i) * 10);
+                }
+                started = canAnnounceAnswer = false;
+                canNext = true;
+                if (questionNum == 4) canEnd = true;
+                setState(() {});
+              },
+            ),
+          ],
+        ),
         body: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 64, vertical: 64),
           child: Row(
@@ -53,13 +103,8 @@ class _AccelScreenState extends State<AccelScreen> {
               ),
               Flexible(
                 child: Padding(
-                  padding: const EdgeInsets.only(left: 48),
-                  child: Column(
-                    children: [
-                      questionInfo(),
-                      startEndButton(),
-                    ],
-                  ),
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: manageButtons(),
                 ),
               ),
             ],
@@ -70,113 +115,102 @@ class _AccelScreenState extends State<AccelScreen> {
   }
 
   Widget questionContainerTop() {
-    return Row(
-      children: [
-        Expanded(
-          child: ClipRRect(
-            borderRadius: const BorderRadius.only(topLeft: Radius.circular(10)),
-            child: Container(
-              decoration: BoxDecoration(
-                color: Colors.transparent,
-                border: BorderDirectional(
-                  end: BorderSide(color: Theme.of(context).colorScheme.onBackground),
-                ),
-              ),
-              padding: const EdgeInsets.symmetric(vertical: 16),
-              alignment: Alignment.center,
-              child: Text(
-                'Question $questionNum',
-                style: const TextStyle(fontSize: fontSizeMedium),
-              ),
-            ),
-          ),
-        ),
-        Expanded(
-          child: ClipRRect(
-            child: Container(
-              decoration: BoxDecoration(
-                color: Colors.transparent,
-                border: BorderDirectional(
-                  end: BorderSide(color: Theme.of(context).colorScheme.onBackground),
-                ),
-              ),
-              padding: const EdgeInsets.symmetric(vertical: 16),
-              alignment: Alignment.center,
-              child: Text(
-                currentQuestion.question,
-                style: const TextStyle(fontSize: fontSizeMedium),
-              ),
-            ),
-          ),
-        ),
-        Expanded(
-          child: ClipRRect(
-            borderRadius: const BorderRadius.only(topRight: Radius.circular(10)),
-            child: Container(
-              decoration: BoxDecoration(
-                color: Colors.transparent,
-                border: BorderDirectional(
-                  end: BorderSide(color: Theme.of(context).colorScheme.onBackground),
-                ),
-              ),
-              padding: const EdgeInsets.symmetric(vertical: 16),
-              alignment: Alignment.center,
-              child: Text(
-                currentQuestion.answer,
-                style: const TextStyle(fontSize: fontSizeMedium),
-              ),
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget questionContainer() {
-    return Expanded(
-      child: Container(
-        decoration: BoxDecoration(
-          border: Border.all(color: Colors.white),
-          color: Theme.of(context).colorScheme.background,
-          borderRadius: BorderRadius.circular(10),
-        ),
-        child: Column(
-          children: [
-            questionContainerTop(),
-            // TODO (sequence of) image(s) here
-            Expanded(
+    return IntrinsicHeight(
+      child: Row(
+        children: [
+          Expanded(
+            child: ClipRRect(
               child: Container(
-                decoration: const BoxDecoration(
-                  border: BorderDirectional(top: BorderSide(color: Colors.white)),
+                decoration: BoxDecoration(
+                  color: Colors.transparent,
+                  border: BorderDirectional(
+                    end: BorderSide(color: Theme.of(context).colorScheme.onBackground),
+                  ),
                 ),
-                padding: const EdgeInsets.symmetric(horizontal: 128),
+                padding: const EdgeInsets.symmetric(vertical: 16),
                 alignment: Alignment.center,
-                child: started
-                    ? Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            currentQuestion.question,
-                            textAlign: TextAlign.center,
-                            style: const TextStyle(fontSize: fontSizeLarge),
-                          ),
-                          const SizedBox(height: 16),
-                          Text(
-                            currentQuestion.answer,
-                            softWrap: true,
-                            textAlign: TextAlign.end,
-                            style: const TextStyle(
-                              fontSize: fontSizeMedium,
-                              fontStyle: FontStyle.italic,
-                            ),
-                          ),
-                        ],
+                child: Text(
+                  questionNum > 0 ? 'Question $questionNum' : '',
+                  style: const TextStyle(fontSize: fontSizeMedium),
+                ),
+              ),
+            ),
+          ),
+          Expanded(
+            child: ClipRRect(
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Colors.transparent,
+                  border: BorderDirectional(
+                    end: BorderSide(color: Theme.of(context).colorScheme.onBackground),
+                  ),
+                ),
+                padding: const EdgeInsets.all(16),
+                alignment: Alignment.center,
+                child: IntrinsicHeight(
+                  child: canShowQuestion
+                      ? Text(
+                          currentQuestion.question,
+                          style: const TextStyle(fontSize: fontSizeMedium),
+                        )
+                      : null,
+                ),
+              ),
+            ),
+          ),
+          Expanded(
+            child: ClipRRect(
+              child: Container(
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                alignment: Alignment.center,
+                child: canShowQuestion && !hideAns
+                    ? Text(
+                        currentQuestion.answer,
+                        style: const TextStyle(fontSize: fontSizeMedium),
                       )
                     : null,
               ),
             ),
-          ],
-        ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget questionContainer() {
+    return Container(
+      decoration: BoxDecoration(
+        border: Border.all(color: Colors.white),
+        color: Theme.of(context).colorScheme.background,
+        borderRadius: BorderRadius.circular(10),
+      ),
+      margin: const EdgeInsets.only(right: 40),
+      child: Column(
+        children: [
+          questionContainerTop(),
+          // TODO (sequence of) image(s) here
+          Expanded(
+            child: Container(
+              decoration: const BoxDecoration(
+                border: BorderDirectional(top: BorderSide(color: Colors.white)),
+              ),
+              padding: const EdgeInsets.symmetric(horizontal: 128),
+              alignment: Alignment.center,
+              child: canShowQuestion
+                  ? Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          currentQuestion.question,
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(fontSize: fontSizeLarge),
+                        ),
+                      ],
+                    )
+                  : null,
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -201,61 +235,90 @@ class _AccelScreenState extends State<AccelScreen> {
     ));
   }
 
-  Widget questionInfo() {
-    return Expanded(
-      child: Column(
-        children: [
-          AnimatedCircularProgressBar(
-            currentTimeSec: currentTimeSec,
-            totalTimeSec: widget.timeLimitSec,
-            strokeWidth: 20,
-            valueColor: const Color(0xFF00A906),
-            backgroundColor: Colors.red,
-          ),
-          // TODO add buttons here: next question, show answer (like obs)
-        ],
-      ),
-    );
-  }
-
-  Widget startEndButton() {
-    return started
-        ? Padding(
-            padding: widget.buttonPadding,
-            child: KLIButton(
-              'End',
-              enableCondition: timeEnded,
-              disabledLabel: 'Currently ongoing',
-              onPressed: () {
-                KLIServer.sendToAllClients(KLISocketMessage(
-                  senderID: ConnectionID.host,
-                  type: KLIMessageType.endSection,
-                ));
-                Navigator.of(context).pop();
-              },
-            ),
-          )
-        : Padding(
-            padding: widget.buttonPadding,
-            child: KLIButton(
-              'Start',
-              enableCondition: !started,
-              onPressed: () {
-                nextQuestion();
-                timer = Timer.periodic(1.seconds, (timer) {
-                  if (currentTimeSec <= 0) {
-                    timer.cancel();
-                    timeEnded = true;
-                    setState(() {});
-                  } else {
-                    currentTimeSec--;
-                    setState(() {});
-                  }
-                });
-                started = true;
+  Widget manageButtons() {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        AnimatedCircularProgressBar(
+          currentTimeSec: currentTimeSec,
+          totalTimeSec: widget.timeLimitSec,
+          strokeWidth: 20,
+          valueColor: const Color(0xFF00A906),
+          backgroundColor: Colors.red,
+        ),
+        const SizedBox(height: 160),
+        KLIButton(
+          hideAns ? 'Show ans' : 'Hide ans',
+          enabledLabel: 'Temporarily hide answer',
+          textAlign: TextAlign.center,
+          onPressed: () {
+            setState(() => hideAns = !hideAns);
+          },
+        ),
+        KLIButton(
+          'Start',
+          enableCondition: canStart,
+          disabledLabel: 'Question is not yet answered',
+          onPressed: () {
+            canStart = false;
+            started = true;
+            timer = Timer.periodic(1.seconds, (timer) {
+              if (currentTimeSec <= 0) {
+                timer.cancel();
+                timeEnded = canAnnounceAnswer = true;
+                canStart = false;
+                answers.sort((a, b) => a.$3.compareTo(b.$3));
                 setState(() {});
-              },
-            ),
-          );
+              } else {
+                currentTimeSec--;
+                setState(() {});
+              }
+            });
+            setState(() {});
+          },
+        ),
+        KLIButton(
+          'Next question',
+          enableCondition: canNext,
+          disabledLabel: 'Question is not yet answered',
+          textAlign: TextAlign.center,
+          onPressed: () {
+            nextQuestion();
+            answerResults.fillRange(0, 4, null);
+            answers = List.generate(4, (i) => (i, '', -1));
+            currentTimeSec = widget.timeLimitSec;
+            canShowQuestion = canStart = true;
+            timeEnded = canNext = false;
+            KLIServer.sendToAllClients(KLISocketMessage(
+              senderID: ConnectionID.host,
+              type: KLIMessageType.hideQuestion,
+            ));
+            setState(() {});
+          },
+        ),
+        KLIButton(
+          'Show answers',
+          enableCondition: timeEnded,
+          disabledLabel: 'Timer is still running',
+          textAlign: TextAlign.center,
+          onPressed: () {
+            setState(() {});
+            _key.currentState?.openEndDrawer();
+          },
+        ),
+        KLIButton(
+          'End',
+          enableCondition: canEnd,
+          disabledLabel: 'Currently ongoing',
+          onPressed: () {
+            KLIServer.sendToAllClients(KLISocketMessage(
+              senderID: ConnectionID.host,
+              type: KLIMessageType.endSection,
+            ));
+            Navigator.of(context).pop();
+          },
+        ),
+      ],
+    );
   }
 }

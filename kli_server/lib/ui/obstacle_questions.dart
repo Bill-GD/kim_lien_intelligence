@@ -120,11 +120,8 @@ class _ObstacleQuestionScreenState extends State<ObstacleQuestionScreen> {
         backgroundColor: Colors.transparent,
         endDrawer: AnswerDrawer(
           answerResult: answerResults,
-          answers: MatchState()
-              .rowAnswers
-              .asMap()
-              .entries
-              .map((e) => (MatchState().players[e.key].name, e.value, -1)),
+          answers: MatchState().rowAnswers.asMap().entries.map((e) => (e.value, -1)),
+          playerNames: Iterable.generate(4, (i) => MatchState().players[i].name),
           actions: [
             KLIButton(
               'Announce Result',

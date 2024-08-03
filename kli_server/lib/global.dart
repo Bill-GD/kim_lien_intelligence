@@ -45,6 +45,7 @@ AppBar managerAppBar(
     automaticallyImplyLeading: implyLeading,
     titleTextStyle: TextStyle(fontSize: fontSize),
     centerTitle: true,
+    surfaceTintColor: Colors.transparent,
     toolbarHeight: kToolbarHeight * 1.1,
     actions: actions,
   );
