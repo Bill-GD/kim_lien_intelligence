@@ -22,7 +22,7 @@ void main() async {
     if (e is! KLIException) {
       showPopupMessage(
         navigatorKey.currentContext!,
-        title: e.toString().split('Exception: ').last,
+        title: e.toString(),
         content: s.toString(),
         centerContent: false,
       );
