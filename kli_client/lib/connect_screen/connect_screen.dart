@@ -24,11 +24,6 @@ class _ConnectPageState extends State<ConnectPage> {
   StreamSubscription<void>? messageSubscription;
 
   @override
-  void initState() {
-    super.initState();
-  }
-
-  @override
   void dispose() {
     ipTextController.dispose();
     messageSubscription?.cancel();

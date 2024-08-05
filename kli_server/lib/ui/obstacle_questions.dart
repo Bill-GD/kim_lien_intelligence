@@ -34,6 +34,7 @@ class _ObstacleQuestionScreenState extends State<ObstacleQuestionScreen> {
 
   @override
   void initState() {
+    super.initState();
     debugPrint('${MatchState().imagePartOrder}');
     KLIServer.onMessageReceived.listen((m) async {
       if (m.type == KLIMessageType.obstacleRowAnswer) {
@@ -96,7 +97,6 @@ class _ObstacleQuestionScreenState extends State<ObstacleQuestionScreen> {
         }
       }
     });
-    super.initState();
   }
 
   @override

@@ -24,8 +24,8 @@ class _ServerSetupState extends State<ServerSetup> {
 
   @override
   void initState() {
-    KLIServer.stop();
     super.initState();
+    KLIServer.stop();
     logHandler.info('Opened Server Setup page');
     getIpAddresses();
   }

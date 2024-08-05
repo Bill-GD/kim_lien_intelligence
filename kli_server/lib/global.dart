@@ -121,6 +121,7 @@ SideNavigationBarTheme sideNavigationTheme(BuildContext context, [double height 
 
 const String changelog = """
   0.4.3 ({latest}):
+  - Added Accel UI: question, answer, timer, image(s), player answers
 
   0.4.2 ({363f0c6}):
   - Obstacle improvements: received/show answers and obs guesses, properly send points, keep track of eliminated, scores, ans results...

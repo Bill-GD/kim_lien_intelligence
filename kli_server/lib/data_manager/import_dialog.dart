@@ -31,9 +31,9 @@ class _ImportQuestionDialogState extends State<ImportQuestionDialog> with Ticker
 
   @override
   void initState() {
+    super.initState();
     logHandler.info('Import question dialog: ${widget.matchName}');
     tabController = TabController(length: sheetCount, vsync: this);
-    super.initState();
   }
 
   @override

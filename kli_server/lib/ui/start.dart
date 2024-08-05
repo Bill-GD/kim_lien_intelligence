@@ -27,12 +27,6 @@ class _StartScreenState extends State<StartScreen> {
   int questionNum = 0;
 
   @override
-  void initState() {
-    super.initState();
-    // currentQuestion = MatchState().questionList!.last as StartQuestion;
-  }
-
-  @override
   void dispose() {
     timer?.cancel();
     super.dispose();

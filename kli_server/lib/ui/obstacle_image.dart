@@ -18,13 +18,13 @@ class _ObstacleImageScreenState extends State<ObstacleImageScreen> {
 
   @override
   void initState() {
+    super.initState();
     FileImage(
       File(StorageHandler.getFullPath(MatchState().obstacleMatch!.imagePath)),
     ).resolve(const ImageConfiguration()).addListener(ImageStreamListener((image, _) {
       imageSize = Size(image.image.width.toDouble(), image.image.height.toDouble());
       setState(() {});
     }));
-    super.initState();
   }
 
   @override

@@ -22,6 +22,7 @@ class _MatchManagerState extends State<MatchManager> {
 
   @override
   void initState() {
+    super.initState();
     logHandler.info('Opened Match Manager');
 
     storageHandler.readFromFile(storageHandler.matchSaveFile).then((value) {
@@ -33,7 +34,6 @@ class _MatchManagerState extends State<MatchManager> {
       setState(() => isLoading = false);
       logHandler.info('Loaded ${matches.length} matches');
     });
-    super.initState();
   }
 
   Future<void> overwriteSave() async {
