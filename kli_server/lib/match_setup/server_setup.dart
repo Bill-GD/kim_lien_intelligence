@@ -46,7 +46,6 @@ class _ServerSetupState extends State<ServerSetup> {
       message: 'Bạn có chắc bạn muốn thoát?\nServer sẽ tự động đóng.',
       acceptLogMessage: 'Leaving Server Setup page...',
       onAccept: () async {
-        MatchState.reset();
         await KLIServer.stop();
         if (mounted) Navigator.pop(context);
       },

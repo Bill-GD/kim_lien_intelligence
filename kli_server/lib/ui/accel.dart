@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -35,6 +36,7 @@ class _AccelScreenState extends State<AccelScreen> {
   List<(int, String, double)> answers = List.generate(4, (i) => (i, '', -1));
   Timer? timer;
   int questionNum = 0;
+  final Key imgContainerKey = UniqueKey();
 
   @override
   void initState() {
@@ -66,6 +68,7 @@ class _AccelScreenState extends State<AccelScreen> {
           implyLeading: kDebugMode,
           actions: [Container()],
         ),
+        extendBodyBehindAppBar: true,
         backgroundColor: Colors.transparent,
         endDrawer: AnswerDrawer(
           answerResult: answerResults,
@@ -85,7 +88,7 @@ class _AccelScreenState extends State<AccelScreen> {
                   answerResults[i] = answers[i].$2.toLowerCase() == currentQuestion.answer.toLowerCase();
                   if (answerResults[i] == true) MatchState().modifyScore(i, (4 - i) * 10);
                 }
-                started = canAnnounceAnswer = false;
+                canAnnounceAnswer = false;
                 canNext = true;
                 if (questionNum == 4) canEnd = true;
                 setState(() {});
@@ -188,24 +191,23 @@ class _AccelScreenState extends State<AccelScreen> {
       child: Column(
         children: [
           questionContainerTop(),
-          // TODO (sequence of) image(s) here
           Expanded(
             child: Container(
               decoration: const BoxDecoration(
                 border: BorderDirectional(top: BorderSide(color: Colors.white)),
               ),
-              padding: const EdgeInsets.symmetric(horizontal: 128),
+              padding: const EdgeInsets.symmetric(horizontal: 128, vertical: 16),
               alignment: Alignment.center,
-              child: canShowQuestion
-                  ? Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          currentQuestion.question,
-                          textAlign: TextAlign.center,
-                          style: const TextStyle(fontSize: fontSizeLarge),
+              child: started
+                  ? AccelImageContainer(
+                      key: imgContainerKey,
+                      images: currentQuestion.imagePaths.map(
+                        (e) => Image.file(
+                          File(StorageHandler.getFullPath(e)),
                         ),
-                      ],
+                      ),
+                      isArrange: currentQuestion.type == AccelQuestionType.arrange && !canNext,
+                      shouldShowArrangeResult: currentQuestion.type == AccelQuestionType.arrange && canNext,
                     )
                   : null,
             ),
@@ -228,6 +230,14 @@ class _AccelScreenState extends State<AccelScreen> {
     }
     questionNum++;
     currentQuestion = MatchState().questionList!.removeLast() as AccelQuestion;
+    // caching for continuous display
+    if (currentQuestion.type == AccelQuestionType.sequence) {
+      for (var p in currentQuestion.imagePaths) {
+        final i = Image.file(File(StorageHandler.getFullPath(p)));
+        final stream = i.image.resolve(const ImageConfiguration());
+        stream.addListener(ImageStreamListener((_, __) {}));
+      }
+    }
     KLIServer.sendToAllClients(KLISocketMessage(
       senderID: ConnectionID.host,
       type: KLIMessageType.startQuestion,
@@ -279,7 +289,7 @@ class _AccelScreenState extends State<AccelScreen> {
         ),
         KLIButton(
           'Next question',
-          enableCondition: canNext,
+          enableCondition: canNext && questionNum < 4,
           disabledLabel: 'Question is not yet answered',
           textAlign: TextAlign.center,
           onPressed: () {
@@ -288,7 +298,7 @@ class _AccelScreenState extends State<AccelScreen> {
             answers = List.generate(4, (i) => (i, '', -1));
             currentTimeSec = widget.timeLimitSec;
             canShowQuestion = canStart = true;
-            timeEnded = canNext = false;
+            timeEnded = canNext = started = false;
             KLIServer.sendToAllClients(KLISocketMessage(
               senderID: ConnectionID.host,
               type: KLIMessageType.hideQuestion,

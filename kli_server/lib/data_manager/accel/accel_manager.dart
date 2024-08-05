@@ -188,7 +188,7 @@ class _AccelManagerState extends State<AccelManager> {
                   await DataManager.removeQuestionsOfMatch<AccelMatch>(selectedMatch);
                   selectedMatch = AccelMatch(
                     matchName: selectedMatch.matchName,
-                    questions: List.filled(4, null),
+                    questions: List.filled(4, AccelQuestion.empty()),
                   );
                   selectedQuestionIndex = -1;
                   selectedImageIndex = -1;
@@ -251,14 +251,16 @@ class _AccelManagerState extends State<AccelManager> {
                     overflow: TextOverflow.fade,
                   ),
                   title: Text(
-                    q?.question ?? '',
+                    q.question,
                     style: const TextStyle(fontSize: fontSizeMedium),
                   ),
-                  subtitle: Text(q?.type != null ? 'Loại: ${AccelQuestion.mapTypeDisplay(q!.type)}' : ''),
+                  subtitle: Text(
+                    q.type != AccelQuestionType.none ? 'Loại: ${AccelQuestion.mapTypeDisplay(q.type)}' : '',
+                  ),
                   subtitleTextStyle: const TextStyle(fontSize: fontSizeSmall),
                   trailing: Container(
                     constraints: const BoxConstraints(maxHeight: 100, maxWidth: 400),
-                    child: Text(q?.answer ?? ''),
+                    child: Text(q.answer),
                   ),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10),
@@ -269,7 +271,7 @@ class _AccelManagerState extends State<AccelManager> {
                   ),
                   onTap: () async {
                     selectedQuestionIndex = index;
-                    if (q == null) {
+                    if (q.isNull) {
                       logHandler.info('Selected question is null, creating new question');
                       selectedQuestion = AccelQuestion.empty();
                       selectedMatch.questions[index] = selectedQuestion;

@@ -93,9 +93,10 @@ class _MatchDataCheckerState extends State<MatchDataChecker> {
                               onPressed: () async {
                                 await MatchState.instantiate(matchNames[selectedMatchIndex]);
                                 if (context.mounted) {
-                                  Navigator.of(context).push(MaterialPageRoute(
+                                  await Navigator.of(context).push(MaterialPageRoute(
                                     builder: (context) => ServerSetup(matchNames[selectedMatchIndex]),
                                   ));
+                                  MatchState.reset();
                                 }
                               },
                             ),
@@ -265,11 +266,11 @@ class _MatchDataCheckerState extends State<MatchDataChecker> {
     try {
       AccelMatch match = saved.firstWhere((e) => e.matchName == matchNames[selectedMatchIndex]);
 
-      if (!match.questions.every((e) => e != null)) errorList.add('Không đủ 4 câu hỏi');
+      if (!match.questions.every((e) => !e.isNull)) errorList.add('Không đủ 4 câu hỏi');
 
       for (int i = 1; i <= 4; i++) {
         final q = match.questions[i - 1];
-        if (q == null) continue;
+        if (q.isNull) continue;
 
         if (q.imagePaths.isEmpty) errorList.add('Câu $i: không có ảnh');
 
