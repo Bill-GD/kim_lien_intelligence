@@ -195,11 +195,6 @@ class MatchState {
   /// [score] can be negative.
   void modifyScore(int playerIndex, int score) {
     scores[playerIndex] += score;
-    KLIServer.sendToAllClients(KLISocketMessage(
-      senderID: ConnectionID.host,
-      message: jsonEncode(scores),
-      type: KLIMessageType.scores,
-    ));
   }
 
   void eliminateObstaclePlayer(int pos) {

@@ -30,13 +30,13 @@ class _AccelScreenState extends State<AccelScreen> {
       canAnnounceAnswer = false,
       timeEnded = false,
       canEnd = false,
-      hideAns = false;
+      hideAns = true;
   late AccelQuestion currentQuestion;
   List<bool?> answerResults = [null, null, null, null];
   List<(int, String, double)> answers = List.generate(4, (i) => (i, '', -1));
   Timer? timer;
   int questionNum = 0;
-  final Key imgContainerKey = UniqueKey();
+  final imgContainerKey = UniqueKey();
 
   @override
   void initState() {
@@ -74,23 +74,36 @@ class _AccelScreenState extends State<AccelScreen> {
           answerResult: answerResults,
           answers: answers.asMap().entries.map((e) => (e.value.$2, e.value.$3)),
           playerNames: Iterable.generate(4, (i) => MatchState().players[answers[i].$1].name),
+          showTime: true,
           actions: [
             KLIButton(
               'Announce Result',
               enableCondition: canAnnounceAnswer,
               onPressed: () {
+                int mul = 0;
                 for (int i = 0; i < 4; i++) {
                   if (answers[i].$3 < 0) {
                     answerResults[i] = false;
                     continue;
                   }
-
                   answerResults[i] = answers[i].$2.toLowerCase() == currentQuestion.answer.toLowerCase();
-                  if (answerResults[i] == true) MatchState().modifyScore(i, (4 - i) * 10);
+                  if (answerResults[i] == true) {
+                    MatchState().modifyScore(answers[i].$1, (4 - mul) * 10);
+                    mul++;
+                  }
                 }
+                KLIServer.sendToAllClients(KLISocketMessage(
+                  senderID: ConnectionID.host,
+                  message: jsonEncode(MatchState().scores),
+                  type: KLIMessageType.scores,
+                ));
                 canAnnounceAnswer = false;
                 canNext = true;
                 if (questionNum == 4) canEnd = true;
+                KLIServer.sendToAllClients(KLISocketMessage(
+                  senderID: ConnectionID.host,
+                  type: KLIMessageType.hideQuestion,
+                ));
                 setState(() {});
               },
             ),
@@ -206,8 +219,8 @@ class _AccelScreenState extends State<AccelScreen> {
                           File(StorageHandler.getFullPath(e)),
                         ),
                       ),
-                      isArrange: currentQuestion.type == AccelQuestionType.arrange && !canNext,
                       shouldShowArrangeResult: currentQuestion.type == AccelQuestionType.arrange && canNext,
+                      isArrange: currentQuestion.type == AccelQuestionType.arrange,
                     )
                   : null,
             ),
@@ -231,6 +244,7 @@ class _AccelScreenState extends State<AccelScreen> {
     questionNum++;
     currentQuestion = MatchState().questionList!.removeLast() as AccelQuestion;
     // caching for continuous display
+    PaintingBinding.instance.imageCache.clear(); // clear all cached images
     if (currentQuestion.type == AccelQuestionType.sequence) {
       for (var p in currentQuestion.imagePaths) {
         final i = Image.file(File(StorageHandler.getFullPath(p)));
@@ -238,9 +252,10 @@ class _AccelScreenState extends State<AccelScreen> {
         stream.addListener(ImageStreamListener((_, __) {}));
       }
     }
+
     KLIServer.sendToAllClients(KLISocketMessage(
       senderID: ConnectionID.host,
-      type: KLIMessageType.startQuestion,
+      type: KLIMessageType.accelQuestion,
       message: jsonEncode(currentQuestion.toJson()),
     ));
   }
@@ -284,6 +299,10 @@ class _AccelScreenState extends State<AccelScreen> {
                 setState(() {});
               }
             });
+            KLIServer.sendToAllClients(KLISocketMessage(
+              senderID: ConnectionID.host,
+              type: KLIMessageType.continueTimer,
+            ));
             setState(() {});
           },
         ),
@@ -299,10 +318,6 @@ class _AccelScreenState extends State<AccelScreen> {
             currentTimeSec = widget.timeLimitSec;
             canShowQuestion = canStart = true;
             timeEnded = canNext = started = false;
-            KLIServer.sendToAllClients(KLISocketMessage(
-              senderID: ConnectionID.host,
-              type: KLIMessageType.hideQuestion,
-            ));
             setState(() {});
           },
         ),

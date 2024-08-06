@@ -81,6 +81,11 @@ class _ObstacleQuestionScreenState extends State<ObstacleQuestionScreen> {
               playerPos,
               MatchState.obstaclePoints[MatchState().answeredObstacleRows.where((e) => e).length],
             );
+            KLIServer.sendToAllClients(KLISocketMessage(
+              senderID: ConnectionID.host,
+              message: jsonEncode(MatchState().scores),
+              type: KLIMessageType.scores,
+            ));
             keywordAnswered = true;
             KLIServer.sendToAllClients(
                 KLISocketMessage(senderID: ConnectionID.host, type: KLIMessageType.correctObstacleAnswer));
@@ -139,6 +144,11 @@ class _ObstacleQuestionScreenState extends State<ObstacleQuestionScreen> {
                   if (answerResults[i] == true) MatchState().modifyScore(i, 10);
                   setState(() {});
                 }
+                KLIServer.sendToAllClients(KLISocketMessage(
+                  senderID: ConnectionID.host,
+                  message: jsonEncode(MatchState().scores),
+                  type: KLIMessageType.scores,
+                ));
 
                 MatchState().answeredObstacleRows[questionIndex] = true;
                 MatchState().revealedImageParts[MatchState().imagePartOrder.indexOf(questionIndex)] =

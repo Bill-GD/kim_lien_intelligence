@@ -45,16 +45,19 @@ class _PlayerAccelScreenState extends State<PlayerAccelScreen> {
           i++;
         }
       }
+
       if (m.type == KLIMessageType.accelQuestion) {
         if (canAnswer) return;
-
         questionNum++;
         currentQuestion = AccelQuestion.fromJson(jsonDecode(m.message));
-        canShowQuestion = true;
-
-        createTimer();
-        canAnswer = true;
+        currentTimeSec = 30;
+        canShowQuestion = canAnswer = true;
       }
+
+      if (m.type == KLIMessageType.continueTimer) {
+        createTimer();
+      }
+
       if (m.type == KLIMessageType.hideQuestion) {
         answerTextController.text = '';
         submittedAnswer = '';
@@ -213,7 +216,7 @@ class _PlayerAccelScreenState extends State<PlayerAccelScreen> {
         KLIClient.sendMessage(KLISocketMessage(
           senderID: KLIClient.clientID!,
           type: KLIMessageType.accelAnswer,
-          message: '$text|${(15 - currentTimeSec).toStringAsPrecision(3)}',
+          message: '$text|${(30 - currentTimeSec).toStringAsPrecision(3)}',
         ));
       },
     );
