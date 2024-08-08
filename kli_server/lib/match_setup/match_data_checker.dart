@@ -37,11 +37,10 @@ class _MatchDataCheckerState extends State<MatchDataChecker> {
     super.initState();
     logHandler.info('Opening Match Data Checker');
 
-    DataManager.getMatchNames().then((value) async {
-      if (value.isEmpty) showToastMessage(context, 'No match found');
-      if (value.isNotEmpty) matchNames = value;
-      setState(() => isLoading = false);
-    });
+    final value = DataManager.getMatchNames();
+    if (value.isEmpty) showToastMessage(context, 'No match found');
+    if (value.isNotEmpty) matchNames = value;
+    setState(() => isLoading = false);
   }
 
   void exitHandler() {
@@ -82,7 +81,7 @@ class _MatchDataCheckerState extends State<MatchDataChecker> {
                             matchSelector(matchNames, (value) async {
                               selectedMatchIndex = matchNames.indexOf(value!);
                               logHandler.info('Selected match: ${matchNames[selectedMatchIndex]}');
-                              questionCheckResults = await checkMatchQuestions();
+                              questionCheckResults = checkMatchQuestions();
                               disableServerSetup = !questionCheckResults.every((e) => e.$1 == true);
                               setState(() {});
                             }),
@@ -91,9 +90,9 @@ class _MatchDataCheckerState extends State<MatchDataChecker> {
                               enableCondition: !disableServerSetup,
                               disabledLabel: 'Trận đấu chưa đủ thông tin',
                               onPressed: () async {
-                                await MatchState.instantiate(matchNames[selectedMatchIndex]);
+                                MatchState.instantiate(matchNames[selectedMatchIndex]);
                                 if (context.mounted) {
-                                  await Navigator.of(context).push(MaterialPageRoute(
+                                  await Navigator.of(context).pushReplacement(MaterialPageRoute(
                                     builder: (context) => ServerSetup(matchNames[selectedMatchIndex]),
                                   ));
                                   MatchState.reset();
@@ -169,21 +168,21 @@ class _MatchDataCheckerState extends State<MatchDataChecker> {
     );
   }
 
-  Future<List<(bool, List<String>)>> checkMatchQuestions() async {
+  List<(bool, List<String>)> checkMatchQuestions() {
     return <(bool, List<String>)>[
-      await checkMatch(),
-      await checkStartQuestions(),
-      await checkObstacleQuestions(),
-      await checkAccelQuestions(),
-      await checkFinishQuestions(),
-      await checkExtraQuestions(),
+      checkMatch(),
+      checkStartQuestions(),
+      checkObstacleQuestions(),
+      checkAccelQuestions(),
+      checkFinishQuestions(),
+      checkExtraQuestions(),
     ];
   }
 
-  Future<(bool, List<String>)> checkMatch() async {
+  (bool, List<String>) checkMatch() {
     final errorList = <String>[];
 
-    final match = (jsonDecode(await storageHandler.readFromFile(storageHandler.matchSaveFile)) as List)
+    final match = (jsonDecode(storageHandler.readFromFile(storageHandler.matchSaveFile)) as List)
         .map((e) => KLIMatch.fromJson(e))
         .firstWhere((e) => e.name == matchNames[selectedMatchIndex]);
 
@@ -198,10 +197,10 @@ class _MatchDataCheckerState extends State<MatchDataChecker> {
     return (errorList.isEmpty, errorList);
   }
 
-  Future<(bool, List<String>)> checkStartQuestions() async {
+  (bool, List<String>) checkStartQuestions() {
     final errorList = <String>[];
 
-    final saved = await DataManager.getAllSavedQuestions<StartMatch>();
+    final saved = DataManager.getAllSavedQuestions<StartMatch>();
     if (saved.isEmpty) return (false, ['Chưa có dữ liệu']);
 
     try {
@@ -235,10 +234,10 @@ class _MatchDataCheckerState extends State<MatchDataChecker> {
     return (errorList.isEmpty, errorList);
   }
 
-  Future<(bool, List<String>)> checkObstacleQuestions() async {
+  (bool, List<String>) checkObstacleQuestions() {
     final errorList = <String>[];
 
-    final saved = await DataManager.getAllSavedQuestions<ObstacleMatch>();
+    final saved = DataManager.getAllSavedQuestions<ObstacleMatch>();
     if (saved.isEmpty) return (false, ['Chưa có dữ liệu']);
 
     try {
@@ -257,10 +256,10 @@ class _MatchDataCheckerState extends State<MatchDataChecker> {
     return (errorList.isEmpty, errorList);
   }
 
-  Future<(bool, List<String>)> checkAccelQuestions() async {
+  (bool, List<String>) checkAccelQuestions() {
     final errorList = <String>[];
 
-    final saved = await DataManager.getAllSavedQuestions<AccelMatch>();
+    final saved = DataManager.getAllSavedQuestions<AccelMatch>();
     if (saved.isEmpty) return (false, ['Chưa có dữ liệu']);
 
     try {
@@ -287,10 +286,10 @@ class _MatchDataCheckerState extends State<MatchDataChecker> {
     return (errorList.isEmpty, errorList);
   }
 
-  Future<(bool, List<String>)> checkFinishQuestions() async {
+  (bool, List<String>) checkFinishQuestions() {
     final errorList = <String>[];
 
-    final saved = await DataManager.getAllSavedQuestions<FinishMatch>();
+    final saved = DataManager.getAllSavedQuestions<FinishMatch>();
     if (saved.isEmpty) return (false, ['Chưa có dữ liệu']);
 
     try {
@@ -313,10 +312,10 @@ class _MatchDataCheckerState extends State<MatchDataChecker> {
     return (errorList.isEmpty, errorList);
   }
 
-  Future<(bool, List<String>)> checkExtraQuestions() async {
+  (bool, List<String>) checkExtraQuestions() {
     final errorList = <String>[];
 
-    final saved = await DataManager.getAllSavedQuestions<ExtraMatch>();
+    final saved = DataManager.getAllSavedQuestions<ExtraMatch>();
     if (saved.isEmpty) return (false, ['Chưa có dữ liệu']);
 
     try {

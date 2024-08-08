@@ -43,7 +43,7 @@ class _LoadingScreenState extends State<LoadingScreen> {
       await Future.delayed(widget.delayMilli);
 
       setState(() => loadingText = 'Initializing storage handler...');
-      await initStorageHandler();
+      initStorageHandler();
       await Future.delayed(widget.delayMilli);
 
       setState(() => loadingText = 'Finished initialization');

@@ -24,10 +24,10 @@ class MatchState {
   }
 
   /// Takes `matchName`. If initialized, does nothing.
-  static Future<void> instantiate(String matchName) async {
+  static void instantiate(String matchName) {
     if (_inst != null && _inst!.match.name == matchName) return;
 
-    final value = await storageHandler.readFromFile(storageHandler.matchSaveFile);
+    final value = storageHandler.readFromFile(storageHandler.matchSaveFile);
 
     final newMatch = KLIMatch.fromJson((jsonDecode(value) as Iterable).firstWhere(
       (e) => e['name'] == matchName,
@@ -111,7 +111,7 @@ class MatchState {
   Future<void> loadQuestions() async {
     switch (section) {
       case MatchSection.start:
-        questionList = (await DataManager.getMatchQuestions<StartMatch>(match.name))
+        questionList = DataManager.getMatchQuestions<StartMatch>(match.name)
             .questions
             .where((e) => e.pos == startOrFinishPos)
             .toList()
@@ -119,19 +119,18 @@ class MatchState {
         break;
       case MatchSection.obstacle:
         questionList = null;
-        obstacleMatch = await DataManager.getMatchQuestions<ObstacleMatch>(match.name);
+        obstacleMatch = DataManager.getMatchQuestions<ObstacleMatch>(match.name);
         break;
       case MatchSection.accel:
         obstacleMatch = null;
-        questionList =
-            (await DataManager.getMatchQuestions<AccelMatch>(match.name)).questions.reversed.toList();
+        questionList = DataManager.getMatchQuestions<AccelMatch>(match.name).questions.reversed.toList();
         break;
       case MatchSection.finish:
         startOrFinishPos = 0;
-        await DataManager.getMatchQuestions<FinishMatch>(match.name);
+        DataManager.getMatchQuestions<FinishMatch>(match.name);
         break;
       case MatchSection.extra:
-        await DataManager.getMatchQuestions<ExtraMatch>(match.name);
+        DataManager.getMatchQuestions<ExtraMatch>(match.name);
         break;
       default:
         throw Exception('Invalid section, this should not happen.');

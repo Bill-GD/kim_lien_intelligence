@@ -30,14 +30,13 @@ class _AccelManagerState extends State<AccelManager> {
 
     selectedMatch = AccelMatch.empty();
     selectedQuestion = AccelQuestion.empty();
-    DataManager.getMatchNames().then((value) async {
-      if (value.isNotEmpty) matchNames = value;
-      setState(() => isLoading = false);
-      await DataManager.removeDeletedMatchQuestions<AccelMatch>();
-    });
+
+    matchNames = DataManager.getMatchNames();
+    setState(() => isLoading = false);
+    DataManager.removeDeletedMatchQuestions<AccelMatch>();
   }
 
-  Future<void> getNewQuestion(Map<String, dynamic> data) async {
+  void getNewQuestion(Map<String, dynamic> data) {
     logHandler.info('Extracting excel data');
     final List<AccelQuestion> allQ = [];
 
@@ -121,7 +120,7 @@ class _AccelManagerState extends State<AccelManager> {
           matchSelector(matchNames, (value) async {
             logHandler.info('Selected match: $value');
             hasSelectedMatch = value != null;
-            selectedMatch = await DataManager.getMatchQuestions<AccelMatch>(value!);
+            selectedMatch = DataManager.getMatchQuestions<AccelMatch>(value!);
             selectedQuestionIndex = -1;
             selectedImageIndex = -1;
             setState(() {});
@@ -138,7 +137,7 @@ class _AccelManagerState extends State<AccelManager> {
               ));
               if (newQ != null) {
                 selectedMatch.questions[selectedQuestionIndex] = newQ;
-                await DataManager.updateQuestions<AccelMatch>(selectedMatch);
+                DataManager.updateQuestions<AccelMatch>(selectedMatch);
               }
               setState(() {});
             },
@@ -149,23 +148,24 @@ class _AccelManagerState extends State<AccelManager> {
             enabledLabel: 'Cho phép nhập dữ liệu từ file Excel',
             disabledLabel: 'Chưa chọn trận đấu',
             onPressed: () async {
-              Map<String, dynamic>? data =
-                  await Navigator.of(context).push<Map<String, dynamic>>(DialogRoute<Map<String, dynamic>>(
-                context: context,
-                barrierDismissible: false,
-                barrierLabel: '',
-                builder: (_) => ImportQuestionDialog(
-                  matchName: selectedMatch.matchName,
-                  maxColumnCount: 4,
-                  maxSheetCount: 1,
-                  columnWidths: const [100, 400, 150, 400, 200],
+              Map<String, dynamic>? data = await Navigator.of(context).push<Map<String, dynamic>>(
+                DialogRoute<Map<String, dynamic>>(
+                  context: context,
+                  barrierDismissible: false,
+                  barrierLabel: '',
+                  builder: (_) => ImportQuestionDialog(
+                    matchName: selectedMatch.matchName,
+                    maxColumnCount: 4,
+                    maxSheetCount: 1,
+                    columnWidths: const [100, 400, 150, 400, 200],
+                  ),
                 ),
-              ));
+              );
 
               if (data == null) return;
 
-              await getNewQuestion(data);
-              await DataManager.saveNewQuestions<AccelMatch>(selectedMatch);
+              getNewQuestion(data);
+              DataManager.saveNewQuestions<AccelMatch>(selectedMatch);
               selectedQuestionIndex = -1;
               selectedImageIndex = -1;
               setState(() {});
@@ -185,11 +185,8 @@ class _AccelManagerState extends State<AccelManager> {
                   if (mounted) {
                     showToastMessage(context, 'Đã xóa (match: ${selectedMatch.matchName})');
                   }
-                  await DataManager.removeQuestionsOfMatch<AccelMatch>(selectedMatch);
-                  selectedMatch = AccelMatch(
-                    matchName: selectedMatch.matchName,
-                    questions: List.filled(4, AccelQuestion.empty()),
-                  );
+                  DataManager.removeQuestionsOfMatch<AccelMatch>(selectedMatch);
+                  selectedMatch = AccelMatch.empty(selectedMatch.matchName);
                   selectedQuestionIndex = -1;
                   selectedImageIndex = -1;
                   setState(() {});
@@ -275,7 +272,7 @@ class _AccelManagerState extends State<AccelManager> {
                       logHandler.info('Selected question is null, creating new question');
                       selectedQuestion = AccelQuestion.empty();
                       selectedMatch.questions[index] = selectedQuestion;
-                      await DataManager.updateQuestions<AccelMatch>(selectedMatch);
+                      DataManager.updateQuestions<AccelMatch>(selectedMatch);
                     } else {
                       selectedQuestion = q;
                     }
@@ -325,10 +322,11 @@ class _AccelManagerState extends State<AccelManager> {
 
                   final p = result.files.single.path!;
                   selectedQuestion.imagePaths.add(StorageHandler.getRelative(p));
-                  selectedQuestion.type =
-                      AccelQuestion.getTypeFromImageCount(selectedQuestion.imagePaths.length);
+                  selectedQuestion.type = AccelQuestion.getTypeFromImageCount(
+                    selectedQuestion.imagePaths.length,
+                  );
                   if (selectedImageIndex < 0) selectedImageIndex = 0;
-                  await DataManager.updateQuestions<AccelMatch>(selectedMatch);
+                  DataManager.updateQuestions<AccelMatch>(selectedMatch);
                   logHandler.info('Chose ${StorageHandler.getRelative(p)}');
                   setState(() {});
                 },
@@ -345,9 +343,10 @@ class _AccelManagerState extends State<AccelManager> {
                   } else {
                     selectedImageIndex = -1;
                   }
-                  selectedQuestion.type =
-                      AccelQuestion.getTypeFromImageCount(selectedQuestion.imagePaths.length);
-                  await DataManager.updateQuestions<AccelMatch>(selectedMatch);
+                  selectedQuestion.type = AccelQuestion.getTypeFromImageCount(
+                    selectedQuestion.imagePaths.length,
+                  );
+                  DataManager.updateQuestions<AccelMatch>(selectedMatch);
                   setState(() {});
                 },
               ),

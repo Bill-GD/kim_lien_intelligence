@@ -18,8 +18,8 @@ Future<void> initPackageInfo() async {
 }
 
 late final StorageHandler storageHandler;
-Future<void> initStorageHandler() async {
-  storageHandler = await StorageHandler.init();
+void initStorageHandler() {
+  storageHandler = StorageHandler.init();
 }
 
 late final AudioHandler audioHandler;

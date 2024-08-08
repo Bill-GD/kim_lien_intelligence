@@ -14,9 +14,9 @@ class DataManager {
     throw Exception('Unknown type');
   }
 
-  static Future<List<T>> getAllSavedQuestions<T extends BaseMatch>() async {
+  static List<T> getAllSavedQuestions<T extends BaseMatch>() {
     logHandler.info('Getting all saved $T questions');
-    final saved = await storageHandler.readFromFile(_mapTypeToFile(T));
+    final saved = storageHandler.readFromFile(_mapTypeToFile(T));
     if (saved.isEmpty) return <T>[];
 
     List<T> q = [];
@@ -28,15 +28,15 @@ class DataManager {
     return q;
   }
 
-  static Future<void> updateQuestions<T extends BaseMatch>(T match) async {
+  static void updateQuestions<T extends BaseMatch>(T match) {
     logHandler.info('Updating questions of match: ${match.matchName}');
-    final saved = await getAllSavedQuestions<T>();
+    final saved = getAllSavedQuestions<T>();
     saved.removeWhere((e) => e.matchName == match.matchName);
     saved.add(match);
-    await overwriteSave(saved, _mapTypeToFile(T));
+    overwriteSave(saved, _mapTypeToFile(T));
   }
 
-  static Future<void> updateAllQuestionMatchName({required String oldName, required String newName}) async {
+  static void updateAllQuestionMatchName({required String oldName, required String newName}) {
     logHandler.info(
       'Match name update detected. Updating match name of all questions (\'$oldName\' -> \'$newName\')',
     );
@@ -45,54 +45,54 @@ class DataManager {
 
     for (final type in types) {
       List<BaseMatch> m = switch (type) {
-        StartMatch => await getAllSavedQuestions<StartMatch>(),
-        ObstacleMatch => await getAllSavedQuestions<ObstacleMatch>(),
-        AccelMatch => await getAllSavedQuestions<AccelMatch>(),
-        FinishMatch => await getAllSavedQuestions<FinishMatch>(),
-        ExtraMatch => await getAllSavedQuestions<ExtraMatch>(),
+        StartMatch => getAllSavedQuestions<StartMatch>(),
+        ObstacleMatch => getAllSavedQuestions<ObstacleMatch>(),
+        AccelMatch => getAllSavedQuestions<AccelMatch>(),
+        FinishMatch => getAllSavedQuestions<FinishMatch>(),
+        ExtraMatch => getAllSavedQuestions<ExtraMatch>(),
         _ => throw Exception('Unknown type'),
       };
 
       for (final e in m) {
         if (e.matchName == oldName) e.matchName = newName;
       }
-      await overwriteSave(m, _mapTypeToFile(type));
+      overwriteSave(m, _mapTypeToFile(type));
       logHandler.info('Updated $type');
     }
   }
 
-  static Future<List<String>> getMatchNames() async {
+  static List<String> getMatchNames() {
     List<String> matchNames = [];
-    String value = await storageHandler.readFromFile(storageHandler.matchSaveFile);
+    String value = storageHandler.readFromFile(storageHandler.matchSaveFile);
     if (value.isNotEmpty) {
       matchNames = (jsonDecode(value) as Iterable).map((e) => e['name'] as String).toList();
     }
     return matchNames;
   }
 
-  static Future<void> saveNewQuestions<T extends BaseMatch>(T selectedMatch) async {
+  static void saveNewQuestions<T extends BaseMatch>(T selectedMatch) {
     logHandler.info('Saving new questions of match: ${selectedMatch.matchName}');
-    final saved = await getAllSavedQuestions<T>();
+    final saved = getAllSavedQuestions<T>();
     saved.removeWhere((e) => e.matchName == selectedMatch.matchName);
     saved.add(selectedMatch);
-    await overwriteSave(saved, _mapTypeToFile(T));
+    overwriteSave(saved, _mapTypeToFile(T));
   }
 
-  static Future<void> removeDeletedMatchQuestions<T extends BaseMatch>() async {
+  static void removeDeletedMatchQuestions<T extends BaseMatch>() {
     logHandler.info('Removing questions of deleted matches');
-    final matchNames = await getMatchNames();
-    final saved = (await getAllSavedQuestions<T>()).where((e) => matchNames.contains(e.matchName)).toList();
-    await overwriteSave(saved, _mapTypeToFile(T));
+    final matchNames = getMatchNames();
+    final saved = (getAllSavedQuestions<T>()).where((e) => matchNames.contains(e.matchName)).toList();
+    overwriteSave(saved, _mapTypeToFile(T));
   }
 
-  static Future<void> removeQuestionsOfMatch<T extends BaseMatch>(T match) async {
+  static void removeQuestionsOfMatch<T extends BaseMatch>(T match) {
     logHandler.info('Removing all questions of match: ${match.matchName}');
-    final saved = (await getAllSavedQuestions<T>())..removeWhere((e) => e.matchName == match.matchName);
-    await overwriteSave(saved, _mapTypeToFile(T));
+    final saved = (getAllSavedQuestions<T>())..removeWhere((e) => e.matchName == match.matchName);
+    overwriteSave(saved, _mapTypeToFile(T));
   }
 
-  static Future<T> getMatchQuestions<T extends BaseMatch>(String matchName) async {
-    final saved = await getAllSavedQuestions<T>();
+  static T getMatchQuestions<T extends BaseMatch>(String matchName) {
+    final saved = getAllSavedQuestions<T>();
     if (saved.isEmpty) return BaseMatch.empty<T>(matchName);
 
     T selectedMatch;
@@ -107,8 +107,8 @@ class DataManager {
     return selectedMatch;
   }
 
-  static Future<void> overwriteSave<T>(List<T> q, String filePath) async {
+  static void overwriteSave<T>(List<T> q, String filePath) {
     logHandler.info('Overwriting save');
-    await storageHandler.writeToFile(filePath, jsonEncode(q));
+    storageHandler.writeToFile(filePath, jsonEncode(q));
   }
 }

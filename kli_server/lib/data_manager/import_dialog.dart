@@ -70,7 +70,7 @@ class _ImportQuestionDialogState extends State<ImportQuestionDialog> with Ticker
                     chosenFile = result.files.single.path!;
                     logHandler.info('Import: $chosenFile');
 
-                    data = await storageHandler.readFromExcel(
+                    data = storageHandler.readFromExcel(
                       chosenFile,
                       widget.maxColumnCount,
                       widget.maxSheetCount,

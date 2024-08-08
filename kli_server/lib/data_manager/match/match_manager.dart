@@ -25,19 +25,18 @@ class _MatchManagerState extends State<MatchManager> {
     super.initState();
     logHandler.info('Opened Match Manager');
 
-    storageHandler.readFromFile(storageHandler.matchSaveFile).then((value) {
-      if (value.isNotEmpty) {
-        matches = (jsonDecode(value) as List).map((e) => KLIMatch.fromJson(e)).toList();
-        currentMatchIndex = -1;
-        setState(() {});
-      }
-      setState(() => isLoading = false);
-      logHandler.info('Loaded ${matches.length} matches');
-    });
+    final value = storageHandler.readFromFile(storageHandler.matchSaveFile);
+    if (value.isNotEmpty) {
+      matches = (jsonDecode(value) as List).map((e) => KLIMatch.fromJson(e)).toList();
+      currentMatchIndex = -1;
+      setState(() {});
+    }
+    setState(() => isLoading = false);
+    logHandler.info('Loaded ${matches.length} matches');
   }
 
-  Future<void> overwriteSave() async {
-    await storageHandler.writeToFile(storageHandler.matchSaveFile, jsonEncode(matches));
+  void overwriteSave() {
+    storageHandler.writeToFile(storageHandler.matchSaveFile, jsonEncode(matches));
   }
 
   @override
@@ -106,7 +105,7 @@ class _MatchManagerState extends State<MatchManager> {
 
               if (newMatch != null) {
                 matches.add(newMatch);
-                await overwriteSave();
+                overwriteSave();
                 setState(() {});
               }
             },
@@ -132,9 +131,9 @@ class _MatchManagerState extends State<MatchManager> {
                 String oldName = matches[currentMatchIndex].name;
                 bool changedName = newMatch.name != oldName;
                 matches[currentMatchIndex] = newMatch;
-                await overwriteSave();
+                overwriteSave();
                 if (changedName) {
-                  await DataManager.updateAllQuestionMatchName(oldName: oldName, newName: newMatch.name);
+                  DataManager.updateAllQuestionMatchName(oldName: oldName, newName: newMatch.name);
                 }
                 setState(() {});
               }
@@ -152,7 +151,7 @@ class _MatchManagerState extends State<MatchManager> {
                 onAccept: () async {
                   if (mounted) showToastMessage(context, 'Đã xóa trận: ${matches[currentMatchIndex].name}');
                   matches.removeAt(currentMatchIndex);
-                  await overwriteSave();
+                  overwriteSave();
                   setState(() => currentMatchIndex = -1);
                 },
               );

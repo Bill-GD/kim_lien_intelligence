@@ -24,16 +24,13 @@ class _StartQuestionManagerState extends State<StartQuestionManager> {
   void initState() {
     super.initState();
     logHandler.info('Opened Start Manager');
-
     selectedMatch = StartMatch.empty();
-    DataManager.getMatchNames().then((value) async {
-      if (value.isNotEmpty) matchNames = value;
-      setState(() => isLoading = false);
-      await DataManager.removeDeletedMatchQuestions<StartMatch>();
-    });
+    matchNames = DataManager.getMatchNames();
+    setState(() => isLoading = false);
+    DataManager.removeDeletedMatchQuestions<StartMatch>();
   }
 
-  Future<void> getNewQuestion(Map<String, dynamic> data) async {
+  void getNewQuestion(Map<String, dynamic> data) {
     final List<StartQuestion> questions = [];
     int idx = 0;
 
@@ -111,7 +108,7 @@ class _StartQuestionManagerState extends State<StartQuestionManager> {
           matchSelector(matchNames, (value) async {
             logHandler.info('Selected match: $value');
             hasSelectedMatch = value != null;
-            selectedMatch = await DataManager.getMatchQuestions<StartMatch>(value!);
+            selectedMatch = DataManager.getMatchQuestions<StartMatch>(value!);
             setState(() {});
           }),
           // sort player pos
@@ -168,7 +165,7 @@ class _StartQuestionManagerState extends State<StartQuestionManager> {
               if (ret == null) return;
 
               selectedMatch.questions.add(ret);
-              await DataManager.updateQuestions<StartMatch>(selectedMatch);
+              DataManager.updateQuestions<StartMatch>(selectedMatch);
               setState(() {});
             },
           ),
@@ -193,8 +190,8 @@ class _StartQuestionManagerState extends State<StartQuestionManager> {
 
               if (data == null) return;
 
-              await getNewQuestion(data);
-              await DataManager.saveNewQuestions<StartMatch>(selectedMatch);
+              getNewQuestion(data);
+              DataManager.saveNewQuestions<StartMatch>(selectedMatch);
 
               setState(() {});
             },
@@ -212,7 +209,7 @@ class _StartQuestionManagerState extends State<StartQuestionManager> {
                 onAccept: () async {
                   if (mounted) showToastMessage(context, 'Đã xóa (trận: ${selectedMatch.matchName})');
 
-                  await DataManager.removeQuestionsOfMatch<StartMatch>(selectedMatch);
+                  DataManager.removeQuestionsOfMatch<StartMatch>(selectedMatch);
                   selectedMatch = StartMatch.empty(selectedMatch.matchName);
                   setState(() {});
                 },
@@ -275,7 +272,7 @@ class _StartQuestionManagerState extends State<StartQuestionManager> {
                                 acceptLogMessage: 'Removed start question: pos=${q.pos}, idx=$index',
                                 onAccept: () async {
                                   selectedMatch.questions.removeWhere((e) => e == q);
-                                  await DataManager.updateQuestions<StartMatch>(selectedMatch);
+                                  DataManager.updateQuestions<StartMatch>(selectedMatch);
                                   setState(() {});
                                 },
                               );
@@ -296,7 +293,7 @@ class _StartQuestionManagerState extends State<StartQuestionManager> {
                         if (ret == null) return;
 
                         selectedMatch.questions[selectedMatch.questions.indexOf(q)] = ret;
-                        await DataManager.updateQuestions<StartMatch>(selectedMatch);
+                        DataManager.updateQuestions<StartMatch>(selectedMatch);
 
                         setState(() {});
                       },
