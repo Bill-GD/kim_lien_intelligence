@@ -211,8 +211,12 @@ class _WaitingScreenState extends State<WaitingScreen> {
                       ),
                       const SizedBox(height: 16),
                       Text(
-                        'Received $dataReceived / $totalData bytes (${(dataReceived / totalData * 100).toStringAsFixed(2)}%)',
+                        'Received ${getSizeString(dataReceived.toDouble())} / ${getSizeString(totalData.toDouble())}',
                         style: const TextStyle(fontSize: fontSizeMedium),
+                      ),
+                      LinearProgressIndicator(
+                        value: dataReceived / totalData,
+                        backgroundColor: Colors.grey,
                       ),
                     ],
                   ),

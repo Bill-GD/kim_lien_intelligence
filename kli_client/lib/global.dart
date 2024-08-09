@@ -26,10 +26,20 @@ void initAudioHandler() {
   audioHandler = AudioHandler.init();
 }
 
+String getSizeString(double bytes) {
+  const List<String> units = ['B', 'KB', 'MB', 'GB'];
+  int unitIndex = 0;
+  while (bytes > 900 && unitIndex < units.length - 1) {
+    bytes /= 1024;
+    unitIndex++;
+  }
+  return '${bytes.toStringAsFixed(2)} ${units[unitIndex]}';
+}
+
 const String changelog = """
   0.2.3 ({latest}):
   - Added Accel screen: question, score, can answer
-  - Caches all match data: images, video, names
+  - Caches all match data: images, video, names; will take cached if hit
 
   0.2.2 ({363f0c6}):
   - Added Obstacle screen: question, score, can guess, answer
