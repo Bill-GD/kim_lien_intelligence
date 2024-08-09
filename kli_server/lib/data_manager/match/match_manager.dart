@@ -36,7 +36,7 @@ class _MatchManagerState extends State<MatchManager> {
   }
 
   void overwriteSave() {
-    storageHandler.writeToFile(storageHandler.matchSaveFile, jsonEncode(matches));
+    storageHandler.writeStringToFile(storageHandler.matchSaveFile, jsonEncode(matches));
   }
 
   @override

@@ -29,6 +29,7 @@ void initAudioHandler() {
 const String changelog = """
   0.2.3 ({latest}):
   - Added Accel screen: question, score, can answer
+  - Caches all match data: images, video, names
 
   0.2.2 ({363f0c6}):
   - Added Obstacle screen: question, score, can guess, answer

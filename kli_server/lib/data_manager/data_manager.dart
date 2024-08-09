@@ -109,6 +109,6 @@ class DataManager {
 
   static void overwriteSave<T>(List<T> q, String filePath) {
     logHandler.info('Overwriting save');
-    storageHandler.writeToFile(filePath, jsonEncode(q));
+    storageHandler.writeStringToFile(filePath, jsonEncode(q));
   }
 }

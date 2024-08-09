@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -140,8 +141,8 @@ class _OverviewState extends State<Overview> {
             constraints: const BoxConstraints(maxHeight: 600, maxWidth: 450, minHeight: 1, minWidth: 260),
             child: ClipRRect(
               borderRadius: BorderRadius.circular(5),
-              child: Image.memory(
-                p.imageBytes,
+              child: Image.file(
+                File(p.fullImagePath),
                 fit: BoxFit.contain,
               ),
             ),

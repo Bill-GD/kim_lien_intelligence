@@ -189,15 +189,30 @@ class _ServerSetupState extends State<ServerSetup> {
 
   void addClientListeners() {
     subscriptions.add(KLIServer.onConnectionChanged.listen((e) {
-      if (e >= 0) {
+      if (e >= 0 && e < 4) {
         MatchState.playerReady[e] = false;
       }
       setState(() {});
     }));
 
     subscriptions.add(KLIServer.onMessageReceived.listen((m) {
-      if (m.type == KLIMessageType.players) {
-        MatchState.sendPlayerData(m);
+      if (m.type == KLIMessageType.dataSize) {
+        MatchState.sendMatchData(m, false);
+      }
+
+      if (m.type == KLIMessageType.matchName) {
+        KLIServer.sendMessage(
+          m.senderID,
+          KLISocketMessage(
+            senderID: ConnectionID.host,
+            type: KLIMessageType.matchName,
+            message: widget.matchName,
+          ),
+        );
+      }
+
+      if (m.type == KLIMessageType.matchData) {
+        MatchState.sendMatchData(m, true);
       }
 
       if (m.type == KLIMessageType.playerReady) {

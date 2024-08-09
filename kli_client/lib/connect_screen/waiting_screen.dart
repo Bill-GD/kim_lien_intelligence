@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -19,6 +20,8 @@ class WaitingScreen extends StatefulWidget {
 class _WaitingScreenState extends State<WaitingScreen> {
   late final StreamSubscription<void> messageSubscription;
   bool receivingData = false;
+  int dataReceived = 0, totalData = 0;
+  String matchName = '';
 
   @override
   void initState() {
@@ -81,34 +84,101 @@ class _WaitingScreenState extends State<WaitingScreen> {
                         );
                         return;
                       }
+
                       MatchData().setPos(KLIClient.clientID!.index - 1);
                       receivingData = true;
                       setState(() {});
 
                       KLIClient.sendMessage(KLISocketMessage(
                         senderID: KLIClient.clientID!,
-                        type: KLIMessageType.players,
+                        type: KLIMessageType.dataSize,
                       ));
 
-                      KLIClient.onMessageReceived.listen((m) {
-                        if (m.type == KLIMessageType.players) {
-                          int i = 0;
-                          final d = (jsonDecode(m.message) as Iterable).map(
-                            (e) {
-                              return Player(
-                                pos: i++,
-                                name: e['name'] as String,
-                                imageBytes: Networking.decodeMedia(e['image']),
-                              );
-                            },
+                      KLIClient.onMessageReceived.listen((m) async {
+                        if (m.type == KLIMessageType.dataSize) {
+                          totalData = int.parse(m.message);
+                          setState(() {});
+
+                          KLIClient.sendMessage(KLISocketMessage(
+                            senderID: KLIClient.clientID!,
+                            type: KLIMessageType.matchName,
+                          ));
+                        }
+
+                        if (m.type == KLIMessageType.matchName) {
+                          matchName = m.message;
+                          final c = await StorageHandler.appCacheDirectory;
+                          if (File('$c\\$matchName\\size.txt').existsSync()) {
+                            final s = StorageHandler().readFromFile('$c\\$matchName\\size.txt');
+                            if (totalData == int.parse(s)) {
+                              receivingData = false;
+                              setState(() {});
+                              if (context.mounted) {
+                                Navigator.of(context).pushReplacement<void, void>(
+                                  MaterialPageRoute<void>(builder: (context) => const Overview()),
+                                );
+                              }
+                              return;
+                            }
+                          }
+
+                          KLIClient.sendMessage(KLISocketMessage(
+                            senderID: KLIClient.clientID!,
+                            type: KLIMessageType.matchData,
+                          ));
+
+                          KLIClient.onDataReceived.listen((b) {
+                            dataReceived += b;
+                            setState(() {});
+                          });
+                        }
+
+                        if (m.type == KLIMessageType.matchData) {
+                          final d = jsonDecode(String.fromCharCodes(
+                            zlib.decode(m.message.codeUnits),
+                          )) as Map<String, dynamic>;
+                          final n = List<String>.filled(4, '');
+                          final c = await StorageHandler.appCacheDirectory;
+
+                          for (var e in d.entries) {
+                            if (e.key.contains('player_name')) {
+                              final pos = int.parse(e.key.split('_').last);
+                              n[pos] = e.value;
+                              continue;
+                            }
+                            if (e.key.contains('player_image')) {
+                              final pos = int.parse(e.key.split('_').last.characters.first);
+                              MatchData().players.add(Player(
+                                    pos: pos,
+                                    name: n[pos],
+                                    fullImagePath: '$c\\$matchName\\${e.key}',
+                                  ));
+                            }
+                            StorageHandler().writeBytesToFile(
+                              '$c\\$matchName\\${e.key}',
+                              Networking.decodeMedia(e.value),
+                              createIfNotExists: true,
+                            );
+                          }
+
+                          StorageHandler().writeStringToFile(
+                            '$c\\$matchName\\size.txt',
+                            totalData.toString(),
+                            createIfNotExists: true,
+                          );
+                          StorageHandler().writeStringToFile(
+                            '$c\\$matchName\\names.txt',
+                            n.join('|'),
+                            createIfNotExists: true,
                           );
 
-                          MatchData().players.addAll(d);
                           receivingData = false;
                           setState(() {});
-                          Navigator.of(context).pushReplacement<void, void>(
-                            MaterialPageRoute<void>(builder: (context) => const Overview()),
-                          );
+                          if (context.mounted) {
+                            Navigator.of(context).pushReplacement<void, void>(
+                              MaterialPageRoute<void>(builder: (context) => const Overview()),
+                            );
+                          }
                         }
                       });
                     },
@@ -116,14 +186,23 @@ class _WaitingScreenState extends State<WaitingScreen> {
                 ],
               ),
               if (receivingData)
-                const Padding(
-                  padding: EdgeInsets.symmetric(vertical: 32),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 32),
+                  child: Column(
                     children: [
-                      Text('Requesting match data from host'),
-                      SizedBox(width: 16),
-                      CircularProgressIndicator(),
+                      const Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text('Requesting match data from host'),
+                          SizedBox(width: 16),
+                          CircularProgressIndicator(),
+                        ],
+                      ),
+                      const SizedBox(height: 16),
+                      Text(
+                        'Received $dataReceived / $totalData bytes',
+                        style: const TextStyle(fontSize: fontSizeMedium),
+                      ),
                     ],
                   ),
                 )

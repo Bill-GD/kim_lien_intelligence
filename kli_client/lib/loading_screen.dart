@@ -42,6 +42,18 @@ class _LoadingScreenState extends State<LoadingScreen> {
       bgDecorationImage = await getBackgroundWidget(assetHandler);
       await Future.delayed(widget.delayMilli);
 
+      setState(() => loadingText = 'Clearing cache...');
+      StorageHandler.clearCache();
+      StorageHandler().writeStringToFile(
+        '${await StorageHandler.appCacheDirectory}\\do not touch anything here.txt',
+        dedent('''
+        The folder(s) here are used for caching match data (names, images, videos)
+        so that the client app doesn't need to request new data every time joining a match.
+        '''),
+        createIfNotExists: true,
+      );
+      await Future.delayed(widget.delayMilli);
+
       setState(() => loadingText = 'Finished initialization');
       await Future.delayed(widget.delayMilli);
 

@@ -19,9 +19,12 @@ void main() async {
 
   PlatformDispatcher.instance.onError = (e, s) {
     logHandler.error(e.toString(), stackTrace: s);
+    final curContext = navigatorKey.currentContext;
+    if (curContext == null) return false;
+
     if (e is! KLIException) {
       showPopupMessage(
-        navigatorKey.currentContext!,
+        curContext,
         title: e.toString(),
         content: s.toString(),
         centerContent: false,
@@ -30,7 +33,7 @@ void main() async {
     }
 
     showPopupMessage(
-      navigatorKey.currentContext!,
+      curContext,
       title: e.formatTitle(),
       content: e.message,
     );

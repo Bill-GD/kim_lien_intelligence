@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:kli_lib/kli_lib.dart';
 
@@ -43,27 +44,54 @@ class MatchState {
 
   static void reset() => _inst = null;
 
-  static void sendPlayerData(KLISocketMessage m) {
+  static void sendMatchData(KLISocketMessage m, bool sendData) {
     assert(initialized, 'MatchState not initialized');
 
-    // logHandler.info('Sending player list');
+    final data = <String, dynamic>{};
 
-    final data = <Map<String, dynamic>>[];
-    for (final p in MatchState().players) {
-      data.add({
-        'name': p.name,
-        'image': Networking.encodeMedia(p.imagePath),
-      });
+    for (int i = 0; i < MatchState().players.length; i++) {
+      final p = MatchState().players[i];
+      final ext = p.imagePath.split('.').last;
+      data['player_name_$i'] = p.name;
+      data['player_image_$i.$ext'] = Networking.encodeMedia(p.imagePath);
     }
 
-    KLIServer.sendMessage(
-      m.senderID,
-      KLISocketMessage(
-        senderID: ConnectionID.host,
-        type: KLIMessageType.players,
-        message: jsonEncode(data),
-      ),
-    );
+    final obsPath = DataManager.getMatchQuestions<ObstacleMatch>(MatchState().match.name).imagePath;
+    data['obstacle_image.${obsPath.split('.').last}'] = Networking.encodeMedia(obsPath);
+
+    for (final i in range(0, 3)) {
+      final q = DataManager.getMatchQuestions<AccelMatch>(MatchState().match.name).questions[i];
+      for (final j in range(0, q.imagePaths.length - 1)) {
+        final ext = q.imagePaths[j].split('.').last;
+        data['accel_image_${i}_$j.$ext'] = Networking.encodeMedia(q.imagePaths[j]);
+      }
+    }
+
+    DataManager.getMatchQuestions<FinishMatch>(MatchState().match.name).questions.forEach((q) {
+      if (q.mediaPath.isEmpty) return;
+      final ext = q.mediaPath.split('.').last;
+      data['finish_${q.mediaPath.split(r'\').last}.$ext'] = Networking.encodeMedia(q.mediaPath);
+    });
+
+    final j = jsonEncode(data);
+
+    sendData
+        ? KLIServer.sendMessage(
+            m.senderID,
+            KLISocketMessage(
+              senderID: ConnectionID.host,
+              type: KLIMessageType.matchData,
+              message: String.fromCharCodes(zlib.encode(j.codeUnits)),
+            ),
+          )
+        : KLIServer.sendMessage(
+            m.senderID,
+            KLISocketMessage(
+              senderID: ConnectionID.host,
+              type: KLIMessageType.dataSize,
+              message: j.codeUnits.length.toString(),
+            ),
+          );
   }
 
   static void handleReconnection(KLISocketMessage m) async {
