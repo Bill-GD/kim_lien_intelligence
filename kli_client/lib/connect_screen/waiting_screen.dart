@@ -108,11 +108,21 @@ class _WaitingScreenState extends State<WaitingScreen> {
                         if (m.type == KLIMessageType.matchName) {
                           matchName = m.message;
                           final c = await StorageHandler.appCacheDirectory;
-                          if (File('$c\\$matchName\\size.txt').existsSync()) {
+                          if (File('$c\\$matchName\\size.txt').existsSync() &&
+                              File('$c\\$matchName\\names.txt').existsSync()) {
                             final s = StorageHandler().readFromFile('$c\\$matchName\\size.txt');
+                            final n = StorageHandler().readFromFile('$c\\$matchName\\names.txt').split('|');
+
                             if (totalData == int.parse(s)) {
-                              receivingData = false;
-                              setState(() {});
+                              setState(() => receivingData = false);
+                              MatchData().players.addAll(List.generate(
+                                    4,
+                                    (i) => Player(
+                                      pos: i,
+                                      name: n[i],
+                                      fullImagePath: '$c\\$matchName\\player_image_$i.png',
+                                    ),
+                                  ));
                               if (context.mounted) {
                                 Navigator.of(context).pushReplacement<void, void>(
                                   MaterialPageRoute<void>(builder: (context) => const Overview()),
@@ -128,6 +138,7 @@ class _WaitingScreenState extends State<WaitingScreen> {
                           ));
 
                           KLIClient.onDataReceived.listen((b) {
+                            print(b);
                             dataReceived += b;
                             setState(() {});
                           });
@@ -200,7 +211,7 @@ class _WaitingScreenState extends State<WaitingScreen> {
                       ),
                       const SizedBox(height: 16),
                       Text(
-                        'Received $dataReceived / $totalData bytes',
+                        'Received $dataReceived / $totalData bytes (${(dataReceived / totalData * 100).toStringAsFixed(2)}%)',
                         style: const TextStyle(fontSize: fontSizeMedium),
                       ),
                     ],
