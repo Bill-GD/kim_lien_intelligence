@@ -307,6 +307,15 @@ class _AccelScreenState extends State<AccelScreen> {
           },
         ),
         KLIButton(
+          'Explanation',
+          enableCondition: timeEnded,
+          disabledLabel: 'Question is not yet answered',
+          textAlign: TextAlign.center,
+          onPressed: () {
+            showPopupMessage(context, title: 'Explanation', content: currentQuestion.explanation);
+          },
+        ),
+        KLIButton(
           'Next question',
           enableCondition: canNext && questionNum < 4,
           disabledLabel: 'Question is not yet answered',

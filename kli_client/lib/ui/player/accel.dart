@@ -51,10 +51,11 @@ class _PlayerAccelScreenState extends State<PlayerAccelScreen> {
         questionNum++;
         currentQuestion = AccelQuestion.fromJson(jsonDecode(m.message));
         currentTimeSec = 30;
-        canShowQuestion = canAnswer = true;
+        canShowQuestion = true;
       }
 
       if (m.type == KLIMessageType.continueTimer) {
+        canAnswer = true;
         createTimer();
       }
 
@@ -210,8 +211,10 @@ class _PlayerAccelScreenState extends State<PlayerAccelScreen> {
       readOnly: !canAnswer,
       controller: answerTextController,
       maxLines: 1,
+      autofocus: canAnswer,
       hintText: 'Enter Answer and press Enter to submit',
       onSubmitted: (text) {
+        if (!canAnswer) return;
         submittedAnswer = text;
         KLIClient.sendMessage(KLISocketMessage(
           senderID: KLIClient.clientID!,
