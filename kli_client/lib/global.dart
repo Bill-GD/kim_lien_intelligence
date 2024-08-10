@@ -37,7 +37,10 @@ String getSizeString(double bytes) {
 }
 
 const String changelog = """
-  0.2.3 ({latest}):
+  0.2.4 ({latest}):
+  - Added 
+
+  0.2.3 ({79f968c}):
   - Added Accel screen: question, score, can answer
   - Caches all match data: images, video, names; will take cached if hit
 

@@ -120,7 +120,10 @@ SideNavigationBarTheme sideNavigationTheme(BuildContext context, [double height 
 }
 
 const String changelog = """
-  0.4.3 ({latest}):
+  0.4.4 ({latest}):
+  - Added Finish UI: question, answer, timer, explanation, star, point value
+
+  0.4.3 ({79f968c}):
   - Added Accel UI: question, answer, timer, image(s), player answers, explanation
   - Send all match data: data size, names, images, videos to clients when requested
 
@@ -146,7 +149,8 @@ const String changelog = """
   0.4 ({34c61cd}):
   - Added error message to loading screen
   - Added overview UI: name, players, scores, current section, timer
-  - Added Obstacle UI: (correctly/wrongly answered) questions, answers, timer, image, image covers
+  - Added Start UI: question, answer, timer, subject, question count
+  - Added Obstacle UI: (correctly/wrongly answered) questions, answer, player answers, timer, image, image covers
   - Can receive Player info request from clients and respond
   - Receives and sends ready signal from/to players, can only start match if all is ready
   - Fixed wrong log messages

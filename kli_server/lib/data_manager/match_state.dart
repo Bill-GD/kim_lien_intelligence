@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'dart:math';
 
 import 'package:kli_lib/kli_lib.dart';
 
@@ -138,7 +139,7 @@ class MatchState {
     ));
   }
 
-  Future<void> loadQuestions() async {
+  void loadQuestions() {
     switch (section) {
       case MatchSection.start:
         questionList = DataManager.getMatchQuestions<StartMatch>(match.name)
@@ -157,7 +158,7 @@ class MatchState {
         break;
       case MatchSection.finish:
         startOrFinishPos = 0;
-        DataManager.getMatchQuestions<FinishMatch>(match.name);
+        questionList = DataManager.getMatchQuestions<FinishMatch>(match.name).questions;
         break;
       case MatchSection.extra:
         DataManager.getMatchQuestions<ExtraMatch>(match.name);
@@ -178,25 +179,20 @@ class MatchState {
       case MatchSection.accel: // none, all player at once
         break;
       case MatchSection.finish:
-        if (finishPlayerDone.every((e) => !e)) {
+        if (finishNotStarted) {
           startOrFinishPos = (<int>[0, 1, 2, 3]..sort((a, b) => scores[b].compareTo(scores[a])))[0];
-          finishPlayerDone[startOrFinishPos] = true;
         } else {
-          final nonFinishedPlayers = List<int>.generate(4, (i) => i)
+          final nonFinishedPlayers = <int>[0, 1, 2, 3]
               .where((pos) => !finishPlayerDone[pos]) //
               .toList()
             ..sort((a, b) => scores[b].compareTo(scores[a]));
 
-          if (nonFinishedPlayers.length == 1) {
+          if (scores[nonFinishedPlayers[0]] == scores[nonFinishedPlayers[1]]) {
+            startOrFinishPos = min(nonFinishedPlayers[0], nonFinishedPlayers[1]);
+          } else {
+            // if (nonFinishedPlayers.length == 1) {
             startOrFinishPos = nonFinishedPlayers[0];
-          } else if (scores[nonFinishedPlayers[0]] == scores[nonFinishedPlayers[1]]) {
-            startOrFinishPos = nonFinishedPlayers[0] < nonFinishedPlayers[1]
-                ? nonFinishedPlayers[0] //
-                : nonFinishedPlayers[1];
           }
-
-          startOrFinishPos = nonFinishedPlayers[0];
-          finishPlayerDone[startOrFinishPos] = true;
         }
         break;
       case MatchSection.extra: // all at once
@@ -240,7 +236,7 @@ class MatchState {
   late final List<KLIPlayer> players;
   static final playerReady = <bool>[false, false, false, false];
   bool get allPlayerReady => playerReady.every((e) => e);
-  MatchSection section = MatchSection.accel;
+  MatchSection section = MatchSection.finish;
 
   /// For Start, Accel, Finish, Extra. For Obstacle, use [obstacleMatch]
   List<BaseQuestion>? questionList;
@@ -249,7 +245,8 @@ class MatchState {
   // start & finish
   int startOrFinishPos = 0;
   final finishPlayerDone = <bool>[false, false, false, false];
-  late final List<int> finishOrder;
+  bool get finishNotStarted => finishPlayerDone.every((e) => !e);
+  bool get allFinishPlayerDone => finishPlayerDone.every((e) => e);
 
   // obstacle
   final revealedObstacleRows = <bool>[false, false, false, false, false];

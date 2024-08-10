@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:kli_lib/kli_lib.dart';
+import 'package:kli_server/ui/finish.dart';
 
 import '../data_manager/match_state.dart';
 import '../global.dart';
@@ -95,14 +96,12 @@ class _MatchOverviewState extends State<MatchOverview> {
                 throw KLIException('Start is done', 'All players have finished Start section');
               }
 
+              MatchState().loadQuestions();
               KLIServer.sendToAllClients(KLISocketMessage(
                 senderID: ConnectionID.host,
-                message: '${MatchState().startOrFinishPos}',
                 type: KLIMessageType.enterStart,
+                message: '${MatchState().startOrFinishPos}',
               ));
-
-              logHandler.info('Start section, player ${MatchState().startOrFinishPos}');
-              await MatchState().loadQuestions();
 
               if (mounted) {
                 await Navigator.of(context).push<void>(
@@ -127,12 +126,12 @@ class _MatchOverviewState extends State<MatchOverview> {
             enabledLabel: 'To Obstacle',
             disabledLabel: 'Current section: ${MatchState().section.name}',
             onPressed: () async {
+              MatchState().loadQuestions();
               KLIServer.sendToAllClients(KLISocketMessage(
                 senderID: ConnectionID.host,
                 type: KLIMessageType.enterObstacle,
               ));
 
-              await MatchState().loadQuestions();
               if (mounted) {
                 await Navigator.of(context).push(
                   MaterialPageRoute<void>(
@@ -150,12 +149,13 @@ class _MatchOverviewState extends State<MatchOverview> {
             enabledLabel: 'To Accel',
             disabledLabel: 'Current section: ${MatchState().section.name}',
             onPressed: () async {
-              await MatchState().loadQuestions();
+              MatchState().loadQuestions();
 
               KLIServer.sendToAllClients(KLISocketMessage(
                 senderID: ConnectionID.host,
                 type: KLIMessageType.enterAccel,
               ));
+
               if (mounted) {
                 await Navigator.of(context).push<void>(
                   MaterialPageRoute(
@@ -163,8 +163,9 @@ class _MatchOverviewState extends State<MatchOverview> {
                   ),
                 );
               }
-
+              MatchState().nextSection();
               setState(() {});
+              MatchState().startOrFinishPos = 0;
             },
           ),
           KLIButton(
@@ -172,11 +173,26 @@ class _MatchOverviewState extends State<MatchOverview> {
             enableCondition: MatchState().section == MatchSection.finish,
             enabledLabel: 'To Finish',
             disabledLabel: 'Current section: ${MatchState().section.name}',
-            onPressed: () {
+            onPressed: () async {
+              if (MatchState().finishNotStarted) MatchState().loadQuestions();
+
               KLIServer.sendToAllClients(KLISocketMessage(
                 senderID: ConnectionID.host,
                 type: KLIMessageType.enterFinish,
+                message: '${MatchState().startOrFinishPos}',
               ));
+
+              if (mounted) {
+                await Navigator.of(context).push<void>(
+                  MaterialPageRoute(
+                    builder: (context) => FinishScreen(playerPos: MatchState().startOrFinishPos),
+                  ),
+                );
+              }
+
+              MatchState().finishPlayerDone[MatchState().startOrFinishPos] = true;
+              MatchState().allFinishPlayerDone ? MatchState().nextSection() : MatchState().nextPlayer();
+              setState(() {});
             },
           ),
           KLIButton(

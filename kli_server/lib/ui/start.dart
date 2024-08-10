@@ -45,18 +45,22 @@ class _StartScreenState extends State<StartScreen> {
             children: [
               Expanded(
                 flex: 9,
-                child: Column(children: [
-                  questionContainer(),
-                  answerButtons(),
-                ]),
+                child: Column(
+                  children: [
+                    questionContainer(),
+                    answerButtons(),
+                  ],
+                ),
               ),
               Flexible(
                 child: Padding(
                   padding: const EdgeInsets.only(left: 48),
-                  child: Column(children: [
-                    questionInfo(),
-                    startEndButton(),
-                  ]),
+                  child: Column(
+                    children: [
+                      questionInfo(),
+                      startEndButton(),
+                    ],
+                  ),
                 ),
               ),
             ],
@@ -152,37 +156,39 @@ class _StartScreenState extends State<StartScreen> {
   Widget answerButtons() {
     return Padding(
       padding: widget.buttonPadding,
-      child: Row(children: [
-        Expanded(
-          child: KLIButton(
-            'Correct',
-            enableCondition: !timeEnded && started,
-            disabledLabel: "Can't answer now",
-            onPressed: () {
-              MatchState().modifyScore(widget.playerPos, 10);
-              KLIServer.sendToAllClients(KLISocketMessage(
-                senderID: ConnectionID.host,
-                message: MatchState().scores[widget.playerPos].toString(),
-                type: KLIMessageType.correctStartAnswer,
-              ));
-              nextQuestion();
-              setState(() {});
-            },
+      child: Row(
+        children: [
+          Expanded(
+            child: KLIButton(
+              'Correct',
+              enableCondition: !timeEnded && started,
+              disabledLabel: "Can't answer now",
+              onPressed: () {
+                MatchState().modifyScore(widget.playerPos, 10);
+                KLIServer.sendToAllClients(KLISocketMessage(
+                  senderID: ConnectionID.host,
+                  message: MatchState().scores[widget.playerPos].toString(),
+                  type: KLIMessageType.correctStartAnswer,
+                ));
+                nextQuestion();
+                setState(() {});
+              },
+            ),
           ),
-        ),
-        const SizedBox(width: 16),
-        Expanded(
-          child: KLIButton(
-            'Incorrect',
-            enableCondition: !timeEnded && started,
-            disabledLabel: "Can't answer now",
-            onPressed: () {
-              nextQuestion();
-              setState(() {});
-            },
+          const SizedBox(width: 16),
+          Expanded(
+            child: KLIButton(
+              'Incorrect',
+              enableCondition: !timeEnded && started,
+              disabledLabel: "Can't answer now",
+              onPressed: () {
+                nextQuestion();
+                setState(() {});
+              },
+            ),
           ),
-        ),
-      ]),
+        ],
+      ),
     );
   }
 

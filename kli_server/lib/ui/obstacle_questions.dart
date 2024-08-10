@@ -58,20 +58,16 @@ class _ObstacleQuestionScreenState extends State<ObstacleQuestionScreen> {
           final res = await dialogWithActions<bool>(
             context,
             title: 'Guess Obstacle',
-            content: 'Player ${Networking.getClientDisplayID(m.senderID)} has decided to guess the obstacle.',
+            content: '${Networking.getClientDisplayID(m.senderID)} has decided to guess the obstacle.',
             time: 150.ms,
             actions: [
               KLIButton(
                 'Correct',
-                onPressed: () {
-                  Navigator.of(context).pop(true);
-                },
+                onPressed: () => Navigator.of(context).pop(true),
               ),
               KLIButton(
                 'Wrong',
-                onPressed: () {
-                  Navigator.of(context).pop(false);
-                },
+                onPressed: () => Navigator.of(context).pop(false),
               ),
             ],
           );
