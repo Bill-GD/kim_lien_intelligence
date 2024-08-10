@@ -24,13 +24,13 @@ class _PlayerObstacleScreenState extends State<PlayerObstacleScreen> {
   String submittedAnswer = '';
   late ObstacleQuestion currentQuestion;
   Timer? timer;
-  late final StreamSubscription<KLISocketMessage> messageSubscription;
+  late final StreamSubscription<KLISocketMessage> sub;
   final answerTextController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
-    messageSubscription = KLIClient.onMessageReceived.listen((m) {
+    sub = KLIClient.onMessageReceived.listen((m) {
       if (m.type == KLIMessageType.endSection) {
         Navigator.of(context).pushReplacement<void, void>(
           MaterialPageRoute(builder: (_) => const Overview()),
@@ -94,7 +94,7 @@ class _PlayerObstacleScreenState extends State<PlayerObstacleScreen> {
   @override
   void dispose() {
     timer?.cancel();
-    messageSubscription.cancel();
+    sub.cancel();
     super.dispose();
   }
 

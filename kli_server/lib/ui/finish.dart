@@ -31,11 +31,12 @@ class _FinishScreenState extends State<FinishScreen> {
   late FinishQuestion currentQuestion;
   Timer? timer;
   int questionNum = 0, pointValue = 0;
+  late final StreamSubscription<KLISocketMessage> sub;
 
   @override
   void initState() {
     super.initState();
-    KLIServer.onMessageReceived.listen((m) async {
+    sub = KLIServer.onMessageReceived.listen((m) async {
       if (m.type == KLIMessageType.stealAnswer) {
         final pos = m.senderID.index - 1;
         KLIServer.sendToAllClients(KLISocketMessage(
@@ -83,6 +84,7 @@ class _FinishScreenState extends State<FinishScreen> {
   @override
   void dispose() {
     timer?.cancel();
+    sub.cancel();
     super.dispose();
   }
 
@@ -171,35 +173,51 @@ class _FinishScreenState extends State<FinishScreen> {
           children: [
             players(),
             Expanded(
-              child: Container(
-                decoration: const BoxDecoration(
-                  border: BorderDirectional(top: BorderSide(color: Colors.white)),
-                ),
-                padding: const EdgeInsets.symmetric(horizontal: 128),
-                alignment: Alignment.center,
-                child: canShowQuestion
-                    ? Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            currentQuestion.question,
-                            textAlign: TextAlign.center,
-                            // textWidthBasis: TextWidthBasis.longestLine,
-                            style: const TextStyle(fontSize: fontSizeLarge),
-                          ),
-                          const SizedBox(height: 16),
-                          Text(
-                            currentQuestion.answer,
-                            softWrap: true,
-                            textAlign: TextAlign.end,
-                            style: const TextStyle(
-                              fontSize: fontSizeMedium,
-                              fontStyle: FontStyle.italic,
+              child: Stack(
+                children: [
+                  Positioned(
+                    right: 0,
+                    child: canShowQuestion
+                        ? Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
+                            child: Text(
+                              '$pointValue điểm',
+                              style: const TextStyle(fontSize: fontSizeLarge),
                             ),
-                          ),
-                        ],
-                      )
-                    : null,
+                          )
+                        : const SizedBox(),
+                  ),
+                  Container(
+                    decoration: const BoxDecoration(
+                      border: BorderDirectional(top: BorderSide(color: Colors.white)),
+                    ),
+                    padding: const EdgeInsets.symmetric(horizontal: 128),
+                    alignment: Alignment.center,
+                    child: canShowQuestion
+                        ? Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                currentQuestion.question,
+                                textAlign: TextAlign.center,
+                                // textWidthBasis: TextWidthBasis.longestLine,
+                                style: const TextStyle(fontSize: fontSizeLarge),
+                              ),
+                              const SizedBox(height: 16),
+                              Text(
+                                currentQuestion.answer,
+                                softWrap: true,
+                                textAlign: TextAlign.end,
+                                style: const TextStyle(
+                                  fontSize: fontSizeMedium,
+                                  fontStyle: FontStyle.italic,
+                                ),
+                              ),
+                            ],
+                          )
+                        : null,
+                  ),
+                ],
               ),
             ),
           ],
@@ -298,9 +316,9 @@ class _FinishScreenState extends State<FinishScreen> {
       i = Random().nextInt(MatchState().questionList!.length);
     }
     currentQuestion = MatchState().questionList!.removeAt(i) as FinishQuestion;
-
     questionNum++;
     canShowQuestion = true;
+    started = chosenStar = false;
     timeLimitSec = currentTimeSec = 5 + point / 10 * 5;
     pointValue = currentQuestion.point;
     KLIServer.sendToAllClients(KLISocketMessage(
@@ -326,31 +344,14 @@ class _FinishScreenState extends State<FinishScreen> {
             width: 128,
             height: 128,
             alignment: Alignment.center,
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               color: Theme.of(context).colorScheme.background,
               border: Border.all(color: Colors.white),
             ),
             child: Text(
-              canShowQuestion ? pointValue.toString() : '',
-              style: const TextStyle(fontSize: fontSizeMedium),
-              textAlign: TextAlign.center,
-            ),
-          ),
-          const SizedBox(height: 64),
-          Container(
-            width: 128,
-            height: 128,
-            alignment: Alignment.center,
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: Theme.of(context).colorScheme.background,
-              border: Border.all(color: Colors.white),
-            ),
-            child: Text(
-              canShowQuestion ? '$questionNum' : '',
+              canShowQuestion ? 'Question $questionNum' : '',
               style: const TextStyle(fontSize: fontSizeMedium),
               textAlign: TextAlign.center,
             ),
@@ -364,12 +365,13 @@ class _FinishScreenState extends State<FinishScreen> {
     return [
       GestureDetector(
         onTap: () {
+          if (started) return;
           chosenStar = !chosenStar;
           chosenStar ? pointValue *= 2 : pointValue ~/= 2;
           setState(() {});
         },
         child: MouseRegion(
-          cursor: SystemMouseCursors.click,
+          cursor: started ? SystemMouseCursors.basic : SystemMouseCursors.click,
           onEnter: (event) {
             setState(() => hoverStar = true);
           },
@@ -403,6 +405,13 @@ class _FinishScreenState extends State<FinishScreen> {
                 setState(() {});
               }
             });
+
+            KLIServer.sendToAllClients(
+              KLISocketMessage(
+                senderID: ConnectionID.host,
+                type: KLIMessageType.continueTimer,
+              ),
+            );
           },
         ),
       ),

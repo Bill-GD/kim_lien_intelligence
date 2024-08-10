@@ -31,12 +31,13 @@ class _ObstacleQuestionScreenState extends State<ObstacleQuestionScreen> {
       canEnd = false;
   Timer? timer;
   final List<bool?> answerResults = List.filled(4, null);
+  late final StreamSubscription<KLISocketMessage> sub;
 
   @override
   void initState() {
     super.initState();
     debugPrint('${MatchState().imagePartOrder}');
-    KLIServer.onMessageReceived.listen((m) async {
+    sub = KLIServer.onMessageReceived.listen((m) async {
       if (m.type == KLIMessageType.obstacleRowAnswer) {
         final pos = m.senderID.index - 1;
         MatchState().rowAnswers[pos] = MatchState().eliminatedPlayers[pos] ? '' : m.message;
@@ -103,6 +104,7 @@ class _ObstacleQuestionScreenState extends State<ObstacleQuestionScreen> {
   @override
   void dispose() {
     timer?.cancel();
+    sub.cancel();
     super.dispose();
   }
 

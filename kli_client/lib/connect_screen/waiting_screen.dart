@@ -19,9 +19,8 @@ class WaitingScreen extends StatefulWidget {
 
 class _WaitingScreenState extends State<WaitingScreen> {
   late final StreamSubscription<void> messageSubscription;
-  bool receivingData = false;
-  int dataReceived = 0, totalData = 0;
-  late final int actualDataSize;
+  bool receivingData = false, checkingCache = false;
+  int dataReceived = 0, totalData = 0, actualDataSize = 0;
   String matchName = '';
 
   @override
@@ -70,25 +69,24 @@ class _WaitingScreenState extends State<WaitingScreen> {
                 children: [
                   KLIButton(
                     'Back',
-                    enableCondition: !receivingData,
+                    enableCondition: !checkingCache && !receivingData,
                     onPressed: () => Navigator.pop(context),
                   ),
                   const SizedBox(width: 32),
                   KLIButton(
                     'Ready',
-                    enableCondition: !receivingData,
+                    enableCondition: !checkingCache && !receivingData,
                     enabledLabel: 'No turning back',
                     onPressed: () {
                       if (MatchData().players.isNotEmpty) {
-                        Navigator.of(context).push(
+                        Navigator.of(context).pushReplacement(
                           MaterialPageRoute<void>(builder: (context) => const Overview()),
                         );
                         return;
                       }
 
                       MatchData().setPos(KLIClient.clientID!.index - 1);
-                      receivingData = true;
-                      setState(() {});
+                      setState(() => checkingCache = true);
 
                       KLIClient.sendMessage(KLISocketMessage(
                         senderID: KLIClient.clientID!,
@@ -145,6 +143,7 @@ class _WaitingScreenState extends State<WaitingScreen> {
                             dataReceived += b;
                             setState(() {});
                           });
+                          setState(() => receivingData = true);
                         }
 
                         if (m.type == KLIMessageType.matchData) {
@@ -199,15 +198,17 @@ class _WaitingScreenState extends State<WaitingScreen> {
                   ),
                 ],
               ),
-              if (receivingData)
+              if (receivingData || checkingCache)
                 Padding(
                   padding: const EdgeInsets.symmetric(vertical: 32),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text(
-                        'Requesting match data from host (${getSizeString(actualDataSize.toDouble())}): ${(dataReceived / totalData).toStringAsFixed(2) * 100}% ',
-                      ),
+                      checkingCache
+                          ? const Text('Checking for cached data...')
+                          : Text(
+                              'Requesting match data from host (${getSizeString(actualDataSize.toDouble())}): ${(dataReceived / totalData).toStringAsFixed(2) * 100}% ',
+                            ),
                       const SizedBox(width: 16),
                       const CircularProgressIndicator(),
                     ],

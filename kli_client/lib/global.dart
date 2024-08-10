@@ -38,7 +38,8 @@ String getSizeString(double bytes) {
 
 const String changelog = """
   0.2.4 ({latest}):
-  - Added 
+  - Added Finish screen: question, score, steal, timer
+  - Fixed UI exception when checking cached match data
 
   0.2.3 ({79f968c}):
   - Added Accel screen: question, score, can answer

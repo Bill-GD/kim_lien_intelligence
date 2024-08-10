@@ -37,11 +37,12 @@ class _AccelScreenState extends State<AccelScreen> {
   Timer? timer;
   int questionNum = 0;
   final imgContainerKey = UniqueKey();
+  late final StreamSubscription<KLISocketMessage> sub;
 
   @override
   void initState() {
     super.initState();
-    KLIServer.onMessageReceived.listen((m) {
+    sub = KLIServer.onMessageReceived.listen((m) {
       if (m.type == KLIMessageType.accelAnswer) {
         final split = m.message.split('|');
         final playerIndex = m.senderID.index - 1;
@@ -53,6 +54,7 @@ class _AccelScreenState extends State<AccelScreen> {
   @override
   void dispose() {
     timer?.cancel();
+    sub.cancel();
     super.dispose();
   }
 

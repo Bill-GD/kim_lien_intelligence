@@ -9,6 +9,7 @@ import 'package:kli_lib/kli_lib.dart';
 import '../global.dart';
 import '../match_data.dart';
 import '../ui/player/accel.dart';
+import '../ui/player/finish.dart';
 import '../ui/player/obstacle.dart';
 import '../ui/player/start.dart';
 
@@ -62,6 +63,9 @@ class _OverviewState extends State<Overview> {
           );
           break;
         case KLIMessageType.enterFinish:
+          Navigator.of(context).pushReplacement<void, void>(
+            MaterialPageRoute(builder: (_) => PlayerFinishScreen(playerPos: int.parse(m.message))),
+          );
           break;
         case KLIMessageType.enterExtra:
           break;

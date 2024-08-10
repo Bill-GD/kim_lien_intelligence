@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:kli_lib/kli_lib.dart';
 
@@ -23,13 +24,13 @@ class _PlayerStartScreenState extends State<PlayerStartScreen> {
   bool started = false, timeEnded = false;
   late StartQuestion currentQuestion;
   Timer? timer;
-  late final StreamSubscription<KLISocketMessage> messageSubscription;
+  late final StreamSubscription<KLISocketMessage> sub;
   int questionNum = 0;
 
   @override
   void initState() {
     super.initState();
-    messageSubscription = KLIClient.onMessageReceived.listen((m) {
+    sub = KLIClient.onMessageReceived.listen((m) {
       if (m.type == KLIMessageType.startQuestion) {
         if (timeEnded) return;
         if (!started) {
@@ -61,14 +62,14 @@ class _PlayerStartScreenState extends State<PlayerStartScreen> {
         );
       }
 
-      if (mounted) setState(() {});
+      setState(() {});
     });
   }
 
   @override
   void dispose() {
     timer?.cancel();
-    messageSubscription.cancel();
+    sub.cancel();
     super.dispose();
   }
 
@@ -78,6 +79,11 @@ class _PlayerStartScreenState extends State<PlayerStartScreen> {
       decoration: BoxDecoration(image: bgDecorationImage),
       child: Scaffold(
         backgroundColor: Colors.transparent,
+        extendBodyBehindAppBar: true,
+        appBar: AppBar(
+          automaticallyImplyLeading: kDebugMode,
+          backgroundColor: Colors.transparent,
+        ),
         body: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 64, vertical: 64),
           child: Row(

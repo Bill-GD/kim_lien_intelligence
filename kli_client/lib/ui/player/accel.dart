@@ -25,13 +25,13 @@ class _PlayerAccelScreenState extends State<PlayerAccelScreen> {
   late AccelQuestion currentQuestion;
   int questionNum = 0;
   Timer? timer;
-  late final StreamSubscription<KLISocketMessage> messageSubscription;
+  late final StreamSubscription<KLISocketMessage> sub;
   final answerTextController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
-    messageSubscription = KLIClient.onMessageReceived.listen((m) {
+    sub = KLIClient.onMessageReceived.listen((m) {
       if (m.type == KLIMessageType.endSection) {
         Navigator.of(context).pushReplacement<void, void>(
           MaterialPageRoute(builder: (_) => const Overview()),
@@ -73,7 +73,7 @@ class _PlayerAccelScreenState extends State<PlayerAccelScreen> {
   @override
   void dispose() {
     timer?.cancel();
-    messageSubscription.cancel();
+    sub.cancel();
     super.dispose();
   }
 
@@ -96,7 +96,7 @@ class _PlayerAccelScreenState extends State<PlayerAccelScreen> {
       decoration: BoxDecoration(image: bgDecorationImage),
       child: Scaffold(
         backgroundColor: Colors.transparent,
-        extendBodyBehindAppBar: kDebugMode,
+        extendBodyBehindAppBar: true,
         appBar: AppBar(
           automaticallyImplyLeading: kDebugMode,
           backgroundColor: Colors.transparent,
