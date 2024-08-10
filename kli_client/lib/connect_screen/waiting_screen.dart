@@ -21,6 +21,7 @@ class _WaitingScreenState extends State<WaitingScreen> {
   late final StreamSubscription<void> messageSubscription;
   bool receivingData = false;
   int dataReceived = 0, totalData = 0;
+  late final int actualDataSize;
   String matchName = '';
 
   @override
@@ -96,7 +97,9 @@ class _WaitingScreenState extends State<WaitingScreen> {
 
                       KLIClient.onMessageReceived.listen((m) async {
                         if (m.type == KLIMessageType.dataSize) {
-                          totalData = int.parse(m.message);
+                          final s = m.message.split('|');
+                          totalData = int.parse(s.first);
+                          actualDataSize = int.parse(s.last);
                           setState(() {});
 
                           KLIClient.sendMessage(KLISocketMessage(
@@ -113,7 +116,7 @@ class _WaitingScreenState extends State<WaitingScreen> {
                             final s = StorageHandler().readFromFile('$c\\$matchName\\size.txt');
                             final n = StorageHandler().readFromFile('$c\\$matchName\\names.txt').split('|');
 
-                            if (totalData == int.parse(s)) {
+                            if (actualDataSize == int.parse(s)) {
                               setState(() => receivingData = false);
                               MatchData().players.addAll(List.generate(
                                     4,
@@ -174,7 +177,7 @@ class _WaitingScreenState extends State<WaitingScreen> {
 
                           StorageHandler().writeStringToFile(
                             '$c\\$matchName\\size.txt',
-                            totalData.toString(),
+                            actualDataSize.toString(),
                             createIfNotExists: true,
                           );
                           StorageHandler().writeStringToFile(
@@ -199,25 +202,14 @@ class _WaitingScreenState extends State<WaitingScreen> {
               if (receivingData)
                 Padding(
                   padding: const EdgeInsets.symmetric(vertical: 32),
-                  child: Column(
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text('Requesting match data from host'),
-                          SizedBox(width: 16),
-                          CircularProgressIndicator(),
-                        ],
-                      ),
-                      const SizedBox(height: 16),
                       Text(
-                        'Received ${getSizeString(dataReceived.toDouble())} / ${getSizeString(totalData.toDouble())}',
-                        style: const TextStyle(fontSize: fontSizeMedium),
+                        'Requesting match data from host (${getSizeString(actualDataSize.toDouble())}): ${(dataReceived / totalData).toStringAsFixed(2) * 100}% ',
                       ),
-                      LinearProgressIndicator(
-                        value: dataReceived / totalData,
-                        backgroundColor: Colors.grey,
-                      ),
+                      const SizedBox(width: 16),
+                      const CircularProgressIndicator(),
                     ],
                   ),
                 )

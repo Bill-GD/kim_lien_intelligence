@@ -46,6 +46,7 @@ class MatchState {
 
   static void sendMatchData(KLISocketMessage m, bool sendData) {
     assert(initialized, 'MatchState not initialized');
+    int actualDataSize = 0;
 
     final data = <String, dynamic>{};
 
@@ -54,16 +55,19 @@ class MatchState {
       final ext = p.imagePath.split('.').last;
       data['player_name_$i'] = p.name;
       data['player_image_$i.$ext'] = Networking.encodeMedia(p.imagePath);
+      actualDataSize += FileStat.statSync(StorageHandler.getFullPath(p.imagePath)).size;
     }
 
     final obsPath = DataManager.getMatchQuestions<ObstacleMatch>(MatchState().match.name).imagePath;
     data['obstacle_image.${obsPath.split('.').last}'] = Networking.encodeMedia(obsPath);
+    actualDataSize += FileStat.statSync(StorageHandler.getFullPath(obsPath)).size;
 
     for (final i in range(0, 3)) {
       final q = DataManager.getMatchQuestions<AccelMatch>(MatchState().match.name).questions[i];
       for (final j in range(0, q.imagePaths.length - 1)) {
         final ext = q.imagePaths[j].split('.').last;
         data['accel_image_${i}_$j.$ext'] = Networking.encodeMedia(q.imagePaths[j]);
+        actualDataSize += FileStat.statSync(StorageHandler.getFullPath(q.imagePaths[j])).size;
       }
     }
 
@@ -71,25 +75,23 @@ class MatchState {
       if (q.mediaPath.isEmpty) return;
       final ext = q.mediaPath.split('.').last;
       data['finish_${q.mediaPath.split(r'\').last}.$ext'] = Networking.encodeMedia(q.mediaPath);
+      actualDataSize += FileStat.statSync(StorageHandler.getFullPath(q.mediaPath)).size;
     });
 
-    final j = jsonEncode(data);
+    final msg = KLISocketMessage(
+      senderID: ConnectionID.host,
+      type: KLIMessageType.matchData,
+      message: String.fromCharCodes(zlib.encode(jsonEncode(data).codeUnits)),
+    );
 
     sendData
-        ? KLIServer.sendMessage(
-            m.senderID,
-            KLISocketMessage(
-              senderID: ConnectionID.host,
-              type: KLIMessageType.matchData,
-              message: String.fromCharCodes(zlib.encode(j.codeUnits)),
-            ),
-          )
+        ? KLIServer.sendMessage(m.senderID, msg)
         : KLIServer.sendMessage(
             m.senderID,
             KLISocketMessage(
               senderID: ConnectionID.host,
               type: KLIMessageType.dataSize,
-              message: j.codeUnits.length.toString(),
+              message: '${(msg.encode() + Networking.eom).codeUnits.length}|$actualDataSize',
             ),
           );
   }
