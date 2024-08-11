@@ -93,10 +93,11 @@ class _FinishScreenState extends State<FinishScreen> {
     return Container(
       decoration: BoxDecoration(image: bgDecorationImage),
       child: Scaffold(
-        appBar: managerAppBar(context, 'Start', implyLeading: kDebugMode),
+        appBar: managerAppBar(context, 'Finish', implyLeading: kDebugMode),
+        extendBodyBehindAppBar: true,
         backgroundColor: Colors.transparent,
         body: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 64, vertical: 64),
+          padding: const EdgeInsets.only(left: 64, right: 64, bottom: 64, top: 96),
           child: Row(
             children: [
               Expanded(
@@ -175,6 +176,15 @@ class _FinishScreenState extends State<FinishScreen> {
             Expanded(
               child: Stack(
                 children: [
+                  canShowQuestion
+                      ? Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
+                          child: Text(
+                            'Câu hỏi $questionNum',
+                            style: const TextStyle(fontSize: fontSizeLarge),
+                          ),
+                        )
+                      : const SizedBox(),
                   Positioned(
                     right: 0,
                     child: canShowQuestion
@@ -260,6 +270,13 @@ class _FinishScreenState extends State<FinishScreen> {
                 canSelectQuestion = questionNum < 3;
                 canEnd = questionNum == 3;
                 timeEnded = false;
+                KLIServer.sendToAllExcept(
+                  ConnectionID.values[widget.playerPos + 1],
+                  KLISocketMessage(
+                    senderID: ConnectionID.host,
+                    type: KLIMessageType.enableSteal,
+                  ),
+                );
                 setState(() {});
               },
             ),
@@ -339,23 +356,6 @@ class _FinishScreenState extends State<FinishScreen> {
             valueColor: const Color(0xFF00A906),
             backgroundColor: Colors.red,
           ),
-          const SizedBox(height: 64),
-          Container(
-            width: 128,
-            height: 128,
-            alignment: Alignment.center,
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: Theme.of(context).colorScheme.background,
-              border: Border.all(color: Colors.white),
-            ),
-            child: Text(
-              canShowQuestion ? 'Question $questionNum' : '',
-              style: const TextStyle(fontSize: fontSizeMedium),
-              textAlign: TextAlign.center,
-            ),
-          ),
         ],
       ),
     );
@@ -364,14 +364,16 @@ class _FinishScreenState extends State<FinishScreen> {
   List<Widget> sideButtons() {
     return [
       GestureDetector(
-        onTap: () {
-          if (started) return;
-          chosenStar = !chosenStar;
-          chosenStar ? pointValue *= 2 : pointValue ~/= 2;
-          setState(() {});
-        },
+        onTap: !started && !canSelectQuestion
+            ? () {
+                if (started) return;
+                chosenStar = !chosenStar;
+                chosenStar ? pointValue *= 2 : pointValue ~/= 2;
+                setState(() {});
+              }
+            : null,
         child: MouseRegion(
-          cursor: started ? SystemMouseCursors.basic : SystemMouseCursors.click,
+          cursor: started || canSelectQuestion ? SystemMouseCursors.basic : SystemMouseCursors.click,
           onEnter: (event) {
             setState(() => hoverStar = true);
           },

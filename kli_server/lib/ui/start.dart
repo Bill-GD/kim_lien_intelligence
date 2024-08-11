@@ -10,7 +10,7 @@ import '../global.dart';
 
 class StartScreen extends StatefulWidget {
   final double timeLimitSec = 60;
-  final buttonPadding = const EdgeInsets.only(top: 90, bottom: 70);
+  final buttonPadding = const EdgeInsets.only(top: 50, bottom: 60);
   final int playerPos;
 
   const StartScreen({super.key, required this.playerPos});
@@ -37,10 +37,11 @@ class _StartScreenState extends State<StartScreen> {
     return Container(
       decoration: BoxDecoration(image: bgDecorationImage),
       child: Scaffold(
+        extendBodyBehindAppBar: true,
         appBar: managerAppBar(context, 'Start', implyLeading: kDebugMode),
         backgroundColor: Colors.transparent,
         body: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 64, vertical: 64),
+          padding: const EdgeInsets.symmetric(horizontal: 64, vertical: 96),
           child: Row(
             children: [
               Expanded(
@@ -57,7 +58,19 @@ class _StartScreenState extends State<StartScreen> {
                   padding: const EdgeInsets.only(left: 48),
                   child: Column(
                     children: [
-                      questionInfo(),
+                      Expanded(
+                        child: Column(
+                          children: [
+                            AnimatedCircularProgressBar(
+                              currentTimeSec: currentTimeSec,
+                              totalTimeSec: widget.timeLimitSec,
+                              strokeWidth: 20,
+                              valueColor: const Color(0xFF00A906),
+                              backgroundColor: Colors.red,
+                            ),
+                          ],
+                        ),
+                      ),
                       startEndButton(),
                     ],
                   ),
@@ -116,35 +129,60 @@ class _StartScreenState extends State<StartScreen> {
           children: [
             players(),
             Expanded(
-              child: Container(
-                decoration: const BoxDecoration(
-                  border: BorderDirectional(top: BorderSide(color: Colors.white)),
-                ),
-                padding: const EdgeInsets.symmetric(horizontal: 128),
-                alignment: Alignment.center,
-                child: started
-                    ? Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            currentQuestion.question,
-                            textAlign: TextAlign.center,
-                            // textWidthBasis: TextWidthBasis.longestLine,
+              child: Stack(
+                children: [
+                  started
+                      ? Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
+                          child: Text(
+                            'Câu hỏi $questionNum',
                             style: const TextStyle(fontSize: fontSizeLarge),
                           ),
-                          const SizedBox(height: 16),
-                          Text(
-                            currentQuestion.answer,
-                            softWrap: true,
-                            textAlign: TextAlign.end,
-                            style: const TextStyle(
-                              fontSize: fontSizeMedium,
-                              fontStyle: FontStyle.italic,
+                        )
+                      : const SizedBox(),
+                  Positioned(
+                    right: 0,
+                    child: started
+                        ? Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
+                            child: Text(
+                              StartQuestion.mapTypeDisplay(currentQuestion.subject),
+                              style: const TextStyle(fontSize: fontSizeLarge),
                             ),
-                          ),
-                        ],
-                      )
-                    : null,
+                          )
+                        : const SizedBox(),
+                  ),
+                  Container(
+                    decoration: const BoxDecoration(
+                      border: BorderDirectional(top: BorderSide(color: Colors.white)),
+                    ),
+                    padding: const EdgeInsets.symmetric(horizontal: 128),
+                    alignment: Alignment.center,
+                    child: started
+                        ? Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                currentQuestion.question,
+                                textAlign: TextAlign.center,
+                                // textWidthBasis: TextWidthBasis.longestLine,
+                                style: const TextStyle(fontSize: fontSizeLarge),
+                              ),
+                              const SizedBox(height: 16),
+                              Text(
+                                currentQuestion.answer,
+                                softWrap: true,
+                                textAlign: TextAlign.end,
+                                style: const TextStyle(
+                                  fontSize: fontSizeMedium,
+                                  fontStyle: FontStyle.italic,
+                                ),
+                              ),
+                            ],
+                          )
+                        : null,
+                  ),
+                ],
               ),
             ),
           ],
@@ -210,56 +248,6 @@ class _StartScreenState extends State<StartScreen> {
       type: KLIMessageType.startQuestion,
       message: jsonEncode(currentQuestion.toJson()),
     ));
-  }
-
-  Widget questionInfo() {
-    return Expanded(
-      child: Column(
-        children: [
-          AnimatedCircularProgressBar(
-            currentTimeSec: currentTimeSec,
-            totalTimeSec: widget.timeLimitSec,
-            strokeWidth: 20,
-            valueColor: const Color(0xFF00A906),
-            backgroundColor: Colors.red,
-          ),
-          const SizedBox(height: 128),
-          Container(
-            width: 128,
-            height: 128,
-            alignment: Alignment.center,
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: Theme.of(context).colorScheme.background,
-              border: Border.all(color: Colors.white),
-            ),
-            child: Text(
-              started ? StartQuestion.mapTypeDisplay(currentQuestion.subject) : '',
-              style: const TextStyle(fontSize: fontSizeMedium),
-              textAlign: TextAlign.center,
-            ),
-          ),
-          const SizedBox(height: 128),
-          Container(
-            width: 128,
-            height: 128,
-            alignment: Alignment.center,
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: Theme.of(context).colorScheme.background,
-              border: Border.all(color: Colors.white),
-            ),
-            child: Text(
-              started ? '$questionNum' : '',
-              style: const TextStyle(fontSize: fontSizeMedium),
-              textAlign: TextAlign.center,
-            ),
-          ),
-        ],
-      ),
-    );
   }
 
   Widget startEndButton() {

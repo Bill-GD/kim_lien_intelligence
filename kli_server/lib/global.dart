@@ -122,6 +122,12 @@ SideNavigationBarTheme sideNavigationTheme(BuildContext context, [double height 
 const String changelog = """
   0.4.4 ({latest}):
   - Added Finish UI: question, answer, timer, explanation, star, point value
+  - Some question info (e.g. question number, subject) now shows in the corner instead
+  - Shows player names & scores in section screens instead of question info
+  - Fixed missing 'setState's in Obstacle
+  - Answer drawer now shows player scores
+  - Fixed starting Obstacle timer after wrong obstacle guess while no question is selected
+  - Fixed not changing to Acceleration when obstacle is guessed correctly
 
   0.4.3 ({79f968c}):
   - Added Accel UI: question, answer, timer, image(s), player answers, explanation

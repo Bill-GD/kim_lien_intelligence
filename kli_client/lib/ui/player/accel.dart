@@ -126,47 +126,29 @@ class _PlayerAccelScreenState extends State<PlayerAccelScreen> {
     );
   }
 
-  Widget questionInfo() {
+  Widget containerTop() {
     return Row(
       children: [
-        Expanded(
-          child: ClipRRect(
-            borderRadius: const BorderRadius.only(topLeft: Radius.circular(10)),
-            child: Container(
-              decoration: BoxDecoration(
-                color: Colors.transparent,
-                border: BorderDirectional(
-                  end: BorderSide(color: Theme.of(context).colorScheme.onBackground),
+        for (final i in range(0, 3))
+          Expanded(
+            child: ClipRRect(
+              borderRadius: const BorderRadius.only(topLeft: Radius.circular(10)),
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Colors.transparent,
+                  border: BorderDirectional(
+                    end: BorderSide(color: Theme.of(context).colorScheme.onBackground),
+                  ),
                 ),
-              ),
-              padding: const EdgeInsets.symmetric(vertical: 16),
-              alignment: Alignment.center,
-              child: Text(
-                MatchData().players[MatchData().playerPos].name,
-                style: const TextStyle(fontSize: fontSizeMedium),
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                alignment: Alignment.center,
+                child: Text(
+                  '${MatchData().players[i].name} (${MatchData().players[i].point})',
+                  style: const TextStyle(fontSize: fontSizeMedium),
+                ),
               ),
             ),
           ),
-        ),
-        Expanded(
-          child: ClipRRect(
-            borderRadius: const BorderRadius.only(topRight: Radius.circular(10)),
-            child: Container(
-              decoration: const BoxDecoration(
-                color: Colors.transparent,
-                border: BorderDirectional(
-                  end: BorderSide(color: Colors.transparent),
-                ),
-              ),
-              padding: const EdgeInsets.symmetric(vertical: 16),
-              alignment: Alignment.center,
-              child: Text(
-                canShowQuestion ? 'Question $questionNum' : '',
-                style: const TextStyle(fontSize: fontSizeMedium),
-              ),
-            ),
-          ),
-        ),
       ],
     );
   }
@@ -181,23 +163,36 @@ class _PlayerAccelScreenState extends State<PlayerAccelScreen> {
         ),
         child: Column(
           children: [
-            questionInfo(),
+            containerTop(),
             Expanded(
-              child: Container(
-                decoration: const BoxDecoration(
-                  border: BorderDirectional(
-                    top: BorderSide(color: Colors.white),
+              child: Stack(
+                children: [
+                  canShowQuestion
+                      ? Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
+                          child: Text(
+                            'Question $questionNum',
+                            style: const TextStyle(fontSize: fontSizeLarge),
+                          ),
+                        )
+                      : const SizedBox(),
+                  Container(
+                    decoration: const BoxDecoration(
+                      border: BorderDirectional(
+                        top: BorderSide(color: Colors.white),
+                      ),
+                    ),
+                    padding: const EdgeInsets.symmetric(horizontal: 128),
+                    alignment: Alignment.center,
+                    child: canShowQuestion
+                        ? Text(
+                            currentQuestion.question,
+                            textAlign: TextAlign.center,
+                            style: const TextStyle(fontSize: fontSizeLarge),
+                          )
+                        : null,
                   ),
-                ),
-                padding: const EdgeInsets.symmetric(horizontal: 128),
-                alignment: Alignment.center,
-                child: canShowQuestion
-                    ? Text(
-                        currentQuestion.question,
-                        textAlign: TextAlign.center,
-                        style: const TextStyle(fontSize: fontSizeLarge),
-                      )
-                    : null,
+                ],
               ),
             ),
           ],
@@ -240,23 +235,6 @@ class _PlayerAccelScreenState extends State<PlayerAccelScreen> {
             valueColor: const Color(0xFF00A906),
             backgroundColor: Colors.red,
           ),
-          Container(
-            width: 128,
-            height: 128,
-            alignment: Alignment.center,
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: Theme.of(context).colorScheme.background,
-              border: Border.all(color: Colors.white),
-            ),
-            child: Text(
-              '${MatchData().players[MatchData().playerPos].point}',
-              style: const TextStyle(fontSize: fontSizeMedium),
-              textAlign: TextAlign.center,
-            ),
-          ),
-          const SizedBox(height: 128),
           Text(
             'Submitted:\n$submittedAnswer',
             softWrap: true,

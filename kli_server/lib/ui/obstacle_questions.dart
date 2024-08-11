@@ -36,7 +36,7 @@ class _ObstacleQuestionScreenState extends State<ObstacleQuestionScreen> {
   @override
   void initState() {
     super.initState();
-    debugPrint('${MatchState().imagePartOrder}');
+    logHandler.info('Image reveal order: ${MatchState().imagePartOrder}');
     sub = KLIServer.onMessageReceived.listen((m) async {
       if (m.type == KLIMessageType.obstacleRowAnswer) {
         final pos = m.senderID.index - 1;
@@ -83,15 +83,17 @@ class _ObstacleQuestionScreenState extends State<ObstacleQuestionScreen> {
               message: jsonEncode(MatchState().scores),
               type: KLIMessageType.scores,
             ));
-            keywordAnswered = true;
-            KLIServer.sendToAllClients(
-                KLISocketMessage(senderID: ConnectionID.host, type: KLIMessageType.correctObstacleAnswer));
+            keywordAnswered = canEnd = true;
+            KLIServer.sendToAllClients(KLISocketMessage(
+              senderID: ConnectionID.host,
+              type: KLIMessageType.correctObstacleAnswer,
+            ));
             setState(() {});
             return;
           }
 
           MatchState().eliminateObstaclePlayer(playerPos);
-          createTimer();
+          if (!canSelectQuestion) createTimer();
           KLIServer.sendToAllExcept(
             m.senderID,
             KLISocketMessage(senderID: ConnectionID.host, type: KLIMessageType.continueTimer),
@@ -124,6 +126,7 @@ class _ObstacleQuestionScreenState extends State<ObstacleQuestionScreen> {
         endDrawer: AnswerDrawer(
           answerResult: answerResults,
           answers: MatchState().rowAnswers.asMap().entries.map((e) => (e.value, -1)),
+          scores: MatchState().scores,
           playerNames: Iterable.generate(4, (i) => MatchState().players[i].name),
           actions: [
             KLIButton(

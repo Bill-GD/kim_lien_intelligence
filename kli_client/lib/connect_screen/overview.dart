@@ -9,6 +9,7 @@ import 'package:kli_lib/kli_lib.dart';
 import '../global.dart';
 import '../match_data.dart';
 import '../ui/player/accel.dart';
+import '../ui/player/extra.dart';
 import '../ui/player/finish.dart';
 import '../ui/player/obstacle.dart';
 import '../ui/player/start.dart';
@@ -68,15 +69,20 @@ class _OverviewState extends State<Overview> {
           );
           break;
         case KLIMessageType.enterExtra:
+          Navigator.of(context).pushReplacement<void, void>(
+            MaterialPageRoute(builder: (_) => const PlayerExtraScreen()),
+          );
           break;
         default:
           break;
       }
       setState(() {});
     }));
-
     KLIClient.sendMessage(
-      KLISocketMessage(senderID: KLIClient.clientID!, type: KLIMessageType.playerReady),
+      KLISocketMessage(senderID: KLIClient.clientID!, type: KLIMessageType.section),
+    );
+    KLIClient.sendMessage(
+      KLISocketMessage(senderID: KLIClient.clientID!, type: KLIMessageType.scores),
     );
   }
 
@@ -103,17 +109,10 @@ class _OverviewState extends State<Overview> {
         body: Center(
           child: Column(
             children: [
-              const SizedBox(height: 64),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  // if (!started) const CircularProgressIndicator(),
-                  Text(
-                    overviewMessage,
-                    style: const TextStyle(fontSize: fontSizeLarge),
-                  ),
-                  // if (!started) const CircularProgressIndicator(),
-                ],
+              const SizedBox(height: 46),
+              Text(
+                overviewMessage,
+                style: const TextStyle(fontSize: fontSizeLarge),
               ),
               const SizedBox(height: 64),
               Row(

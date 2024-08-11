@@ -124,6 +124,11 @@ class _WaitingScreenState extends State<WaitingScreen> {
                                       fullImagePath: '$c\\$matchName\\player_image_$i.png',
                                     ),
                                   ));
+
+                              KLIClient.sendMessage(
+                                KLISocketMessage(
+                                    senderID: KLIClient.clientID!, type: KLIMessageType.playerReady),
+                              );
                               if (context.mounted) {
                                 Navigator.of(context).pushReplacement<void, void>(
                                   MaterialPageRoute<void>(builder: (context) => const Overview()),
@@ -187,6 +192,10 @@ class _WaitingScreenState extends State<WaitingScreen> {
 
                           receivingData = false;
                           setState(() {});
+
+                          KLIClient.sendMessage(
+                            KLISocketMessage(senderID: KLIClient.clientID!, type: KLIMessageType.playerReady),
+                          );
                           if (context.mounted) {
                             Navigator.of(context).pushReplacement<void, void>(
                               MaterialPageRoute<void>(builder: (context) => const Overview()),

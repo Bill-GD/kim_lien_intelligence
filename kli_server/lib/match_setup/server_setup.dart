@@ -179,6 +179,7 @@ class _ServerSetupState extends State<ServerSetup> {
               final matchName = MatchState().match.name;
               MatchState.reset();
               MatchState.instantiate(matchName);
+              logHandler.info('Match reset');
               debugPrint('Match reset');
               setState(() {});
             },

@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/foundation.dart';
@@ -23,8 +24,28 @@ class _MatchOverviewState extends State<MatchOverview> {
   void initState() {
     super.initState();
     KLIServer.onMessageReceived.listen((m) {
-      if (m.type == KLIMessageType.reconnect) {
-        MatchState.handleReconnection(m);
+      // if (m.type == KLIMessageType.reconnect) {
+      //   MatchState.handleReconnection(m);
+      // }
+      if (m.type == KLIMessageType.section) {
+        KLIServer.sendMessage(
+          m.senderID,
+          KLISocketMessage(
+            senderID: ConnectionID.host,
+            message: MatchState().sectionDisplay(MatchState().section),
+            type: KLIMessageType.section,
+          ),
+        );
+      }
+      if (m.type == KLIMessageType.scores) {
+        KLIServer.sendMessage(
+          m.senderID,
+          KLISocketMessage(
+            senderID: ConnectionID.host,
+            message: jsonEncode(MatchState().scores),
+            type: KLIMessageType.scores,
+          ),
+        );
       }
     });
   }
@@ -139,7 +160,7 @@ class _MatchOverviewState extends State<MatchOverview> {
                   ),
                 );
               }
-              if (MatchState().answeredObstacleRows.every((e) => e)) MatchState().nextSection();
+              MatchState().nextSection();
               setState(() {});
             },
           ),
@@ -201,6 +222,7 @@ class _MatchOverviewState extends State<MatchOverview> {
             enabledLabel: 'To Extra',
             disabledLabel: 'Current section: ${MatchState().section.name}',
             onPressed: () {
+              MatchState().loadQuestions();
               KLIServer.sendToAllClients(KLISocketMessage(
                 senderID: ConnectionID.host,
                 type: KLIMessageType.enterExtra,

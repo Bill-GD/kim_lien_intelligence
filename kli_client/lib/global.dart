@@ -40,6 +40,10 @@ const String changelog = """
   0.2.4 ({latest}):
   - Added Finish screen: question, score, steal, timer
   - Fixed UI exception when checking cached match data
+  - Some question info (e.g. question number, subject) now shows in the corner instead
+  - Send playerReady before switching to Overview, Overview init requests scores, section name
+  - Re-aligned Overview screen to match Server's
+  - Shows player names & scores in section screens instead of question info
 
   0.2.3 ({79f968c}):
   - Added Accel screen: question, score, can answer

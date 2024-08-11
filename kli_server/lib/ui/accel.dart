@@ -75,6 +75,7 @@ class _AccelScreenState extends State<AccelScreen> {
         endDrawer: AnswerDrawer(
           answerResult: answerResults,
           answers: answers.asMap().entries.map((e) => (e.value.$2, e.value.$3)),
+          scores: Iterable<int>.generate(4, (i) => MatchState().scores[answers[i].$1]),
           playerNames: Iterable.generate(4, (i) => MatchState().players[answers[i].$1].name),
           showTime: true,
           actions: [
@@ -314,7 +315,12 @@ class _AccelScreenState extends State<AccelScreen> {
           disabledLabel: 'Question is not yet answered',
           textAlign: TextAlign.center,
           onPressed: () {
-            showPopupMessage(context, title: 'Explanation', content: currentQuestion.explanation);
+            showPopupMessage(
+              context,
+              title: 'Explanation',
+              content: currentQuestion.explanation,
+              horizontalPadding: 500,
+            );
           },
         ),
         KLIButton(

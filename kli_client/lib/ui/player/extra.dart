@@ -9,32 +9,27 @@ import '../../connect_screen/overview.dart';
 import '../../global.dart';
 import '../../match_data.dart';
 
-class PlayerFinishScreen extends StatefulWidget {
-  final int playerPos;
-
-  const PlayerFinishScreen({super.key, required this.playerPos});
+class PlayerExtraScreen extends StatefulWidget {
+  const PlayerExtraScreen({super.key});
 
   @override
-  State<PlayerFinishScreen> createState() => _PlayerFinishScreenState();
+  State<PlayerExtraScreen> createState() => _PlayerExtraScreenState();
 }
 
-class _PlayerFinishScreenState extends State<PlayerFinishScreen> {
+class _PlayerExtraScreenState extends State<PlayerExtraScreen> {
   double timeLimitSec = 1, currentTimeSec = 0;
   bool canShowQuestion = false, canSteal = false, timeEnded = false;
-  late FinishQuestion currentQuestion;
+  late ExtraQuestion currentQuestion;
   Timer? timer;
   late final StreamSubscription<KLISocketMessage> sub;
-  int questionNum = 0;
 
   @override
   void initState() {
     super.initState();
     sub = KLIClient.onMessageReceived.listen((m) {
-      if (m.type == KLIMessageType.finishQuestion) {
-        currentQuestion = FinishQuestion.fromJson(jsonDecode(m.message));
-        questionNum++;
+      if (m.type == KLIMessageType.extraQuestion) {
+        currentQuestion = ExtraQuestion.fromJson(jsonDecode(m.message));
         canShowQuestion = true;
-        timeLimitSec = currentTimeSec = currentQuestion.point / 10 * 5 + 5;
         setState(() {});
       }
 
@@ -57,16 +52,6 @@ class _PlayerFinishScreenState extends State<PlayerFinishScreen> {
           MatchData().players[i].point = s;
           i++;
         }
-      }
-
-      if (m.type == KLIMessageType.enableSteal) {
-        canSteal = true;
-        setState(() {});
-      }
-
-      if (m.type == KLIMessageType.disableSteal) {
-        canSteal = false;
-        setState(() {});
       }
 
       if (m.type == KLIMessageType.endSection) {
@@ -123,14 +108,12 @@ class _PlayerFinishScreenState extends State<PlayerFinishScreen> {
           Expanded(
             child: ClipRRect(
               borderRadius: BorderRadius.only(
-                topLeft: widget.playerPos == 0 ? const Radius.circular(10) : Radius.zero,
-                topRight: widget.playerPos == 3 ? const Radius.circular(10) : Radius.zero,
+                topLeft: i == 0 ? const Radius.circular(10) : Radius.zero,
+                topRight: i == 3 ? const Radius.circular(10) : Radius.zero,
               ),
               child: Container(
                 decoration: BoxDecoration(
-                  color: i == widget.playerPos
-                      ? Theme.of(context).colorScheme.primaryContainer
-                      : Colors.transparent,
+                  color: Colors.transparent,
                   border: BorderDirectional(
                     end: BorderSide(
                       color: i > 2 ? Colors.transparent : Theme.of(context).colorScheme.onBackground,
@@ -161,44 +144,19 @@ class _PlayerFinishScreenState extends State<PlayerFinishScreen> {
         children: [
           containerTop(),
           Expanded(
-            child: Stack(
-              children: [
-                canShowQuestion
-                    ? Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
-                        child: Text(
-                          'Câu hỏi $questionNum',
-                          style: const TextStyle(fontSize: fontSizeLarge),
-                        ),
-                      )
-                    : const SizedBox(),
-                Positioned(
-                  right: 0,
-                  child: canShowQuestion
-                      ? Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
-                          child: Text(
-                            '${currentQuestion.point} điểm',
-                            style: const TextStyle(fontSize: fontSizeLarge),
-                          ),
-                        )
-                      : const SizedBox(),
+            child: Container(
+              decoration: const BoxDecoration(
+                border: BorderDirectional(
+                  top: BorderSide(color: Colors.white),
                 ),
-                Container(
-                  decoration: const BoxDecoration(
-                    border: BorderDirectional(
-                      top: BorderSide(color: Colors.white),
-                    ),
-                  ),
-                  padding: const EdgeInsets.symmetric(horizontal: 128),
-                  alignment: Alignment.center,
-                  child: Text(
-                    canShowQuestion ? currentQuestion.question : '',
-                    textAlign: TextAlign.center,
-                    style: const TextStyle(fontSize: fontSizeLarge),
-                  ),
-                ),
-              ],
+              ),
+              padding: const EdgeInsets.symmetric(horizontal: 128),
+              alignment: Alignment.center,
+              child: Text(
+                canShowQuestion ? currentQuestion.question : '',
+                textAlign: TextAlign.center,
+                style: const TextStyle(fontSize: fontSizeLarge),
+              ),
             ),
           ),
         ],
@@ -216,17 +174,6 @@ class _PlayerFinishScreenState extends State<PlayerFinishScreen> {
           strokeWidth: 20,
           valueColor: const Color(0xFF00A906),
           backgroundColor: Colors.red,
-        ),
-        const Expanded(child: SizedBox()),
-        KLIButton(
-          'Steal',
-          enableCondition: canSteal,
-          onPressed: () {
-            KLIClient.sendMessage(KLISocketMessage(
-              senderID: KLIClient.clientID!,
-              type: KLIMessageType.stealAnswer,
-            ));
-          },
         ),
       ],
     );

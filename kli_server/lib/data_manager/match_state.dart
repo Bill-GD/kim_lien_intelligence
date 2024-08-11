@@ -161,7 +161,7 @@ class MatchState {
         questionList = DataManager.getMatchQuestions<FinishMatch>(match.name).questions;
         break;
       case MatchSection.extra:
-        DataManager.getMatchQuestions<ExtraMatch>(match.name);
+        questionList = DataManager.getMatchQuestions<ExtraMatch>(match.name).questions;
         break;
       default:
         throw Exception('Invalid section, this should not happen.');
@@ -181,18 +181,18 @@ class MatchState {
       case MatchSection.finish:
         if (finishNotStarted) {
           startOrFinishPos = (<int>[0, 1, 2, 3]..sort((a, b) => scores[b].compareTo(scores[a])))[0];
-        } else {
-          final nonFinishedPlayers = <int>[0, 1, 2, 3]
-              .where((pos) => !finishPlayerDone[pos]) //
-              .toList()
-            ..sort((a, b) => scores[b].compareTo(scores[a]));
+          return;
+        }
 
-          if (scores[nonFinishedPlayers[0]] == scores[nonFinishedPlayers[1]]) {
-            startOrFinishPos = min(nonFinishedPlayers[0], nonFinishedPlayers[1]);
-          } else {
-            // if (nonFinishedPlayers.length == 1) {
-            startOrFinishPos = nonFinishedPlayers[0];
-          }
+        final nonFinishedPlayers = <int>[0, 1, 2, 3]
+            .where((pos) => !finishPlayerDone[pos]) //
+            .toList()
+          ..sort((a, b) => scores[b].compareTo(scores[a]));
+
+        if (nonFinishedPlayers.length > 1 && scores[nonFinishedPlayers[0]] == scores[nonFinishedPlayers[1]]) {
+          startOrFinishPos = min(nonFinishedPlayers[0], nonFinishedPlayers[1]);
+        } else {
+          startOrFinishPos = nonFinishedPlayers[0];
         }
         break;
       case MatchSection.extra: // all at once
@@ -236,7 +236,7 @@ class MatchState {
   late final List<KLIPlayer> players;
   static final playerReady = <bool>[false, false, false, false];
   bool get allPlayerReady => playerReady.every((e) => e);
-  MatchSection section = MatchSection.finish;
+  MatchSection section = MatchSection.start;
 
   /// For Start, Accel, Finish, Extra. For Obstacle, use [obstacleMatch]
   List<BaseQuestion>? questionList;

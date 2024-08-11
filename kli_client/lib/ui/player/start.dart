@@ -94,7 +94,17 @@ class _PlayerStartScreenState extends State<PlayerStartScreen> {
               ),
               Padding(
                 padding: const EdgeInsets.only(left: 48),
-                child: playerInfo(),
+                child: Column(
+                  children: [
+                    AnimatedCircularProgressBar(
+                      currentTimeSec: currentTimeSec,
+                      totalTimeSec: widget.timeLimitSec,
+                      strokeWidth: 20,
+                      valueColor: const Color(0xFF00A906),
+                      backgroundColor: Colors.red,
+                    ),
+                  ],
+                ),
               ),
             ],
           ),
@@ -103,47 +113,29 @@ class _PlayerStartScreenState extends State<PlayerStartScreen> {
     );
   }
 
-  Widget questionInfo() {
+  Widget containerTop() {
     return Row(
       children: [
-        Expanded(
-          child: ClipRRect(
-            borderRadius: const BorderRadius.only(topLeft: Radius.circular(10)),
-            child: Container(
-              decoration: BoxDecoration(
-                color: Colors.transparent,
-                border: BorderDirectional(
-                  end: BorderSide(color: Theme.of(context).colorScheme.onBackground),
+        for (final i in range(0, 3))
+          Expanded(
+            child: ClipRRect(
+              borderRadius: const BorderRadius.only(topLeft: Radius.circular(10)),
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Colors.transparent,
+                  border: BorderDirectional(
+                    end: BorderSide(color: Theme.of(context).colorScheme.onBackground),
+                  ),
                 ),
-              ),
-              padding: const EdgeInsets.symmetric(vertical: 16),
-              alignment: Alignment.center,
-              child: Text(
-                started ? 'Câu hỏi $questionNum' : '',
-                style: const TextStyle(fontSize: fontSizeMedium),
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                alignment: Alignment.center,
+                child: Text(
+                  '${MatchData().players[i].name} (${MatchData().players[i].point})',
+                  style: const TextStyle(fontSize: fontSizeMedium),
+                ),
               ),
             ),
           ),
-        ),
-        Expanded(
-          child: ClipRRect(
-            borderRadius: const BorderRadius.only(topRight: Radius.circular(10)),
-            child: Container(
-              decoration: const BoxDecoration(
-                color: Colors.transparent,
-                border: BorderDirectional(
-                  end: BorderSide(color: Colors.transparent),
-                ),
-              ),
-              padding: const EdgeInsets.symmetric(vertical: 16),
-              alignment: Alignment.center,
-              child: Text(
-                started ? StartQuestion.mapTypeDisplay(currentQuestion.subject) : '',
-                style: const TextStyle(fontSize: fontSizeMedium),
-              ),
-            ),
-          ),
-        ),
       ],
     );
   }
@@ -155,56 +147,52 @@ class _PlayerStartScreenState extends State<PlayerStartScreen> {
         color: Theme.of(context).colorScheme.background,
         borderRadius: BorderRadius.circular(10),
       ),
-      child: Column(children: [
-        questionInfo(),
-        Expanded(
-          child: Container(
-            decoration: const BoxDecoration(
-              border: BorderDirectional(
-                top: BorderSide(color: Colors.white),
-              ),
+      child: Column(
+        children: [
+          containerTop(),
+          Expanded(
+            child: Stack(
+              children: [
+                started
+                    ? Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
+                        child: Text(
+                          'Câu hỏi $questionNum',
+                          style: const TextStyle(fontSize: fontSizeLarge),
+                        ),
+                      )
+                    : const SizedBox(),
+                Positioned(
+                  right: 0,
+                  child: started
+                      ? Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
+                          child: Text(
+                            StartQuestion.mapTypeDisplay(currentQuestion.subject),
+                            style: const TextStyle(fontSize: fontSizeLarge),
+                          ),
+                        )
+                      : const SizedBox(),
+                ),
+                Container(
+                  decoration: const BoxDecoration(
+                    border: BorderDirectional(
+                      top: BorderSide(color: Colors.white),
+                    ),
+                  ),
+                  padding: const EdgeInsets.symmetric(horizontal: 128),
+                  alignment: Alignment.center,
+                  child: Text(
+                    started ? currentQuestion.question : '',
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(fontSize: fontSizeLarge),
+                  ),
+                ),
+              ],
             ),
-            padding: const EdgeInsets.symmetric(horizontal: 128),
-            alignment: Alignment.center,
-            child: Text(
-              started ? currentQuestion.question : '',
-              textAlign: TextAlign.center,
-              style: const TextStyle(fontSize: fontSizeLarge),
-            ),
           ),
-        ),
-      ]),
-    );
-  }
-
-  Widget playerInfo() {
-    return Column(
-      children: [
-        AnimatedCircularProgressBar(
-          currentTimeSec: currentTimeSec,
-          totalTimeSec: widget.timeLimitSec,
-          strokeWidth: 20,
-          valueColor: const Color(0xFF00A906),
-          backgroundColor: Colors.red,
-        ),
-        const SizedBox(height: 128),
-        Container(
-          width: 128,
-          height: 128,
-          alignment: Alignment.center,
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            color: Theme.of(context).colorScheme.background,
-            border: Border.all(color: Colors.white),
-          ),
-          child: Text(
-            '${MatchData().players[widget.playerPos].point}',
-            style: const TextStyle(fontSize: fontSizeMedium),
-            textAlign: TextAlign.center,
-          ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }

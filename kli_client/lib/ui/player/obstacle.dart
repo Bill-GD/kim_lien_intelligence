@@ -56,6 +56,7 @@ class _PlayerObstacleScreenState extends State<PlayerObstacleScreen> {
 
         currentQuestion = ObstacleQuestion.fromJson(jsonDecode(m.message));
         canShowQuestion = true;
+        setState(() {});
 
         if (eliminated) return;
         createTimer();
@@ -67,6 +68,8 @@ class _PlayerObstacleScreenState extends State<PlayerObstacleScreen> {
         canShowQuestion = false;
         if (!eliminated) currentTimeSec = 15;
       }
+
+      setState(() {});
 
       if (eliminated) {
         setState(() {});
@@ -99,14 +102,14 @@ class _PlayerObstacleScreenState extends State<PlayerObstacleScreen> {
   }
 
   void createTimer() {
-    timer = Timer.periodic(10.ms, (timer) {
+    timer = Timer.periodic(1.seconds, (timer) {
       if (currentTimeSec <= 0) {
         timer.cancel();
         canAnswer = false;
         setState(() {});
         return;
       }
-      currentTimeSec -= .01;
+      currentTimeSec -= 1;
       setState(() {});
     });
   }
@@ -147,47 +150,29 @@ class _PlayerObstacleScreenState extends State<PlayerObstacleScreen> {
     );
   }
 
-  Widget questionInfo() {
+  Widget containerTop() {
     return Row(
       children: [
-        Expanded(
-          child: ClipRRect(
-            borderRadius: const BorderRadius.only(topLeft: Radius.circular(10)),
-            child: Container(
-              decoration: BoxDecoration(
-                color: Colors.transparent,
-                border: BorderDirectional(
-                  end: BorderSide(color: Theme.of(context).colorScheme.onBackground),
+        for (final i in range(0, 3))
+          Expanded(
+            child: ClipRRect(
+              borderRadius: const BorderRadius.only(topLeft: Radius.circular(10)),
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Colors.transparent,
+                  border: BorderDirectional(
+                    end: BorderSide(color: Theme.of(context).colorScheme.onBackground),
+                  ),
                 ),
-              ),
-              padding: const EdgeInsets.symmetric(vertical: 16),
-              alignment: Alignment.center,
-              child: Text(
-                MatchData().players[MatchData().playerPos].name,
-                style: const TextStyle(fontSize: fontSizeMedium),
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                alignment: Alignment.center,
+                child: Text(
+                  '${MatchData().players[i].name} (${MatchData().players[i].point})',
+                  style: const TextStyle(fontSize: fontSizeMedium),
+                ),
               ),
             ),
           ),
-        ),
-        Expanded(
-          child: ClipRRect(
-            borderRadius: const BorderRadius.only(topRight: Radius.circular(10)),
-            child: Container(
-              decoration: const BoxDecoration(
-                color: Colors.transparent,
-                border: BorderDirectional(
-                  end: BorderSide(color: Colors.transparent),
-                ),
-              ),
-              padding: const EdgeInsets.symmetric(vertical: 16),
-              alignment: Alignment.center,
-              child: Text(
-                canShowQuestion ? 'Question ${currentQuestion.id + 1}' : '',
-                style: const TextStyle(fontSize: fontSizeMedium),
-              ),
-            ),
-          ),
-        ),
       ],
     );
   }
@@ -202,23 +187,36 @@ class _PlayerObstacleScreenState extends State<PlayerObstacleScreen> {
         ),
         child: Column(
           children: [
-            questionInfo(),
+            containerTop(),
             Expanded(
-              child: Container(
-                decoration: const BoxDecoration(
-                  border: BorderDirectional(
-                    top: BorderSide(color: Colors.white),
+              child: Stack(
+                children: [
+                  canShowQuestion
+                      ? Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
+                          child: Text(
+                            'Question ${currentQuestion.id + 1}',
+                            style: const TextStyle(fontSize: fontSizeLarge),
+                          ),
+                        )
+                      : const SizedBox(),
+                  Container(
+                    decoration: const BoxDecoration(
+                      border: BorderDirectional(
+                        top: BorderSide(color: Colors.white),
+                      ),
+                    ),
+                    padding: const EdgeInsets.symmetric(horizontal: 128),
+                    alignment: Alignment.center,
+                    child: canShowQuestion
+                        ? Text(
+                            currentQuestion.question,
+                            textAlign: TextAlign.center,
+                            style: const TextStyle(fontSize: fontSizeLarge),
+                          )
+                        : null,
                   ),
-                ),
-                padding: const EdgeInsets.symmetric(horizontal: 128),
-                alignment: Alignment.center,
-                child: canShowQuestion
-                    ? Text(
-                        currentQuestion.question,
-                        textAlign: TextAlign.center,
-                        style: const TextStyle(fontSize: fontSizeLarge),
-                      )
-                    : null,
+                ],
               ),
             ),
           ],
@@ -259,23 +257,7 @@ class _PlayerObstacleScreenState extends State<PlayerObstacleScreen> {
             valueColor: const Color(0xFF00A906),
             backgroundColor: Colors.red,
           ),
-          Container(
-            width: 128,
-            height: 128,
-            alignment: Alignment.center,
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: Theme.of(context).colorScheme.background,
-              border: Border.all(color: Colors.white),
-            ),
-            child: Text(
-              '${MatchData().players[MatchData().playerPos].point}',
-              style: const TextStyle(fontSize: fontSizeMedium),
-              textAlign: TextAlign.center,
-            ),
-          ),
-          const SizedBox(height: 128),
+          const SizedBox(height: 512),
           KLIButton(
             'Obstacle',
             enableCondition: canGuessObstacle,
