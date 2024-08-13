@@ -40,6 +40,7 @@ const String changelog = """
   0.2.5 ({latest}):
   - Added Extra screen: question, timer
   - Fixed not sending ready if MatchData is already initialized when switching to Overview
+  - Added cache manager: view cached match, size, open, delete
 
   0.2.4 ({e8abe73}):
   - Added Finish screen: question, score, steal, timer

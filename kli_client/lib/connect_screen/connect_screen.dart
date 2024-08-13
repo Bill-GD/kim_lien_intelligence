@@ -5,7 +5,10 @@ import 'package:flutter/material.dart';
 import 'package:kli_lib/kli_lib.dart';
 
 import '../global.dart';
+import 'cache_drawer.dart';
 import 'waiting_screen.dart';
+
+final _key = GlobalKey<ScaffoldState>();
 
 class ConnectPage extends StatefulWidget {
   const ConnectPage({super.key});
@@ -33,6 +36,7 @@ class _ConnectPageState extends State<ConnectPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: _key,
       extendBodyBehindAppBar: true,
       appBar: AppBar(
         automaticallyImplyLeading: false,
@@ -56,6 +60,7 @@ class _ConnectPageState extends State<ConnectPage> {
         ],
         forceMaterialTransparency: true,
       ),
+      endDrawer: const CacheDrawer(),
       body: Container(
         decoration: BoxDecoration(image: bgDecorationImage),
         alignment: Alignment.center,
@@ -65,6 +70,7 @@ class _ConnectPageState extends State<ConnectPage> {
             connectionStatus(),
             connectInfo(),
             connectButtons(),
+            cacheButton(),
           ],
         ),
       ),
@@ -185,6 +191,15 @@ class _ConnectPageState extends State<ConnectPage> {
           },
         ),
       ],
+    );
+  }
+
+  Widget cacheButton() {
+    return KLIButton(
+      'Manage cache',
+      onPressed: () {
+        _key.currentState?.openEndDrawer();
+      },
     );
   }
 }

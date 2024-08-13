@@ -120,7 +120,7 @@ SideNavigationBarTheme sideNavigationTheme(BuildContext context, [double height 
 }
 
 const String changelog = """
-  0.4.5 ({latest}):
+  0.4.5 ({a353fd5}):
   - Added Extra UI: question, answer, timer, stop timer
   - Added extra scores for sort players with same scores
   - Match Data Checker only take the required match, not all
