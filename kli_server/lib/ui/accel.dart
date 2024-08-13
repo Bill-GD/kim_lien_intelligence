@@ -290,6 +290,7 @@ class _AccelScreenState extends State<AccelScreen> {
           onPressed: () {
             canStart = false;
             started = true;
+            setState(() {});
             timer = Timer.periodic(1.seconds, (timer) {
               if (currentTimeSec <= 0) {
                 timer.cancel();

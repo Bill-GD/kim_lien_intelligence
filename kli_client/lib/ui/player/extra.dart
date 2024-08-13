@@ -10,6 +10,7 @@ import '../../global.dart';
 import '../../match_data.dart';
 
 class PlayerExtraScreen extends StatefulWidget {
+  final timeLimitSec = 15.0;
   const PlayerExtraScreen({super.key});
 
   @override
@@ -17,11 +18,12 @@ class PlayerExtraScreen extends StatefulWidget {
 }
 
 class _PlayerExtraScreenState extends State<PlayerExtraScreen> {
-  double timeLimitSec = 1, currentTimeSec = 0;
+  double currentTimeSec = 0;
   bool canShowQuestion = false, canSteal = false, timeEnded = false;
   late ExtraQuestion currentQuestion;
   Timer? timer;
   late final StreamSubscription<KLISocketMessage> sub;
+  int questionNum = 0;
 
   @override
   void initState() {
@@ -30,6 +32,8 @@ class _PlayerExtraScreenState extends State<PlayerExtraScreen> {
       if (m.type == KLIMessageType.extraQuestion) {
         currentQuestion = ExtraQuestion.fromJson(jsonDecode(m.message));
         canShowQuestion = true;
+        questionNum++;
+        currentTimeSec = widget.timeLimitSec;
         setState(() {});
       }
 
@@ -144,19 +148,32 @@ class _PlayerExtraScreenState extends State<PlayerExtraScreen> {
         children: [
           containerTop(),
           Expanded(
-            child: Container(
-              decoration: const BoxDecoration(
-                border: BorderDirectional(
-                  top: BorderSide(color: Colors.white),
+            child: Stack(
+              children: [
+                canShowQuestion
+                    ? Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
+                        child: Text(
+                          'Câu hỏi $questionNum',
+                          style: const TextStyle(fontSize: fontSizeLarge),
+                        ),
+                      )
+                    : const SizedBox(),
+                Container(
+                  decoration: const BoxDecoration(
+                    border: BorderDirectional(
+                      top: BorderSide(color: Colors.white),
+                    ),
+                  ),
+                  padding: const EdgeInsets.symmetric(horizontal: 128),
+                  alignment: Alignment.center,
+                  child: Text(
+                    canShowQuestion ? currentQuestion.question : '',
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(fontSize: fontSizeLarge),
+                  ),
                 ),
-              ),
-              padding: const EdgeInsets.symmetric(horizontal: 128),
-              alignment: Alignment.center,
-              child: Text(
-                canShowQuestion ? currentQuestion.question : '',
-                textAlign: TextAlign.center,
-                style: const TextStyle(fontSize: fontSizeLarge),
-              ),
+              ],
             ),
           ),
         ],
@@ -170,7 +187,7 @@ class _PlayerExtraScreenState extends State<PlayerExtraScreen> {
       children: [
         AnimatedCircularProgressBar(
           currentTimeSec: currentTimeSec,
-          totalTimeSec: timeLimitSec,
+          totalTimeSec: widget.timeLimitSec,
           strokeWidth: 20,
           valueColor: const Color(0xFF00A906),
           backgroundColor: Colors.red,

@@ -161,7 +161,7 @@ class MatchState {
         questionList = DataManager.getMatchQuestions<FinishMatch>(match.name).questions;
         break;
       case MatchSection.extra:
-        questionList = DataManager.getMatchQuestions<ExtraMatch>(match.name).questions;
+        questionList = DataManager.getMatchQuestions<ExtraMatch>(match.name).questions.reversed.toList();
         break;
       default:
         throw Exception('Invalid section, this should not happen.');
@@ -233,10 +233,11 @@ class MatchState {
   // These are instance variables
   late final KLIMatch match;
   final scores = <int>[0, 0, 0, 0];
+  final extraScores = <int>[0, 0, 0, 0];
   late final List<KLIPlayer> players;
   static final playerReady = <bool>[false, false, false, false];
   bool get allPlayerReady => playerReady.every((e) => e);
-  MatchSection section = MatchSection.start;
+  MatchSection section = MatchSection.extra;
 
   /// For Start, Accel, Finish, Extra. For Obstacle, use [obstacleMatch]
   List<BaseQuestion>? questionList;

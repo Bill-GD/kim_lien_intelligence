@@ -200,17 +200,14 @@ class _MatchDataCheckerState extends State<MatchDataChecker> {
   (bool, List<String>) checkStartQuestions() {
     final errorList = <String>[];
 
-    final saved = DataManager.getAllSavedQuestions<StartMatch>();
-    if (saved.isEmpty) return (false, ['Chưa có dữ liệu']);
+    final savedMatch = DataManager.getMatchQuestions<StartMatch>(matchNames[selectedMatchIndex]);
 
     try {
-      StartMatch match = saved.firstWhere((e) => e.matchName == matchNames[selectedMatchIndex]);
-
-      if (match.questions.isEmpty) return (false, ['Chưa có câu hỏi']);
+      if (savedMatch.isEmpty) return (false, ['Chưa có câu hỏi']);
 
       for (int i = 0; i < 4; i++) {
         try {
-          final qList = match.questions.where((v) => v.pos == i);
+          final qList = savedMatch.questions.where((v) => v.pos == i);
           final misingSubjects = <String>[];
           for (final qType in StartQuestionSubject.values) {
             if (qList.where((e) => e.subject == qType).isEmpty) {
@@ -237,18 +234,16 @@ class _MatchDataCheckerState extends State<MatchDataChecker> {
   (bool, List<String>) checkObstacleQuestions() {
     final errorList = <String>[];
 
-    final saved = DataManager.getAllSavedQuestions<ObstacleMatch>();
-    if (saved.isEmpty) return (false, ['Chưa có dữ liệu']);
+    final savedMatch = DataManager.getMatchQuestions<ObstacleMatch>(matchNames[selectedMatchIndex]);
+    if (savedMatch.isEmpty) return (false, ['Chưa có dữ liệu']);
 
     try {
-      ObstacleMatch match = saved.firstWhere((e) => e.matchName == matchNames[selectedMatchIndex]);
-
-      if (match.keyword.isEmpty) errorList.add('Không có đáp án CNV');
-      if (match.imagePath.isEmpty) errorList.add('Không có ảnh CNV');
-      if (!File(StorageHandler.getFullPath(match.imagePath)).existsSync()) {
+      if (savedMatch.keyword.isEmpty) errorList.add('Không có đáp án CNV');
+      if (savedMatch.imagePath.isEmpty) errorList.add('Không có ảnh CNV');
+      if (!File(StorageHandler.getFullPath(savedMatch.imagePath)).existsSync()) {
         errorList.add('Không tìm thấy ảnh CNV');
       }
-      if (match.hintQuestions.length < 5) errorList.add('Không đủ số câu hỏi');
+      if (savedMatch.hintQuestions.length < 5) errorList.add('Không đủ số câu hỏi');
     } on StateError {
       return (false, ['Chưa có dữ liệu']);
     }
@@ -259,16 +254,14 @@ class _MatchDataCheckerState extends State<MatchDataChecker> {
   (bool, List<String>) checkAccelQuestions() {
     final errorList = <String>[];
 
-    final saved = DataManager.getAllSavedQuestions<AccelMatch>();
-    if (saved.isEmpty) return (false, ['Chưa có dữ liệu']);
+    final savedMatch = DataManager.getMatchQuestions<AccelMatch>(matchNames[selectedMatchIndex]);
+    if (savedMatch.isEmpty) return (false, ['Chưa có dữ liệu']);
 
     try {
-      AccelMatch match = saved.firstWhere((e) => e.matchName == matchNames[selectedMatchIndex]);
-
-      if (!match.questions.every((e) => !e.isNull)) errorList.add('Không đủ 4 câu hỏi');
+      if (!savedMatch.questions.every((e) => !e.isNull)) errorList.add('Không đủ 4 câu hỏi');
 
       for (int i = 1; i <= 4; i++) {
-        final q = match.questions[i - 1];
+        final q = savedMatch.questions[i - 1];
         if (q.isNull) continue;
 
         if (q.imagePaths.isEmpty) errorList.add('Câu $i: không có ảnh');
@@ -289,18 +282,17 @@ class _MatchDataCheckerState extends State<MatchDataChecker> {
   (bool, List<String>) checkFinishQuestions() {
     final errorList = <String>[];
 
-    final saved = DataManager.getAllSavedQuestions<FinishMatch>();
-    if (saved.isEmpty) return (false, ['Chưa có dữ liệu']);
+    final savedMatch = DataManager.getMatchQuestions<FinishMatch>(matchNames[selectedMatchIndex]);
+    if (savedMatch.isEmpty) return (false, ['Chưa có dữ liệu']);
 
     try {
-      FinishMatch match = saved.firstWhere((e) => e.matchName == matchNames[selectedMatchIndex]);
       for (int i = 1; i <= 3; i++) {
-        final qCount = match.questions.where((e) => e.point == i * 10).length;
+        final qCount = savedMatch.questions.where((e) => e.point == i * 10).length;
         if (qCount < 12) {
           errorList.add('Mức điểm ${i * 10}: $qCount/12');
         }
       }
-      for (final q in match.questions) {
+      for (final q in savedMatch.questions) {
         if (q.mediaPath.isNotEmpty && !File(StorageHandler.getFullPath(q.mediaPath)).existsSync()) {
           errorList.add('Không tìm thấy ảnh ${q.mediaPath}');
         }
@@ -315,13 +307,11 @@ class _MatchDataCheckerState extends State<MatchDataChecker> {
   (bool, List<String>) checkExtraQuestions() {
     final errorList = <String>[];
 
-    final saved = DataManager.getAllSavedQuestions<ExtraMatch>();
-    if (saved.isEmpty) return (false, ['Chưa có dữ liệu']);
+    final savedMatch = DataManager.getMatchQuestions<ExtraMatch>(matchNames[selectedMatchIndex]);
 
     try {
-      ExtraMatch match = saved.firstWhere((e) => e.matchName == matchNames[selectedMatchIndex]);
-
-      if (match.questions.isEmpty) errorList.add('Chưa có câu hỏi');
+      if (savedMatch.isEmpty) errorList.add('Chưa có câu hỏi');
+      if (savedMatch.questions.length < 3) errorList.add('Không đủ 3 câu hỏi');
     } on StateError {
       return (false, ['Chưa có dữ liệu']);
     }

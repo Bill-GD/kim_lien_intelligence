@@ -79,6 +79,12 @@ class _WaitingScreenState extends State<WaitingScreen> {
                     enabledLabel: 'No turning back',
                     onPressed: () {
                       if (MatchData().players.isNotEmpty) {
+                        KLIClient.sendMessage(
+                          KLISocketMessage(
+                            senderID: KLIClient.clientID!,
+                            type: KLIMessageType.playerReady,
+                          ),
+                        );
                         Navigator.of(context).pushReplacement(
                           MaterialPageRoute<void>(builder: (context) => const Overview()),
                         );
@@ -127,8 +133,11 @@ class _WaitingScreenState extends State<WaitingScreen> {
 
                               KLIClient.sendMessage(
                                 KLISocketMessage(
-                                    senderID: KLIClient.clientID!, type: KLIMessageType.playerReady),
+                                  senderID: KLIClient.clientID!,
+                                  type: KLIMessageType.playerReady,
+                                ),
                               );
+
                               if (context.mounted) {
                                 Navigator.of(context).pushReplacement<void, void>(
                                   MaterialPageRoute<void>(builder: (context) => const Overview()),
@@ -144,7 +153,7 @@ class _WaitingScreenState extends State<WaitingScreen> {
                           ));
 
                           KLIClient.onDataReceived.listen((b) {
-                            print(b);
+                            // print(b);
                             dataReceived += b;
                             setState(() {});
                           });
@@ -194,8 +203,12 @@ class _WaitingScreenState extends State<WaitingScreen> {
                           setState(() {});
 
                           KLIClient.sendMessage(
-                            KLISocketMessage(senderID: KLIClient.clientID!, type: KLIMessageType.playerReady),
+                            KLISocketMessage(
+                              senderID: KLIClient.clientID!,
+                              type: KLIMessageType.playerReady,
+                            ),
                           );
+
                           if (context.mounted) {
                             Navigator.of(context).pushReplacement<void, void>(
                               MaterialPageRoute<void>(builder: (context) => const Overview()),

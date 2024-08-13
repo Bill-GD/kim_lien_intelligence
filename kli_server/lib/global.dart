@@ -120,7 +120,14 @@ SideNavigationBarTheme sideNavigationTheme(BuildContext context, [double height 
 }
 
 const String changelog = """
-  0.4.4 ({latest}):
+  0.4.5 ({latest}):
+  - Added Extra UI: question, answer, timer, stop timer
+  - Added extra scores for sort players with same scores
+  - Match Data Checker only take the required match, not all
+  - Fixed several missing 'setState's after starting the timer
+  - Rmoved some 'mounted' checks
+
+  0.4.4 ({e8abe73}):
   - Added Finish UI: question, answer, timer, explanation, star, point value
   - Some question info (e.g. question number, subject) now shows in the corner instead
   - Shows player names & scores in section screens instead of question info

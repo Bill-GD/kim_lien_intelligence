@@ -37,7 +37,11 @@ String getSizeString(double bytes) {
 }
 
 const String changelog = """
-  0.2.4 ({latest}):
+  0.2.5 ({latest}):
+  - Added Extra screen: question, timer
+  - Fixed not sending ready if MatchData is already initialized when switching to Overview
+
+  0.2.4 ({e8abe73}):
   - Added Finish screen: question, score, steal, timer
   - Fixed UI exception when checking cached match data
   - Some question info (e.g. question number, subject) now shows in the corner instead

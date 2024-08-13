@@ -9,6 +9,7 @@ import 'package:kli_server/ui/finish.dart';
 import '../data_manager/match_state.dart';
 import '../global.dart';
 import 'accel.dart';
+import 'extra.dart';
 import 'obstacle_questions.dart';
 import 'start.dart';
 
@@ -124,15 +125,13 @@ class _MatchOverviewState extends State<MatchOverview> {
                 message: '${MatchState().startOrFinishPos}',
               ));
 
-              if (mounted) {
-                await Navigator.of(context).push<void>(
-                  MaterialPageRoute(
-                    builder: (context) => StartScreen(
-                      playerPos: MatchState().startOrFinishPos,
-                    ),
+              await Navigator.of(context).push<void>(
+                MaterialPageRoute(
+                  builder: (context) => StartScreen(
+                    playerPos: MatchState().startOrFinishPos,
                   ),
-                );
-              }
+                ),
+              );
 
               if (MatchState().startOrFinishPos == 3) {
                 MatchState().nextSection();
@@ -153,13 +152,12 @@ class _MatchOverviewState extends State<MatchOverview> {
                 type: KLIMessageType.enterObstacle,
               ));
 
-              if (mounted) {
-                await Navigator.of(context).push(
-                  MaterialPageRoute<void>(
-                    builder: (context) => const ObstacleQuestionScreen(),
-                  ),
-                );
-              }
+              await Navigator.of(context).push(
+                MaterialPageRoute<void>(
+                  builder: (context) => const ObstacleQuestionScreen(),
+                ),
+              );
+
               MatchState().nextSection();
               setState(() {});
             },
@@ -177,13 +175,12 @@ class _MatchOverviewState extends State<MatchOverview> {
                 type: KLIMessageType.enterAccel,
               ));
 
-              if (mounted) {
-                await Navigator.of(context).push<void>(
-                  MaterialPageRoute(
-                    builder: (context) => const AccelScreen(),
-                  ),
-                );
-              }
+              await Navigator.of(context).push<void>(
+                MaterialPageRoute(
+                  builder: (context) => const AccelScreen(),
+                ),
+              );
+
               MatchState().nextSection();
               setState(() {});
               MatchState().startOrFinishPos = 0;
@@ -203,13 +200,11 @@ class _MatchOverviewState extends State<MatchOverview> {
                 message: '${MatchState().startOrFinishPos}',
               ));
 
-              if (mounted) {
-                await Navigator.of(context).push<void>(
-                  MaterialPageRoute(
-                    builder: (context) => FinishScreen(playerPos: MatchState().startOrFinishPos),
-                  ),
-                );
-              }
+              await Navigator.of(context).push<void>(
+                MaterialPageRoute(
+                  builder: (context) => FinishScreen(playerPos: MatchState().startOrFinishPos),
+                ),
+              );
 
               MatchState().finishPlayerDone[MatchState().startOrFinishPos] = true;
               MatchState().allFinishPlayerDone ? MatchState().nextSection() : MatchState().nextPlayer();
@@ -221,12 +216,18 @@ class _MatchOverviewState extends State<MatchOverview> {
             enableCondition: MatchState().section == MatchSection.extra,
             enabledLabel: 'To Extra',
             disabledLabel: 'Current section: ${MatchState().section.name}',
-            onPressed: () {
+            onPressed: () async {
               MatchState().loadQuestions();
               KLIServer.sendToAllClients(KLISocketMessage(
                 senderID: ConnectionID.host,
                 type: KLIMessageType.enterExtra,
               ));
+
+              await Navigator.of(context).push<void>(
+                MaterialPageRoute(
+                  builder: (context) => const ExtraScreen(),
+                ),
+              );
             },
           ),
         ],

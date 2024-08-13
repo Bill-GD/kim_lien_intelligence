@@ -115,7 +115,7 @@ class _FinishScreenState extends State<FinishScreen> {
                   padding: const EdgeInsets.only(left: 48),
                   child: Column(
                     children: [
-                      questionInfo(),
+                      timerWidget(),
                       ...sideButtons(),
                     ],
                   ),
@@ -345,7 +345,7 @@ class _FinishScreenState extends State<FinishScreen> {
     ));
   }
 
-  Widget questionInfo() {
+  Widget timerWidget() {
     return Expanded(
       child: Column(
         children: [
@@ -396,6 +396,7 @@ class _FinishScreenState extends State<FinishScreen> {
           onPressed: () {
             canStart = false;
             started = true;
+            setState(() {});
             timer = Timer.periodic(1.seconds, (timer) {
               if (currentTimeSec <= 0) {
                 timer.cancel();
