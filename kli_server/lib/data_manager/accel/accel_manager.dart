@@ -251,9 +251,7 @@ class _AccelManagerState extends State<AccelManager> {
                     q.question,
                     style: const TextStyle(fontSize: fontSizeMedium),
                   ),
-                  subtitle: Text(
-                    q.type != AccelQuestionType.none ? 'Loại: ${AccelQuestion.mapTypeDisplay(q.type)}' : '',
-                  ),
+                  subtitle: Text('Loại: ${AccelQuestion.mapTypeDisplay(q.type)}'),
                   subtitleTextStyle: const TextStyle(fontSize: fontSizeSmall),
                   trailing: Container(
                     constraints: const BoxConstraints(maxHeight: 100, maxWidth: 400),
@@ -310,24 +308,41 @@ class _AccelManagerState extends State<AccelManager> {
                 enableCondition: selectedQuestionIndex >= 0,
                 fontSize: fontSizeSmall,
                 onPressed: () async {
-                  logHandler
-                      .info('Selecting image at ${StorageHandler.getRelative(storageHandler.mediaDir)}');
+                  logHandler.info(
+                    'Selecting image at ${StorageHandler.getRelative(storageHandler.mediaDir)}',
+                  );
                   final result = await FilePicker.platform.pickFiles(
                     dialogTitle: 'Select Image',
                     initialDirectory: storageHandler.mediaDir.replaceAll('/', '\\'),
                     type: FileType.image,
+                    allowMultiple: true,
+                    readSequential: true,
                   );
 
                   if (result == null) return;
 
-                  final p = result.files.single.path!;
-                  selectedQuestion.imagePaths.add(StorageHandler.getRelative(p));
+                  final picks = result.files;
+
+                  if (mounted) {
+                    showPopupMessage(
+                      context,
+                      title: 'Files',
+                      content: result.names.join('\n'),
+                    );
+                  }
+
+                  picks.length == 1
+                      ? logHandler.info('Chose ${StorageHandler.getRelative(picks.first.name)}')
+                      : logHandler.info('Chose ${picks.length} files');
+
+                  for (final p in picks) {
+                    selectedQuestion.imagePaths.add(StorageHandler.getRelative(p.name));
+                  }
                   selectedQuestion.type = AccelQuestion.getTypeFromImageCount(
                     selectedQuestion.imagePaths.length,
                   );
                   if (selectedImageIndex < 0) selectedImageIndex = 0;
                   DataManager.updateQuestions<AccelMatch>(selectedMatch);
-                  logHandler.info('Chose ${StorageHandler.getRelative(p)}');
                   setState(() {});
                 },
               ),
@@ -336,6 +351,7 @@ class _AccelManagerState extends State<AccelManager> {
                 enableCondition: selectedQuestionIndex >= 0 && selectedImageIndex >= 0,
                 fontSize: fontSizeSmall,
                 onPressed: () async {
+                  if (selectedImageIndex < 0) return;
                   logHandler.info('Removing image $selectedImageIndex');
                   selectedQuestion.imagePaths.removeAt(selectedImageIndex);
                   if (selectedQuestion.imagePaths.isNotEmpty) {
@@ -381,6 +397,7 @@ class _AccelManagerState extends State<AccelManager> {
                 icon: const Icon(Icons.arrow_back_ios_new_rounded),
                 onPressed: selectedQuestionIndex >= 0 && selectedImageIndex > 0
                     ? () {
+                        if (selectedImageIndex <= 0) return;
                         setState(() => selectedImageIndex--);
                       }
                     : null,
@@ -389,7 +406,10 @@ class _AccelManagerState extends State<AccelManager> {
                 icon: const Icon(Icons.arrow_forward_ios_rounded),
                 onPressed:
                     selectedQuestionIndex >= 0 && selectedImageIndex < selectedQuestion.imagePaths.length - 1
-                        ? () => setState(() => selectedImageIndex++)
+                        ? () {
+                            if (selectedImageIndex >= selectedQuestion.imagePaths.length - 1) return;
+                            setState(() => selectedImageIndex++);
+                          }
                         : null,
               )
             ],

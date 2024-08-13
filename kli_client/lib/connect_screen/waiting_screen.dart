@@ -157,7 +157,9 @@ class _WaitingScreenState extends State<WaitingScreen> {
                             dataReceived += b;
                             setState(() {});
                           });
-                          setState(() => receivingData = true);
+                          receivingData = true;
+                          checkingCache = false;
+                          setState(() {});
                         }
 
                         if (m.type == KLIMessageType.matchData) {
@@ -229,7 +231,7 @@ class _WaitingScreenState extends State<WaitingScreen> {
                       checkingCache
                           ? const Text('Checking for cached data...')
                           : Text(
-                              'Requesting match data from host (${getSizeString(actualDataSize.toDouble())}): ${(dataReceived / totalData).toStringAsFixed(2) * 100}% ',
+                              'Requesting match data from host (${getSizeString(actualDataSize.toDouble())}): ${(dataReceived / totalData * 100).toStringAsFixed(2)}% ',
                             ),
                       const SizedBox(width: 16),
                       const CircularProgressIndicator(),

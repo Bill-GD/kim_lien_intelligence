@@ -122,7 +122,13 @@ SideNavigationBarTheme sideNavigationTheme(BuildContext context, [double height 
 }
 
 const String changelog = """
-  0.4.5 ({latest}):
+  0.4.5.1 ({latest}):
+  - Fixed accel manager not showing type when image count is 0
+  - Accel manager allows adding multiple images at once, but result is sorted
+  - Fixed out of range when switching image too fast
+  - Fixing null IP address when using Ethernet
+
+  0.4.5 ({aeaa769}):
   - Added Extra UI: question, answer, timer, stop timer
   - Added extra scores for sort players with same scores
   - Match Data Checker only take the required match, not all

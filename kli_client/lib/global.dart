@@ -38,7 +38,11 @@ String getSizeString(double bytes) {
 }
 
 const String changelog = """
-  0.2.5 ({latest}):
+  0.2.5.1 ({latest}):
+  - Fixed not showing match data received progress if missed cache
+  - Fixed progress percentage is duplicated instead of multiplied
+
+  0.2.5 ({aeaa769}):
   - Added Extra screen: question, timer
   - Fixed not sending ready if MatchData is already initialized when switching to Overview
   - Added cache manager: view cached match, size, open, delete
