@@ -21,6 +21,10 @@ class _CacheDrawerState extends State<CacheDrawer> {
   @override
   void initState() {
     super.initState();
+    getCachedData();
+  }
+
+  void getCachedData() {
     StorageHandler.appCacheDirectory.then((dirPath) {
       cacheEntities = Directory(dirPath).listSync().whereType<Directory>().map((e) {
         final size = StorageHandler.getDirectorySize(e.path);
@@ -41,56 +45,68 @@ class _CacheDrawerState extends State<CacheDrawer> {
       width: 800,
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
-        child: Column(
+        child: Stack(
           children: [
-            Text(
-              'Cache ${loading ? '' : '(${getSizeString(totalSize.toDouble())})'}',
-              style: const TextStyle(fontSize: 24),
+            KLIIconButton(
+              const Icon(Icons.refresh),
+              enabledLabel: 'Refresh',
+              onPressed: () => getCachedData(),
             ),
-            const Divider(),
-            loading
-                ? const Expanded(
-                    child: Center(child: Text('Loading...')),
-                  )
-                : Expanded(
-                    child: ListView.builder(
-                      itemCount: cacheEntities.length,
-                      itemBuilder: (context, index) {
-                        final entity = cacheEntities[index];
-                        return ListTile(
-                          title: Text(entity.name),
-                          // title: Text('"${entity.name}" at ${entity.path}'),
-                          subtitle: Text(getSizeString(entity.size.toDouble())),
-                          trailing: IntrinsicWidth(
-                            child: Row(
-                              children: [
-                                KLIIconButton(
-                                  const Icon(Icons.folder),
-                                  enabledLabel: 'Open folder',
-                                  onPressed: () async {
-                                    launchUrlString(
-                                      'file://${Uri.directory(entity.path).toFilePath(windows: Platform.isWindows)}',
-                                      mode: LaunchMode.externalApplication,
-                                    );
-                                  },
+            Column(
+              children: [
+                Text(
+                  'Cache ${loading ? '' : '(${getSizeString(totalSize.toDouble())})'}',
+                  style: const TextStyle(fontSize: 24),
+                ),
+                const Padding(
+                  padding: EdgeInsets.symmetric(vertical: 12),
+                  child: Divider(),
+                ),
+                loading
+                    ? const Expanded(
+                        child: Center(child: Text('Loading...')),
+                      )
+                    : Expanded(
+                        child: ListView.builder(
+                          itemCount: cacheEntities.length,
+                          itemBuilder: (context, index) {
+                            final entity = cacheEntities[index];
+                            return ListTile(
+                              title: Text(entity.name),
+                              // title: Text('"${entity.name}" at ${entity.path}'),
+                              subtitle: Text(getSizeString(entity.size.toDouble())),
+                              trailing: IntrinsicWidth(
+                                child: Row(
+                                  children: [
+                                    KLIIconButton(
+                                      const Icon(Icons.folder),
+                                      enabledLabel: 'Open folder',
+                                      onPressed: () async {
+                                        launchUrlString(
+                                          'file://${Uri.directory(entity.path).toFilePath(windows: Platform.isWindows)}',
+                                          mode: LaunchMode.externalApplication,
+                                        );
+                                      },
+                                    ),
+                                    KLIIconButton(
+                                      const Icon(Icons.delete),
+                                      enabledLabel: 'Delete cache of ${entity.name}',
+                                      onPressed: () async {
+                                        if (await entity.delete(context)) {
+                                          cacheEntities.removeAt(index);
+                                          setState(() {});
+                                        }
+                                      },
+                                    ),
+                                  ],
                                 ),
-                                KLIIconButton(
-                                  const Icon(Icons.delete),
-                                  enabledLabel: 'Delete cache of ${entity.name}',
-                                  onPressed: () async {
-                                    if (await entity.delete(context)) {
-                                      cacheEntities.removeAt(index);
-                                      setState(() {});
-                                    }
-                                  },
-                                ),
-                              ],
-                            ),
-                          ),
-                        );
-                      },
-                    ),
-                  ),
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+              ],
+            ),
           ],
         ),
       ),
