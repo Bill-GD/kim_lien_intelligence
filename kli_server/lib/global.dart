@@ -3,6 +3,8 @@ import 'package:kli_lib/kli_lib.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:side_navigation/side_navigation.dart';
 
+bool isTesting = true;
+
 late final DecorationImage bgDecorationImage;
 
 late final LogHandler logHandler;
@@ -120,7 +122,7 @@ SideNavigationBarTheme sideNavigationTheme(BuildContext context, [double height 
 }
 
 const String changelog = """
-  0.4.5 ({a353fd5}):
+  0.4.5 ({latest}):
   - Added Extra UI: question, answer, timer, stop timer
   - Added extra scores for sort players with same scores
   - Match Data Checker only take the required match, not all
