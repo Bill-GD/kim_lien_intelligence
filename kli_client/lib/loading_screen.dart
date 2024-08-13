@@ -45,7 +45,7 @@ class _LoadingScreenState extends State<LoadingScreen> {
       setState(() => loadingText = 'Clearing cache...');
       StorageHandler.clearCache();
       StorageHandler().writeStringToFile(
-        '${await StorageHandler.appCacheDirectory}\\do not touch anything here.txt',
+        '${await StorageHandler.appCacheDirectory}\\cache.txt',
         dedent('''
         The folder(s) here are used for caching match data (names, images, videos)
         so that the client app doesn't need to request new data every time joining a match.

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:kli_lib/kli_lib.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
+bool isTesting = true;
 DecorationImage? bgDecorationImage;
 
 late final LogHandler logHandler;

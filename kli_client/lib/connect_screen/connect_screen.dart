@@ -53,10 +53,13 @@ class _ConnectPageState extends State<ConnectPage> {
         ),
         centerTitle: true,
         actions: [
-          CloseButton(onPressed: () {
-            logHandler.info('Exiting app');
-            exit(0);
-          }),
+          Padding(
+            padding: const EdgeInsets.only(right: 8, bottom: 16),
+            child: CloseButton(onPressed: () {
+              logHandler.info('Exiting app');
+              exit(0);
+            }),
+          ),
         ],
         forceMaterialTransparency: true,
       ),

@@ -127,7 +127,7 @@ const String changelog = """
   - Added extra scores for sort players with same scores
   - Match Data Checker only take the required match, not all
   - Fixed several missing 'setState's after starting the timer
-  - Rmoved some 'mounted' checks
+  - Removed some 'mounted' checks
 
   0.4.4 ({e8abe73}):
   - Added Finish UI: question, answer, timer, explanation, star, point value

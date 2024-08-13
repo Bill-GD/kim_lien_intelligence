@@ -53,7 +53,7 @@ void main() async {
     await windowManager.hide();
     await windowManager.ensureInitialized();
   }
-  windowManager.setAlwaysOnTop(!kDebugMode);
+  windowManager.setAlwaysOnTop(!isTesting);
   await windowManager.waitUntilReadyToShow(null, () async {
     await windowManager.setFullScreen(true);
     await windowManager.show();
