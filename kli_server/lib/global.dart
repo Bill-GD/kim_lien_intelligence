@@ -9,7 +9,7 @@ late final DecorationImage bgDecorationImage;
 
 late final LogHandler logHandler;
 void initLogHandler() {
-  logHandler = LogHandler(logFile: StorageHandler.getFullPath('UserData\\log.txt'));
+  logHandler = LogHandler(logFile: StorageHandler.getFullPath('log.txt'));
 }
 
 late final String appVersionString;
@@ -128,6 +128,7 @@ const String changelog = """
   - Fixed out of range when switching image too fast
   - Fixing null IP address when using Ethernet
   - Send playerData if player requested, send matchData if viewer/mc requested
+  - Fixed invalid url when opening app folder
 
   0.4.5 ({aeaa769}):
   - Added Extra UI: question, answer, timer, stop timer

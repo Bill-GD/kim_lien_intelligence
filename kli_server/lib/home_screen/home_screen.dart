@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:kli_lib/kli_lib.dart';
 import 'package:side_navigation/side_navigation.dart';
-import 'package:url_launcher/url_launcher.dart';
+import 'package:url_launcher/url_launcher_string.dart';
 
 import '../data_manager/data_manager_page.dart';
 import '../global.dart';
@@ -99,7 +99,10 @@ class _HomeScreenState extends State<HomeScreen> {
                     'Open Log File',
                     onPressed: () async {
                       logHandler.info('Opening log...');
-                      await launchUrl(Uri.parse(storageHandler.logFile));
+                      await launchUrlString(
+                        Uri.file(storageHandler.logFile).toFilePath(windows: true),
+                        mode: LaunchMode.externalApplication,
+                      );
                     },
                   ),
                   const SoundTest(),

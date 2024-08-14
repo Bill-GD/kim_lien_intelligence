@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:kli_lib/kli_lib.dart';
-import 'package:url_launcher/url_launcher.dart';
+import 'package:url_launcher/url_launcher_string.dart';
 
 import '../global.dart';
 
@@ -51,7 +51,10 @@ class _HelpScreenState extends State<HelpScreen> {
                   'Mở thư mục chứa phần mềm',
                   onPressed: () async {
                     logHandler.info('Opened parent folder: ${StorageHandler.appRootDirectory}');
-                    await launchUrl(Uri.parse(StorageHandler.appRootDirectory));
+                    await launchUrlString(
+                      Uri.directory(StorageHandler.appRootDirectory).toFilePath(windows: true),
+                      mode: LaunchMode.externalApplication,
+                    );
                   },
                 ),
                 const KLIButton('Mở file thông tin chi tiết'),

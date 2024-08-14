@@ -46,6 +46,7 @@ const String changelog = """
   - Separated match data cache from player data cache (match/player and match/other). Player folder will only
     contain player data, match folder will contain all match's image data and player data
   - Better waiting screen progress message
+  - Fixed invalid url when opening app folder
 
   0.2.5 ({aeaa769}):
   - Added Extra screen: question, timer

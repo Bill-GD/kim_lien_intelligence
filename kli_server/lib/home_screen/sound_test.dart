@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:kli_lib/kli_lib.dart';
-import 'package:url_launcher/url_launcher.dart';
+import 'package:url_launcher/url_launcher_string.dart';
 
 import '../global.dart';
 
@@ -23,7 +23,10 @@ class _SoundTestState extends State<SoundTest> {
             KLIButton(
               'Mở thư mục Assets',
               onPressed: () async {
-                await launchUrl(Uri.parse(AssetHandler.assetFolder));
+                await launchUrlString(
+                  Uri.directory(AssetHandler.assetFolder).toFilePath(windows: true),
+                  mode: LaunchMode.externalApplication,
+                );
               },
             ),
             Flexible(

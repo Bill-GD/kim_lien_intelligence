@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:kli_lib/kli_lib.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:url_launcher/url_launcher_string.dart';
 
 import 'global.dart';
 import 'home_screen/home_screen.dart';
@@ -88,7 +89,10 @@ class _LoadingScreenState extends State<LoadingScreen> {
                       KLIButton(
                         'Open Asset Folder',
                         onPressed: () async {
-                          await launchUrl(Uri.parse(AssetHandler.assetFolder));
+                          await launchUrlString(
+                            Uri.directory(AssetHandler.assetFolder).toFilePath(windows: true),
+                            mode: LaunchMode.externalApplication,
+                          );
                         },
                       ),
                       KLIButton(
