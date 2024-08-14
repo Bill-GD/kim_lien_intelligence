@@ -21,7 +21,7 @@ class _WaitingScreenState extends State<WaitingScreen> {
   late final StreamSubscription<void> messageSubscription;
   bool receivingData = false, checkingCache = false;
   int dataReceived = 0, totalData = 0, actualDataSize = 0;
-  String matchName = '';
+  String matchName = '', progressMessage = '';
 
   @override
   void initState() {
@@ -82,10 +82,12 @@ class _WaitingScreenState extends State<WaitingScreen> {
                         moveToOverview();
                         return;
                       }
+                      if (KLIClient.isPlayer) MatchData().setPos(KLIClient.clientID!.index - 1);
+                      checkingCache = true;
+                      progressMessage = 'App doesn\'t have data for this match...';
+                      setState(() {});
 
-                      MatchData().setPos(KLIClient.clientID!.index - 1);
-                      setState(() => checkingCache = true);
-
+                      setState(() => progressMessage = 'Requesting metadata...');
                       KLIClient.sendMessage(KLISocketMessage(
                         senderID: KLIClient.clientID!,
                         type: KLIMessageType.dataSize,
@@ -93,6 +95,7 @@ class _WaitingScreenState extends State<WaitingScreen> {
 
                       KLIClient.onMessageReceived.listen((m) async {
                         if (m.type == KLIMessageType.dataSize) {
+                          setState(() => progressMessage = 'Received metadata...');
                           final s = m.message.split('|');
                           totalData = int.parse(s.first);
                           actualDataSize = int.parse(s.last);
@@ -106,18 +109,19 @@ class _WaitingScreenState extends State<WaitingScreen> {
 
                         if (m.type == KLIMessageType.matchName) {
                           matchName = m.message;
+                          setState(() => progressMessage = 'Checking cached data of "$matchName"...');
                           final r = await checkCache();
 
                           if (r) {
+                            setState(() => progressMessage = 'Found cached data of "$matchName"...');
                             moveToOverview();
                             return;
                           }
 
-                          final id = KLIClient.clientID!.name;
-
+                          setState(() => progressMessage = 'Requesting data of "$matchName"...');
                           KLIClient.sendMessage(KLISocketMessage(
                             senderID: KLIClient.clientID!,
-                            type: id.contains('player') //
+                            type: KLIClient.isPlayer //
                                 ? KLIMessageType.playerData
                                 : KLIMessageType.matchData,
                           ));
@@ -156,7 +160,8 @@ class _WaitingScreenState extends State<WaitingScreen> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       checkingCache
-                          ? const Text('Checking for cached data...')
+                          ? Text(progressMessage)
+                          // ? const Text('Checking for cached data...')
                           : Text(
                               'Requesting match data from host (${getSizeString(actualDataSize.toDouble())}): ${(dataReceived / totalData * 100).toStringAsFixed(2)}% ',
                             ),
@@ -173,10 +178,12 @@ class _WaitingScreenState extends State<WaitingScreen> {
   }
 
   void moveToOverview() {
-    KLIClient.sendMessage(KLISocketMessage(
-      senderID: KLIClient.clientID!,
-      type: KLIMessageType.playerReady,
-    ));
+    if (KLIClient.isPlayer) {
+      KLIClient.sendMessage(KLISocketMessage(
+        senderID: KLIClient.clientID!,
+        type: KLIMessageType.playerReady,
+      ));
+    }
     Navigator.of(context).pushReplacement<void, void>(
       MaterialPageRoute<void>(builder: (context) => const Overview()),
     );
@@ -185,9 +192,7 @@ class _WaitingScreenState extends State<WaitingScreen> {
   Future<bool> checkCache() async {
     final c = await StorageHandler.appCacheDirectory;
 
-    final id = KLIClient.clientID!.name;
-
-    if (id.contains('player')) {
+    if (KLIClient.isPlayer) {
       if (File('$c\\$matchName\\player\\size.txt').existsSync() &&
           File('$c\\$matchName\\player\\names.txt').existsSync()) {
         final s = StorageHandler().readFromFile('$c\\$matchName\\player\\size.txt');
@@ -259,6 +264,12 @@ class _WaitingScreenState extends State<WaitingScreen> {
         createIfNotExists: true,
       );
     }
+
+    StorageHandler().writeStringToFile(
+      '$c\\$matchName\\other\\names.txt',
+      n.join('|'),
+      createIfNotExists: true,
+    );
 
     StorageHandler().writeStringToFile(
       '$c\\$matchName\\other\\size.txt',
