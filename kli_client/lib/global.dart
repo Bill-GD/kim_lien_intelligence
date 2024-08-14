@@ -38,7 +38,12 @@ String getSizeString(double bytes) {
 }
 
 const String changelog = """
-  0.2.5.1 ({latest}):
+  0.2.5.2 ({latest}):
+  - Fixed can guess obstacle before first question
+  - Fixed obstacle screen top "padding"
+  - Can quit when match ends (wip)
+
+  0.2.5.1 ({463fdf9}):
   - Fixed not showing match data received progress if missed cache
   - Fixed progress percentage is duplicated instead of multiplied
   - Players will only request player data, viewer & mc (?) will request match data (reduces wait time)

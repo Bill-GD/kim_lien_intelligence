@@ -27,6 +27,7 @@ class _AccelScreenState extends State<AccelScreen> {
       canStart = false,
       started = false,
       canShowQuestion = false,
+      canShowArrangeAns = false,
       canAnnounceAnswer = false,
       timeEnded = false,
       canEnd = false,
@@ -222,7 +223,8 @@ class _AccelScreenState extends State<AccelScreen> {
                           File(StorageHandler.getFullPath(e)),
                         ),
                       ),
-                      shouldShowArrangeResult: currentQuestion.type == AccelQuestionType.arrange && canNext,
+                      shouldShowArrangeResult:
+                          currentQuestion.type == AccelQuestionType.arrange && canShowArrangeAns,
                       isArrange: currentQuestion.type == AccelQuestionType.arrange,
                     )
                   : null,
@@ -322,6 +324,9 @@ class _AccelScreenState extends State<AccelScreen> {
               content: currentQuestion.explanation,
               horizontalPadding: 500,
             );
+            if (currentQuestion.type == AccelQuestionType.arrange) {
+              setState(() => canShowArrangeAns = true);
+            }
           },
         ),
         KLIButton(

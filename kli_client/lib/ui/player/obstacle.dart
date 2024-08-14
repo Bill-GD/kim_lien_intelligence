@@ -20,7 +20,7 @@ class PlayerObstacleScreen extends StatefulWidget {
 
 class _PlayerObstacleScreenState extends State<PlayerObstacleScreen> {
   double currentTimeSec = 15;
-  bool canShowQuestion = false, canAnswer = false, canGuessObstacle = true, eliminated = false;
+  bool canShowQuestion = false, canAnswer = false, canGuessObstacle = false, eliminated = false;
   String submittedAnswer = '';
   late ObstacleQuestion currentQuestion;
   Timer? timer;
@@ -52,6 +52,7 @@ class _PlayerObstacleScreenState extends State<PlayerObstacleScreen> {
         }
       }
       if (m.type == KLIMessageType.obstacleQuestion) {
+        canGuessObstacle = true;
         if (canAnswer) return;
 
         currentQuestion = ObstacleQuestion.fromJson(jsonDecode(m.message));
@@ -120,7 +121,7 @@ class _PlayerObstacleScreenState extends State<PlayerObstacleScreen> {
       decoration: BoxDecoration(image: bgDecorationImage),
       child: Scaffold(
         backgroundColor: Colors.transparent,
-        extendBodyBehindAppBar: kDebugMode,
+        extendBodyBehindAppBar: true,
         appBar: AppBar(
           automaticallyImplyLeading: kDebugMode,
           backgroundColor: Colors.transparent,

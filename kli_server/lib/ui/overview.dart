@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:kli_lib/kli_lib.dart';
 import 'package:kli_server/ui/finish.dart';
@@ -60,7 +59,7 @@ class _MatchOverviewState extends State<MatchOverview> {
           context,
           fontSize: fontSizeLarge,
           'Tổng quan trận ${MatchState().match.name}',
-          implyLeading: kDebugMode,
+          implyLeading: true,
           actions: [
             const KLIHelpButton(
               content: '''
