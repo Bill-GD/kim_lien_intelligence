@@ -45,7 +45,39 @@ class MatchState {
 
   static void reset() => _inst = null;
 
-  static void sendMatchData(KLISocketMessage m, bool sendData) {
+  static void sendPlayerData(ConnectionID id, bool sendData) {
+    assert(initialized, 'MatchState not initialized');
+    int actualDataSize = 0;
+
+    final data = <String, dynamic>{};
+
+    for (int i = 0; i < MatchState().players.length; i++) {
+      final p = MatchState().players[i];
+      final ext = p.imagePath.split('.').last;
+      data['player_name_$i'] = p.name;
+      data['player_image_$i.$ext'] = Networking.encodeMedia(p.imagePath);
+      actualDataSize += FileStat.statSync(StorageHandler.getFullPath(p.imagePath)).size;
+    }
+
+    final msg = KLISocketMessage(
+      senderID: ConnectionID.host,
+      type: KLIMessageType.playerData,
+      message: String.fromCharCodes(zlib.encode(jsonEncode(data).codeUnits)),
+    );
+
+    sendData
+        ? KLIServer.sendMessage(id, msg)
+        : KLIServer.sendMessage(
+            id,
+            KLISocketMessage(
+              senderID: ConnectionID.host,
+              type: KLIMessageType.dataSize,
+              message: '${(msg.encode() + Networking.eom).codeUnits.length}|$actualDataSize',
+            ),
+          );
+  }
+
+  static void sendMatchData(ConnectionID id, bool sendData) {
     assert(initialized, 'MatchState not initialized');
     int actualDataSize = 0;
 
@@ -86,45 +118,15 @@ class MatchState {
     );
 
     sendData
-        ? KLIServer.sendMessage(m.senderID, msg)
+        ? KLIServer.sendMessage(id, msg)
         : KLIServer.sendMessage(
-            m.senderID,
+            id,
             KLISocketMessage(
               senderID: ConnectionID.host,
               type: KLIMessageType.dataSize,
               message: '${(msg.encode() + Networking.eom).codeUnits.length}|$actualDataSize',
             ),
           );
-  }
-
-  static void handleReconnection(KLISocketMessage m) async {
-    assert(initialized, 'MatchState not initialized');
-
-    await KLIServer.sendMessage(
-      m.senderID,
-      KLISocketMessage(
-        senderID: ConnectionID.host,
-        type: KLIMessageType.startMatch,
-      ),
-    );
-
-    await KLIServer.sendMessage(
-      m.senderID,
-      KLISocketMessage(
-        senderID: ConnectionID.host,
-        type: KLIMessageType.section,
-        message: _inst!.sectionDisplay(_inst!.section),
-      ),
-    );
-
-    await KLIServer.sendMessage(
-      m.senderID,
-      KLISocketMessage(
-        senderID: ConnectionID.host,
-        type: KLIMessageType.scores,
-        message: jsonEncode(_inst!.scores),
-      ),
-    );
   }
 
   void nextSection() {

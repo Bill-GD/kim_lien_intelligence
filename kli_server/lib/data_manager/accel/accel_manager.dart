@@ -322,21 +322,12 @@ class _AccelManagerState extends State<AccelManager> {
                   if (result == null) return;
 
                   final picks = result.files;
-
-                  if (mounted) {
-                    showPopupMessage(
-                      context,
-                      title: 'Files',
-                      content: result.names.join('\n'),
-                    );
-                  }
-
                   picks.length == 1
-                      ? logHandler.info('Chose ${StorageHandler.getRelative(picks.first.name)}')
+                      ? logHandler.info('Chose ${StorageHandler.getRelative(picks.first.path!)}')
                       : logHandler.info('Chose ${picks.length} files');
 
                   for (final p in picks) {
-                    selectedQuestion.imagePaths.add(StorageHandler.getRelative(p.name));
+                    selectedQuestion.imagePaths.add(StorageHandler.getRelative(p.path!));
                   }
                   selectedQuestion.type = AccelQuestion.getTypeFromImageCount(
                     selectedQuestion.imagePaths.length,

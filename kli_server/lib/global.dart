@@ -127,6 +127,7 @@ const String changelog = """
   - Accel manager allows adding multiple images at once, but result is sorted
   - Fixed out of range when switching image too fast
   - Fixing null IP address when using Ethernet
+  - Send playerData if player requested, send matchData if viewer/mc requested
 
   0.4.5 ({aeaa769}):
   - Added Extra UI: question, answer, timer, stop timer

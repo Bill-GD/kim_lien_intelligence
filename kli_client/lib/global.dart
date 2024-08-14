@@ -41,6 +41,10 @@ const String changelog = """
   0.2.5.1 ({latest}):
   - Fixed not showing match data received progress if missed cache
   - Fixed progress percentage is duplicated instead of multiplied
+  - Players will only request player data, viewer & mc (?) will request match data (reduces wait time)
+  - Reorganized waiting screen code
+  - Separated match data cache from player data cache (match/player and match/other). Player folder will only
+    contain player data, match folder will contain all match's image data and player data
 
   0.2.5 ({aeaa769}):
   - Added Extra screen: question, timer

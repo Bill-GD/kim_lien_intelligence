@@ -198,7 +198,10 @@ class _ServerSetupState extends State<ServerSetup> {
 
     subscriptions.add(KLIServer.onMessageReceived.listen((m) {
       if (m.type == KLIMessageType.dataSize) {
-        MatchState.sendMatchData(m, false);
+        final id = m.senderID.name;
+        id.contains('player')
+            ? MatchState.sendPlayerData(m.senderID, false)
+            : MatchState.sendMatchData(m.senderID, false);
       }
 
       if (m.type == KLIMessageType.matchName) {
@@ -212,8 +215,12 @@ class _ServerSetupState extends State<ServerSetup> {
         );
       }
 
+      if (m.type == KLIMessageType.playerData) {
+        MatchState.sendPlayerData(m.senderID, true);
+      }
+
       if (m.type == KLIMessageType.matchData) {
-        MatchState.sendMatchData(m, true);
+        MatchState.sendMatchData(m.senderID, true);
       }
 
       if (m.type == KLIMessageType.playerReady) {
