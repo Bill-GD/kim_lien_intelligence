@@ -75,6 +75,12 @@ class _AccelScreenState extends State<AccelScreen> {
         backgroundColor: Colors.transparent,
         endDrawer: AnswerDrawer(
           answerResult: answerResults,
+          checkboxOnChanged: (i, v) {
+            answerResults[i] = v;
+            canAnnounceAnswer = answerResults.every((e) => e != null);
+            setState(() {});
+          },
+          canCheck: !canNext,
           answers: answers.asMap().entries.map((e) => (e.value.$2, e.value.$3)),
           scores: Iterable<int>.generate(4, (i) => MatchState().scores[answers[i].$1]),
           playerNames: Iterable.generate(4, (i) => MatchState().players[answers[i].$1].name),
@@ -86,11 +92,11 @@ class _AccelScreenState extends State<AccelScreen> {
               onPressed: () {
                 int mul = 0;
                 for (int i = 0; i < 4; i++) {
-                  if (answers[i].$3 < 0) {
-                    answerResults[i] = false;
-                    continue;
-                  }
-                  answerResults[i] = answers[i].$2.toLowerCase() == currentQuestion.answer.toLowerCase();
+                  // if (answers[i].$3 < 0) {
+                  //   answerResults[i] = false;
+                  //   continue;
+                  // }
+                  // answerResults[i] = answers[i].$2.toLowerCase() == currentQuestion.answer.toLowerCase();
                   if (answerResults[i] == true) {
                     MatchState().modifyScore(answers[i].$1, (4 - mul) * 10);
                     mul++;
@@ -296,7 +302,7 @@ class _AccelScreenState extends State<AccelScreen> {
             timer = Timer.periodic(1.seconds, (timer) {
               if (currentTimeSec <= 0) {
                 timer.cancel();
-                timeEnded = canAnnounceAnswer = true;
+                timeEnded = true;
                 canStart = false;
                 answers.sort((a, b) => a.$3.compareTo(b.$3));
                 setState(() {});

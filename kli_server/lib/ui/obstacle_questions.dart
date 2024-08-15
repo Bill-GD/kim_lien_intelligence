@@ -125,6 +125,14 @@ class _ObstacleQuestionScreenState extends State<ObstacleQuestionScreen> {
         backgroundColor: Colors.transparent,
         endDrawer: AnswerDrawer(
           answerResult: answerResults,
+          checkboxOnChanged: (i, v) {
+            if (MatchState().eliminatedPlayers[i]) return;
+
+            answerResults[i] = v;
+            canAnnounceAnswer = answerResults.every((e) => e != null);
+            setState(() {});
+          },
+          canCheck: canShowAnswers,
           answers: MatchState().rowAnswers.asMap().entries.map((e) => (e.value, -1)),
           scores: MatchState().scores,
           playerNames: Iterable.generate(4, (i) => MatchState().players[i].name),
@@ -135,15 +143,15 @@ class _ObstacleQuestionScreenState extends State<ObstacleQuestionScreen> {
               onPressed: () {
                 obstacleWait();
                 for (int i = 0; i < 4; i++) {
-                  if (MatchState().eliminatedPlayers[i]) {
-                    answerResults[i] = false;
-                    continue;
-                  }
+                  //   if (MatchState().eliminatedPlayers[i]) {
+                  //     answerResults[i] = false;
+                  //     continue;
+                  //   }
 
-                  answerResults[i] = MatchState().rowAnswers[i].toLowerCase() ==
-                      MatchState().obstacleMatch!.hintQuestions[questionIndex]!.answer.toLowerCase();
+                  //   answerResults[i] = MatchState().rowAnswers[i].toLowerCase() ==
+                  //       MatchState().obstacleMatch!.hintQuestions[questionIndex]!.answer.toLowerCase();
                   if (answerResults[i] == true) MatchState().modifyScore(i, 10);
-                  setState(() {});
+                  //   setState(() {});
                 }
                 KLIServer.sendToAllClients(KLISocketMessage(
                   senderID: ConnectionID.host,
@@ -270,9 +278,14 @@ class _ObstacleQuestionScreenState extends State<ObstacleQuestionScreen> {
             'Show Answers',
             enableCondition: canShowAnswers,
             onPressed: () {
-              canAnnounceAnswer = true;
-              setState(() {});
+              // canAnnounceAnswer = true;
+              for (final i in range(0, 3)) {
+                if (MatchState().eliminatedPlayers[i]) {
+                  answerResults[i] = false;
+                }
+              }
               _key.currentState?.openEndDrawer();
+              setState(() {});
             },
           ),
           const SizedBox(height: 32),
