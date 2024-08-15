@@ -22,12 +22,11 @@ class ObstacleQuestionScreen extends StatefulWidget {
 class _ObstacleQuestionScreenState extends State<ObstacleQuestionScreen> {
   int questionIndex = -1;
   double currentTimeSec = 15;
-  bool timeEnded = false,
+  bool canStart = false,
       canShowAnswers = false,
       canAnnounceAnswer = false,
       canShowImage = false,
       canSelectQuestion = true,
-      keywordAnswered = false,
       canEnd = false;
   Timer? timer;
   final List<bool?> answerResults = List.filled(4, null);
@@ -83,7 +82,8 @@ class _ObstacleQuestionScreenState extends State<ObstacleQuestionScreen> {
               message: jsonEncode(MatchState().scores),
               type: KLIMessageType.scores,
             ));
-            keywordAnswered = canEnd = true;
+            canEnd = true;
+            canStart = canSelectQuestion = false;
             KLIServer.sendToAllClients(KLISocketMessage(
               senderID: ConnectionID.host,
               type: KLIMessageType.correctObstacleAnswer,
@@ -143,16 +143,9 @@ class _ObstacleQuestionScreenState extends State<ObstacleQuestionScreen> {
               onPressed: () {
                 obstacleWait();
                 for (int i = 0; i < 4; i++) {
-                  //   if (MatchState().eliminatedPlayers[i]) {
-                  //     answerResults[i] = false;
-                  //     continue;
-                  //   }
-
-                  //   answerResults[i] = MatchState().rowAnswers[i].toLowerCase() ==
-                  //       MatchState().obstacleMatch!.hintQuestions[questionIndex]!.answer.toLowerCase();
                   if (answerResults[i] == true) MatchState().modifyScore(i, 10);
-                  //   setState(() {});
                 }
+
                 KLIServer.sendToAllClients(KLISocketMessage(
                   senderID: ConnectionID.host,
                   message: jsonEncode(MatchState().scores),
@@ -164,8 +157,7 @@ class _ObstacleQuestionScreenState extends State<ObstacleQuestionScreen> {
                     MatchState().revealedObstacleRows[questionIndex] = answerResults.any((e) => e == true);
                 questionIndex = -1;
                 canShowAnswers = false;
-                canShowImage = true;
-                canSelectQuestion = true;
+                canShowImage = canSelectQuestion = true;
 
                 KLIServer.sendToAllClients(KLISocketMessage(
                   senderID: ConnectionID.host,
@@ -228,7 +220,8 @@ class _ObstacleQuestionScreenState extends State<ObstacleQuestionScreen> {
                   onTap: canSelectQuestion
                       ? () {
                           questionIndex = i;
-                          timeEnded = canAnnounceAnswer = false;
+                          canAnnounceAnswer = false;
+                          canStart = true;
                           currentTimeSec = widget.timeLimitSec;
                           MatchState().rowAnswers.fillRange(0, 4, '');
                           answerResults.fillRange(0, 4, null);
@@ -264,12 +257,15 @@ class _ObstacleQuestionScreenState extends State<ObstacleQuestionScreen> {
           ),
           KLIButton(
             'Get Middle Row',
-            enableCondition:
-                MatchState().allRowsAnswered && !MatchState().answeredObstacleRows[4] && questionIndex != 4,
+            enableCondition: MatchState().allRowsAnswered &&
+                !MatchState().answeredObstacleRows[4] &&
+                questionIndex != 4 &&
+                canSelectQuestion,
             onPressed: () {
               answerResults.fillRange(0, 4, null);
               questionIndex = 4;
-              timeEnded = canAnnounceAnswer = false;
+              canAnnounceAnswer = false;
+              canStart = true;
               currentTimeSec = widget.timeLimitSec;
               setState(() {});
             },
@@ -294,9 +290,10 @@ class _ObstacleQuestionScreenState extends State<ObstacleQuestionScreen> {
             children: [
               KLIButton(
                 'Start',
-                enableCondition: questionIndex >= 0 && !timeEnded && !(timer?.isActive == true),
+                // enableCondition: questionIndex >= 0 && !timeEnded && !(timer?.isActive == true),
+                enableCondition: canStart,
                 onPressed: () {
-                  canSelectQuestion = false;
+                  canSelectQuestion = canStart = false;
                   KLIServer.sendToAllClients(
                     KLISocketMessage(
                       senderID: ConnectionID.host,
@@ -333,7 +330,6 @@ class _ObstacleQuestionScreenState extends State<ObstacleQuestionScreen> {
       timer = Timer.periodic(1.seconds, (timer) {
         if (currentTimeSec <= 0) {
           timer.cancel();
-          timeEnded = true;
           canEnd = true;
           setState(() {});
           return;
@@ -422,7 +418,6 @@ class _ObstacleQuestionScreenState extends State<ObstacleQuestionScreen> {
     timer = Timer.periodic(1.seconds, (timer) {
       if (currentTimeSec <= 0) {
         timer.cancel();
-        timeEnded = true;
         canShowAnswers = true;
         setState(() {});
         return;

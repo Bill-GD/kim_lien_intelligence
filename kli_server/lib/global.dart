@@ -124,6 +124,7 @@ SideNavigationBarTheme sideNavigationTheme(BuildContext context, [double height 
 const String changelog = """
   0.4.5.2 ({latest}):
   - Show arrange question's answer when pressing explanation button
+  - Fixed can select and start question when obstacle is answered
 
   0.4.5.1 ({463fdf9}):
   - Fixed accel manager not showing type when image count is 0
