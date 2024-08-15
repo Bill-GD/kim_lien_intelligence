@@ -20,18 +20,21 @@ class FinishScreen extends StatefulWidget {
 
 class _FinishScreenState extends State<FinishScreen> {
   double timeLimitSec = 1, currentTimeSec = 0;
-  bool canSelectQuestion = true,
+  bool canSelectPoint = true,
+      canSelectQuestion = false,
       canStart = false,
       canShowQuestion = false,
       hoverStar = false,
       chosenStar = false,
+      canUseStar = true,
       started = false,
       timeEnded = false,
       canEnd = false;
   late FinishQuestion currentQuestion;
   Timer? timer;
-  int questionNum = 0, pointValue = 0;
+  int chosenQuestionCount = 0, questionNum = 0, pointValue = 0;
   late final StreamSubscription<KLISocketMessage> sub;
+  final List<int> chosenQuestions = [0, 0, 0];
 
   @override
   void initState() {
@@ -115,7 +118,7 @@ class _FinishScreenState extends State<FinishScreen> {
                   padding: const EdgeInsets.only(left: 48),
                   child: Column(
                     children: [
-                      timerWidget(),
+                      sideWidget(),
                       ...sideButtons(),
                     ],
                   ),
@@ -313,11 +316,12 @@ class _FinishScreenState extends State<FinishScreen> {
               ),
               child: KLIButton(
                 (i * 10).toString(),
-                enableCondition: canSelectQuestion,
+                enableCondition: canSelectPoint,
+                disabledLabel: 'Already chosen',
                 onPressed: () {
-                  nextQuestion(i * 10);
-                  canSelectQuestion = false;
-                  canStart = true;
+                  chosenQuestions[chosenQuestionCount++] = i * 10;
+                  canSelectQuestion = chosenQuestionCount == 3;
+                  canSelectPoint = !canSelectQuestion;
                   setState(() {});
                 },
               ),
@@ -335,9 +339,10 @@ class _FinishScreenState extends State<FinishScreen> {
     currentQuestion = MatchState().questionList!.removeAt(i) as FinishQuestion;
     questionNum++;
     canShowQuestion = true;
-    started = chosenStar = false;
+    started = false;
     timeLimitSec = currentTimeSec = 5 + point / 10 * 5;
-    pointValue = currentQuestion.point;
+    if (!canUseStar && chosenStar) chosenStar = false;
+    pointValue = chosenStar ? currentQuestion.point * 2 : point;
     KLIServer.sendToAllClients(KLISocketMessage(
       senderID: ConnectionID.host,
       type: KLIMessageType.finishQuestion,
@@ -345,7 +350,7 @@ class _FinishScreenState extends State<FinishScreen> {
     ));
   }
 
-  Widget timerWidget() {
+  Widget sideWidget() {
     return Expanded(
       child: Column(
         children: [
@@ -356,6 +361,23 @@ class _FinishScreenState extends State<FinishScreen> {
             valueColor: const Color(0xFF00A906),
             backgroundColor: Colors.red,
           ),
+          const Expanded(child: SizedBox()),
+          for (final i in range(0, 2))
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 8),
+              child: KLIButton(
+                'Q${i + 1}: ${chosenQuestions[i]}',
+                enableCondition: canSelectQuestion && questionNum == i,
+                disabledLabel: 'Not chosen yet',
+                onPressed: () {
+                  nextQuestion(chosenQuestions[i]);
+                  canSelectQuestion = false;
+                  canStart = true;
+                  setState(() {});
+                },
+              ),
+            ),
+          const Expanded(child: SizedBox()),
         ],
       ),
     );
@@ -363,17 +385,20 @@ class _FinishScreenState extends State<FinishScreen> {
 
   List<Widget> sideButtons() {
     return [
+      // star
       GestureDetector(
-        onTap: !started && !canSelectQuestion
+        onTap: canUseStar && canSelectQuestion && !started
             ? () {
                 if (started) return;
                 chosenStar = !chosenStar;
-                chosenStar ? pointValue *= 2 : pointValue ~/= 2;
+                // chosenStar ? pointValue *= 2 : pointValue ~/= 2;
                 setState(() {});
               }
             : null,
         child: MouseRegion(
-          cursor: started || canSelectQuestion ? SystemMouseCursors.basic : SystemMouseCursors.click,
+          cursor: canUseStar && canSelectQuestion && !started
+              ? SystemMouseCursors.click
+              : SystemMouseCursors.basic,
           onEnter: (event) {
             setState(() => hoverStar = true);
           },
@@ -396,12 +421,13 @@ class _FinishScreenState extends State<FinishScreen> {
           onPressed: () {
             canStart = false;
             started = true;
+            if (chosenStar && canUseStar) canUseStar = false;
             setState(() {});
             timer = Timer.periodic(1.seconds, (timer) {
               if (currentTimeSec <= 0) {
                 timer.cancel();
                 timeEnded = true;
-                canStart = false;
+                started = false;
                 setState(() {});
               } else {
                 currentTimeSec--;
