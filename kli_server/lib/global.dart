@@ -127,6 +127,8 @@ const String changelog = """
   - Fixed can select and start question when obstacle is answered
   - Finish point values are selected first, then use side buttons to show next question
   - Select star before showing question, can only use once
+  - Stealing shows other who's the stealer
+  - Wrong answer with star reduces score (original value)
 
   0.4.5.1 ({463fdf9}):
   - Fixed accel manager not showing type when image count is 0

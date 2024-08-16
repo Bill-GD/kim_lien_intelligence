@@ -132,7 +132,10 @@ class _PlayerAccelScreenState extends State<PlayerAccelScreen> {
         for (final i in range(0, 3))
           Expanded(
             child: ClipRRect(
-              borderRadius: const BorderRadius.only(topLeft: Radius.circular(10)),
+              borderRadius: BorderRadius.only(
+                topLeft: i == 0 ? const Radius.circular(10) : Radius.zero,
+                topRight: i == 3 ? const Radius.circular(10) : Radius.zero,
+              ),
               child: Container(
                 decoration: BoxDecoration(
                   color: Colors.transparent,

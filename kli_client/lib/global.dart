@@ -41,6 +41,7 @@ const String changelog = """
   0.2.5.2 ({latest}):
   - Fixed can guess obstacle before first question
   - Fixed obstacle screen top "padding"
+  - Highlights who signaled to steal finish answer in yellow
 
   0.2.5.1 ({463fdf9}):
   - Fixed not showing match data received progress if missed cache

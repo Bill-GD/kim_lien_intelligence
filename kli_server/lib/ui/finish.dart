@@ -32,7 +32,7 @@ class _FinishScreenState extends State<FinishScreen> {
       canEnd = false;
   late FinishQuestion currentQuestion;
   Timer? timer;
-  int chosenQuestionCount = 0, questionNum = 0, pointValue = 0;
+  int chosenQuestionCount = 0, questionNum = 0, pointValue = 0, stealer = -1;
   late final StreamSubscription<KLISocketMessage> sub;
   final List<int> chosenQuestions = [0, 0, 0];
 
@@ -41,12 +41,15 @@ class _FinishScreenState extends State<FinishScreen> {
     super.initState();
     sub = KLIServer.onMessageReceived.listen((m) async {
       if (m.type == KLIMessageType.stealAnswer) {
-        final pos = m.senderID.index - 1;
+        stealer = m.senderID.index - 1;
+
         KLIServer.sendToAllClients(KLISocketMessage(
           senderID: ConnectionID.host,
           type: KLIMessageType.disableSteal,
+          message: '$stealer',
         ));
         timer?.cancel();
+        setState(() {});
 
         if (mounted) {
           final res = await dialogWithActions<bool>(
@@ -67,10 +70,12 @@ class _FinishScreenState extends State<FinishScreen> {
           );
 
           if (res == true) {
-            MatchState().modifyScore(pos, currentQuestion.point);
-            MatchState().modifyScore(widget.playerPos, -currentQuestion.point);
+            MatchState().modifyScore(stealer, currentQuestion.point);
+            if (!chosenStar) {
+              MatchState().modifyScore(widget.playerPos, -currentQuestion.point);
+            }
           } else {
-            MatchState().modifyScore(pos, -(currentQuestion.point ~/ 2));
+            MatchState().modifyScore(stealer, -(currentQuestion.point ~/ 2));
           }
 
           setState(() {});
@@ -145,7 +150,9 @@ class _FinishScreenState extends State<FinishScreen> {
                 decoration: BoxDecoration(
                   color: i == widget.playerPos
                       ? Theme.of(context).colorScheme.primaryContainer
-                      : Colors.transparent,
+                      : i == stealer
+                          ? Colors.yellow.shade800.withOpacity(0.7)
+                          : Colors.transparent,
                   border: BorderDirectional(
                     end: BorderSide(
                       color: i > 2 ? Colors.transparent : Theme.of(context).colorScheme.onBackground,
@@ -273,6 +280,14 @@ class _FinishScreenState extends State<FinishScreen> {
                 canSelectQuestion = questionNum < 3;
                 canEnd = questionNum == 3;
                 timeEnded = false;
+                if (chosenStar) {
+                  MatchState().modifyScore(widget.playerPos, -currentQuestion.point);
+                  KLIServer.sendToAllClients(KLISocketMessage(
+                    senderID: ConnectionID.host,
+                    message: jsonEncode(MatchState().scores),
+                    type: KLIMessageType.scores,
+                  ));
+                }
                 KLIServer.sendToAllExcept(
                   ConnectionID.values[widget.playerPos + 1],
                   KLISocketMessage(
@@ -340,6 +355,7 @@ class _FinishScreenState extends State<FinishScreen> {
     questionNum++;
     canShowQuestion = true;
     started = false;
+    stealer = -1;
     timeLimitSec = currentTimeSec = 5 + point / 10 * 5;
     if (!canUseStar && chosenStar) chosenStar = false;
     pointValue = chosenStar ? currentQuestion.point * 2 : point;

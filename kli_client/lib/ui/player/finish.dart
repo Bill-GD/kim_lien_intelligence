@@ -24,7 +24,7 @@ class _PlayerFinishScreenState extends State<PlayerFinishScreen> {
   late FinishQuestion currentQuestion;
   Timer? timer;
   late final StreamSubscription<KLISocketMessage> sub;
-  int questionNum = 0;
+  int questionNum = 0, stealer = -1;
 
   @override
   void initState() {
@@ -35,6 +35,7 @@ class _PlayerFinishScreenState extends State<PlayerFinishScreen> {
         questionNum++;
         canShowQuestion = true;
         timeLimitSec = currentTimeSec = currentQuestion.point / 10 * 5 + 5;
+        stealer = -1;
         setState(() {});
       }
 
@@ -66,6 +67,7 @@ class _PlayerFinishScreenState extends State<PlayerFinishScreen> {
 
       if (m.type == KLIMessageType.disableSteal) {
         canSteal = false;
+        stealer = int.parse(m.message);
         setState(() {});
       }
 
@@ -123,14 +125,16 @@ class _PlayerFinishScreenState extends State<PlayerFinishScreen> {
           Expanded(
             child: ClipRRect(
               borderRadius: BorderRadius.only(
-                topLeft: widget.playerPos == 0 ? const Radius.circular(10) : Radius.zero,
-                topRight: widget.playerPos == 3 ? const Radius.circular(10) : Radius.zero,
+                topLeft: i == 0 ? const Radius.circular(10) : Radius.zero,
+                topRight: i == 3 ? const Radius.circular(10) : Radius.zero,
               ),
               child: Container(
                 decoration: BoxDecoration(
                   color: i == widget.playerPos
                       ? Theme.of(context).colorScheme.primaryContainer
-                      : Colors.transparent,
+                      : i == stealer
+                          ? Colors.yellow.shade800.withOpacity(0.7)
+                          : Colors.transparent,
                   border: BorderDirectional(
                     end: BorderSide(
                       color: i > 2 ? Colors.transparent : Theme.of(context).colorScheme.onBackground,
