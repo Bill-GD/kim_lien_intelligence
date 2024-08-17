@@ -220,8 +220,9 @@ class MatchState {
   }
 
   /// [score] can be negative.
-  void modifyScore(int playerIndex, int score) {
-    scores[playerIndex] += score;
+  void modifyScore(int idx, int score) {
+    scores[idx] += score;
+    if (scores[idx] < 0) scores[idx] = 0;
   }
 
   void eliminateObstaclePlayer(int pos) {
@@ -239,7 +240,7 @@ class MatchState {
   late final List<KLIPlayer> players;
   static final playerReady = <bool>[false, false, false, false];
   bool get allPlayerReady => playerReady.every((e) => e);
-  MatchSection section = MatchSection.start;
+  MatchSection section = MatchSection.extra;
 
   /// For Start, Accel, Finish, Extra. For Obstacle, use [obstacleMatch]
   List<BaseQuestion>? questionList;

@@ -19,7 +19,7 @@ class PlayerExtraScreen extends StatefulWidget {
 
 class _PlayerExtraScreenState extends State<PlayerExtraScreen> {
   double currentTimeSec = 0;
-  bool canShowQuestion = false, canSteal = false, timeEnded = false;
+  bool canShowQuestion = false, canAnswer = false, timeEnded = false;
   late ExtraQuestion currentQuestion;
   Timer? timer;
   late final StreamSubscription<KLISocketMessage> sub;
@@ -34,20 +34,26 @@ class _PlayerExtraScreenState extends State<PlayerExtraScreen> {
         canShowQuestion = true;
         questionNum++;
         currentTimeSec = widget.timeLimitSec;
-        setState(() {});
       }
 
       if (m.type == KLIMessageType.continueTimer) {
+        canAnswer = true;
         timer = Timer.periodic(1.seconds, (timer) {
           if (currentTimeSec <= 0) {
             timer.cancel();
             timeEnded = true;
+            canAnswer = false;
             setState(() {});
             return;
           }
           currentTimeSec -= 1;
           setState(() {});
         });
+      }
+
+      if (m.type == KLIMessageType.stopTimer) {
+        timer?.cancel();
+        canAnswer = false;
       }
 
       if (m.type == KLIMessageType.scores) {
@@ -117,7 +123,9 @@ class _PlayerExtraScreenState extends State<PlayerExtraScreen> {
               ),
               child: Container(
                 decoration: BoxDecoration(
-                  color: Colors.transparent,
+                  color: i == MatchData().playerPos
+                      ? Theme.of(context).colorScheme.primaryContainer
+                      : Colors.transparent,
                   border: BorderDirectional(
                     end: BorderSide(
                       color: i > 2 ? Colors.transparent : Theme.of(context).colorScheme.onBackground,
@@ -183,7 +191,6 @@ class _PlayerExtraScreenState extends State<PlayerExtraScreen> {
 
   Widget playerInfo() {
     return Column(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         AnimatedCircularProgressBar(
           currentTimeSec: currentTimeSec,
@@ -191,6 +198,19 @@ class _PlayerExtraScreenState extends State<PlayerExtraScreen> {
           strokeWidth: 20,
           valueColor: const Color(0xFF00A906),
           backgroundColor: Colors.red,
+        ),
+        const Expanded(child: SizedBox()),
+        KLIButton(
+          'Answer',
+          enableCondition: canAnswer,
+          onPressed: () {
+            KLIClient.sendMessage(KLISocketMessage(
+              senderID: KLIClient.clientID!,
+              type: KLIMessageType.extraSignal,
+            ));
+            canAnswer = false;
+            setState(() {});
+          },
         ),
       ],
     );

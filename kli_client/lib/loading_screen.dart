@@ -52,6 +52,7 @@ class _LoadingScreenState extends State<LoadingScreen> {
         so that the client app doesn't need to request new data every time joining a match.
         '''),
         createIfNotExists: true,
+        abortIfExists: true,
       );
       await Future.delayed(widget.delayMilli);
 

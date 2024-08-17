@@ -95,7 +95,7 @@ class _ObstacleQuestionScreenState extends State<ObstacleQuestionScreen> {
           MatchState().eliminateObstaclePlayer(playerPos);
           if (!canSelectQuestion) createTimer();
           KLIServer.sendToAllExcept(
-            m.senderID,
+            [m.senderID],
             KLISocketMessage(senderID: ConnectionID.host, type: KLIMessageType.continueTimer),
           );
         }

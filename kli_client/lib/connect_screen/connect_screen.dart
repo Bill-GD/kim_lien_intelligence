@@ -27,6 +27,21 @@ class _ConnectPageState extends State<ConnectPage> {
   StreamSubscription<void>? messageSubscription;
 
   @override
+  void initState() {
+    super.initState();
+
+    messageSubscription = KLIClient.onDisconnected.listen((m) {
+      isConnected = false;
+      clientTextController.text = '';
+      messageSubscription?.cancel();
+      messageSubscription = null;
+
+      showPopupMessage(context, title: 'Forced disconnection', content: m);
+      setState(() {});
+    });
+  }
+
+  @override
   void dispose() {
     ipTextController.dispose();
     messageSubscription?.cancel();
@@ -146,16 +161,6 @@ class _ConnectPageState extends State<ConnectPage> {
               setState(() {
                 isConnecting = false;
                 isConnected = true;
-              });
-
-              messageSubscription = KLIClient.onDisconnected.listen((m) {
-                isConnected = false;
-                clientTextController.text = '';
-                messageSubscription!.cancel();
-                messageSubscription = null;
-
-                showPopupMessage(context, title: 'Forced disconnection', content: m);
-                setState(() {});
               });
             } on Exception catch (e, stack) {
               logHandler.error('Error when trying to connect: $e', stackTrace: stack);

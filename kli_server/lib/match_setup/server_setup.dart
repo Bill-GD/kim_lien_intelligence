@@ -130,10 +130,6 @@ class _ServerSetupState extends State<ServerSetup> {
 
             addClientListeners();
             setState(() {});
-
-            if (mounted) {
-              showToastMessage(context, 'Started a server');
-            }
           },
         ),
         KLIButton(
@@ -244,7 +240,7 @@ class _ServerSetupState extends State<ServerSetup> {
     final clients = <Widget>[];
 
     for (int index = 0; index < KLIServer.totalClientCount; index++) {
-      final client = KLIServer.clientAt(index);
+      final client = KLIServer.getClientSocket(index);
       final clientConnected = client != null;
       String ip = clientConnected ? '${client.remoteAddress.address}:${client.remotePort}' : 'Not connected';
 

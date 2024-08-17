@@ -36,7 +36,6 @@ class _PlayerFinishScreenState extends State<PlayerFinishScreen> {
         canShowQuestion = true;
         timeLimitSec = currentTimeSec = currentQuestion.point / 10 * 5 + 5;
         stealer = -1;
-        setState(() {});
       }
 
       if (m.type == KLIMessageType.continueTimer) {
@@ -62,13 +61,11 @@ class _PlayerFinishScreenState extends State<PlayerFinishScreen> {
 
       if (m.type == KLIMessageType.enableSteal) {
         canSteal = true;
-        setState(() {});
       }
 
       if (m.type == KLIMessageType.disableSteal) {
         canSteal = false;
         stealer = int.parse(m.message);
-        setState(() {});
       }
 
       if (m.type == KLIMessageType.endSection) {
@@ -212,7 +209,6 @@ class _PlayerFinishScreenState extends State<PlayerFinishScreen> {
 
   Widget playerInfo() {
     return Column(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         AnimatedCircularProgressBar(
           currentTimeSec: currentTimeSec,

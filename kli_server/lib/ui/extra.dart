@@ -3,7 +3,9 @@ import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:kli_lib/kli_lib.dart';
+import 'package:kli_server/ui/allow_player.dart';
 
 import '../data_manager/match_state.dart';
 import '../global.dart';
@@ -27,16 +29,95 @@ class _ExtraScreenState extends State<ExtraScreen> {
       timerStopped = false;
   late ExtraQuestion currentQuestion;
   Timer? timer;
-  int questionNum = 0;
+  int questionNum = 0, answeredCount = 0;
+  List<bool> allowedPlayers = [false, false, false, false];
+  late StreamSubscription<KLISocketMessage> sub;
 
   @override
   void initState() {
     super.initState();
+    sub = KLIServer.onMessageReceived.listen((m) async {
+      if (m.type == KLIMessageType.extraSignal) {
+        // stop timer, show popup
+        // returm: continue timer if wrong
+        final pos = m.senderID.index - 1;
+
+        KLIServer.sendToAllClients(KLISocketMessage(
+          senderID: ConnectionID.host,
+          type: KLIMessageType.stopTimer,
+        ));
+        timer?.cancel();
+        setState(() {});
+
+        if (mounted) {
+          final res = await dialogWithActions<bool>(
+            context,
+            title: 'Answer',
+            content: '${Networking.getClientDisplayID(m.senderID)} has decided to answer.',
+            time: 150.ms,
+            actions: [
+              KLIButton(
+                'Correct',
+                onPressed: () => Navigator.of(context).pop(true),
+              ),
+              KLIButton(
+                'Wrong',
+                onPressed: () {
+                  Navigator.of(context).pop(false);
+                },
+              ),
+            ],
+          );
+
+          if (res == true) {
+            MatchState().extraScores[pos]++;
+            canEnd = true;
+          } else {
+            if (allowedPlayers.where((e) => e).length == answeredCount) {
+              if (questionNum == 3) {
+                canEnd = true;
+              } else {
+                canNext = true;
+              }
+            }
+            if (currentTimeSec > 0) {
+              createTimer();
+              KLIServer.sendToAllClients(KLISocketMessage(
+                senderID: ConnectionID.host,
+                type: KLIMessageType.continueTimer,
+              ));
+            }
+          }
+
+          setState(() {});
+        }
+      }
+    });
+
+    SchedulerBinding.instance.addPostFrameCallback((_) async {
+      allowedPlayers = (await Navigator.of(context).push<List<bool>>(
+        PageRouteBuilder(
+          opaque: false,
+          transitionsBuilder: (_, anim1, __, child) {
+            return ScaleTransition(
+              scale: anim1.drive(CurveTween(curve: Curves.easeOutQuart)),
+              alignment: Alignment.center,
+              child: child,
+            );
+          },
+          transitionDuration: 150.ms,
+          reverseTransitionDuration: 150.ms,
+          pageBuilder: (_, __, ___) => const AllowExtraDialog(),
+        ),
+      ))!;
+    });
+    setState(() {});
   }
 
   @override
   void dispose() {
     timer?.cancel();
+    sub.cancel();
     super.dispose();
   }
 
@@ -57,7 +138,7 @@ class _ExtraScreenState extends State<ExtraScreen> {
                 child: Column(
                   children: [
                     questionContainer(),
-                    correctButtons(),
+                    // correctButtons(),
                     manageButtons(),
                   ],
                 ),
@@ -99,7 +180,7 @@ class _ExtraScreenState extends State<ExtraScreen> {
                 padding: const EdgeInsets.symmetric(vertical: 16),
                 alignment: Alignment.center,
                 child: Text(
-                  '${MatchState().players[i].name} (${MatchState().scores[i]})',
+                  '${MatchState().players[i].name} (${MatchState().scores[i]} - ${MatchState().extraScores[i]})',
                   style: const TextStyle(fontSize: fontSizeMedium),
                 ),
               ),
@@ -171,85 +252,27 @@ class _ExtraScreenState extends State<ExtraScreen> {
     );
   }
 
-  Widget correctButtons() {
+  Widget manageButtons() {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 32),
+      padding: const EdgeInsets.only(top: 32),
       child: Row(
         children: [
-          for (final i in range(0, 3))
-            Expanded(
-              child: Container(
-                margin: EdgeInsets.only(
-                  right: i == 3 ? 0 : 8,
-                  left: i == 0 ? 0 : 8,
-                ),
-                child: KLIButton(
-                  '${MatchState().players[i].name} (${MatchState().extraScores[i]})',
-                  enableCondition: canAnnounce,
-                  onPressed: () {
-                    MatchState().extraScores[i]++;
-                    canEnd = true;
-                    canAnnounce = canStopTimer = false;
-                    setState(() {});
-                  },
-                ),
-              ),
+          Expanded(
+            child: KLIButton(
+              'Next',
+              enableCondition: canNext,
+              disabledLabel: "Question not answered",
+              onPressed: () {
+                nextQuestion();
+                currentTimeSec = widget.timeLimitSec;
+                canNext = timerStopped = false;
+                canStart = canShowQuestion = true;
+                setState(() {});
+              },
             ),
+          ),
         ],
       ),
-    );
-  }
-
-  Widget manageButtons() {
-    return Row(
-      children: [
-        Expanded(
-          child: KLIButton(
-            'Incorrect',
-            enableCondition: canAnnounce,
-            disabledLabel: "Can't answer now",
-            onPressed: () {
-              canNext = questionNum < 3;
-              canEnd = questionNum == 3;
-              canAnnounce = canStopTimer = false;
-              setState(() {});
-            },
-          ),
-        ),
-        const SizedBox(width: 16),
-        Expanded(
-          child: KLIButton(
-            'Next',
-            enableCondition: canNext,
-            disabledLabel: "Question not answered",
-            onPressed: () {
-              nextQuestion();
-              currentTimeSec = widget.timeLimitSec;
-              canNext = timerStopped = false;
-              canStart = canShowQuestion = true;
-              setState(() {});
-            },
-          ),
-        ),
-        const SizedBox(width: 16),
-        Expanded(
-          child: KLIButton(
-            '${timerStopped ? 'Start' : 'Stop'} Timer',
-            enableCondition: canStopTimer,
-            disabledLabel: "Question not selected",
-            onPressed: () {
-              if (timerStopped) {
-                createTimer();
-              } else {
-                timer?.cancel();
-                canAnnounce = true;
-              }
-              timerStopped = !timerStopped;
-              setState(() {});
-            },
-          ),
-        ),
-      ],
     );
   }
 
@@ -257,7 +280,7 @@ class _ExtraScreenState extends State<ExtraScreen> {
     timer = Timer.periodic(1.seconds, (timer) {
       if (currentTimeSec <= 0) {
         timer.cancel();
-        timerStopped = true;
+        timerStopped = canNext = true;
         canStopTimer = canAnnounce = false;
         setState(() {});
       } else {
@@ -270,7 +293,18 @@ class _ExtraScreenState extends State<ExtraScreen> {
   void nextQuestion() {
     currentQuestion = MatchState().questionList!.removeLast() as ExtraQuestion;
     questionNum++;
-    KLIServer.sendToAllClients(KLISocketMessage(
+    for (final i in range(0, 3)) {
+      if (!allowedPlayers[i]) continue;
+      KLIServer.sendToPlayer(
+        i,
+        KLISocketMessage(
+          senderID: ConnectionID.host,
+          type: KLIMessageType.extraQuestion,
+          message: jsonEncode(currentQuestion.toJson()),
+        ),
+      );
+    }
+    KLIServer.sendToNonPlayer(KLISocketMessage(
       senderID: ConnectionID.host,
       type: KLIMessageType.extraQuestion,
       message: jsonEncode(currentQuestion.toJson()),

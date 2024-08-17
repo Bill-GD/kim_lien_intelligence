@@ -41,7 +41,6 @@ class _PlayerObstacleScreenState extends State<PlayerObstacleScreen> {
         canAnswer = canGuessObstacle = false;
         currentTimeSec = 0;
         timer?.cancel();
-        setState(() {});
       }
 
       if (m.type == KLIMessageType.scores) {
@@ -51,6 +50,7 @@ class _PlayerObstacleScreenState extends State<PlayerObstacleScreen> {
           i++;
         }
       }
+
       if (m.type == KLIMessageType.obstacleQuestion) {
         canGuessObstacle = true;
         if (canAnswer) return;
@@ -63,6 +63,7 @@ class _PlayerObstacleScreenState extends State<PlayerObstacleScreen> {
         createTimer();
         canAnswer = true;
       }
+
       if (m.type == KLIMessageType.hideQuestion) {
         answerTextController.text = '';
         submittedAnswer = '';

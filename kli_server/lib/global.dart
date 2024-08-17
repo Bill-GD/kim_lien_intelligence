@@ -128,7 +128,10 @@ const String changelog = """
   - Finish point values are selected first, then use side buttons to show next question
   - Select star before showing question, can only use once
   - Stealing shows other who's the stealer
-  - Wrong answer with star reduces score (original value)
+  - Wrong answer with star reduces score (original value), won't be reduced again if stolen
+  - Fixed player scores can be negative
+  - Extra section receives player answer signals
+  - Added "dialog" to allow 2-4 players to participate in extra section
 
   0.4.5.1 ({463fdf9}):
   - Fixed accel manager not showing type when image count is 0

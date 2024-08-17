@@ -81,8 +81,8 @@ class _FinishScreenState extends State<FinishScreen> {
           setState(() {});
           KLIServer.sendToAllClients(KLISocketMessage(
             senderID: ConnectionID.host,
-            message: jsonEncode(MatchState().scores),
             type: KLIMessageType.scores,
+            message: jsonEncode(MatchState().scores),
           ));
         }
       }
@@ -289,7 +289,7 @@ class _FinishScreenState extends State<FinishScreen> {
                   ));
                 }
                 KLIServer.sendToAllExcept(
-                  ConnectionID.values[widget.playerPos + 1],
+                  [ConnectionID.values[widget.playerPos + 1]],
                   KLISocketMessage(
                     senderID: ConnectionID.host,
                     type: KLIMessageType.enableSteal,
