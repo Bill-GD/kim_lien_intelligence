@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
@@ -23,11 +24,13 @@ class MatchOverview extends StatefulWidget {
 class _MatchOverviewState extends State<MatchOverview> {
   bool canEndMatch = false, canStartExtra = false;
   List<bool> allowExtra = [];
+  StreamSubscription<KLISocketMessage>? sub;
 
   @override
   void initState() {
     super.initState();
-    KLIServer.onMessageReceived.listen((m) {
+
+    sub ??= KLIServer.onMessageReceived.listen((m) {
       // if (m.type == KLIMessageType.reconnect) {
       //   MatchState.handleReconnection(m);
       // }
@@ -52,6 +55,12 @@ class _MatchOverviewState extends State<MatchOverview> {
         );
       }
     });
+  }
+
+  @override
+  void dispose() {
+    sub?.cancel();
+    super.dispose();
   }
 
   @override
