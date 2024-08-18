@@ -3,16 +3,15 @@ import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
 import 'package:kli_lib/kli_lib.dart';
-import 'package:kli_server/ui/allow_player.dart';
 
 import '../data_manager/match_state.dart';
 import '../global.dart';
 
 class ExtraScreen extends StatefulWidget {
   final timeLimitSec = 15.0;
-  const ExtraScreen({super.key});
+  final int playerCount;
+  const ExtraScreen({super.key, required this.playerCount});
 
   @override
   State<ExtraScreen> createState() => _ExtraScreenState();
@@ -30,7 +29,6 @@ class _ExtraScreenState extends State<ExtraScreen> {
   late ExtraQuestion currentQuestion;
   Timer? timer;
   int questionNum = 0, answeredCount = 0;
-  List<bool> allowedPlayers = [false, false, false, false];
   late StreamSubscription<KLISocketMessage> sub;
 
   @override
@@ -73,7 +71,7 @@ class _ExtraScreenState extends State<ExtraScreen> {
             MatchState().extraScores[pos]++;
             canEnd = true;
           } else {
-            if (allowedPlayers.where((e) => e).length == answeredCount) {
+            if (answeredCount == widget.playerCount) {
               if (questionNum == 3) {
                 canEnd = true;
               } else {
@@ -94,23 +92,6 @@ class _ExtraScreenState extends State<ExtraScreen> {
       }
     });
 
-    SchedulerBinding.instance.addPostFrameCallback((_) async {
-      allowedPlayers = (await Navigator.of(context).push<List<bool>>(
-        PageRouteBuilder(
-          opaque: false,
-          transitionsBuilder: (_, anim1, __, child) {
-            return ScaleTransition(
-              scale: anim1.drive(CurveTween(curve: Curves.easeOutQuart)),
-              alignment: Alignment.center,
-              child: child,
-            );
-          },
-          transitionDuration: 150.ms,
-          reverseTransitionDuration: 150.ms,
-          pageBuilder: (_, __, ___) => const AllowExtraDialog(),
-        ),
-      ))!;
-    });
     setState(() {});
   }
 
@@ -294,7 +275,6 @@ class _ExtraScreenState extends State<ExtraScreen> {
     currentQuestion = MatchState().questionList!.removeLast() as ExtraQuestion;
     questionNum++;
     for (final i in range(0, 3)) {
-      if (!allowedPlayers[i]) continue;
       KLIServer.sendToPlayer(
         i,
         KLISocketMessage(

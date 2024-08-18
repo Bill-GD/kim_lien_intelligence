@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:kli_lib/kli_lib.dart';
 
@@ -25,7 +24,7 @@ class _OverviewState extends State<Overview> {
   final List<StreamSubscription<void>> messageSubscriptions = [];
   final playerReady = <bool>[false, false, false, false];
   String overviewMessage = 'Chờ máy chủ bắt đầu trận đấu';
-  bool started = false;
+  bool ended = false;
 
   @override
   void initState() {
@@ -33,6 +32,7 @@ class _OverviewState extends State<Overview> {
 
     messageSubscriptions.add(KLIClient.onDisconnected.listen((_) => Navigator.pop(context)));
     messageSubscriptions.add(KLIClient.onMessageReceived.listen((m) {
+      if (ended) return;
       switch (m.type) {
         case KLIMessageType.scores:
           int i = 0;
@@ -44,9 +44,16 @@ class _OverviewState extends State<Overview> {
         case KLIMessageType.section:
           overviewMessage = 'Phần thi: ${m.message}';
           break;
+        case KLIMessageType.endMatch:
+          showPopupMessage(
+            context,
+            title: 'Match ended',
+            content: 'The match has ended for you. You can exit now.',
+          );
+          ended = true;
+          break;
         case KLIMessageType.startMatch:
           overviewMessage = 'Phần thi: khởi động';
-          started = true;
           break;
         case KLIMessageType.enterStart:
           Navigator.of(context).pushReplacement<void, void>(
@@ -103,7 +110,7 @@ class _OverviewState extends State<Overview> {
           centerTitle: true,
           title: const Text('Tổng quan', style: TextStyle(fontSize: fontSizeLarge)),
           forceMaterialTransparency: true,
-          automaticallyImplyLeading: kDebugMode,
+          automaticallyImplyLeading: ended,
         ),
         backgroundColor: Colors.transparent,
         body: Center(

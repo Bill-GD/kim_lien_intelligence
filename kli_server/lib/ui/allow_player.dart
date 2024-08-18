@@ -32,7 +32,7 @@ class _AllowExtraDialogState extends State<AllowExtraDialog> {
             mainAxisSize: MainAxisSize.min,
             children: [
               const Text(
-                'Who will be participating?',
+                'Who will be participating the Extra section?',
                 style: TextStyle(fontSize: fontSizeMedium),
               ),
               SizedBox(height: widget.spacing),
@@ -54,14 +54,23 @@ class _AllowExtraDialogState extends State<AllowExtraDialog> {
                 ],
               ),
               SizedBox(height: widget.spacing),
-              TextButton(
-                onPressed: selected.where((e) => e).length >= 2
-                    ? () {
-                        Future.delayed(50.ms, () => setState(() => barrierColor = Colors.transparent));
-                        Navigator.of(context).pop(selected);
-                      }
-                    : null,
-                child: const Text('OK'),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  TextButton(
+                    onPressed: selected.where((e) => e).length >= 2
+                        ? () {
+                            Future.delayed(50.ms, () => setState(() => barrierColor = Colors.transparent));
+                            Navigator.of(context).pop(selected);
+                          }
+                        : null,
+                    child: const Text('OK'),
+                  ),
+                  TextButton(
+                    onPressed: Navigator.of(context).pop,
+                    child: const Text('None, end match', style: TextStyle(color: Colors.red)),
+                  ),
+                ],
               ),
             ],
           ),

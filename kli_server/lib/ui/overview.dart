@@ -8,6 +8,7 @@ import 'package:kli_server/ui/finish.dart';
 import '../data_manager/match_state.dart';
 import '../global.dart';
 import 'accel.dart';
+import 'allow_player.dart';
 import 'extra.dart';
 import 'obstacle_questions.dart';
 import 'start.dart';
@@ -20,6 +21,9 @@ class MatchOverview extends StatefulWidget {
 }
 
 class _MatchOverviewState extends State<MatchOverview> {
+  bool canEndMatch = false, canStartExtra = false;
+  List<bool> allowExtra = [];
+
   @override
   void initState() {
     super.initState();
@@ -59,7 +63,22 @@ class _MatchOverviewState extends State<MatchOverview> {
           context,
           fontSize: fontSizeLarge,
           'Tổng quan trận ${MatchState().match.name}',
-          implyLeading: true,
+          // implyLeading: true,
+          leading: KLIIconButton(
+            const Icon(Icons.arrow_back),
+            enableCondition: canEndMatch || isTesting,
+            enabledLabel: 'End match',
+            disabledLabel: 'Cannot end match yet',
+            onPressed: () {
+              if (canEndMatch) {
+                KLIServer.sendToAllClients(KLISocketMessage(
+                  senderID: ConnectionID.host,
+                  type: KLIMessageType.endMatch,
+                ));
+              }
+              Navigator.of(context).pop();
+            },
+          ),
           actions: [
             const KLIHelpButton(
               content: '''
@@ -206,13 +225,51 @@ class _MatchOverviewState extends State<MatchOverview> {
               );
 
               MatchState().finishPlayerDone[MatchState().startOrFinishPos] = true;
-              MatchState().allFinishPlayerDone ? MatchState().nextSection() : MatchState().nextPlayer();
+              if (MatchState().allFinishPlayerDone) {
+                MatchState().nextSection();
+                if (mounted) {
+                  final s = await Navigator.of(context).push<List<bool>>(
+                    PageRouteBuilder(
+                      opaque: false,
+                      transitionsBuilder: (_, anim1, __, child) {
+                        return ScaleTransition(
+                          scale: anim1.drive(CurveTween(curve: Curves.easeOutQuart)),
+                          alignment: Alignment.center,
+                          child: child,
+                        );
+                      },
+                      transitionDuration: 150.ms,
+                      reverseTransitionDuration: 150.ms,
+                      pageBuilder: (_, __, ___) => const AllowExtraDialog(),
+                    ),
+                  );
+                  if (s != null) allowExtra = s;
+                }
+
+                if (allowExtra.isEmpty) {
+                  setState(() => canEndMatch = true);
+                  return;
+                }
+                canStartExtra = true;
+
+                KLIServer.sendToAllExcept(
+                  ConnectionID.values.where(
+                    (e) => e.name.contains('player') && allowExtra[e.index - 1],
+                  ),
+                  KLISocketMessage(
+                    senderID: ConnectionID.host,
+                    type: KLIMessageType.endMatch,
+                  ),
+                );
+              } else {
+                MatchState().nextPlayer();
+              }
               setState(() {});
             },
           ),
           KLIButton(
             'Extra',
-            enableCondition: MatchState().section == MatchSection.extra,
+            enableCondition: canStartExtra && MatchState().section == MatchSection.extra,
             enabledLabel: 'To Extra',
             disabledLabel: 'Current section: ${MatchState().section.name}',
             onPressed: () async {
@@ -224,9 +281,14 @@ class _MatchOverviewState extends State<MatchOverview> {
 
               await Navigator.of(context).push<void>(
                 MaterialPageRoute(
-                  builder: (context) => const ExtraScreen(),
+                  builder: (context) => ExtraScreen(playerCount: allowExtra.where((e) => e).length),
                 ),
               );
+              setState(() => canEndMatch = true);
+              KLIServer.sendToAllClients(KLISocketMessage(
+                senderID: ConnectionID.host,
+                type: KLIMessageType.endMatch,
+              ));
             },
           ),
         ],

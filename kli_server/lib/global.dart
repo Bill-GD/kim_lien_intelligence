@@ -37,12 +37,14 @@ void initAssetHandler() {
 AppBar managerAppBar(
   BuildContext context,
   String title, {
-  List<Widget>? actions,
+  Widget? leading,
   bool implyLeading = false,
+  List<Widget>? actions,
   final double fontSize = fontSizeXL,
 }) {
   return AppBar(
     title: Text(title),
+    leading: leading,
     backgroundColor: Colors.transparent,
     automaticallyImplyLeading: implyLeading,
     titleTextStyle: TextStyle(fontSize: fontSize),
@@ -132,6 +134,8 @@ const String changelog = """
   - Fixed player scores can be negative
   - Extra section receives player answer signals
   - Added "dialog" to allow 2-4 players to participate in extra section
+  - Manager app bar can have custom leading
+  - Match can end or continue with the Extra section, players not in extra can exit right away
 
   0.4.5.1 ({463fdf9}):
   - Fixed accel manager not showing type when image count is 0

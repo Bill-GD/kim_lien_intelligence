@@ -44,6 +44,7 @@ const String changelog = """
   - Highlights who signaled to steal finish answer in yellow
   - Added button to signal answer in extra
   - Doesn't create cache note if already exists
+  - Enables quiting if match ended (received endMatch message)
 
   0.2.5.1 ({463fdf9}):
   - Fixed not showing match data received progress if missed cache
