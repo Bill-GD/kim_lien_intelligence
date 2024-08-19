@@ -1,10 +1,12 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 import 'dart:math';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:kli_lib/kli_lib.dart';
+import 'package:video_player/video_player.dart';
 
 import '../data_manager/match_state.dart';
 import '../global.dart';
@@ -22,6 +24,7 @@ class _FinishScreenState extends State<FinishScreen> {
   double timeLimitSec = 1, currentTimeSec = 0;
   bool canSelectPoint = true,
       canSelectQuestion = false,
+      canPlayVideo = true,
       canStart = false,
       canShowQuestion = false,
       hoverStar = false,
@@ -35,6 +38,8 @@ class _FinishScreenState extends State<FinishScreen> {
   int chosenQuestionCount = 0, questionNum = 0, pointValue = 0, stealer = -1;
   late final StreamSubscription<KLISocketMessage> sub;
   final List<int> chosenQuestions = [0, 0, 0];
+  VideoPlayerController? vidController;
+  bool get isVidQuestion => currentQuestion.mediaPath.isNotEmpty;
 
   @override
   void initState() {
@@ -93,6 +98,7 @@ class _FinishScreenState extends State<FinishScreen> {
   void dispose() {
     timer?.cancel();
     sub.cancel();
+    vidController?.dispose();
     super.dispose();
   }
 
@@ -181,63 +187,103 @@ class _FinishScreenState extends State<FinishScreen> {
           borderRadius: BorderRadius.circular(10),
         ),
         child: Column(
-          children: [
+          children: <Widget>[
             players(),
             Expanded(
-              child: Stack(
-                children: [
-                  canShowQuestion
-                      ? Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
-                          child: Text(
-                            'Câu hỏi $questionNum',
-                            style: const TextStyle(fontSize: fontSizeLarge),
-                          ),
-                        )
-                      : const SizedBox(),
-                  Positioned(
-                    right: 0,
-                    child: canShowQuestion
-                        ? Padding(
+              child: Container(
+                decoration: const BoxDecoration(
+                  border: BorderDirectional(top: BorderSide(color: Colors.white)),
+                ),
+                alignment: Alignment.center,
+                child: canShowQuestion
+                    ? Stack(
+                        children: [
+                          Padding(
                             padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
                             child: Text(
-                              '$pointValue điểm',
+                              'Câu hỏi $questionNum',
                               style: const TextStyle(fontSize: fontSizeLarge),
                             ),
-                          )
-                        : const SizedBox(),
-                  ),
-                  Container(
-                    decoration: const BoxDecoration(
-                      border: BorderDirectional(top: BorderSide(color: Colors.white)),
-                    ),
-                    padding: const EdgeInsets.symmetric(horizontal: 128),
-                    alignment: Alignment.center,
-                    child: canShowQuestion
-                        ? Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text(
-                                currentQuestion.question,
-                                textAlign: TextAlign.center,
-                                // textWidthBasis: TextWidthBasis.longestLine,
+                          ),
+                          Positioned(
+                            right: 0,
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
+                              child: Text(
+                                '$pointValue điểm',
                                 style: const TextStyle(fontSize: fontSizeLarge),
                               ),
-                              const SizedBox(height: 16),
-                              Text(
-                                currentQuestion.answer,
-                                softWrap: true,
-                                textAlign: TextAlign.end,
-                                style: const TextStyle(
-                                  fontSize: fontSizeMedium,
-                                  fontStyle: FontStyle.italic,
-                                ),
+                            ),
+                          ),
+                          !isVidQuestion
+                              ? Padding(
+                                  padding: const EdgeInsets.only(left: 128, right: 128),
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Text(
+                                        currentQuestion.question,
+                                        textAlign: TextAlign.center,
+                                        style: const TextStyle(fontSize: fontSizeLarge),
+                                      ),
+                                      const SizedBox(height: 16),
+                                      Text(
+                                        currentQuestion.answer,
+                                        softWrap: true,
+                                        style: const TextStyle(
+                                          fontSize: fontSizeMedium,
+                                          fontStyle: FontStyle.italic,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                )
+                              : const SizedBox(),
+                          if (vidController != null && isVidQuestion)
+                            Padding(
+                              padding: const EdgeInsets.only(top: 20, bottom: 24),
+                              child: Stack(
+                                children: [
+                                  Positioned(
+                                    top: 0,
+                                    left: MediaQuery.of(context).size.width / 2.5,
+                                    child: Text(
+                                      currentQuestion.answer,
+                                      softWrap: true,
+                                      textAlign: TextAlign.center,
+                                      style: const TextStyle(
+                                        fontSize: fontSizeMSmall,
+                                        fontStyle: FontStyle.italic,
+                                      ),
+                                    ),
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.only(top: 48),
+                                    child: Row(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        VideoPlayer(vidController!),
+                                      ],
+                                    ),
+                                  ),
+                                  Container(
+                                    alignment: Alignment.centerRight,
+                                    padding: const EdgeInsets.only(right: 100),
+                                    child: KLIButton(
+                                      'Play',
+                                      enableCondition: canShowQuestion && canPlayVideo,
+                                      onPressed: () {
+                                        vidController!.play();
+                                        setState(() => canPlayVideo = false);
+                                      },
+                                    ),
+                                  ),
+                                ],
                               ),
-                            ],
-                          )
-                        : null,
-                  ),
-                ],
+                            ),
+                        ],
+                      )
+                    : const SizedBox(),
               ),
             ),
           ],
@@ -359,6 +405,16 @@ class _FinishScreenState extends State<FinishScreen> {
     timeLimitSec = currentTimeSec = 5 + point / 10 * 5;
     if (!canUseStar && chosenStar) chosenStar = false;
     pointValue = chosenStar ? currentQuestion.point * 2 : point;
+
+    if (isVidQuestion) {
+      vidController = VideoPlayerController.file(
+        File(StorageHandler.getFullPath(currentQuestion.mediaPath)),
+      )..initialize().then((_) => setState(() => canPlayVideo = true));
+    } else {
+      vidController?.dispose();
+      vidController = null;
+    }
+
     KLIServer.sendToAllClients(KLISocketMessage(
       senderID: ConnectionID.host,
       type: KLIMessageType.finishQuestion,

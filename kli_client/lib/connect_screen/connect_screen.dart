@@ -22,6 +22,7 @@ class _ConnectPageState extends State<ConnectPage> {
   bool isLoading = true;
 
   final clientTextController = TextEditingController(), ipTextController = TextEditingController();
+  ConnectionID? selectedID;
   bool isConnecting = false, isConnected = false;
 
   StreamSubscription<void>? messageSubscription;
@@ -110,7 +111,7 @@ class _ConnectPageState extends State<ConnectPage> {
       children: [
         DropdownMenu(
           enabled: !isConnected,
-          initialSelection: KLIClient.clientID,
+          initialSelection: selectedID,
           controller: clientTextController,
           label: const Text('Client'),
           dropdownMenuEntries: [
@@ -118,7 +119,7 @@ class _ConnectPageState extends State<ConnectPage> {
               DropdownMenuEntry(value: c, label: Networking.getClientDisplayID(c))
           ],
           onSelected: (value) {
-            KLIClient.clientID = value!;
+            selectedID = value;
             setState(() {});
           },
         ),
@@ -145,7 +146,7 @@ class _ConnectPageState extends State<ConnectPage> {
           enableCondition: !isConnecting && !isConnected,
           onPressed: () async {
             final ip = ipTextController.value.text.trim();
-            if (ip.isEmpty || KLIClient.clientID == null) {
+            if (ip.isEmpty || selectedID == null) {
               showPopupMessage(
                 context,
                 title: 'Client ID and Host IP',
@@ -154,10 +155,10 @@ class _ConnectPageState extends State<ConnectPage> {
               return;
             }
 
-            logHandler.info('Selected role: ${KLIClient.clientID}');
+            logHandler.info('Selected id: ${selectedID!.name}');
             try {
               setState(() => isConnecting = true);
-              await KLIClient.init(ip, KLIClient.clientID!);
+              await KLIClient.init(ip, selectedID!);
               setState(() {
                 isConnecting = false;
                 isConnected = true;
@@ -184,7 +185,7 @@ class _ConnectPageState extends State<ConnectPage> {
           enableCondition: isConnected,
           onPressed: () {
             KLIClient.disconnect();
-            clientTextController.text = '';
+            // clientTextController.text = '';
             setState(() => isConnected = false);
           },
         ),

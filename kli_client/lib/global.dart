@@ -38,7 +38,10 @@ String getSizeString(double bytes) {
 }
 
 const String changelog = """
-  0.2.5.2 ({latest}):
+  0.2.5.3 ({latest}):
+  - Reworked connect screen: no longer need to re-enter id to reconnect
+
+  0.2.5.2 ({cf809e4}):
   - Fixed can guess obstacle before first question
   - Fixed obstacle screen top "padding"
   - Highlights who signaled to steal finish answer in yellow

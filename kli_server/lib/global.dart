@@ -124,7 +124,11 @@ SideNavigationBarTheme sideNavigationTheme(BuildContext context, [double height 
 }
 
 const String changelog = """
-  0.4.5.2 ({latest}):
+  0.4.5.3 ({latest}):
+  - Added video player to Finish UI: hides question, shows video & answer
+  - Fixed receiving error showing concatenated data while already handled
+
+  0.4.5.2 ({cf809e4}):
   - Show arrange question's answer when pressing explanation button
   - Fixed can select and start question when obstacle is answered
   - Finish point values are selected first, then use side buttons to show next question
