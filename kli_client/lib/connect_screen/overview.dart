@@ -29,7 +29,7 @@ class _OverviewState extends State<Overview> {
   @override
   void initState() {
     super.initState();
-    updateChild = setState;
+    updateChild = () => setState(() {});
     messageSubscriptions.add(KLIClient.onDisconnected.listen((_) => Navigator.pop(context)));
     messageSubscriptions.add(KLIClient.onMessageReceived.listen((m) {
       if (ended) return;

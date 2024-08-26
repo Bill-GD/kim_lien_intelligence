@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:kli_lib/kli_lib.dart';
 
@@ -107,7 +106,7 @@ class _ExtraScreenState extends State<ExtraScreen> {
     return Container(
       decoration: BoxDecoration(image: bgDecorationImage),
       child: Scaffold(
-        appBar: managerAppBar(context, 'Extra', implyLeading: kDebugMode),
+        appBar: managerAppBar(context, 'Extra', implyLeading: isTesting),
         extendBodyBehindAppBar: true,
         backgroundColor: Colors.transparent,
         body: Padding(

@@ -1,12 +1,13 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:kli_lib/kli_lib.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
-bool isTesting = false, showDebugInfo = false;
+bool isTesting = kDebugMode, showDebugInfo = false;
 DecorationImage? bgDecorationImage;
 
-late void Function(void Function()) updateDebugOverlay;
-late void Function(void Function()) updateChild;
+late void Function() updateDebugOverlay;
+late void Function() updateChild;
 
 late final LogHandler logHandler;
 void initLogHandler() {
@@ -27,7 +28,7 @@ void initAssetHandler() {
 
 late final AudioHandler audioHandler;
 void initAudioHandler() {
-  audioHandler = AudioHandler.init();
+  audioHandler = AudioHandler.init(updateDebugOverlay);
 }
 
 String getSizeString(double bytes) {
@@ -41,7 +42,7 @@ String getSizeString(double bytes) {
 }
 
 const String changelog = """
-  0.2.6 ({latest}):
+  0.2.5.4 ({latest}):
   - Added Debug overlay: version, build date, test mode, ip, port, clientID, receiving data...
   - Fixed not listening to onDisconnected more than once
 

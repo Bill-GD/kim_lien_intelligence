@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:kli_lib/kli_lib.dart';
 
@@ -38,7 +37,7 @@ class _StartScreenState extends State<StartScreen> {
       decoration: BoxDecoration(image: bgDecorationImage),
       child: Scaffold(
         extendBodyBehindAppBar: true,
-        appBar: managerAppBar(context, 'Start', implyLeading: kDebugMode),
+        appBar: managerAppBar(context, 'Start', implyLeading: isTesting),
         backgroundColor: Colors.transparent,
         body: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 64, vertical: 96),

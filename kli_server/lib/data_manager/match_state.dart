@@ -139,6 +139,7 @@ class MatchState {
       message: sectionDisplay(section),
       type: KLIMessageType.section,
     ));
+    updateDebugOverlay();
   }
 
   void loadQuestions() {

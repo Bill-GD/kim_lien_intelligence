@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:kli_lib/kli_lib.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -52,6 +53,11 @@ class _LoadingScreenState extends State<LoadingScreen> {
 
       logHandler.info('Finished initializing app');
       logHandler.empty();
+
+      if (kDebugMode) {
+        showDebugInfo = true;
+        updateDebugOverlay();
+      }
 
       if (mounted) {
         Navigator.of(context).pushReplacement(

@@ -3,7 +3,6 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:kli_lib/kli_lib.dart';
 import 'package:video_player/video_player.dart';
@@ -107,7 +106,7 @@ class _FinishScreenState extends State<FinishScreen> {
     return Container(
       decoration: BoxDecoration(image: bgDecorationImage),
       child: Scaffold(
-        appBar: managerAppBar(context, 'Finish', implyLeading: kDebugMode),
+        appBar: managerAppBar(context, 'Finish', implyLeading: isTesting),
         extendBodyBehindAppBar: true,
         backgroundColor: Colors.transparent,
         body: Padding(

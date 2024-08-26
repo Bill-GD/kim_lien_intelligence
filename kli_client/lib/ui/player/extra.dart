@@ -27,7 +27,7 @@ class _PlayerExtraScreenState extends State<PlayerExtraScreen> {
   @override
   void initState() {
     super.initState();
-    updateChild = setState;
+    updateChild = () => setState(() {});
     sub = KLIClient.onMessageReceived.listen((m) {
       if (m.type == KLIMessageType.extraQuestion) {
         currentQuestion = ExtraQuestion.fromJson(jsonDecode(m.message));

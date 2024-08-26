@@ -28,7 +28,7 @@ class _PlayerFinishScreenState extends State<PlayerFinishScreen> {
   @override
   void initState() {
     super.initState();
-    updateChild = setState;
+    updateChild = () => setState(() {});
     sub = KLIClient.onMessageReceived.listen((m) {
       if (m.type == KLIMessageType.finishQuestion) {
         currentQuestion = FinishQuestion.fromJson(jsonDecode(m.message));

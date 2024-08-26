@@ -29,7 +29,7 @@ class _PlayerStartScreenState extends State<PlayerStartScreen> {
   @override
   void initState() {
     super.initState();
-    updateChild = setState;
+    updateChild = () => setState(() {});
     sub = KLIClient.onMessageReceived.listen((m) {
       if (m.type == KLIMessageType.startQuestion) {
         if (timeEnded) return;

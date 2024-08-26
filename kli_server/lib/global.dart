@@ -1,11 +1,14 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:kli_lib/kli_lib.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:side_navigation/side_navigation.dart';
 
-bool isTesting = true;
-
+bool isTesting = kDebugMode, showDebugInfo = false;
 late final DecorationImage bgDecorationImage;
+
+late void Function() updateDebugOverlay;
+late void Function() updateChild;
 
 late final LogHandler logHandler;
 void initLogHandler() {
@@ -26,7 +29,7 @@ void initStorageHandler() {
 
 late final AudioHandler audioHandler;
 void initAudioHandler() {
-  audioHandler = AudioHandler.init();
+  audioHandler = AudioHandler.init(updateDebugOverlay);
 }
 
 late final AssetHandler assetHandler;
@@ -124,7 +127,10 @@ SideNavigationBarTheme sideNavigationTheme(BuildContext context, [double height 
 }
 
 const String changelog = """
-  0.4.5.3 ({latest}):
+  0.4.5.4 ({latest}):
+  - Added Debug overlay: version, build date, test mode, server status, host IP, port, device IP...
+
+  0.4.5.3 ({085715f}):
   - Added video player to Finish UI: hides question, shows video & answer
   - Fixed receiving error showing concatenated data while already handled
 

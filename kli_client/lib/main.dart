@@ -53,7 +53,7 @@ void main() async {
     await windowManager.hide();
     await windowManager.ensureInitialized();
   }
-  windowManager.setAlwaysOnTop(!kDebugMode && false);
+  windowManager.setAlwaysOnTop(!isTesting && false);
   await windowManager.waitUntilReadyToShow(null, () async {
     await windowManager.setFullScreen(true);
     await windowManager.show();
@@ -101,7 +101,10 @@ class _KliClientAppState extends State<KliClientApp> {
               navigatorKey: widget.navKey,
               builder: (context, child) {
                 ErrorWidget.builder = (errorDetails) => WidgetErrorScreen(e: errorDetails);
-                updateDebugOverlay = setState;
+                updateDebugOverlay = () {
+                  // logHandler.info('Updating debug overlay');
+                  setState(() {});
+                };
                 return Stack(
                   children: [
                     child!,
@@ -148,7 +151,7 @@ class _KliClientAppState extends State<KliClientApp> {
                       onTap: () {
                         logHandler.info('Toggling test mode');
                         setState(() => isTesting = !isTesting);
-                        updateChild(() {});
+                        updateChild();
                       },
                       child: MouseRegion(
                         cursor: SystemMouseCursors.click,
@@ -157,10 +160,12 @@ class _KliClientAppState extends State<KliClientApp> {
                     ),
                   ],
                 ),
+                Text('Position: $_offset'),
                 Text('Client ID: ${KLIClient.clientID}'),
                 Text('Host: ${KLIClient.socket?.remoteAddress.address}:${KLIClient.socket?.remotePort}'),
                 Text('Client: ${KLIClient.socket?.address.address}:${KLIClient.socket?.port}'),
                 Text('Receiving data: ${KLIClient.receivingData}'),
+                Text('Playing sound: ${audioHandler.isPlaying}'),
               ],
             ),
           ),

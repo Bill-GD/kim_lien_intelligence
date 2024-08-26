@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -25,13 +24,16 @@ class _ServerSetupState extends State<ServerSetup> {
   @override
   void initState() {
     super.initState();
+    updateChild = () => setState(() {});
     KLIServer.stop();
     logHandler.info('Opened Server Setup page');
     getIpAddresses();
   }
 
   void getIpAddresses() async {
-    localAddress = await Networking.getLocalIP();
+    KLIServer.serverAddress = await Networking.getLocalIP();
+    localAddress = KLIServer.serverIP;
+    updateDebugOverlay();
     setState(() {});
   }
 
@@ -47,6 +49,7 @@ class _ServerSetupState extends State<ServerSetup> {
       acceptLogMessage: 'Leaving Server Setup page...',
       onAccept: () async {
         await KLIServer.stop();
+        updateDebugOverlay();
         if (mounted) Navigator.pop(context);
       },
     );
@@ -126,8 +129,8 @@ class _ServerSetupState extends State<ServerSetup> {
           enableCondition: !KLIServer.started,
           disabledLabel: 'Server already started',
           onPressed: () async {
-            await KLIServer.start();
-
+            await KLIServer.start(updateDebugOverlay);
+            updateDebugOverlay();
             addClientListeners();
             setState(() {});
           },
@@ -139,6 +142,7 @@ class _ServerSetupState extends State<ServerSetup> {
           onPressed: () async {
             // MatchState.reset();
             await KLIServer.stop();
+            updateDebugOverlay();
             setState(() {});
           },
         ),
@@ -159,6 +163,7 @@ class _ServerSetupState extends State<ServerSetup> {
               type: KLIMessageType.section,
             ));
 
+            updateDebugOverlay();
             logHandler.empty();
             logHandler.info('Match started');
             if (mounted) {
@@ -168,13 +173,14 @@ class _ServerSetupState extends State<ServerSetup> {
             }
           },
         ),
-        if (kDebugMode)
+        if (isTesting)
           KLIButton(
             'Reset',
             onPressed: () {
               final matchName = MatchState().match.name;
               MatchState.reset();
               MatchState.instantiate(matchName);
+              updateDebugOverlay();
               logHandler.info('Match reset');
               debugPrint('Match reset');
               setState(() {});

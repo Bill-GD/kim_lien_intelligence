@@ -30,7 +30,7 @@ class _PlayerAccelScreenState extends State<PlayerAccelScreen> {
   @override
   void initState() {
     super.initState();
-    updateChild = setState;
+    updateChild = () => setState(() {});
     sub = KLIClient.onMessageReceived.listen((m) {
       if (m.type == KLIMessageType.endSection) {
         Navigator.of(context).pushReplacement<void, void>(

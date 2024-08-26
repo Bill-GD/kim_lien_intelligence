@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:kli_lib/kli_lib.dart';
 
@@ -68,7 +67,7 @@ class _AccelScreenState extends State<AccelScreen> {
         appBar: managerAppBar(
           context,
           'Accel',
-          implyLeading: kDebugMode,
+          implyLeading: isTesting,
           actions: [Container()],
         ),
         extendBodyBehindAppBar: true,

@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:kli_lib/kli_lib.dart';
 
@@ -119,7 +118,7 @@ class _ObstacleQuestionScreenState extends State<ObstacleQuestionScreen> {
         appBar: managerAppBar(
           context,
           'Obstacle: ${MatchState().obstacleMatch!.keyword}',
-          implyLeading: kDebugMode,
+          implyLeading: isTesting,
           actions: [Container()],
         ),
         backgroundColor: Colors.transparent,

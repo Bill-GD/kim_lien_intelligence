@@ -31,7 +31,7 @@ class _ConnectPageState extends State<ConnectPage> {
     KLIClient.onDisconnected.listen((m) {
       showPopupMessage(context, title: 'Forced disconnection', content: m);
       setState(() => isConnected = false);
-      updateDebugOverlay(() {});
+      updateDebugOverlay();
     });
   }
 
@@ -59,7 +59,10 @@ class _ConnectPageState extends State<ConnectPage> {
                 changelog: changelog,
                 versionString: appVersionString,
                 appName: 'KLI Client',
-                devToggle: () => updateDebugOverlay(() => showDebugInfo = !showDebugInfo),
+                devToggle: () {
+                  showDebugInfo = !showDebugInfo;
+                  updateDebugOverlay();
+                },
               ),
             ],
           ),
@@ -156,7 +159,7 @@ class _ConnectPageState extends State<ConnectPage> {
                 isConnecting = false;
                 isConnected = true;
               });
-              updateDebugOverlay(() {});
+              updateDebugOverlay();
             } on Exception catch (e, stack) {
               logHandler.error('Error when trying to connect: $e', stackTrace: stack);
               setState(() {
@@ -181,7 +184,7 @@ class _ConnectPageState extends State<ConnectPage> {
             KLIClient.disconnect();
             // clientTextController.text = '';
             setState(() => isConnected = false);
-            updateDebugOverlay(() {});
+            updateDebugOverlay();
           },
         ),
         const SizedBox(width: 20),

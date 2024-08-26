@@ -8,6 +8,7 @@ import 'package:kli_lib/kli_lib.dart';
 import 'package:theme_provider/theme_provider.dart';
 import 'package:window_manager/window_manager.dart';
 
+import 'data_manager/match_state.dart';
 import 'global.dart';
 import 'loading_screen.dart';
 
@@ -61,9 +62,16 @@ void main() async {
   runApp(KliServerApp(navKey: navigatorKey));
 }
 
-class KliServerApp extends StatelessWidget {
+class KliServerApp extends StatefulWidget {
   final GlobalKey<NavigatorState> navKey;
   const KliServerApp({super.key, required this.navKey});
+
+  @override
+  State<KliServerApp> createState() => _KliServerAppState();
+}
+
+class _KliServerAppState extends State<KliServerApp> {
+  Offset _offset = Offset.zero;
 
   @override
   Widget build(BuildContext context) {
@@ -88,18 +96,78 @@ class KliServerApp extends StatelessWidget {
       child: ThemeConsumer(
         child: Builder(builder: (context) {
           return MaterialApp(
-            navigatorKey: navKey,
+            navigatorKey: widget.navKey,
             builder: (context, child) {
               ErrorWidget.builder = (errorDetails) => WidgetErrorScreen(e: errorDetails);
-
-              if (child != null) return child;
-              throw StateError('widget is null');
+              updateDebugOverlay = () {
+                // logHandler.info('Updating debug overlay');
+                setState(() {});
+              };
+              return Stack(
+                children: [
+                  child!,
+                  showDebugInfo ? debugOverlay() : const SizedBox(),
+                ],
+              );
             },
             scrollBehavior: const MaterialScrollBehavior().copyWith(dragDevices: {PointerDeviceKind.mouse}),
             theme: ThemeProvider.themeOf(context).data,
             home: const LoadingScreen(),
           );
         }),
+      ),
+    );
+  }
+
+  Widget debugOverlay() {
+    return Positioned(
+      top: _offset.dy,
+      left: _offset.dx,
+      child: GestureDetector(
+        onPanUpdate: (details) => setState(() => _offset += details.delta),
+        child: Container(
+          decoration: BoxDecoration(
+            color: Theme.of(context).colorScheme.onBackground,
+            border: Border.all(color: Theme.of(context).colorScheme.background),
+            borderRadius: BorderRadius.circular(10),
+          ),
+          padding: const EdgeInsets.all(12),
+          child: DefaultTextStyle.merge(
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: Theme.of(context).colorScheme.background,
+                  fontSize: fontSizeSmall,
+                ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('App version: $appVersionString (${DateTime(2024, 8, 26).reverseDate})'),
+                Row(
+                  children: [
+                    const Text('Test mode: '),
+                    GestureDetector(
+                      onTap: () {
+                        logHandler.info('Toggling test mode');
+                        setState(() => isTesting = !isTesting);
+                        updateChild();
+                      },
+                      child: MouseRegion(
+                        cursor: SystemMouseCursors.click,
+                        child: Text(isTesting ? '✔️' : '❌'),
+                      ),
+                    ),
+                  ],
+                ),
+                Text('Position: $_offset'),
+                Text('Server started: ${KLIServer.started}'),
+                Text('Host: ${KLIServer.socket?.address.address}:${KLIServer.socket?.port}'),
+                Text('Device: ${KLIServer.serverIP}'),
+                Text('Client count: ${KLIServer.connectedClientCount}'),
+                Text('Playing sound: ${audioHandler.isPlaying}'),
+                Text('Match section: ${MatchState.initialized ? MatchState().section : null}'),
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }

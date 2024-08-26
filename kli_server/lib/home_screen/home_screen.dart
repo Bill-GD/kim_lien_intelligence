@@ -61,6 +61,10 @@ class _HomeScreenState extends State<HomeScreen> {
                   changelog: changelog,
                   versionString: appVersionString,
                   appName: 'KLI Server',
+                  devToggle: () {
+                    showDebugInfo = !showDebugInfo;
+                    updateDebugOverlay();
+                  },
                 ),
               ),
               items: const [
