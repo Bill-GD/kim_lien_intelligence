@@ -4,6 +4,7 @@
 
 list(APPEND FLUTTER_PLUGIN_LIST
   audioplayers_windows
+  flutter_acrylic
   screen_retriever
   url_launcher_windows
   video_player_win

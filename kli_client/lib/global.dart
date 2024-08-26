@@ -2,8 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:kli_lib/kli_lib.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
-bool isTesting = true;
+bool isTesting = false, showDebugInfo = false;
 DecorationImage? bgDecorationImage;
+
+late void Function(void Function()) updateDebugOverlay;
+late void Function(void Function()) updateChild;
 
 late final LogHandler logHandler;
 void initLogHandler() {
@@ -38,7 +41,11 @@ String getSizeString(double bytes) {
 }
 
 const String changelog = """
-  0.2.5.3 ({latest}):
+  0.2.6 ({latest}):
+  - Added Debug overlay: version, build date, test mode, ip, port, clientID, receiving data...
+  - Fixed not listening to onDisconnected more than once
+
+  0.2.5.3 ({085715f}):
   - Reworked connect screen: no longer need to re-enter id to reconnect
 
   0.2.5.2 ({cf809e4}):

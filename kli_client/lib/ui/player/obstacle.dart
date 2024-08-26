@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:kli_lib/kli_lib.dart';
 
@@ -30,6 +29,7 @@ class _PlayerObstacleScreenState extends State<PlayerObstacleScreen> {
   @override
   void initState() {
     super.initState();
+    updateChild = setState;
     sub = KLIClient.onMessageReceived.listen((m) {
       if (m.type == KLIMessageType.endSection) {
         Navigator.of(context).pushReplacement<void, void>(
@@ -124,7 +124,7 @@ class _PlayerObstacleScreenState extends State<PlayerObstacleScreen> {
         backgroundColor: Colors.transparent,
         extendBodyBehindAppBar: true,
         appBar: AppBar(
-          automaticallyImplyLeading: kDebugMode,
+          automaticallyImplyLeading: isTesting,
           backgroundColor: Colors.transparent,
         ),
         body: Padding(

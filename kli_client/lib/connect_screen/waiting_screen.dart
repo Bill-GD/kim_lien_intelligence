@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:kli_lib/kli_lib.dart';
 
@@ -47,7 +46,7 @@ class _WaitingScreenState extends State<WaitingScreen> {
           centerTitle: true,
           title: const Text('Waiting room', style: TextStyle(fontSize: fontSizeLarge)),
           forceMaterialTransparency: true,
-          automaticallyImplyLeading: kDebugMode,
+          automaticallyImplyLeading: isTesting,
         ),
         body: Container(
           alignment: Alignment.center,

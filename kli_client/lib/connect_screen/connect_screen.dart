@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -25,65 +24,59 @@ class _ConnectPageState extends State<ConnectPage> {
   ConnectionID? selectedID;
   bool isConnecting = false, isConnected = false;
 
-  StreamSubscription<void>? messageSubscription;
-
   @override
   void initState() {
     super.initState();
 
-    messageSubscription = KLIClient.onDisconnected.listen((m) {
-      isConnected = false;
-      clientTextController.text = '';
-      messageSubscription?.cancel();
-      messageSubscription = null;
-
+    KLIClient.onDisconnected.listen((m) {
       showPopupMessage(context, title: 'Forced disconnection', content: m);
-      setState(() {});
+      setState(() => isConnected = false);
+      updateDebugOverlay(() {});
     });
   }
 
   @override
   void dispose() {
     ipTextController.dispose();
-    messageSubscription?.cancel();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      key: _key,
-      extendBodyBehindAppBar: true,
-      appBar: AppBar(
-        automaticallyImplyLeading: false,
-        toolbarHeight: kToolbarHeight * 1.5,
-        title: Column(
-          children: [
-            const Text('Client', style: TextStyle(fontSize: fontSizeLarge)),
-            ChangelogPanel(
-              changelog: changelog,
-              versionString: appVersionString,
-              appName: 'KLI Client',
+    return Container(
+      decoration: BoxDecoration(image: bgDecorationImage),
+      alignment: Alignment.center,
+      child: Scaffold(
+        key: _key,
+        backgroundColor: Colors.transparent,
+        appBar: AppBar(
+          automaticallyImplyLeading: false,
+          toolbarHeight: kToolbarHeight * 1.5,
+          title: Column(
+            children: [
+              const Text('Client', style: TextStyle(fontSize: fontSizeLarge)),
+              ChangelogPanel(
+                changelog: changelog,
+                versionString: appVersionString,
+                appName: 'KLI Client',
+                devToggle: () => updateDebugOverlay(() => showDebugInfo = !showDebugInfo),
+              ),
+            ],
+          ),
+          centerTitle: true,
+          actions: [
+            Padding(
+              padding: const EdgeInsets.only(right: 8, bottom: 16),
+              child: CloseButton(onPressed: () {
+                logHandler.info('Exiting app');
+                exit(0);
+              }),
             ),
           ],
+          forceMaterialTransparency: true,
         ),
-        centerTitle: true,
-        actions: [
-          Padding(
-            padding: const EdgeInsets.only(right: 8, bottom: 16),
-            child: CloseButton(onPressed: () {
-              logHandler.info('Exiting app');
-              exit(0);
-            }),
-          ),
-        ],
-        forceMaterialTransparency: true,
-      ),
-      endDrawer: const CacheDrawer(),
-      body: Container(
-        decoration: BoxDecoration(image: bgDecorationImage),
-        alignment: Alignment.center,
-        child: Column(
+        endDrawer: const CacheDrawer(),
+        body: Column(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: <Widget>[
             connectionStatus(),
@@ -163,6 +156,7 @@ class _ConnectPageState extends State<ConnectPage> {
                 isConnecting = false;
                 isConnected = true;
               });
+              updateDebugOverlay(() {});
             } on Exception catch (e, stack) {
               logHandler.error('Error when trying to connect: $e', stackTrace: stack);
               setState(() {
@@ -187,6 +181,7 @@ class _ConnectPageState extends State<ConnectPage> {
             KLIClient.disconnect();
             // clientTextController.text = '';
             setState(() => isConnected = false);
+            updateDebugOverlay(() {});
           },
         ),
         const SizedBox(width: 20),

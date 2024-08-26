@@ -53,7 +53,7 @@ void main() async {
     await windowManager.hide();
     await windowManager.ensureInitialized();
   }
-  windowManager.setAlwaysOnTop(!isTesting);
+  windowManager.setAlwaysOnTop(!kDebugMode && false);
   await windowManager.waitUntilReadyToShow(null, () async {
     await windowManager.setFullScreen(true);
     await windowManager.show();
@@ -63,9 +63,16 @@ void main() async {
   runApp(KliClientApp(navKey: navigatorKey));
 }
 
-class KliClientApp extends StatelessWidget {
+class KliClientApp extends StatefulWidget {
   final GlobalKey<NavigatorState> navKey;
   const KliClientApp({super.key, required this.navKey});
+
+  @override
+  State<KliClientApp> createState() => _KliClientAppState();
+}
+
+class _KliClientAppState extends State<KliClientApp> {
+  Offset _offset = Offset.zero;
 
   @override
   Widget build(BuildContext context) {
@@ -88,20 +95,76 @@ class KliClientApp extends StatelessWidget {
         ),
       ],
       child: ThemeConsumer(
-        child: Builder(builder: (context) {
-          return MaterialApp(
-            navigatorKey: navKey,
-            builder: (context, child) {
-              ErrorWidget.builder = (errorDetails) => WidgetErrorScreen(e: errorDetails);
+        child: Builder(
+          builder: (context) {
+            return MaterialApp(
+              navigatorKey: widget.navKey,
+              builder: (context, child) {
+                ErrorWidget.builder = (errorDetails) => WidgetErrorScreen(e: errorDetails);
+                updateDebugOverlay = setState;
+                return Stack(
+                  children: [
+                    child!,
+                    showDebugInfo ? debugOverlay() : const SizedBox(),
+                  ],
+                );
+              },
+              scrollBehavior: const MaterialScrollBehavior().copyWith(dragDevices: {PointerDeviceKind.mouse}),
+              theme: ThemeProvider.themeOf(context).data,
+              home: const LoadingScreen(),
+            );
+          },
+        ),
+      ),
+    );
+  }
 
-              if (child != null) return child;
-              throw StateError('widget is null');
-            },
-            scrollBehavior: const MaterialScrollBehavior().copyWith(dragDevices: {PointerDeviceKind.mouse}),
-            theme: ThemeProvider.themeOf(context).data,
-            home: const LoadingScreen(),
-          );
-        }),
+  Widget debugOverlay() {
+    return Positioned(
+      top: _offset.dy,
+      left: _offset.dx,
+      child: GestureDetector(
+        onPanUpdate: (details) => setState(() => _offset += details.delta),
+        child: Container(
+          decoration: BoxDecoration(
+            color: Theme.of(context).colorScheme.onBackground,
+            border: Border.all(color: Theme.of(context).colorScheme.background),
+            borderRadius: BorderRadius.circular(10),
+          ),
+          padding: const EdgeInsets.all(12),
+          child: DefaultTextStyle.merge(
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: Theme.of(context).colorScheme.background,
+                  fontSize: fontSizeSmall,
+                ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('App version: $appVersionString (${DateTime(2024, 8, 26).reverseDate})'),
+                Row(
+                  children: [
+                    const Text('Test mode: '),
+                    GestureDetector(
+                      onTap: () {
+                        logHandler.info('Toggling test mode');
+                        setState(() => isTesting = !isTesting);
+                        updateChild(() {});
+                      },
+                      child: MouseRegion(
+                        cursor: SystemMouseCursors.click,
+                        child: Text(isTesting ? '✔️' : '❌'),
+                      ),
+                    ),
+                  ],
+                ),
+                Text('Client ID: ${KLIClient.clientID}'),
+                Text('Host: ${KLIClient.socket?.remoteAddress.address}:${KLIClient.socket?.remotePort}'),
+                Text('Client: ${KLIClient.socket?.address.address}:${KLIClient.socket?.port}'),
+                Text('Receiving data: ${KLIClient.receivingData}'),
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }

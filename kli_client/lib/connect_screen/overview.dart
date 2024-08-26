@@ -29,7 +29,7 @@ class _OverviewState extends State<Overview> {
   @override
   void initState() {
     super.initState();
-
+    updateChild = setState;
     messageSubscriptions.add(KLIClient.onDisconnected.listen((_) => Navigator.pop(context)));
     messageSubscriptions.add(KLIClient.onMessageReceived.listen((m) {
       if (ended) return;
@@ -110,7 +110,7 @@ class _OverviewState extends State<Overview> {
           centerTitle: true,
           title: const Text('Tổng quan', style: TextStyle(fontSize: fontSizeLarge)),
           forceMaterialTransparency: true,
-          automaticallyImplyLeading: ended,
+          automaticallyImplyLeading: isTesting || ended,
         ),
         backgroundColor: Colors.transparent,
         body: Center(
