@@ -4,6 +4,7 @@ import 'dart:ui';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:flutter_acrylic/flutter_acrylic.dart';
 import 'package:kli_lib/kli_lib.dart';
 import 'package:theme_provider/theme_provider.dart';
 import 'package:window_manager/window_manager.dart';
@@ -13,6 +14,7 @@ import 'loading_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await Window.initialize();
 
   RenderErrorBox.backgroundColor = Colors.transparent;
   final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
@@ -100,7 +102,7 @@ class _KliClientAppState extends State<KliClientApp> {
             return MaterialApp(
               navigatorKey: widget.navKey,
               builder: (context, child) {
-                ErrorWidget.builder = (errorDetails) => WidgetErrorScreen(e: errorDetails);
+                ErrorWidget.builder = (d) => WidgetErrorScreen(e: d);
                 updateDebugOverlay = () {
                   // logHandler.info('Updating debug overlay');
                   setState(() {});

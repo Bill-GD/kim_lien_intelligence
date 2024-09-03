@@ -32,7 +32,7 @@ void initAudioHandler() {
 }
 
 String getSizeString(double bytes) {
-  const List<String> units = ['B', 'KB', 'MB', 'GB'];
+  const units = ['B', 'KB', 'MB', 'GB'];
   int unitIndex = 0;
   while (bytes > 900 && unitIndex < units.length - 1) {
     bytes /= 1024;

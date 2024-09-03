@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:kli_lib/kli_lib.dart';
 
 import '../global.dart';
+import '../ui/viewer/start.dart';
 import 'cache_drawer.dart';
 import 'waiting_screen.dart';
 
@@ -27,7 +28,7 @@ class _ConnectPageState extends State<ConnectPage> {
   @override
   void initState() {
     super.initState();
-
+    updateChild = () => setState(() {});
     KLIClient.onDisconnected.listen((m) {
       showPopupMessage(context, title: 'Forced disconnection', content: m);
       setState(() => isConnected = false);
@@ -194,9 +195,25 @@ class _ConnectPageState extends State<ConnectPage> {
           disabledLabel: 'Not connected',
           enableCondition: isConnected,
           onPressed: () {
-            Navigator.of(context).push(MaterialPageRoute(builder: (context) => const WaitingScreen()));
+            Navigator.of(context).push(
+              MaterialPageRoute(builder: (context) => const WaitingScreen()),
+            );
           },
         ),
+        if (isTesting) ...[
+          const SizedBox(width: 20),
+          KLIButton(
+            'Open viewer start',
+            enabledLabel: "View viewer's start screen",
+            onPressed: () async {
+              await Navigator.of(context).push(
+                MaterialPageRoute(builder: (context) => const ViewerStartScreen()),
+              );
+              updateChild = () => setState(() {});
+              setState(() {});
+            },
+          ),
+        ],
       ],
     );
   }
