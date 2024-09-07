@@ -7,6 +7,7 @@ import 'package:kli_lib/kli_lib.dart';
 
 import '../global.dart';
 import '../match_data.dart';
+import '../ui/viewer/viewer_wait.dart';
 import 'overview.dart';
 
 class WaitingScreen extends StatefulWidget {
@@ -182,9 +183,13 @@ class _WaitingScreenState extends State<WaitingScreen> {
         senderID: KLIClient.clientID!,
         type: KLIMessageType.playerReady,
       ));
+      Navigator.of(context).pushReplacement<void, void>(
+        MaterialPageRoute<void>(builder: (context) => const Overview()),
+      );
+      return;
     }
     Navigator.of(context).pushReplacement<void, void>(
-      MaterialPageRoute<void>(builder: (context) => const Overview()),
+      MaterialPageRoute<void>(builder: (context) => const ViewerWaitScreen()),
     );
   }
 

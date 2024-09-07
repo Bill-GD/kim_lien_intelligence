@@ -42,7 +42,10 @@ String getSizeString(double bytes) {
 }
 
 const String changelog = """
-  0.2.5.4 ({latest}):
+  0.3 ({latest}):
+  - Added Viewer start screen: transparent background, players, question, scores
+
+  0.2.5.4 ({aa99930}):
   - Added Debug overlay: version, build date, test mode, ip, port, clientID, receiving data...
   - Fixed not listening to onDisconnected more than once
 
