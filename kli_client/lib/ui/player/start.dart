@@ -20,7 +20,7 @@ class PlayerStartScreen extends StatefulWidget {
 
 class _PlayerStartScreenState extends State<PlayerStartScreen> {
   double currentTimeSec = 60;
-  bool started = false, timeEnded = false;
+  bool started = false;
   late StartQuestion currentQuestion;
   Timer? timer;
   late final StreamSubscription<KLISocketMessage> sub;
@@ -32,12 +32,11 @@ class _PlayerStartScreenState extends State<PlayerStartScreen> {
     updateChild = () => setState(() {});
     sub = KLIClient.onMessageReceived.listen((m) {
       if (m.type == KLIMessageType.startQuestion) {
-        if (timeEnded) return;
         if (!started) {
           timer = Timer.periodic(1.seconds, (timer) {
             if (currentTimeSec <= 0) {
               timer.cancel();
-              timeEnded = true;
+              started = false;
               setState(() {});
               return;
             }

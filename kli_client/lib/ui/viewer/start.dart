@@ -5,9 +5,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_acrylic/flutter_acrylic.dart';
 import 'package:kli_lib/kli_lib.dart';
 
-import '../../connect_screen/overview.dart';
 import '../../global.dart';
 import '../../match_data.dart';
+import 'viewer_wait.dart';
 
 class ViewerStartScreen extends StatefulWidget {
   final int timeLimitSec = 60;
@@ -21,7 +21,7 @@ class ViewerStartScreen extends StatefulWidget {
 class _ViewerStartScreenState extends State<ViewerStartScreen> with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   double currentTimeSec = 60;
-  bool started = false, timeEnded = false;
+  bool started = false;
   late StartQuestion currentQuestion;
   late final StreamSubscription<KLISocketMessage> sub;
 
@@ -32,7 +32,6 @@ class _ViewerStartScreenState extends State<ViewerStartScreen> with SingleTicker
     Window.setEffect(effect: WindowEffect.transparent);
     sub = KLIClient.onMessageReceived.listen((m) {
       if (m.type == KLIMessageType.startQuestion) {
-        if (timeEnded) return;
         if (!started) {
           _controller.forward();
           setState(() {});
@@ -48,9 +47,10 @@ class _ViewerStartScreenState extends State<ViewerStartScreen> with SingleTicker
       }
       if (m.type == KLIMessageType.endSection) {
         Navigator.of(context).pushReplacement<void, void>(
-          MaterialPageRoute(builder: (_) => const Overview()),
+          MaterialPageRoute(builder: (_) => const ViewerWaitScreen()),
         );
       }
+      setState(() {});
     });
 
     _controller = AnimationController(vsync: this, duration: Duration(seconds: widget.timeLimitSec))
@@ -83,7 +83,7 @@ class _ViewerStartScreenState extends State<ViewerStartScreen> with SingleTicker
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
             Expanded(
-              flex: 9,
+              flex: 8,
               child: AnimatedBuilder(
                 animation: _controller,
                 builder: (context, _) {
@@ -102,21 +102,41 @@ class _ViewerStartScreenState extends State<ViewerStartScreen> with SingleTicker
                 },
               ),
             ),
-            const SizedBox(width: 48),
+            const SizedBox(width: 32),
             Expanded(
-              child: Container(
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(10),
-                  border: Border.all(color: Colors.white),
-                  color: Theme.of(context).colorScheme.background,
-                ),
-                alignment: Alignment.center,
-                constraints: const BoxConstraints(minWidth: 100, maxHeight: 200),
-                padding: const EdgeInsets.all(16),
-                child: Text(
-                  MatchData().players[widget.playerPos].point.toString(),
-                  style: const TextStyle(fontSize: fontSizeLarge),
-                ),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(color: Colors.white),
+                      color: Theme.of(context).colorScheme.background,
+                    ),
+                    alignment: Alignment.center,
+                    constraints: const BoxConstraints(maxHeight: 80),
+                    padding: const EdgeInsets.all(16),
+                    child: Text(
+                      started ? StartQuestion.mapTypeDisplay(currentQuestion.subject) : '',
+                      style: const TextStyle(fontSize: fontSizeLarge),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(color: Colors.white),
+                      color: Theme.of(context).colorScheme.background,
+                    ),
+                    alignment: Alignment.center,
+                    constraints: const BoxConstraints(minWidth: 170, maxHeight: 200),
+                    padding: const EdgeInsets.all(16),
+                    child: Text(
+                      MatchData().players[widget.playerPos].point.toString(),
+                      style: const TextStyle(fontSize: fontSizeLarge),
+                    ),
+                  ),
+                ],
               ),
             ),
           ],
@@ -158,12 +178,10 @@ class _ViewerStartScreenState extends State<ViewerStartScreen> with SingleTicker
                       )
                     : null,
               ),
+              constraints: const BoxConstraints(maxHeight: 80),
               padding: const EdgeInsets.symmetric(vertical: 16),
               alignment: Alignment.center,
-              child: Text(
-                s,
-                style: const TextStyle(fontSize: fontSizeMedium),
-              ),
+              child: Text(s, style: const TextStyle(fontSize: fontSizeMedium)),
             ),
           ),
         ),

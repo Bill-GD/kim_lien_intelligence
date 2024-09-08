@@ -140,7 +140,7 @@ class _KliServerAppState extends State<KliServerApp> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('App version: $appVersionString (${DateTime(2024, 8, 26).reverseDate})'),
+                Text('App version: $appVersionString (${buildDate.reverseDate})'),
                 Row(
                   children: [
                     const Text('Test mode: '),
@@ -157,7 +157,7 @@ class _KliServerAppState extends State<KliServerApp> {
                     ),
                   ],
                 ),
-                Text('Position: $_offset'),
+                Text('Position: (${_offset.dx.toInt()}, ${_offset.dy.toInt()})'),
                 Text('Server started: ${KLIServer.started}'),
                 Text('Host: ${KLIServer.socket?.address.address}:${KLIServer.socket?.port}'),
                 Text('Device: ${KLIServer.serverIP}'),

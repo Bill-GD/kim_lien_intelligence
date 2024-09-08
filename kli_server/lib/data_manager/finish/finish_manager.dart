@@ -207,7 +207,7 @@ class _FinishManagerState extends State<FinishManager> {
       filtered.add((i, selectedMatch.questions[i]));
     }
 
-    List<double> widthRatios = [0.07, 0.4, 0.1, 0.15, 0.03];
+    final widthRatios = [0.06, 0.3, 0.1, 0.15, 0.04, 0.03];
 
     return Flexible(
       child: Container(
@@ -223,7 +223,8 @@ class _FinishManagerState extends State<FinishManager> {
               (const Text('Câu hỏi'), widthRatios[1]),
               (const Text('Đáp án'), widthRatios[2]),
               (const Text('Giải thích'), widthRatios[3]),
-              (const Text(''), widthRatios[4]),
+              (const Text('Video'), widthRatios[4]),
+              (const Text(''), widthRatios[5]),
             ]),
             Flexible(
               child: Material(
@@ -241,6 +242,10 @@ class _FinishManagerState extends State<FinishManager> {
                         (Text(q.$2.answer), widthRatios[2]),
                         (Text(q.$2.explanation), widthRatios[3]),
                         (
+                          Text(q.$2.mediaPath.isEmpty ? '❌' : '✔️', textAlign: TextAlign.center),
+                          widthRatios[4],
+                        ),
+                        (
                           IconButton(
                             icon: const Icon(Icons.delete),
                             onPressed: () async {
@@ -256,7 +261,7 @@ class _FinishManagerState extends State<FinishManager> {
                               );
                             },
                           ),
-                          widthRatios[4],
+                          widthRatios[5],
                         )
                       ],
                       onTap: () async {

@@ -5,6 +5,7 @@ import 'package:package_info_plus/package_info_plus.dart';
 
 bool isTesting = kDebugMode, showDebugInfo = false;
 DecorationImage? bgDecorationImage;
+final buildDate = DateTime(2024, 9, 8);
 
 late void Function() updateDebugOverlay;
 late void Function() updateChild;
@@ -43,6 +44,7 @@ String getSizeString(double bytes) {
 
 const String changelog = """
   0.3 ({latest}):
+  - Added viewer wait screen: used between sections
   - Added Viewer start screen: transparent background, players, question, scores
 
   0.2.5.4 ({aa99930}):

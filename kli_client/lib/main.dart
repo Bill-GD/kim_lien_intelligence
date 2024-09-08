@@ -145,7 +145,7 @@ class _KliClientAppState extends State<KliClientApp> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('App version: $appVersionString (${DateTime(2024, 8, 26).reverseDate})'),
+                Text('App version: $appVersionString (${buildDate.reverseDate})'),
                 Row(
                   children: [
                     const Text('Test mode: '),
@@ -162,7 +162,7 @@ class _KliClientAppState extends State<KliClientApp> {
                     ),
                   ],
                 ),
-                Text('Position: $_offset'),
+                Text('Position: (${_offset.dx.toInt()}, ${_offset.dy.toInt()})'),
                 Text('Client ID: ${KLIClient.clientID}'),
                 Text('Host: ${KLIClient.socket?.remoteAddress.address}:${KLIClient.socket?.remotePort}'),
                 Text('Client: ${KLIClient.socket?.address.address}:${KLIClient.socket?.port}'),
