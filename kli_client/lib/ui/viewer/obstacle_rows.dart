@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:kli_lib/kli_lib.dart';
 
@@ -18,15 +20,22 @@ class ViewerObstacleRowsScreen extends StatefulWidget {
 }
 
 class _ViewerObstacleRowsScreenState extends State<ViewerObstacleRowsScreen> {
+  late StreamSubscription<KLISocketMessage> sub;
+
   @override
   void initState() {
     super.initState();
-    updateChild = () => setState(() {});
-    KLIClient.onMessageReceived.listen((m) {
+    sub = KLIClient.onMessageReceived.listen((m) {
       if (m.type == KLIMessageType.pop) {
         Navigator.of(context).pop();
       }
     });
+  }
+
+  @override
+  void dispose() {
+    sub.cancel();
+    super.dispose();
   }
 
   @override

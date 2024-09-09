@@ -44,12 +44,14 @@ class _ViewerObstacleMainScreenState extends State<ViewerObstacleMainScreen>
     sub = KLIClient.onMessageReceived.listen((m) {
       if (m.type == KLIMessageType.obstacleQuestion) {
         if (!canShowQuestion) {
-          _controller.forward();
-          setState(() {});
+          Future.delayed(1.seconds).then((value) {
+            _controller.forward();
+          });
         }
         currentQuestion = ObstacleQuestion.fromJson(jsonDecode(m.message));
-        answers[currentQuestion.id] = currentQuestion.answer;
         canShowQuestion = true;
+        final qId = currentQuestion.id;
+        if (qId < 4) answers[qId] = currentQuestion.answer;
       }
       if (m.type == KLIMessageType.scores) {
         int i = 0;

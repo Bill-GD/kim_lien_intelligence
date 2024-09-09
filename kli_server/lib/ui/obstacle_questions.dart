@@ -26,6 +26,7 @@ class _ObstacleQuestionScreenState extends State<ObstacleQuestionScreen> {
       canAnnounceAnswer = false,
       canShowImage = false,
       canSelectQuestion = true,
+      canShowRows = true,
       canEnd = false;
   Timer? timer;
   final List<bool?> answerResults = List.filled(4, null);
@@ -94,7 +95,7 @@ class _ObstacleQuestionScreenState extends State<ObstacleQuestionScreen> {
               type: KLIMessageType.scores,
             ));
             canEnd = true;
-            canStart = canSelectQuestion = false;
+            canStart = canSelectQuestion = canShowRows = false;
             KLIServer.sendToAllClients(KLISocketMessage(
               senderID: ConnectionID.host,
               type: KLIMessageType.correctObstacleAnswer,
@@ -185,7 +186,7 @@ class _ObstacleQuestionScreenState extends State<ObstacleQuestionScreen> {
                 }
                 questionIndex = -1;
                 canShowAnswers = false;
-                canShowImage = canSelectQuestion = true;
+                canShowImage = canSelectQuestion = canShowRows = true;
 
                 KLIServer.sendToAllClients(KLISocketMessage(
                   senderID: ConnectionID.host,
@@ -194,20 +195,6 @@ class _ObstacleQuestionScreenState extends State<ObstacleQuestionScreen> {
                 setState(() {});
               },
             ),
-            if (isTesting) ...[
-              KLIButton(
-                'All right',
-                onPressed: () {
-                  setState(() => answerResults.fillRange(0, 4, true));
-                },
-              ),
-              KLIButton(
-                'All wrong',
-                onPressed: () {
-                  setState(() => answerResults.fillRange(0, 4, false));
-                },
-              ),
-            ],
           ],
         ),
         body: Container(
@@ -256,12 +243,13 @@ class _ObstacleQuestionScreenState extends State<ObstacleQuestionScreen> {
               bottom: 20,
               child: KLIButton(
                 'Show rows',
-                enableCondition: canSelectQuestion,
+                enableCondition: canShowRows,
                 onPressed: () {
                   KLIServer.sendToNonPlayer(KLISocketMessage(
                     senderID: ConnectionID.host,
                     type: KLIMessageType.showObstacleRows,
                   ));
+                  canShowRows = false;
                   setState(() {});
                 },
               ),
@@ -289,6 +277,9 @@ class _ObstacleQuestionScreenState extends State<ObstacleQuestionScreen> {
                                 senderID: ConnectionID.host,
                                 type: KLIMessageType.pop,
                               ));
+                              if (MatchState().answeredObstacleRows.where((e) => e).length == 3) {
+                                canShowRows = false;
+                              }
                               setState(() {});
                             }
                           : null,
@@ -322,7 +313,7 @@ class _ObstacleQuestionScreenState extends State<ObstacleQuestionScreen> {
                 ),
               );
               canShowImage = false;
-              canSelectQuestion = true;
+              canSelectQuestion = canShowRows = true;
               setState(() {});
             },
           ),
@@ -364,7 +355,7 @@ class _ObstacleQuestionScreenState extends State<ObstacleQuestionScreen> {
                 // enableCondition: questionIndex >= 0 && !timeEnded && !(timer?.isActive == true),
                 enableCondition: canStart,
                 onPressed: () {
-                  canSelectQuestion = canStart = false;
+                  canSelectQuestion = canStart = canShowRows = false;
                   KLIServer.sendToAllClients(
                     KLISocketMessage(
                       senderID: ConnectionID.host,
