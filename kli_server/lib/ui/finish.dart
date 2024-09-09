@@ -106,7 +106,21 @@ class _FinishScreenState extends State<FinishScreen> {
     return Container(
       decoration: BoxDecoration(image: bgDecorationImage),
       child: Scaffold(
-        appBar: managerAppBar(context, 'Finish', implyLeading: isTesting),
+        appBar: managerAppBar(
+          context,
+          'Finish',
+          leading: isTesting
+              ? BackButton(
+                  onPressed: () {
+                    KLIServer.sendToAllClients(KLISocketMessage(
+                      senderID: ConnectionID.host,
+                      type: KLIMessageType.endSection,
+                    ));
+                    Navigator.of(context).pop();
+                  },
+                )
+              : null,
+        ),
         extendBodyBehindAppBar: true,
         backgroundColor: Colors.transparent,
         body: Padding(

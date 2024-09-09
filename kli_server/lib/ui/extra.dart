@@ -106,7 +106,21 @@ class _ExtraScreenState extends State<ExtraScreen> {
     return Container(
       decoration: BoxDecoration(image: bgDecorationImage),
       child: Scaffold(
-        appBar: managerAppBar(context, 'Extra', implyLeading: isTesting),
+        appBar: managerAppBar(
+          context,
+          'Extra',
+          leading: isTesting
+              ? BackButton(
+                  onPressed: () {
+                    KLIServer.sendToAllClients(KLISocketMessage(
+                      senderID: ConnectionID.host,
+                      type: KLIMessageType.endSection,
+                    ));
+                    Navigator.of(context).pop();
+                  },
+                )
+              : null,
+        ),
         extendBodyBehindAppBar: true,
         backgroundColor: Colors.transparent,
         body: Padding(

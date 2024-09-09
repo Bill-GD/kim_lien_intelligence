@@ -67,7 +67,17 @@ class _AccelScreenState extends State<AccelScreen> {
         appBar: managerAppBar(
           context,
           'Accel',
-          implyLeading: isTesting,
+          leading: isTesting
+              ? BackButton(
+                  onPressed: () {
+                    KLIServer.sendToAllClients(KLISocketMessage(
+                      senderID: ConnectionID.host,
+                      type: KLIMessageType.endSection,
+                    ));
+                    Navigator.of(context).pop();
+                  },
+                )
+              : null,
           actions: [Container()],
         ),
         extendBodyBehindAppBar: true,
@@ -329,7 +339,12 @@ class _AccelScreenState extends State<AccelScreen> {
               content: currentQuestion.explanation,
               horizontalPadding: 500,
             );
+
             if (currentQuestion.type == AccelQuestionType.arrange) {
+              KLIServer.sendToNonPlayer(KLISocketMessage(
+                senderID: ConnectionID.host,
+                type: KLIMessageType.revealArrangeAnswer,
+              ));
               setState(() => canShowArrangeAns = true);
             }
           },

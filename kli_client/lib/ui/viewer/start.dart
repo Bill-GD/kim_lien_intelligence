@@ -53,7 +53,7 @@ class _ViewerStartScreenState extends State<ViewerStartScreen> with SingleTicker
       setState(() {});
     });
 
-    _controller = AnimationController(vsync: this, duration: Duration(seconds: widget.timeLimitSec))
+    _controller = AnimationController(vsync: this, duration: widget.timeLimitSec.seconds)
       ..addListener(() => setState(() {}))
       ..addStatusListener((status) {
         if (status == AnimationStatus.completed) {

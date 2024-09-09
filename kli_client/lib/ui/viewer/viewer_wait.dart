@@ -7,6 +7,7 @@ import 'package:kli_lib/kli_lib.dart';
 
 import '../../global.dart';
 import '../../match_data.dart';
+import 'accel.dart';
 import 'obstacle_main.dart';
 import 'start.dart';
 
@@ -46,9 +47,9 @@ class _ViewerWaitScreenState extends State<ViewerWaitScreen> {
           );
           break;
         case KLIMessageType.enterAccel:
-          // Navigator.of(context).pushReplacement<void, void>(
-          //   MaterialPageRoute(builder: (_) => const PlayerAccelScreen()),
-          // );
+          Navigator.of(context).pushReplacement<void, void>(
+            MaterialPageRoute(builder: (_) => const ViewerAccelScreen()),
+          );
           break;
         case KLIMessageType.enterFinish:
           // Navigator.of(context).pushReplacement<void, void>(
