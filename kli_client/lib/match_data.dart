@@ -12,6 +12,7 @@ class MatchData {
   // a list of players
   int playerPos = -1;
   final players = <Player>[];
+  String matchName = '';
 }
 
 class Player {

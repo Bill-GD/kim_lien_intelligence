@@ -109,6 +109,7 @@ class _WaitingScreenState extends State<WaitingScreen> {
 
                         if (m.type == KLIMessageType.matchName) {
                           matchName = m.message;
+                          MatchData().matchName = matchName;
                           setState(() => progressMessage = 'Checking cached data of "$matchName"...');
                           final r = await checkCache();
 
@@ -189,7 +190,7 @@ class _WaitingScreenState extends State<WaitingScreen> {
       return;
     }
     Navigator.of(context).pushReplacement<void, void>(
-      MaterialPageRoute<void>(builder: (context) => const ViewerWaitScreen()),
+      MaterialPageRoute<void>(builder: (context) => const ViewerWaitScreen(saysWaiting: true)),
     );
   }
 

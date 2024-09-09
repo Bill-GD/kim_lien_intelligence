@@ -45,6 +45,7 @@ class _LoadingScreenState extends State<LoadingScreen> {
       await Future.delayed(widget.delayMilli);
 
       setState(() => loadingText = 'Clearing cache...');
+      logHandler.info('Cache: ${await StorageHandler.appCacheDirectory}');
       StorageHandler.clearCache();
       StorageHandler().writeStringToFile(
         '${await StorageHandler.appCacheDirectory}\\cache.txt',

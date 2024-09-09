@@ -7,43 +7,96 @@ import 'package:kli_lib/kli_lib.dart';
 
 import '../../global.dart';
 import '../../match_data.dart';
+import 'obstacle_image.dart';
+import 'obstacle_rows.dart';
 import 'viewer_wait.dart';
 
-class ViewerStartScreen extends StatefulWidget {
-  final int timeLimitSec = 60;
-  final int playerPos;
-  const ViewerStartScreen({super.key, required this.playerPos});
+class ViewerObstacleMainScreen extends StatefulWidget {
+  final int timeLimitSec = 15;
+  const ViewerObstacleMainScreen({super.key});
 
   @override
-  State<ViewerStartScreen> createState() => _ViewerStartScreenState();
+  State<ViewerObstacleMainScreen> createState() => _ViewerObstacleMainScreenState();
 }
 
-class _ViewerStartScreenState extends State<ViewerStartScreen> with SingleTickerProviderStateMixin {
+class _ViewerObstacleMainScreenState extends State<ViewerObstacleMainScreen>
+    with SingleTickerProviderStateMixin {
   late AnimationController _controller;
-  double currentTimeSec = 60;
-  bool started = false;
-  late StartQuestion currentQuestion;
+  bool canShowQuestion = false;
+  late ObstacleQuestion currentQuestion;
   late final StreamSubscription<KLISocketMessage> sub;
+  late final List<String> answers;
+  final revealed = [false, false, false, false], answered = [false, false, false, false];
+  late final String obsImage;
 
   @override
   void initState() {
     super.initState();
     updateChild = () => setState(() {});
     Window.setEffect(effect: WindowEffect.transparent);
+    StorageHandler.appCacheDirectory.then((p) {
+      obsImage = '$p\\${MatchData().matchName}\\other\\obstacle_image.png';
+    });
+    KLIClient.sendMessage(
+      KLISocketMessage(senderID: KLIClient.clientID!, type: KLIMessageType.rowCharCounts),
+    );
+
     sub = KLIClient.onMessageReceived.listen((m) {
-      if (m.type == KLIMessageType.startQuestion) {
-        if (!started) {
+      if (m.type == KLIMessageType.obstacleQuestion) {
+        if (!canShowQuestion) {
           _controller.forward();
           setState(() {});
         }
-        currentQuestion = StartQuestion.fromJson(jsonDecode(m.message));
-        started = true;
+        currentQuestion = ObstacleQuestion.fromJson(jsonDecode(m.message));
+        answers[currentQuestion.id] = currentQuestion.answer;
+        canShowQuestion = true;
       }
-      if (m.type == KLIMessageType.correctStartAnswer) {
-        MatchData().players[widget.playerPos].point = int.parse(m.message);
+      if (m.type == KLIMessageType.scores) {
+        int i = 0;
+        for (int s in jsonDecode(m.message) as List) {
+          MatchData().players[i].point = s;
+          i++;
+        }
+      }
+      if (m.type == KLIMessageType.rowCharCounts) {
+        final charCounts = jsonDecode(m.message) as List;
+        answers = List.generate(4, (i) => 'a' * charCounts[i]);
+      }
+
+      if (m.type == KLIMessageType.revealRow) {
+        revealed[currentQuestion.id] = true;
+      }
+      if (m.type == KLIMessageType.hideQuestion) {
+        answered[currentQuestion.id] = true;
+        canShowQuestion = false;
+        _controller.reset();
       }
       if (m.type == KLIMessageType.stopTimer) {
         _controller.stop();
+      }
+      if (m.type == KLIMessageType.continueTimer) {
+        _controller.forward();
+      }
+      if (m.type == KLIMessageType.showObstacleRows) {
+        Navigator.of(context).push<void>(
+          MaterialPageRoute(
+            builder: (_) => ViewerObstacleRowsScreen(
+              answers: answers,
+              revealedAnswers: revealed,
+              answeredRows: answered,
+            ),
+          ),
+        );
+      }
+      if (m.type == KLIMessageType.obstacleImage) {
+        Navigator.of(context).push<void>(
+          MaterialPageRoute(
+            builder: (_) => ViewerObstacleImageScreen(
+              imagePath: obsImage,
+              revealedImageParts: List<bool>.from(jsonDecode(m.message)),
+            ),
+          ),
+        );
       }
       if (m.type == KLIMessageType.endSection) {
         Navigator.of(context).pushReplacement<void, void>(
@@ -57,7 +110,7 @@ class _ViewerStartScreenState extends State<ViewerStartScreen> with SingleTicker
       ..addListener(() => setState(() {}))
       ..addStatusListener((status) {
         if (status == AnimationStatus.completed) {
-          started = false;
+          // started = false;
         }
       });
   }
@@ -117,7 +170,7 @@ class _ViewerStartScreenState extends State<ViewerStartScreen> with SingleTicker
                     constraints: const BoxConstraints(maxHeight: 80),
                     padding: const EdgeInsets.all(16),
                     child: Text(
-                      started ? StartQuestion.mapTypeDisplay(currentQuestion.subject) : '',
+                      canShowQuestion ? 'Question ${currentQuestion.id + 1}' : '',
                       style: const TextStyle(fontSize: fontSizeLarge),
                     ),
                   ),
@@ -132,7 +185,7 @@ class _ViewerStartScreenState extends State<ViewerStartScreen> with SingleTicker
                     constraints: const BoxConstraints(minWidth: 170, maxHeight: 200),
                     padding: const EdgeInsets.all(16),
                     child: Text(
-                      MatchData().players[widget.playerPos].point.toString(),
+                      (widget.timeLimitSec * (1 - _controller.value)).toInt().toString(),
                       style: const TextStyle(fontSize: fontSizeLarge),
                     ),
                   ),
@@ -147,27 +200,19 @@ class _ViewerStartScreenState extends State<ViewerStartScreen> with SingleTicker
 
   Widget players() {
     final w = <Widget>[];
-    String s;
     for (final i in range(0, 3)) {
-      final isCurPlayer = i == widget.playerPos;
-
       final p = MatchData().players[i];
-      s = '${p.name}${isCurPlayer ? '' : ' (${p.point})'}';
 
       w.add(
         Expanded(
           child: ClipRRect(
             borderRadius: BorderRadius.horizontal(
               left: i == 0 ? const Radius.circular(10) : Radius.zero,
-              // bottomLeft: i == 0 ? const Radius.circular(10) : Radius.zero,
               right: i == 3 ? const Radius.circular(10) : Radius.zero,
-              // bottomRight: i == 3 ? const Radius.circular(10) : Radius.zero,
             ),
             child: Container(
               decoration: BoxDecoration(
-                color: i == widget.playerPos
-                    ? Theme.of(context).colorScheme.primaryContainer
-                    : Theme.of(context).colorScheme.background,
+                color: Theme.of(context).colorScheme.background,
                 border: i < 3
                     ? BorderDirectional(
                         end: BorderSide(color: Theme.of(context).colorScheme.onBackground),
@@ -177,7 +222,7 @@ class _ViewerStartScreenState extends State<ViewerStartScreen> with SingleTicker
               constraints: const BoxConstraints(maxHeight: 80),
               padding: const EdgeInsets.symmetric(vertical: 16),
               alignment: Alignment.center,
-              child: Text(s, style: const TextStyle(fontSize: fontSizeMedium)),
+              child: Text('${p.name} (${p.point})', style: const TextStyle(fontSize: fontSizeMedium)),
             ),
           ),
         ),
@@ -214,7 +259,7 @@ class _ViewerStartScreenState extends State<ViewerStartScreen> with SingleTicker
       child: Stack(
         children: [
           Text(
-            started ? currentQuestion.question : '',
+            canShowQuestion ? currentQuestion.question : '',
             textAlign: TextAlign.center,
             style: const TextStyle(fontSize: fontSizeLarge),
           ),

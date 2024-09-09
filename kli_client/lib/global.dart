@@ -5,7 +5,7 @@ import 'package:package_info_plus/package_info_plus.dart';
 
 bool isTesting = kDebugMode, showDebugInfo = false;
 DecorationImage? bgDecorationImage;
-final buildDate = DateTime(2024, 9, 8);
+final buildDate = DateTime(2024, 9, 9);
 
 late void Function() updateDebugOverlay;
 late void Function() updateChild;
@@ -43,9 +43,15 @@ String getSizeString(double bytes) {
 }
 
 const String changelog = """
-  0.3 ({latest}):
+  0.3.1 ({latest}):
+  - Added viewer obstacle screens: question (like start), image, rows
+  - Viewer wait screen says waiting before match
+  - Now logs cache path when loading app
+  - Now stores match name
+
+  0.3 ({678b43e}):
   - Added viewer wait screen: used between sections
-  - Added Viewer start screen: transparent background, players, question, scores
+  - Added viewer start screen: transparent background, players, question, scores
 
   0.2.5.4 ({aa99930}):
   - Added Debug overlay: version, build date, test mode, ip, port, clientID, receiving data...

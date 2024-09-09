@@ -1,30 +1,44 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:kli_lib/kli_lib.dart';
 
-import '../data_manager/match_state.dart';
-import '../global.dart';
+import '../../global.dart';
 
-class ObstacleImageScreen extends StatefulWidget {
-  const ObstacleImageScreen({super.key});
+class ViewerObstacleImageScreen extends StatefulWidget {
+  final String imagePath;
+  final List<bool> revealedImageParts;
+  const ViewerObstacleImageScreen({super.key, required this.imagePath, required this.revealedImageParts});
 
   @override
-  State<ObstacleImageScreen> createState() => _ObstacleImageScreenState();
+  State<ViewerObstacleImageScreen> createState() => _ViewerObstacleImageScreenState();
 }
 
-class _ObstacleImageScreenState extends State<ObstacleImageScreen> {
+class _ViewerObstacleImageScreenState extends State<ViewerObstacleImageScreen> {
   Size imageSize = const Size(0, 0);
+  late StreamSubscription<KLISocketMessage> sub;
 
   @override
   void initState() {
     super.initState();
     FileImage(
-      File(StorageHandler.getFullPath(MatchState().obstacleMatch!.imagePath)),
+      File(widget.imagePath),
     ).resolve(const ImageConfiguration()).addListener(ImageStreamListener((image, _) {
       imageSize = Size(image.image.width.toDouble(), image.image.height.toDouble());
       setState(() {});
     }));
+    sub = KLIClient.onMessageReceived.listen((m) {
+      if (m.type == KLIMessageType.pop) {
+        Navigator.of(context).pop();
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    sub.cancel();
+    super.dispose();
   }
 
   @override
@@ -32,20 +46,9 @@ class _ObstacleImageScreenState extends State<ObstacleImageScreen> {
     return Container(
       decoration: BoxDecoration(image: bgDecorationImage),
       child: Scaffold(
-        appBar: managerAppBar(
-          context,
-          'Obstacle',
-          leading: isTesting
-              ? BackButton(
-                  onPressed: () {
-                    KLIServer.sendToNonPlayer(KLISocketMessage(
-                      senderID: ConnectionID.host,
-                      type: KLIMessageType.pop,
-                    ));
-                    Navigator.of(context).pop();
-                  },
-                )
-              : null,
+        appBar: AppBar(
+          backgroundColor: Colors.transparent,
+          automaticallyImplyLeading: isTesting,
         ),
         backgroundColor: Colors.transparent,
         body: Center(
@@ -54,14 +57,14 @@ class _ObstacleImageScreenState extends State<ObstacleImageScreen> {
             child: Stack(
               children: [
                 Image.file(
-                  File(StorageHandler.getFullPath(MatchState().obstacleMatch!.imagePath)),
+                  File(widget.imagePath),
                   fit: BoxFit.contain,
                 ),
                 Positioned.fill(
                   child: Stack(
                     children: [
                       for (var i = 0; i < 5; i++)
-                        if (!MatchState().revealedImageParts[i]) ImageCover(id: i + 1, size: imageSize),
+                        if (!widget.revealedImageParts[i]) ImageCover(id: i + 1, size: imageSize),
                     ],
                   ),
                 ),

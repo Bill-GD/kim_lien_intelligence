@@ -37,7 +37,21 @@ class _StartScreenState extends State<StartScreen> {
       decoration: BoxDecoration(image: bgDecorationImage),
       child: Scaffold(
         extendBodyBehindAppBar: true,
-        appBar: managerAppBar(context, 'Start', implyLeading: isTesting),
+        appBar: managerAppBar(
+          context,
+          'Start',
+          leading: BackButton(
+            onPressed: isTesting
+                ? () {
+                    KLIServer.sendToAllClients(KLISocketMessage(
+                      senderID: ConnectionID.host,
+                      type: KLIMessageType.endSection,
+                    ));
+                    Navigator.of(context).pop();
+                  }
+                : null,
+          ),
+        ),
         backgroundColor: Colors.transparent,
         body: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 64, vertical: 96),

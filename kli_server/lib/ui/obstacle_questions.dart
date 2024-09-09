@@ -35,7 +35,19 @@ class _ObstacleQuestionScreenState extends State<ObstacleQuestionScreen> {
   void initState() {
     super.initState();
     logHandler.info('Image reveal order: ${MatchState().imagePartOrder}');
+    updateChild = () => setState(() {});
     sub = KLIServer.onMessageReceived.listen((m) async {
+      if (m.type == KLIMessageType.rowCharCounts) {
+        KLIServer.sendMessage(
+          m.senderID,
+          KLISocketMessage(
+            senderID: ConnectionID.host,
+            type: KLIMessageType.rowCharCounts,
+            message: jsonEncode(MatchState().obstacleMatch!.hintQuestions.map((e) => e!.charCount).toList()),
+          ),
+        );
+      }
+
       if (m.type == KLIMessageType.obstacleRowAnswer) {
         final pos = m.senderID.index - 1;
         MatchState().rowAnswers[pos] = MatchState().eliminatedPlayers[pos] ? '' : m.message;
@@ -118,7 +130,17 @@ class _ObstacleQuestionScreenState extends State<ObstacleQuestionScreen> {
         appBar: managerAppBar(
           context,
           'Obstacle: ${MatchState().obstacleMatch!.keyword}',
-          implyLeading: isTesting,
+          leading: isTesting
+              ? BackButton(
+                  onPressed: () {
+                    KLIServer.sendToAllClients(KLISocketMessage(
+                      senderID: ConnectionID.host,
+                      type: KLIMessageType.endSection,
+                    ));
+                    Navigator.of(context).pop();
+                  },
+                )
+              : null,
           actions: [Container()],
         ),
         backgroundColor: Colors.transparent,
@@ -152,8 +174,15 @@ class _ObstacleQuestionScreenState extends State<ObstacleQuestionScreen> {
                 ));
 
                 MatchState().answeredObstacleRows[questionIndex] = true;
-                MatchState().revealedImageParts[MatchState().imagePartOrder.indexOf(questionIndex)] =
-                    MatchState().revealedObstacleRows[questionIndex] = answerResults.any((e) => e == true);
+                MatchState().revealedImageParts[MatchState().imagePartOrder.indexOf(questionIndex)] //
+                    = MatchState().revealedObstacleRows[questionIndex] //
+                        = answerResults.any((e) => e == true);
+                if (MatchState().revealedObstacleRows[questionIndex]) {
+                  KLIServer.sendToAllClients(KLISocketMessage(
+                    senderID: ConnectionID.host,
+                    type: KLIMessageType.revealRow,
+                  ));
+                }
                 questionIndex = -1;
                 canShowAnswers = false;
                 canShowImage = canSelectQuestion = true;
@@ -165,6 +194,20 @@ class _ObstacleQuestionScreenState extends State<ObstacleQuestionScreen> {
                 setState(() {});
               },
             ),
+            if (isTesting) ...[
+              KLIButton(
+                'All right',
+                onPressed: () {
+                  setState(() => answerResults.fillRange(0, 4, true));
+                },
+              ),
+              KLIButton(
+                'All wrong',
+                onPressed: () {
+                  setState(() => answerResults.fillRange(0, 4, false));
+                },
+              ),
+            ],
           ],
         ),
         body: Container(
@@ -205,30 +248,54 @@ class _ObstacleQuestionScreenState extends State<ObstacleQuestionScreen> {
           border: Border.all(color: Colors.white),
           borderRadius: BorderRadius.circular(16),
         ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+        child: Stack(
+          alignment: Alignment.center,
           children: [
-            for (int i = 0; i < 4; i++)
-              Padding(
-                padding: const EdgeInsets.only(bottom: 16),
-                child: ObstacleRow(
-                  index: i,
-                  answer: MatchState().obstacleMatch!.hintQuestions[i]!.answer,
-                  revealed: MatchState().revealedObstacleRows[i],
-                  answered: MatchState().answeredObstacleRows[i],
-                  onTap: canSelectQuestion
-                      ? () {
-                          questionIndex = i;
-                          canAnnounceAnswer = false;
-                          canStart = true;
-                          currentTimeSec = widget.timeLimitSec;
-                          MatchState().rowAnswers.fillRange(0, 4, '');
-                          answerResults.fillRange(0, 4, null);
-                          setState(() {});
-                        }
-                      : null,
-                ),
-              )
+            Positioned(
+              right: 20,
+              bottom: 20,
+              child: KLIButton(
+                'Show rows',
+                enableCondition: canSelectQuestion,
+                onPressed: () {
+                  KLIServer.sendToNonPlayer(KLISocketMessage(
+                    senderID: ConnectionID.host,
+                    type: KLIMessageType.showObstacleRows,
+                  ));
+                  setState(() {});
+                },
+              ),
+            ),
+            Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                for (int i = 0; i < 4; i++)
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 16),
+                    child: ObstacleRow(
+                      index: i,
+                      answer: MatchState().obstacleMatch!.hintQuestions[i]!.answer,
+                      revealed: MatchState().revealedObstacleRows[i],
+                      answered: MatchState().answeredObstacleRows[i],
+                      onTap: canSelectQuestion
+                          ? () {
+                              questionIndex = i;
+                              canAnnounceAnswer = false;
+                              canStart = true;
+                              currentTimeSec = widget.timeLimitSec;
+                              MatchState().rowAnswers.fillRange(0, 4, '');
+                              answerResults.fillRange(0, 4, null);
+                              KLIServer.sendToNonPlayer(KLISocketMessage(
+                                senderID: ConnectionID.host,
+                                type: KLIMessageType.pop,
+                              ));
+                              setState(() {});
+                            }
+                          : null,
+                    ),
+                  )
+              ],
+            ),
           ],
         ),
       ),
@@ -244,6 +311,11 @@ class _ObstacleQuestionScreenState extends State<ObstacleQuestionScreen> {
             'Show Image',
             // enableCondition: canShowImage,
             onPressed: () async {
+              KLIServer.sendToAllClients(KLISocketMessage(
+                senderID: ConnectionID.host,
+                type: KLIMessageType.obstacleImage,
+                message: jsonEncode(MatchState().revealedImageParts),
+              ));
               await Navigator.of(context).push(
                 MaterialPageRoute(
                   builder: (context) => const ObstacleImageScreen(),
