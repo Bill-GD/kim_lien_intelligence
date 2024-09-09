@@ -41,31 +41,24 @@ class _ViewerObstacleRowsScreenState extends State<ViewerObstacleRowsScreen> {
         ),
         extendBodyBehindAppBar: true,
         body: Center(
-          child: Container(
-            decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.background,
-              border: Border.all(color: Colors.white),
-              borderRadius: BorderRadius.circular(20),
-            ),
-            padding: const EdgeInsets.all(128),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                for (int i = 0; i < 4; i++)
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: 16),
-                    child: ObstacleRow(
-                      index: i,
-                      answer: widget.answers[i],
-                      revealed: widget.revealedAnswers[i],
-                      answered: widget.answeredRows[i],
-                      squareSize: 100,
-                      fontSize: fontSizeLarge,
-                    ),
-                  )
-              ],
-            ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              for (int i = 0; i < 4; i++)
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 16),
+                  child: ObstacleRow(
+                    index: i,
+                    answer: widget.answers[i],
+                    revealed: widget.revealedAnswers[i],
+                    answered: widget.answeredRows[i],
+                    squareSize: 100,
+                    fontSize: fontSizeLarge,
+                    borderWidth: 3,
+                  ),
+                )
+            ],
           ),
         ),
       ),
