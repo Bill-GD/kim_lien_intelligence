@@ -20,29 +20,37 @@ class _ViewerAccelScreenState extends State<ViewerAccelScreen> with SingleTicker
   String question = '';
   Iterable<Image> images = [];
   bool canShowQuestion = false, isArrange = false;
-  Timer? timer;
-  int imageIndex = 0, questionNum = 0, totalImageCount = 0;
-  double timePerImage = 0, currentTime = 0;
+  int imageIndex = -1, questionNum = -1, totalImageCount = 0;
+  double timePerImage = 0;
   late AnimationController _controller;
   late final StreamSubscription<KLISocketMessage> sub;
+  late final String cachePath;
 
   @override
   void initState() {
     super.initState();
     updateChild = () => setState(() {});
+    StorageHandler.appCacheDirectory.then((p) => cachePath = '$p\\${MatchData().matchName}\\other');
 
     sub = KLIClient.onMessageReceived.listen((m) async {
       if (m.type == KLIMessageType.accelQuestion) {
         final aQ = AccelQuestion.fromJson(jsonDecode(m.message));
 
         isArrange = aQ.type == AccelQuestionType.arrange;
+        _controller.value = 0;
         question = aQ.question;
+        canShowQuestion = true;
+        questionNum++;
 
-        final cache = '${await StorageHandler.appCacheDirectory}\\${MatchData().matchName}\\other';
-        images = Directory(cache)
+        final l = Directory(cachePath)
             .listSync()
-            .where((e) => e is File && e.path.contains('accel_image_$questionNum'))
-            .map((e) => Image.file(e as File));
+            .where((e) => e is File && e.path.contains('accel_image_${questionNum}_'))
+            .toList()
+          ..sort((a, b) => a.path.compareTo(b.path));
+        images = l.map((e) => Image.file(e as File));
+        logHandler.info(
+          'Loaded: c=${images.length}, q=$questionNum, l=${l.map((e) => e.path.split('\\').last).join('|')}',
+        );
 
         // caching for continuous display
         PaintingBinding.instance.imageCache.clear(); // clear all cached images
@@ -52,17 +60,13 @@ class _ViewerAccelScreenState extends State<ViewerAccelScreen> with SingleTicker
             stream.addListener(ImageStreamListener((_, __) {}));
           }
         }
-
-        _controller.reset();
         totalImageCount = images.length;
-        timePerImage = 30 / totalImageCount;
-        imageIndex = 0;
-        canShowQuestion = true;
-        questionNum++;
+        timePerImage = isArrange ? 30 : 30 / totalImageCount;
+        imageIndex = -1;
       }
 
       if (m.type == KLIMessageType.continueTimer) {
-        if (!isArrange) startImageShow();
+        imageIndex = 0;
         _controller.forward();
       }
 
@@ -78,17 +82,14 @@ class _ViewerAccelScreenState extends State<ViewerAccelScreen> with SingleTicker
       setState(() {});
     });
 
-    if (images.length == 1) {
-      setState(() {});
-      return;
-    }
-
     _controller = AnimationController(vsync: this, duration: 30.seconds)
-      ..addListener(() => setState(() {}))
-      ..addStatusListener((status) {
-        if (status == AnimationStatus.completed) {
-          // started = false;
-        }
+      ..addListener(() {
+        final t = _controller.value * 30;
+        if (t >= 30) return;
+
+        if (imageIndex >= totalImageCount - 1) return;
+        if (!isArrange && t >= timePerImage * (imageIndex + 1)) imageIndex++;
+        setState(() {});
       });
 
     setState(() {});
@@ -96,7 +97,6 @@ class _ViewerAccelScreenState extends State<ViewerAccelScreen> with SingleTicker
 
   @override
   void dispose() {
-    timer?.cancel();
     sub.cancel();
     super.dispose();
   }
@@ -119,51 +119,47 @@ class _ViewerAccelScreenState extends State<ViewerAccelScreen> with SingleTicker
           ),
           child: Column(
             children: [
-              Row(
-                children: [
-                  Expanded(
-                    child: ClipRRect(
-                      borderRadius: const BorderRadius.only(
-                        topLeft: Radius.circular(10),
-                      ),
-                      child: Container(
-                        decoration: BoxDecoration(
-                          color: Colors.transparent,
-                          border: BorderDirectional(
-                            end: BorderSide(color: Theme.of(context).colorScheme.onBackground),
+              IntrinsicHeight(
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: ClipRRect(
+                        borderRadius: const BorderRadius.only(topLeft: Radius.circular(10)),
+                        child: Container(
+                          decoration: const BoxDecoration(color: Colors.transparent),
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          alignment: Alignment.center,
+                          child: Text(
+                            canShowQuestion ? 'Question ${questionNum + 1}' : '',
+                            style: const TextStyle(fontSize: fontSizeMedium),
                           ),
-                        ),
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        alignment: Alignment.center,
-                        child: Text(
-                          canShowQuestion ? 'Question $questionNum' : '',
-                          style: const TextStyle(fontSize: fontSizeMedium),
                         ),
                       ),
                     ),
-                  ),
-                  Expanded(
-                    child: ClipRRect(
-                      borderRadius: const BorderRadius.only(
-                        topRight: Radius.circular(10),
-                      ),
-                      child: Container(
-                        decoration: BoxDecoration(
-                          color: Colors.transparent,
-                          border: BorderDirectional(
-                            end: BorderSide(color: Theme.of(context).colorScheme.onBackground),
+                    Expanded(
+                      child: ClipRRect(
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: Colors.transparent,
+                            border: BorderDirectional(
+                              start: BorderSide(color: Theme.of(context).colorScheme.onBackground),
+                            ),
                           ),
-                        ),
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        alignment: Alignment.center,
-                        child: Text(
-                          question,
-                          style: const TextStyle(fontSize: fontSizeMedium),
+                          padding: const EdgeInsets.all(16),
+                          alignment: Alignment.center,
+                          child: IntrinsicHeight(
+                            child: canShowQuestion
+                                ? Text(
+                                    question,
+                                    style: const TextStyle(fontSize: fontSizeMedium),
+                                  )
+                                : null,
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
               Expanded(
                 child: CustomPaint(
@@ -173,15 +169,19 @@ class _ViewerAccelScreenState extends State<ViewerAccelScreen> with SingleTicker
                     maxValue: 30.0,
                     foregroundColor: Colors.green,
                     backgroundColor: Colors.red,
+                    strokeWidth: 8,
                   ),
-                  child: Container(
-                    decoration: BoxDecoration(
-                      image: canShowQuestion
-                          ? DecorationImage(
-                              image: images.elementAt(imageIndex).image,
-                              fit: BoxFit.contain,
-                            )
-                          : null,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 8),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        image: imageIndex >= 0
+                            ? DecorationImage(
+                                image: images.elementAt(imageIndex).image,
+                                fit: BoxFit.contain,
+                              )
+                            : null,
+                      ),
                     ),
                   ),
                 ),
@@ -191,18 +191,5 @@ class _ViewerAccelScreenState extends State<ViewerAccelScreen> with SingleTicker
         ),
       ),
     );
-  }
-
-  void startImageShow() {
-    timer = Timer.periodic(timePerImage.seconds, (t) {
-      if (currentTime >= 30) {
-        t.cancel();
-        timer = null;
-        return;
-      }
-      if (imageIndex >= totalImageCount - 1) return;
-      imageIndex++;
-      currentTime += timePerImage;
-    });
   }
 }
