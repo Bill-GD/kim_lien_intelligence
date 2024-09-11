@@ -6,7 +6,7 @@ import 'package:side_navigation/side_navigation.dart';
 
 bool isTesting = kDebugMode, showDebugInfo = false;
 late final DecorationImage bgDecorationImage;
-final buildDate = DateTime(2024, 9, 9);
+final buildDate = DateTime(2024, 9, 11);
 
 late void Function() updateDebugOverlay;
 late void Function() updateChild;
@@ -133,7 +133,7 @@ const String changelog = """
   - Can start match with no player
   - Finish manager shows which question has video
   - Back buttons also pops client-side routes
-  - Added 'Show rows' to Obstacle screen: shows rows on viewer screen
+  - Added 'Show rows' to Obstacle & Accel screen: shows rows on viewer screen
 
   0.4.5.3 ({085715f}):
   - Added video player to Finish UI: hides question, shows video & answer

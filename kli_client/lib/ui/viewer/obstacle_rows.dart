@@ -62,7 +62,7 @@ class _ViewerObstacleRowsScreenState extends State<ViewerObstacleRowsScreen> {
                     answer: widget.answers[i],
                     revealed: widget.revealedAnswers[i],
                     answered: widget.answeredRows[i],
-                    squareSize: 100,
+                    squareSize: 90,
                     fontSize: fontSizeLarge,
                     borderWidth: 3,
                   ),

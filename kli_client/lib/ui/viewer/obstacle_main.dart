@@ -7,6 +7,7 @@ import 'package:kli_lib/kli_lib.dart';
 
 import '../../global.dart';
 import '../../match_data.dart';
+import 'answer_slide.dart';
 import 'obstacle_image.dart';
 import 'obstacle_rows.dart';
 import 'viewer_wait.dart';
@@ -41,7 +42,7 @@ class _ViewerObstacleMainScreenState extends State<ViewerObstacleMainScreen>
       KLISocketMessage(senderID: KLIClient.clientID!, type: KLIMessageType.rowCharCounts),
     );
 
-    sub = KLIClient.onMessageReceived.listen((m) {
+    sub = KLIClient.onMessageReceived.listen((m) async {
       if (m.type == KLIMessageType.obstacleQuestion) {
         if (!canShowQuestion) {
           Future.delayed(1.seconds).then((value) {
@@ -53,6 +54,7 @@ class _ViewerObstacleMainScreenState extends State<ViewerObstacleMainScreen>
         final qId = currentQuestion.id;
         if (qId < 4) answers[qId] = currentQuestion.answer;
       }
+
       if (m.type == KLIMessageType.scores) {
         int i = 0;
         for (int s in jsonDecode(m.message) as List) {
@@ -60,6 +62,7 @@ class _ViewerObstacleMainScreenState extends State<ViewerObstacleMainScreen>
           i++;
         }
       }
+
       if (m.type == KLIMessageType.rowCharCounts) {
         final charCounts = jsonDecode(m.message) as List;
         answers = List.generate(4, (i) => 'a' * charCounts[i]);
@@ -68,17 +71,21 @@ class _ViewerObstacleMainScreenState extends State<ViewerObstacleMainScreen>
       if (m.type == KLIMessageType.revealRow) {
         revealed[currentQuestion.id] = true;
       }
+
       if (m.type == KLIMessageType.hideQuestion) {
-        answered[currentQuestion.id] = true;
+        if (currentQuestion.id <= 3) answered[currentQuestion.id] = true;
         canShowQuestion = false;
         _controller.reset();
       }
+
       if (m.type == KLIMessageType.stopTimer) {
         _controller.stop();
       }
+
       if (m.type == KLIMessageType.continueTimer) {
         _controller.forward();
       }
+
       if (m.type == KLIMessageType.showObstacleRows) {
         Navigator.of(context).push<void>(
           MaterialPageRoute(
@@ -90,6 +97,7 @@ class _ViewerObstacleMainScreenState extends State<ViewerObstacleMainScreen>
           ),
         );
       }
+
       if (m.type == KLIMessageType.obstacleImage) {
         Navigator.of(context).push<void>(
           MaterialPageRoute(
@@ -100,10 +108,28 @@ class _ViewerObstacleMainScreenState extends State<ViewerObstacleMainScreen>
           ),
         );
       }
+
       if (m.type == KLIMessageType.endSection) {
         Navigator.of(context).pushReplacement<void, void>(
           MaterialPageRoute(builder: (_) => const ViewerWaitScreen()),
         );
+      }
+
+      if (m.type == KLIMessageType.showAnswers) {
+        if (m.message.isNotEmpty) {
+          final d = jsonDecode(m.message) as Map;
+
+          await Navigator.of(context).push<void>(
+            MaterialPageRoute(
+              builder: (_) => ViewerAnswerSlide(
+                showTime: false,
+                playerNames: MatchData().players.map((e) => e.name),
+                answers: (d['answers'] as List).map((e) => e as String),
+                times: (d['times'] as List).map((e) => e as double),
+              ),
+            ),
+          );
+        }
       }
       setState(() {});
     });
@@ -115,6 +141,12 @@ class _ViewerObstacleMainScreenState extends State<ViewerObstacleMainScreen>
           // started = false;
         }
       });
+  }
+
+  @override
+  void didUpdateWidget(covariant ViewerObstacleMainScreen oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    updateChild = () => setState(() {});
   }
 
   @override

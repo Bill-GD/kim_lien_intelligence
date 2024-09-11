@@ -7,6 +7,7 @@ import 'package:kli_lib/kli_lib.dart';
 
 import '../data_manager/match_state.dart';
 import '../global.dart';
+import 'answer_drawer.dart';
 
 final _key = GlobalKey<ScaffoldState>();
 
@@ -111,14 +112,23 @@ class _AccelScreenState extends State<AccelScreen> {
                     mul++;
                   }
                 }
+
+                canAnnounceAnswer = false;
+                canNext = true;
+                if (questionNum == 4) canEnd = true;
+
                 KLIServer.sendToAllClients(KLISocketMessage(
                   senderID: ConnectionID.host,
                   message: jsonEncode(MatchState().scores),
                   type: KLIMessageType.scores,
                 ));
-                canAnnounceAnswer = false;
-                canNext = true;
-                if (questionNum == 4) canEnd = true;
+
+                KLIServer.sendToNonPlayer(KLISocketMessage(
+                  senderID: ConnectionID.host,
+                  type: KLIMessageType.revealAnswerResults,
+                  message: jsonEncode(answerResults),
+                ));
+
                 KLIServer.sendToAllClients(KLISocketMessage(
                   senderID: ConnectionID.host,
                   type: KLIMessageType.hideQuestion,

@@ -6,6 +6,7 @@ import 'package:kli_lib/kli_lib.dart';
 
 import '../data_manager/match_state.dart';
 import '../global.dart';
+import 'answer_drawer.dart';
 import 'obstacle_image.dart';
 
 final _key = GlobalKey<ScaffoldState>();
@@ -172,11 +173,17 @@ class _ObstacleQuestionScreenState extends State<ObstacleQuestionScreen> {
                     MatchState().revealedObstacleRows[questionIndex] = answerResults.any((e) => e == true);
 
                 if (MatchState().revealedObstacleRows[questionIndex]) {
-                  KLIServer.sendToAllClients(KLISocketMessage(
+                  KLIServer.sendToNonPlayer(KLISocketMessage(
                     senderID: ConnectionID.host,
                     type: KLIMessageType.revealRow,
                   ));
                 }
+
+                KLIServer.sendToNonPlayer(KLISocketMessage(
+                  senderID: ConnectionID.host,
+                  type: KLIMessageType.revealAnswerResults,
+                  message: jsonEncode(answerResults),
+                ));
 
                 KLIServer.sendToAllClients(KLISocketMessage(
                   senderID: ConnectionID.host,
@@ -244,6 +251,7 @@ class _ObstacleQuestionScreenState extends State<ObstacleQuestionScreen> {
               child: KLIButton(
                 'Show rows',
                 enableCondition: canShowRows,
+                enabledLabel: 'Show rows to viewers',
                 onPressed: () {
                   KLIServer.sendToNonPlayer(KLISocketMessage(
                     senderID: ConnectionID.host,
@@ -338,7 +346,6 @@ class _ObstacleQuestionScreenState extends State<ObstacleQuestionScreen> {
             'Show Answers',
             enableCondition: canShowAnswers,
             onPressed: () {
-              // canAnnounceAnswer = true;
               for (final i in range(0, 3)) {
                 if (MatchState().eliminatedPlayers[i]) {
                   answerResults[i] = false;

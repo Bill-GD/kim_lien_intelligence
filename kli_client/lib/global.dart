@@ -5,7 +5,7 @@ import 'package:package_info_plus/package_info_plus.dart';
 
 bool isTesting = kDebugMode, showDebugInfo = false;
 DecorationImage? bgDecorationImage;
-final buildDate = DateTime(2024, 9, 9);
+final buildDate = DateTime(2024, 9, 11);
 
 late void Function() updateDebugOverlay;
 late void Function() updateChild;
@@ -45,6 +45,7 @@ String getSizeString(double bytes) {
 const String changelog = """
   0.3.2 ({latest}):
   - Added viewer accel screen: question, images, timer
+  - Added viewer answer screen: time (accel), player names, answers
 
   0.3.1 ({70b7ce4}):
   - Added viewer obstacle screens: question (like start), image, rows

@@ -7,6 +7,7 @@ import 'package:kli_lib/kli_lib.dart';
 
 import '../../global.dart';
 import '../../match_data.dart';
+import 'answer_slide.dart';
 import 'viewer_wait.dart';
 
 class ViewerAccelScreen extends StatefulWidget {
@@ -74,10 +75,26 @@ class _ViewerAccelScreenState extends State<ViewerAccelScreen> with SingleTicker
         imageIndex = 1;
       }
 
-      if (m.type == KLIMessageType.endSection && mounted) {
+      if (m.type == KLIMessageType.endSection) {
         Navigator.of(context).pushReplacement<void, void>(
           MaterialPageRoute(builder: (_) => const ViewerWaitScreen()),
         );
+      }
+
+      if (m.type == KLIMessageType.showAnswers) {
+        if (m.message.isNotEmpty) {
+          final d = jsonDecode(m.message) as Map;
+
+          await Navigator.of(context).push<void>(
+            MaterialPageRoute(
+              builder: (_) => ViewerAnswerSlide(
+                playerNames: MatchData().players.map((e) => e.name),
+                answers: (d['answers'] as List).map((e) => e as String),
+                times: (d['times'] as List).map((e) => e as double),
+              ),
+            ),
+          );
+        }
       }
       setState(() {});
     });
@@ -85,14 +102,26 @@ class _ViewerAccelScreenState extends State<ViewerAccelScreen> with SingleTicker
     _controller = AnimationController(vsync: this, duration: 30.seconds)
       ..addListener(() {
         final t = _controller.value * 30;
-        if (t >= 30) return;
+        if (t >= 30) {
+          setState(() {});
+          return;
+        }
 
-        if (imageIndex >= totalImageCount - 1) return;
+        if (imageIndex >= totalImageCount - 1) {
+          setState(() {});
+          return;
+        }
         if (!isArrange && t >= timePerImage * (imageIndex + 1)) imageIndex++;
         setState(() {});
       });
 
     setState(() {});
+  }
+
+  @override
+  void didUpdateWidget(covariant ViewerAccelScreen oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    updateChild = () => setState(() {});
   }
 
   @override
