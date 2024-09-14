@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:kli_lib/kli_lib.dart';
@@ -23,11 +24,12 @@ class ViewerAnswerSlide extends StatefulWidget {
 }
 
 class _ViewerAnswerSlideState extends State<ViewerAnswerSlide> {
-  static const offScreenOffset = 1.1;
+  static const horizontalPadding = 216.0, offScreenOffset = 1.1;
   late final StreamSubscription<KLISocketMessage> sub;
   Offset offset = const Offset(offScreenOffset, 0);
   bool showAnswers = false;
   Iterable<bool?> answerResult = Iterable.generate(4, (_) => null);
+  double answerContainerWidth = 1;
 
   @override
   void initState() {
@@ -48,6 +50,11 @@ class _ViewerAnswerSlideState extends State<ViewerAnswerSlide> {
       if (m.type == KLIMessageType.pop) {
         Navigator.pop(context);
       }
+    });
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      answerContainerWidth = MediaQuery.of(context).size.width - (horizontalPadding * 2);
+      if (widget.showTime) answerContainerWidth -= 160;
     });
   }
 
@@ -75,7 +82,7 @@ class _ViewerAnswerSlideState extends State<ViewerAnswerSlide> {
           automaticallyImplyLeading: isTesting,
         ),
         body: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 160),
+          padding: const EdgeInsets.symmetric(horizontal: horizontalPadding),
           child: AnimatedSlide(
             offset: offset,
             duration: 1.seconds,
@@ -85,51 +92,64 @@ class _ViewerAnswerSlideState extends State<ViewerAnswerSlide> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 for (final i in range(0, 3))
-                  Container(
-                    decoration: BoxDecoration(
-                      color: answerResult.elementAt(i) == null
-                          ? Theme.of(context).colorScheme.background
-                          : answerResult.elementAt(i)!
-                              ? Colors.green.withOpacity(0.6)
-                              : Colors.red.withOpacity(0.6),
-                      border: Border.all(color: Colors.white),
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    margin: const EdgeInsets.symmetric(vertical: 16),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 12),
                     child: IntrinsicHeight(
                       child: Row(
                         children: [
                           if (widget.showTime)
                             Container(
-                              constraints: const BoxConstraints(minWidth: 160),
-                              decoration: const BoxDecoration(
-                                border: BorderDirectional(end: BorderSide(color: Colors.white)),
+                              constraints: const BoxConstraints(maxWidth: 160),
+                              decoration: BoxDecoration(
+                                border: Border.all(color: Colors.white),
+                                color: containerColor(i),
+                                borderRadius: const BorderRadius.only(
+                                  bottomLeft: Radius.circular(10),
+                                  topLeft: Radius.circular(10),
+                                ),
                               ),
                               alignment: Alignment.center,
                               child: Text(
-                                showAnswers
-                                    ? widget.times.elementAt(i) == 0
-                                        ? '0'
-                                        : widget.times.elementAt(i).toString()
-                                    : '',
+                                showAnswers ? max(0, widget.times.elementAt(i)).toString() : '',
                                 style: const TextStyle(fontSize: fontSizeLarge),
                                 textAlign: TextAlign.center,
                               ),
                             ),
-                          Expanded(
+                          IntrinsicWidth(
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Padding(
-                                  padding: const EdgeInsets.only(top: 16, bottom: 12, left: 32),
+                                // player name
+                                Container(
+                                  padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 32),
+                                  decoration: BoxDecoration(
+                                    color: containerColor(i),
+                                    border: Border.all(color: Colors.white),
+                                    borderRadius: BorderRadius.only(
+                                      topRight: const Radius.circular(10),
+                                      topLeft: widget.showTime ? Radius.zero : const Radius.circular(10),
+                                    ),
+                                  ),
+                                  constraints: const BoxConstraints(minWidth: 80),
                                   child: Text(
-                                    showAnswers ? widget.playerNames.elementAt(i) : '',
+                                    !widget.showTime || showAnswers ? widget.playerNames.elementAt(i) : '',
                                     style: const TextStyle(fontSize: fontSizeLarge),
                                   ),
                                 ),
-                                const Divider(color: Colors.white, thickness: 1),
-                                Padding(
-                                  padding: const EdgeInsets.only(top: 12, bottom: 16, left: 32),
+                                // player answer
+                                Container(
+                                  width: double.infinity,
+                                  padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 32),
+                                  decoration: BoxDecoration(
+                                    color: containerColor(i),
+                                    border: Border.all(color: Colors.white),
+                                    borderRadius: BorderRadius.only(
+                                      bottomRight: const Radius.circular(10),
+                                      topRight: const Radius.circular(10),
+                                      bottomLeft: widget.showTime ? Radius.zero : const Radius.circular(10),
+                                    ),
+                                  ),
+                                  constraints: BoxConstraints(maxWidth: answerContainerWidth),
                                   child: Text(
                                     showAnswers ? widget.answers.elementAt(i) : '',
                                     style: const TextStyle(fontSize: fontSizeLarge),
@@ -148,5 +168,10 @@ class _ViewerAnswerSlideState extends State<ViewerAnswerSlide> {
         ),
       ),
     );
+  }
+
+  Color containerColor(int i) {
+    if (answerResult.elementAt(i) == null) return Theme.of(context).colorScheme.background;
+    return answerResult.elementAt(i)! ? Colors.green.withOpacity(0.6) : Colors.red.withOpacity(0.6);
   }
 }

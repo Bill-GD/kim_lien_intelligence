@@ -45,7 +45,7 @@ String getSizeString(double bytes) {
 const String changelog = """
   0.3.2 ({latest}):
   - Added viewer accel screen: question, images, timer
-  - Added viewer answer screen: time (accel), player names, answers
+  - Added viewer answer screen: time (accel), player names, answers (the answer cards slides in)
 
   0.3.1 ({70b7ce4}):
   - Added viewer obstacle screens: question (like start), image, rows
