@@ -19,7 +19,7 @@ class PlayerFinishScreen extends StatefulWidget {
 
 class _PlayerFinishScreenState extends State<PlayerFinishScreen> {
   double timeLimitSec = 1, currentTimeSec = 0;
-  bool canShowQuestion = false, canSteal = false, timeEnded = false;
+  bool canShowQuestion = false, canSteal = false;
   late FinishQuestion currentQuestion;
   Timer? timer;
   late final StreamSubscription<KLISocketMessage> sub;
@@ -42,7 +42,6 @@ class _PlayerFinishScreenState extends State<PlayerFinishScreen> {
         timer = Timer.periodic(1.seconds, (timer) {
           if (currentTimeSec <= 0) {
             timer.cancel();
-            timeEnded = true;
             setState(() {});
             return;
           }

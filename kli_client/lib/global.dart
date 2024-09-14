@@ -43,7 +43,10 @@ String getSizeString(double bytes) {
 }
 
 const String changelog = """
-  0.3.2 ({latest}):
+  0.3.3 ({latest}):
+  - Added viewer finish screen: question, timer, point value, player names, scores
+
+  0.3.2 ({0a2200b}):
   - Added viewer accel screen: question, images, timer
   - Added viewer answer screen: time (accel), player names, answers (the answer cards slides in)
 

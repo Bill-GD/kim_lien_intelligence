@@ -9,20 +9,19 @@ import '../../global.dart';
 import '../../match_data.dart';
 import 'viewer_wait.dart';
 
-class ViewerStartScreen extends StatefulWidget {
-  final int timeLimitSec = 60;
+class ViewerFinishScreen extends StatefulWidget {
   final int playerPos;
-  const ViewerStartScreen({super.key, required this.playerPos});
+  const ViewerFinishScreen({super.key, required this.playerPos});
 
   @override
-  State<ViewerStartScreen> createState() => _ViewerStartScreenState();
+  State<ViewerFinishScreen> createState() => _ViewerFinishScreenState();
 }
 
-class _ViewerStartScreenState extends State<ViewerStartScreen> with SingleTickerProviderStateMixin {
+class _ViewerFinishScreenState extends State<ViewerFinishScreen> with SingleTickerProviderStateMixin {
   late AnimationController _controller;
-  double currentTimeSec = 60;
-  bool started = false;
-  late StartQuestion currentQuestion;
+  double maxTimeSec = 10;
+  bool canShowQuestion = false, canGetNewQuestion = true;
+  late FinishQuestion currentQuestion;
   late final StreamSubscription<KLISocketMessage> sub;
 
   @override
@@ -31,21 +30,25 @@ class _ViewerStartScreenState extends State<ViewerStartScreen> with SingleTicker
     updateChild = () => setState(() {});
     Window.setEffect(effect: WindowEffect.transparent);
     sub = KLIClient.onMessageReceived.listen((m) {
-      if (m.type == KLIMessageType.startQuestion) {
-        if (!started) {
-          _controller.forward();
-          setState(() {});
+      if (m.type == KLIMessageType.finishQuestion) {
+        if (canGetNewQuestion) {
+          currentQuestion = FinishQuestion.fromJson(jsonDecode(m.message));
+          canShowQuestion = true;
+          maxTimeSec = currentQuestion.point / 10 * 5 + 5;
+          _controller = newAnimController(maxTimeSec.seconds);
         }
-        currentQuestion = StartQuestion.fromJson(jsonDecode(m.message));
-        started = true;
       }
 
-      if (m.type == KLIMessageType.correctStartAnswer) {
-        MatchData().players[widget.playerPos].point = int.parse(m.message);
+      if (m.type == KLIMessageType.continueTimer) {
+        _controller.forward();
       }
 
-      if (m.type == KLIMessageType.stopTimer) {
-        _controller.stop();
+      if (m.type == KLIMessageType.scores) {
+        int i = 0;
+        for (int s in jsonDecode(m.message) as List) {
+          MatchData().players[i].point = s;
+          i++;
+        }
       }
 
       if (m.type == KLIMessageType.endSection) {
@@ -53,16 +56,11 @@ class _ViewerStartScreenState extends State<ViewerStartScreen> with SingleTicker
           MaterialPageRoute(builder: (_) => const ViewerWaitScreen()),
         );
       }
+
+      _controller = newAnimController(maxTimeSec.seconds);
+
       setState(() {});
     });
-
-    _controller = AnimationController(vsync: this, duration: widget.timeLimitSec.seconds)
-      ..addListener(() => setState(() {}))
-      ..addStatusListener((status) {
-        if (status == AnimationStatus.completed) {
-          started = false;
-        }
-      });
   }
 
   @override
@@ -70,6 +68,10 @@ class _ViewerStartScreenState extends State<ViewerStartScreen> with SingleTicker
     _controller.dispose();
     sub.cancel();
     super.dispose();
+  }
+
+  AnimationController newAnimController(Duration duration) {
+    return AnimationController(vsync: this, duration: duration)..addListener(() => setState(() {}));
   }
 
   @override
@@ -120,7 +122,7 @@ class _ViewerStartScreenState extends State<ViewerStartScreen> with SingleTicker
                     constraints: const BoxConstraints(maxHeight: 80),
                     padding: const EdgeInsets.all(16),
                     child: Text(
-                      started ? StartQuestion.mapTypeDisplay(currentQuestion.subject) : '',
+                      canShowQuestion ? '${currentQuestion.point} point' : '',
                       style: const TextStyle(fontSize: fontSizeLarge),
                     ),
                   ),
@@ -200,9 +202,9 @@ class _ViewerStartScreenState extends State<ViewerStartScreen> with SingleTicker
   Widget timer(Widget child) {
     return CustomPaint(
       painter: RRectProgressPainter(
-        value: widget.timeLimitSec - _controller.value * widget.timeLimitSec,
+        value: maxTimeSec - _controller.value * maxTimeSec,
         minValue: 0,
-        maxValue: widget.timeLimitSec.toDouble(),
+        maxValue: maxTimeSec.toDouble(),
         foregroundColor: Colors.green,
         backgroundColor: Colors.red,
       ),
@@ -217,7 +219,7 @@ class _ViewerStartScreenState extends State<ViewerStartScreen> with SingleTicker
       child: Stack(
         children: [
           Text(
-            started ? currentQuestion.question : '',
+            canShowQuestion ? currentQuestion.question : '',
             textAlign: TextAlign.center,
             style: const TextStyle(fontSize: fontSizeLarge),
           ),
