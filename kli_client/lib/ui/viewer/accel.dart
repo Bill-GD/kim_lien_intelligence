@@ -25,13 +25,11 @@ class _ViewerAccelScreenState extends State<ViewerAccelScreen> with SingleTicker
   double timePerImage = 0;
   late AnimationController _controller;
   late final StreamSubscription<KLISocketMessage> sub;
-  late final String cachePath;
 
   @override
   void initState() {
     super.initState();
     updateChild = () => setState(() {});
-    StorageHandler.appCacheDirectory.then((p) => cachePath = '$p\\${MatchData().matchName}\\other');
 
     sub = KLIClient.onMessageReceived.listen((m) async {
       if (m.type == KLIMessageType.accelQuestion) {
@@ -45,7 +43,7 @@ class _ViewerAccelScreenState extends State<ViewerAccelScreen> with SingleTicker
 
         final l = Directory(cachePath)
             .listSync()
-            .where((e) => e is File && e.path.contains('accel_image_${questionNum}_'))
+            .where((e) => e is File && e.path.contains('ai_${questionNum}_'))
             .toList()
           ..sort((a, b) => a.path.compareTo(b.path));
         images = l.map((e) => Image.file(e as File));

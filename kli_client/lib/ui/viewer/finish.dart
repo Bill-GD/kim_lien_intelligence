@@ -47,7 +47,7 @@ class _ViewerFinishScreenState extends State<ViewerFinishScreen> with SingleTick
               MaterialPageRoute(
                 builder: (_) => ViewerFinishVideoScreen(
                   question: currentQuestion.question,
-                  videoPath: currentQuestion.mediaPath,
+                  videoPath: 'f_${currentQuestion.mediaPath.split(r'\').last}',
                 ),
               ),
             );

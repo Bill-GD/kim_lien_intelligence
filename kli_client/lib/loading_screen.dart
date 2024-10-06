@@ -44,11 +44,12 @@ class _LoadingScreenState extends State<LoadingScreen> {
       bgDecorationImage = await getBackgroundWidget(assetHandler);
       await Future.delayed(widget.delayMilli);
 
+      cachePath = await StorageHandler.appCacheDirectory;
       setState(() => loadingText = 'Clearing cache...');
-      logHandler.info('Cache: ${await StorageHandler.appCacheDirectory}');
+      logHandler.info('Cache: $cachePath');
       StorageHandler.clearCache();
       StorageHandler().writeStringToFile(
-        '${await StorageHandler.appCacheDirectory}\\cache.txt',
+        '$cachePath\\cache.txt',
         dedent('''
         The folder(s) here are used for caching match data (names, images, videos)
         so that the client app doesn't need to request new data every time joining a match.

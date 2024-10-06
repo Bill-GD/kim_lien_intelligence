@@ -20,7 +20,7 @@ class ServerSetup extends StatefulWidget {
 class _ServerSetupState extends State<ServerSetup> {
   String localAddress = '';
   final List<StreamSubscription> subscriptions = [];
-  String popupContent = 'The app is preparing the match data. Please wait for it to finish.';
+  bool canClosePopup = false;
 
   @override
   void initState() {
@@ -31,9 +31,18 @@ class _ServerSetupState extends State<ServerSetup> {
     getIpAddresses();
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      showPopupMessage(context, title: 'Match data', content: popupContent);
-      MatchState.prepareMatchData(storageHandler.matchData, storageHandler.playerData);
-      setState(() => popupContent = 'Done! You can close this now.');
+      showPopupMessage(
+        context,
+        title: 'Match data',
+        content: 'The app is preparing the match data. Please wait for it to finish.',
+      );
+      Future.delayed(
+        500.ms,
+        () {
+          MatchState.prepareMatchData(storageHandler.matchData, storageHandler.playerData);
+          showToastMessage(context, 'Done! You can close this now.');
+        },
+      );
     });
   }
 
@@ -87,6 +96,21 @@ class _ServerSetupState extends State<ServerSetup> {
           child: Scaffold(
             extendBodyBehindAppBar: true,
             appBar: AppBar(forceMaterialTransparency: true),
+            endDrawer: Drawer(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Text('Player: pi_<pos>'),
+                  const Text('obstacle: oi'),
+                  const Text('accel: ai_<q>_<i>'),
+                  const Text('finish: f_<path>'),
+                  Text('Match data: ${DataSize.matchActualDataSize}'),
+                  Text('Match msg data: ${DataSize.matchMessageSize}'),
+                  Text('Player data: ${DataSize.playerActualDataSize}'),
+                  Text('Player msg data: ${DataSize.playerMessageSize}'),
+                ],
+              ),
+            ),
             body: Container(
               decoration: BoxDecoration(image: bgDecorationImage),
               child: Row(

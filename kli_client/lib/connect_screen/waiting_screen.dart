@@ -93,7 +93,7 @@ class _WaitingScreenState extends State<WaitingScreen> {
                         type: KLIMessageType.dataSize,
                       ));
 
-                      KLIClient.onMessageReceived.listen((m) async {
+                      KLIClient.onMessageReceived.listen((m) {
                         if (m.type == KLIMessageType.dataSize) {
                           setState(() => progressMessage = 'Received metadata...');
                           final s = m.message.split('|');
@@ -111,7 +111,7 @@ class _WaitingScreenState extends State<WaitingScreen> {
                           matchName = m.message;
                           MatchData().matchName = matchName;
                           setState(() => progressMessage = 'Checking cached data of "$matchName"...');
-                          final r = await checkCache();
+                          final r = checkCache();
 
                           if (r) {
                             setState(() => progressMessage = 'Found cached data of "$matchName"...');
@@ -137,14 +137,14 @@ class _WaitingScreenState extends State<WaitingScreen> {
                         }
 
                         if (m.type == KLIMessageType.playerData) {
-                          await parsePlayerData(m);
+                          parsePlayerData(m);
                           receivingData = false;
                           setState(() {});
                           moveToOverview();
                         }
 
                         if (m.type == KLIMessageType.matchData) {
-                          await parseNewData(m);
+                          parseNewData(m);
                           receivingData = false;
                           setState(() {});
                           moveToOverview();
@@ -160,12 +160,13 @@ class _WaitingScreenState extends State<WaitingScreen> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      checkingCache
-                          ? Text(progressMessage)
-                          // ? const Text('Checking for cached data...')
-                          : Text(
-                              'Requesting match data from host (${getSizeString(actualDataSize.toDouble())}): ${(dataReceived / totalData * 100).toStringAsFixed(2)}% ',
-                            ),
+                      Text(
+                        checkingCache
+                            ? progressMessage
+                            : 'Requesting match data from host'
+                                ' (${getSizeString(actualDataSize)}):'
+                                ' ${(dataReceived / totalData * 100).toStringAsFixed(2)}% ',
+                      ),
                       const SizedBox(width: 16),
                       const CircularProgressIndicator(),
                     ],
@@ -194,14 +195,12 @@ class _WaitingScreenState extends State<WaitingScreen> {
     );
   }
 
-  Future<bool> checkCache() async {
-    final c = await StorageHandler.appCacheDirectory;
-
+  bool checkCache() {
     if (KLIClient.isPlayer) {
-      if (File('$c\\$matchName\\player\\size.txt').existsSync() &&
-          File('$c\\$matchName\\player\\names.txt').existsSync()) {
-        final s = StorageHandler().readFromFile('$c\\$matchName\\player\\size.txt');
-        final n = StorageHandler().readFromFile('$c\\$matchName\\player\\names.txt').split('|');
+      if (File('$cachePath\\$matchName\\player\\size.txt').existsSync() &&
+          File('$cachePath\\$matchName\\player\\names.txt').existsSync()) {
+        final s = StorageHandler().readFromFile('$cachePath\\$matchName\\player\\size.txt');
+        final n = StorageHandler().readFromFile('$cachePath\\$matchName\\player\\names.txt').split('|');
 
         if (actualDataSize == int.parse(s)) {
           setState(() => receivingData = false);
@@ -210,7 +209,7 @@ class _WaitingScreenState extends State<WaitingScreen> {
                 (i) => Player(
                   pos: i,
                   name: n[i],
-                  fullImagePath: '$c\\$matchName\\player\\player_image_$i.png',
+                  fullImagePath: '$cachePath\\$matchName\\player\\pi_$i.png',
                 ),
               ));
           logHandler.info('Found player data in cache');
@@ -219,10 +218,10 @@ class _WaitingScreenState extends State<WaitingScreen> {
       }
       return false;
     } else {
-      if (File('$c\\$matchName\\other\\size.txt').existsSync() &&
-          File('$c\\$matchName\\other\\names.txt').existsSync()) {
-        final s = StorageHandler().readFromFile('$c\\$matchName\\other\\size.txt');
-        final n = StorageHandler().readFromFile('$c\\$matchName\\other\\names.txt').split('|');
+      if (File('$cachePath\\$matchName\\other\\size.txt').existsSync() &&
+          File('$cachePath\\$matchName\\other\\names.txt').existsSync()) {
+        final s = StorageHandler().readFromFile('$cachePath\\$matchName\\other\\size.txt');
+        final n = StorageHandler().readFromFile('$cachePath\\$matchName\\other\\names.txt').split('|');
 
         if (actualDataSize == int.parse(s)) {
           setState(() => receivingData = false);
@@ -231,7 +230,7 @@ class _WaitingScreenState extends State<WaitingScreen> {
                 (i) => Player(
                   pos: i,
                   name: n[i],
-                  fullImagePath: '$c\\$matchName\\other\\player_image_$i.png',
+                  fullImagePath: '$cachePath\\$matchName\\other\\pi_$i.png',
                 ),
               ));
           logHandler.info('Found match data in cache');
@@ -242,71 +241,69 @@ class _WaitingScreenState extends State<WaitingScreen> {
     }
   }
 
-  Future<void> parseNewData(KLISocketMessage m) async {
+  void parseNewData(KLISocketMessage m) {
     final d = jsonDecode(String.fromCharCodes(
       zlib.decode(m.message.codeUnits),
     )) as Map<String, dynamic>;
     final n = List<String>.filled(4, '');
-    final c = await StorageHandler.appCacheDirectory;
 
     for (var e in d.entries) {
-      if (e.key.contains('player_name')) {
+      if (e.key.contains('pn')) {
         final pos = int.parse(e.key.split('_').last);
         n[pos] = e.value;
         continue;
       }
-      if (e.key.contains('player_image')) {
+      if (e.key.contains('pi')) {
         final pos = int.parse(e.key.split('_').last.characters.first);
         MatchData().players.add(Player(
               pos: pos,
               name: n[pos],
-              fullImagePath: '$c\\$matchName\\other\\${e.key}',
+              fullImagePath: '$cachePath\\$matchName\\other\\${e.key}',
             ));
       }
       StorageHandler().writeBytesToFile(
-        '$c\\$matchName\\other\\${e.key}',
+        '$cachePath\\$matchName\\other\\${e.key}',
         Networking.decodeMedia(e.value),
         createIfNotExists: true,
       );
     }
 
     StorageHandler().writeStringToFile(
-      '$c\\$matchName\\other\\names.txt',
+      '$cachePath\\$matchName\\other\\names.txt',
       n.join('|'),
       createIfNotExists: true,
     );
 
     StorageHandler().writeStringToFile(
-      '$c\\$matchName\\other\\size.txt',
+      '$cachePath\\$matchName\\other\\size.txt',
       actualDataSize.toString(),
       createIfNotExists: true,
     );
   }
 
-  Future<void> parsePlayerData(KLISocketMessage m) async {
+  void parsePlayerData(KLISocketMessage m) {
     final d = jsonDecode(String.fromCharCodes(
       zlib.decode(m.message.codeUnits),
     )) as Map<String, dynamic>;
     final n = List<String>.filled(4, '');
-    final c = await StorageHandler.appCacheDirectory;
 
     for (var e in d.entries) {
-      if (e.key.contains('player_name')) {
+      if (e.key.contains('pn')) {
         final pos = int.parse(e.key.split('_').last);
         n[pos] = e.value;
       }
 
-      if (e.key.contains('player_image')) {
+      if (e.key.contains('pi')) {
         final pos = int.parse(e.key.split('_').last.characters.first);
         MatchData().players.add(
               Player(
                 pos: pos,
                 name: n[pos],
-                fullImagePath: '$c\\$matchName\\player\\${e.key}',
+                fullImagePath: '$cachePath\\$matchName\\player\\${e.key}',
               ),
             );
         StorageHandler().writeBytesToFile(
-          '$c\\$matchName\\player\\${e.key}',
+          '$cachePath\\$matchName\\player\\${e.key}',
           Networking.decodeMedia(e.value),
           createIfNotExists: true,
         );
@@ -314,13 +311,13 @@ class _WaitingScreenState extends State<WaitingScreen> {
     }
 
     StorageHandler().writeStringToFile(
-      '$c\\$matchName\\player\\names.txt',
+      '$cachePath\\$matchName\\player\\names.txt',
       n.join('|'),
       createIfNotExists: true,
     );
 
     StorageHandler().writeStringToFile(
-      '$c\\$matchName\\player\\size.txt',
+      '$cachePath\\$matchName\\player\\size.txt',
       actualDataSize.toString(),
       createIfNotExists: true,
     );

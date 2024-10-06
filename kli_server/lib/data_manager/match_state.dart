@@ -47,6 +47,7 @@ class MatchState {
 
   static void prepareMatchData(String matchDataPath, String playerDataPath) {
     if (!initialized) return;
+    logHandler.info('Preparing match data');
 
     final fm = File(matchDataPath), fp = File(playerDataPath);
     DataSize.matchActualDataSize = 0;
@@ -58,23 +59,26 @@ class MatchState {
       final p = MatchState().players[i];
       final ext = p.imagePath.split('.').last;
 
-      md['player_name_$i'] = pd['player_name_$i'] = p.name;
-      md['player_image_$i.$ext'] = pd['player_image_$i.$ext'] = Networking.encodeMedia(p.imagePath);
+      md['pn_$i'] = pd['pn_$i'] = p.name;
+      md['pi_$i.$ext'] = pd['pi_$i.$ext'] = Networking.encodeMedia(p.imagePath);
 
       DataSize.playerActualDataSize += FileStat.statSync(StorageHandler.getFullPath(p.imagePath)).size;
       DataSize.matchActualDataSize += FileStat.statSync(StorageHandler.getFullPath(p.imagePath)).size;
     }
 
     final pm = String.fromCharCodes(zlib.encode(jsonEncode(pd).codeUnits));
+    // final pm = jsonEncode(pd);
     DataSize.playerMessageSize = KLISocketMessage(
       senderID: ConnectionID.host,
       type: KLIMessageType.playerData,
       message: pm,
+      // message: String.fromCharCodes(zlib.encode(pm.codeUnits)),
     ).encode().codeUnits.length;
     fp.writeAsStringSync(pm);
+    logHandler.info('Player data done');
 
     final obsPath = DataManager.getMatchQuestions<ObstacleMatch>(MatchState().match.name).imagePath;
-    md['obstacle_image.${obsPath.split('.').last}'] = Networking.encodeMedia(obsPath);
+    md['oi.${obsPath.split('.').last}'] = Networking.encodeMedia(obsPath);
     DataSize.matchActualDataSize += FileStat.statSync(StorageHandler.getFullPath(obsPath)).size;
     pd.clear();
 
@@ -82,25 +86,29 @@ class MatchState {
       final q = DataManager.getMatchQuestions<AccelMatch>(MatchState().match.name).questions[i];
       for (final j in range(0, q.imagePaths.length - 1)) {
         final ext = q.imagePaths[j].split('.').last;
-        md['accel_image_${i}_$j.$ext'] = Networking.encodeMedia(q.imagePaths[j]);
+        md['ai_${i}_$j.$ext'] = Networking.encodeMedia(q.imagePaths[j]);
         DataSize.matchActualDataSize += FileStat.statSync(StorageHandler.getFullPath(q.imagePaths[j])).size;
       }
     }
 
     DataManager.getMatchQuestions<FinishMatch>(MatchState().match.name).questions.forEach((q) {
       if (q.mediaPath.isEmpty) return;
-      final ext = q.mediaPath.split('.').last;
-      md['finish_${q.mediaPath.split(r'\').last}.$ext'] = Networking.encodeMedia(q.mediaPath);
+      if (md.containsKey('f_${q.mediaPath.split(r'\').last}')) return;
+
+      md['f_${q.mediaPath.split(r'\').last}'] = Networking.encodeMedia(q.mediaPath);
       DataSize.matchActualDataSize += FileStat.statSync(StorageHandler.getFullPath(q.mediaPath)).size;
     });
 
+    // final mm = jsonEncode(md);
     final mm = String.fromCharCodes(zlib.encode(jsonEncode(md).codeUnits));
-    DataSize.playerMessageSize = KLISocketMessage(
+    DataSize.matchMessageSize = KLISocketMessage(
       senderID: ConnectionID.host,
       type: KLIMessageType.matchData,
       message: mm,
+      // message: String.fromCharCodes(zlib.encode(mm.codeUnits)),
     ).encode().codeUnits.length;
     fm.writeAsStringSync(mm);
+    logHandler.info('Match data done');
   }
 
   static void sendPlayerData(ConnectionID id, bool sendData, String playerDataPath) {
@@ -114,6 +122,7 @@ class MatchState {
           senderID: ConnectionID.host,
           type: KLIMessageType.playerData,
           message: msg,
+          // message: String.fromCharCodes(zlib.encode(msg.codeUnits)),
         ),
       );
       return;
@@ -139,6 +148,7 @@ class MatchState {
           senderID: ConnectionID.host,
           type: KLIMessageType.matchData,
           message: msg,
+          // message: String.fromCharCodes(zlib.encode(msg.codeUnits)),
         ),
       );
       return;

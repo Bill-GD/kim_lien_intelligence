@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:kli_lib/kli_lib.dart';
 
 import '../global.dart';
+import '../match_data.dart';
 import 'cache_drawer.dart';
 import 'waiting_screen.dart';
 
@@ -183,6 +184,7 @@ class _ConnectPageState extends State<ConnectPage> {
           onPressed: () {
             KLIClient.disconnect();
             // clientTextController.text = '';
+            MatchData().reset();
             setState(() => isConnected = false);
             updateDebugOverlay();
           },

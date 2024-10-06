@@ -1,9 +1,10 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:kli_client/global.dart';
 import 'package:kli_lib/kli_lib.dart';
 import 'package:url_launcher/url_launcher_string.dart';
+
+import '../global.dart';
 
 class CacheDrawer extends StatefulWidget {
   const CacheDrawer({super.key});
@@ -25,18 +26,16 @@ class _CacheDrawerState extends State<CacheDrawer> {
   }
 
   void getCachedData() {
-    StorageHandler.appCacheDirectory.then((dirPath) {
-      cacheEntities = Directory(dirPath).listSync().whereType<Directory>().map((e) {
-        final size = StorageHandler.getDirectorySize(e.path);
-        return _CacheEntity(
-          name: e.path.split('\\').last,
-          path: e.path,
-          size: size,
-        );
-      }).toList();
-      loading = false;
-      setState(() {});
-    });
+    cacheEntities = Directory(cachePath).listSync().whereType<Directory>().map((e) {
+      final size = StorageHandler.getDirectorySize(e.path);
+      return _CacheEntity(
+        name: e.path.split('\\').last,
+        path: e.path,
+        size: size,
+      );
+    }).toList();
+    loading = false;
+    setState(() {});
   }
 
   @override
@@ -55,7 +54,7 @@ class _CacheDrawerState extends State<CacheDrawer> {
             Column(
               children: [
                 Text(
-                  'Cache ${loading ? '' : '(${getSizeString(totalSize.toDouble())})'}',
+                  'Cache ${loading ? '' : '(${getSizeString(totalSize)})'}',
                   style: const TextStyle(fontSize: 24),
                 ),
                 const Padding(
@@ -74,7 +73,7 @@ class _CacheDrawerState extends State<CacheDrawer> {
                             return ListTile(
                               title: Text(entity.name),
                               // title: Text('"${entity.name}" at ${entity.path}'),
-                              subtitle: Text(getSizeString(entity.size.toDouble())),
+                              subtitle: Text(getSizeString(entity.size)),
                               trailing: IntrinsicWidth(
                                 child: Row(
                                   children: [

@@ -35,9 +35,7 @@ class _ViewerObstacleMainScreenState extends State<ViewerObstacleMainScreen>
     super.initState();
     updateChild = () => setState(() {});
     Window.setEffect(effect: WindowEffect.transparent);
-    StorageHandler.appCacheDirectory.then((p) {
-      obsImage = '$p\\${MatchData().matchName}\\other\\obstacle_image.png';
-    });
+    obsImage = '$cachePath\\${MatchData().matchName}\\other\\oi.png';
     KLIClient.sendMessage(
       KLISocketMessage(senderID: KLIClient.clientID!, type: KLIMessageType.rowCharCounts),
     );

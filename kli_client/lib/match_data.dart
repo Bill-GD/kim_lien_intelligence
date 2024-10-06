@@ -3,6 +3,12 @@ class MatchData {
   static final MatchData _singleton = MatchData._internal();
   factory MatchData() => _singleton;
   MatchData._internal();
+  
+  void reset() {
+    playerPos = -1;
+    players.clear();
+    matchName = '';
+  }
 
   void setPos(int pos) {
     assert(pos >= 0 && pos < 4, 'Invalid player position: $pos');

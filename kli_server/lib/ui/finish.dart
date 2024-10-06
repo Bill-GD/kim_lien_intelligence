@@ -274,9 +274,7 @@ class _FinishScreenState extends State<FinishScreen> {
                                     padding: const EdgeInsets.only(top: 48),
                                     child: Row(
                                       mainAxisAlignment: MainAxisAlignment.center,
-                                      children: [
-                                        VideoPlayer(vidController!),
-                                      ],
+                                      children: [VideoPlayer(vidController!)],
                                     ),
                                   ),
                                   Container(
@@ -501,36 +499,35 @@ class _FinishScreenState extends State<FinishScreen> {
           ),
         ),
       ),
-      Padding(
-        padding: const EdgeInsets.symmetric(vertical: 32),
-        child: KLIButton(
-          'Start',
-          enableCondition: canStart,
-          disabledLabel: 'Currently ongoing',
-          onPressed: () {
-            canStart = false;
-            started = true;
-            if (chosenStar && canUseStar) canUseStar = false;
-            setState(() {});
-            timer = Timer.periodic(1.seconds, (timer) {
-              if (currentTimeSec <= 0) {
-                timer.cancel();
-                timeEnded = true;
-                started = false;
-                setState(() {});
-              } else {
-                currentTimeSec--;
-                setState(() {});
-              }
-            });
+      const SizedBox(height: 32),
+      KLIButton(
+        'Start',
+        enableCondition: canStart,
+        disabledLabel: 'Currently ongoing',
+        onPressed: () {
+          canStart = false;
+          started = true;
+          if (chosenStar && canUseStar) canUseStar = false;
+          setState(() {});
+          timer = Timer.periodic(1.seconds, (timer) {
+            if (currentTimeSec <= 0) {
+              timer.cancel();
+              timeEnded = true;
+              started = false;
+              setState(() {});
+            } else {
+              currentTimeSec--;
+              setState(() {});
+            }
+          });
 
-            KLIServer.sendToAllClients(KLISocketMessage(
-              senderID: ConnectionID.host,
-              type: KLIMessageType.continueTimer,
-            ));
-          },
-        ),
+          KLIServer.sendToAllClients(KLISocketMessage(
+            senderID: ConnectionID.host,
+            type: KLIMessageType.continueTimer,
+          ));
+        },
       ),
+      const SizedBox(height: 32),
       KLIButton(
         'End',
         enableCondition: canEnd,

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:kli_lib/kli_lib.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
+late final String cachePath;
 bool isTesting = kDebugMode, showDebugInfo = false;
 DecorationImage? bgDecorationImage;
 final buildDate = DateTime(2024, 9, 11);
@@ -32,19 +33,21 @@ void initAudioHandler() {
   audioHandler = AudioHandler.init(updateDebugOverlay);
 }
 
-String getSizeString(double bytes) {
+String getSizeString(int bytes) {
   const units = ['B', 'KB', 'MB', 'GB'];
   int unitIndex = 0;
-  while (bytes > 900 && unitIndex < units.length - 1) {
-    bytes /= 1024;
+  double b = bytes.toDouble();
+  while (b > 900 && unitIndex < units.length - 1) {
+    b /= 1024;
     unitIndex++;
   }
-  return '${bytes.toStringAsFixed(2)} ${units[unitIndex]}';
+  return '${b.toStringAsFixed(2)} ${units[unitIndex]}';
 }
 
 const String changelog = """
   0.3.3 ({latest}):
   - Added viewer finish screen: question, timer, point value, player names, scores
+  - Added viewer finish video screen: plays video on demand
 
   0.3.2 ({0a2200b}):
   - Added viewer accel screen: question, images, timer
