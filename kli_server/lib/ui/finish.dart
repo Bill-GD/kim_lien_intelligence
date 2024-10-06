@@ -287,6 +287,10 @@ class _FinishScreenState extends State<FinishScreen> {
                                       enableCondition: canShowQuestion && canPlayVideo,
                                       onPressed: () {
                                         vidController!.play();
+                                        KLIServer.sendToNonPlayer(KLISocketMessage(
+                                          senderID: ConnectionID.host,
+                                          type: KLIMessageType.playVideo,
+                                        ));
                                         setState(() => canPlayVideo = false);
                                       },
                                     ),
@@ -520,12 +524,10 @@ class _FinishScreenState extends State<FinishScreen> {
               }
             });
 
-            KLIServer.sendToAllClients(
-              KLISocketMessage(
-                senderID: ConnectionID.host,
-                type: KLIMessageType.continueTimer,
-              ),
-            );
+            KLIServer.sendToAllClients(KLISocketMessage(
+              senderID: ConnectionID.host,
+              type: KLIMessageType.continueTimer,
+            ));
           },
         ),
       ),

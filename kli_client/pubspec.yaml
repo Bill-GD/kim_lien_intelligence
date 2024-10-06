@@ -39,6 +39,7 @@ dependencies:
   video_player: ^2.5.1
   video_player_win: ^2.0.0
   flutter_acrylic: ^1.1.4
+  auto_size_text: ^3.0.0
   kli_lib:
     path: D:/Code/Flutter/kim_lien_intelligence/kli_lib
 

@@ -31,7 +31,7 @@ class _AccelScreenState extends State<AccelScreen> {
       canAnnounceAnswer = false,
       timeEnded = false,
       canEnd = false,
-      hideAns = true;
+      hideAns = false;
   late AccelQuestion currentQuestion;
   List<bool?> answerResults = [null, null, null, null];
   List<(int, String, double)> answers = List.generate(4, (i) => (i, '', -1));

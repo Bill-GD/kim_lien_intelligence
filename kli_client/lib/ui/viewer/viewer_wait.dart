@@ -3,6 +3,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_acrylic/flutter_acrylic.dart';
+import 'package:kli_client/ui/viewer/finish.dart';
 import 'package:kli_lib/kli_lib.dart';
 
 import '../../global.dart';
@@ -52,9 +53,9 @@ class _ViewerWaitScreenState extends State<ViewerWaitScreen> {
           );
           break;
         case KLIMessageType.enterFinish:
-          // Navigator.of(context).pushReplacement<void, void>(
-          //   MaterialPageRoute(builder: (_) => PlayerFinishScreen(playerPos: int.parse(m.message))),
-          // );
+          Navigator.of(context).pushReplacement<void, void>(
+            MaterialPageRoute(builder: (_) => ViewerFinishScreen(playerPos: int.parse(m.message))),
+          );
           break;
         case KLIMessageType.enterExtra:
           // Navigator.of(context).pushReplacement<void, void>(

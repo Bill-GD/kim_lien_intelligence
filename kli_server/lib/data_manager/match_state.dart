@@ -129,6 +129,47 @@ class MatchState {
           );
   }
 
+  void getDataSize() {
+    assert(initialized, 'MatchState not initialized');
+    int matchAtualDataSize = 0;
+
+    final data = <String, dynamic>{};
+
+    for (int i = 0; i < MatchState().players.length; i++) {
+      final p = MatchState().players[i];
+      final ext = p.imagePath.split('.').last;
+      data['player_name_$i'] = p.name;
+      data['player_image_$i.$ext'] = Networking.encodeMedia(p.imagePath);
+      matchAtualDataSize += FileStat.statSync(StorageHandler.getFullPath(p.imagePath)).size;
+    }
+
+    final obsPath = DataManager.getMatchQuestions<ObstacleMatch>(MatchState().match.name).imagePath;
+    data['obstacle_image.${obsPath.split('.').last}'] = Networking.encodeMedia(obsPath);
+    matchAtualDataSize += FileStat.statSync(StorageHandler.getFullPath(obsPath)).size;
+
+    for (final i in range(0, 3)) {
+      final q = DataManager.getMatchQuestions<AccelMatch>(MatchState().match.name).questions[i];
+      for (final j in range(0, q.imagePaths.length - 1)) {
+        final ext = q.imagePaths[j].split('.').last;
+        data['accel_image_${i}_$j.$ext'] = Networking.encodeMedia(q.imagePaths[j]);
+        matchAtualDataSize += FileStat.statSync(StorageHandler.getFullPath(q.imagePaths[j])).size;
+      }
+    }
+
+    DataManager.getMatchQuestions<FinishMatch>(MatchState().match.name).questions.forEach((q) {
+      if (q.mediaPath.isEmpty) return;
+      final ext = q.mediaPath.split('.').last;
+      data['finish_${q.mediaPath.split(r'\').last}.$ext'] = Networking.encodeMedia(q.mediaPath);
+      matchAtualDataSize += FileStat.statSync(StorageHandler.getFullPath(q.mediaPath)).size;
+    });
+
+    final msg = KLISocketMessage(
+      senderID: ConnectionID.host,
+      type: KLIMessageType.matchData,
+      message: String.fromCharCodes(zlib.encode(jsonEncode(data).codeUnits)),
+    );
+  }
+
   void nextSection() {
     if (section == MatchSection.extra) return;
 
@@ -241,7 +282,7 @@ class MatchState {
   late final List<KLIPlayer> players;
   static final playerReady = <bool>[false, false, false, false];
   bool get allPlayerReady => playerReady.every((e) => e);
-  MatchSection section = MatchSection.obstacle;
+  MatchSection section = MatchSection.finish;
 
   /// For Start, Accel, Finish, Extra. For Obstacle, use [obstacleMatch]
   List<BaseQuestion>? questionList;

@@ -214,14 +214,13 @@ class _ViewerStartScreenState extends State<ViewerStartScreen> with SingleTicker
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 128),
       alignment: Alignment.center,
-      child: Stack(
-        children: [
-          Text(
-            started ? currentQuestion.question : '',
-            textAlign: TextAlign.center,
-            style: const TextStyle(fontSize: fontSizeLarge),
-          ),
-        ],
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 16),
+        child: Text(
+          started ? currentQuestion.question : '',
+          textAlign: TextAlign.center,
+          style: const TextStyle(fontSize: fontSizeLarge),
+        ),
       ),
     );
   }

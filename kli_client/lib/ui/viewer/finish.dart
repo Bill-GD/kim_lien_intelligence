@@ -1,12 +1,14 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_acrylic/flutter_acrylic.dart';
 import 'package:kli_lib/kli_lib.dart';
 
 import '../../global.dart';
 import '../../match_data.dart';
+import 'finish_video.dart';
 import 'viewer_wait.dart';
 
 class ViewerFinishScreen extends StatefulWidget {
@@ -29,18 +31,32 @@ class _ViewerFinishScreenState extends State<ViewerFinishScreen> with SingleTick
     super.initState();
     updateChild = () => setState(() {});
     Window.setEffect(effect: WindowEffect.transparent);
+    _controller = AnimationController(vsync: this, duration: maxTimeSec.seconds)
+      ..addListener(() => setState(() {}));
+
     sub = KLIClient.onMessageReceived.listen((m) {
       if (m.type == KLIMessageType.finishQuestion) {
         if (canGetNewQuestion) {
           currentQuestion = FinishQuestion.fromJson(jsonDecode(m.message));
           canShowQuestion = true;
           maxTimeSec = currentQuestion.point / 10 * 5 + 5;
-          _controller = newAnimController(maxTimeSec.seconds);
+          _controller.duration = maxTimeSec.seconds;
+          _controller.reset();
+          if (currentQuestion.mediaPath.isNotEmpty) {
+            Navigator.of(context).push<void>(
+              MaterialPageRoute(
+                builder: (_) => ViewerFinishVideoScreen(
+                  question: currentQuestion.question,
+                  videoPath: currentQuestion.mediaPath,
+                ),
+              ),
+            );
+          }
         }
       }
 
       if (m.type == KLIMessageType.continueTimer) {
-        _controller.forward();
+        Future.delayed(1.seconds, () => _controller.forward());
       }
 
       if (m.type == KLIMessageType.scores) {
@@ -57,10 +73,14 @@ class _ViewerFinishScreenState extends State<ViewerFinishScreen> with SingleTick
         );
       }
 
-      _controller = newAnimController(maxTimeSec.seconds);
-
       setState(() {});
     });
+  }
+
+  @override
+  void didUpdateWidget(covariant ViewerFinishScreen oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    updateChild = () => setState(() {});
   }
 
   @override
@@ -68,10 +88,6 @@ class _ViewerFinishScreenState extends State<ViewerFinishScreen> with SingleTick
     _controller.dispose();
     sub.cancel();
     super.dispose();
-  }
-
-  AnimationController newAnimController(Duration duration) {
-    return AnimationController(vsync: this, duration: duration)..addListener(() => setState(() {}));
   }
 
   @override
@@ -216,14 +232,13 @@ class _ViewerFinishScreenState extends State<ViewerFinishScreen> with SingleTick
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 128),
       alignment: Alignment.center,
-      child: Stack(
-        children: [
-          Text(
-            canShowQuestion ? currentQuestion.question : '',
-            textAlign: TextAlign.center,
-            style: const TextStyle(fontSize: fontSizeLarge),
-          ),
-        ],
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 16),
+        child: AutoSizeText(
+          canShowQuestion ? currentQuestion.question : '',
+          textAlign: TextAlign.center,
+          style: const TextStyle(fontSize: fontSizeLarge),
+        ),
       ),
     );
   }

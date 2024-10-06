@@ -133,7 +133,7 @@ class _ViewerAccelScreenState extends State<ViewerAccelScreen> with SingleTicker
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.transparent,
+      // backgroundColor: Colors.transparent,
       extendBodyBehindAppBar: true,
       appBar: AppBar(
         automaticallyImplyLeading: isTesting,

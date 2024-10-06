@@ -290,14 +290,13 @@ class _ViewerObstacleMainScreenState extends State<ViewerObstacleMainScreen>
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 128),
       alignment: Alignment.center,
-      child: Stack(
-        children: [
-          Text(
-            canShowQuestion ? currentQuestion.question : '',
-            textAlign: TextAlign.center,
-            style: const TextStyle(fontSize: fontSizeLarge),
-          ),
-        ],
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 16),
+        child: Text(
+          canShowQuestion ? currentQuestion.question : '',
+          textAlign: TextAlign.center,
+          style: const TextStyle(fontSize: fontSizeLarge),
+        ),
       ),
     );
   }
