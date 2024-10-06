@@ -45,128 +45,111 @@ class MatchState {
 
   static void reset() => _inst = null;
 
-  static void sendPlayerData(ConnectionID id, bool sendData) {
-    assert(initialized, 'MatchState not initialized');
-    int actualDataSize = 0;
+  static void prepareMatchData(String matchDataPath, String playerDataPath) {
+    if (!initialized) return;
 
-    final data = <String, dynamic>{};
+    final fm = File(matchDataPath), fp = File(playerDataPath);
+    DataSize.matchActualDataSize = 0;
+    DataSize.playerActualDataSize = 0;
+
+    final md = <String, dynamic>{}, pd = <String, dynamic>{};
 
     for (int i = 0; i < MatchState().players.length; i++) {
       final p = MatchState().players[i];
       final ext = p.imagePath.split('.').last;
-      data['player_name_$i'] = p.name;
-      data['player_image_$i.$ext'] = Networking.encodeMedia(p.imagePath);
-      actualDataSize += FileStat.statSync(StorageHandler.getFullPath(p.imagePath)).size;
+
+      md['player_name_$i'] = pd['player_name_$i'] = p.name;
+      md['player_image_$i.$ext'] = pd['player_image_$i.$ext'] = Networking.encodeMedia(p.imagePath);
+
+      DataSize.playerActualDataSize += FileStat.statSync(StorageHandler.getFullPath(p.imagePath)).size;
+      DataSize.matchActualDataSize += FileStat.statSync(StorageHandler.getFullPath(p.imagePath)).size;
     }
 
-    final msg = KLISocketMessage(
+    final pm = String.fromCharCodes(zlib.encode(jsonEncode(pd).codeUnits));
+    DataSize.playerMessageSize = KLISocketMessage(
       senderID: ConnectionID.host,
       type: KLIMessageType.playerData,
-      message: String.fromCharCodes(zlib.encode(jsonEncode(data).codeUnits)),
-    );
-
-    sendData
-        ? KLIServer.sendMessage(id, msg)
-        : KLIServer.sendMessage(
-            id,
-            KLISocketMessage(
-              senderID: ConnectionID.host,
-              type: KLIMessageType.dataSize,
-              message: '${(msg.encode() + Networking.eom).codeUnits.length}|$actualDataSize',
-            ),
-          );
-  }
-
-  static void sendMatchData(ConnectionID id, bool sendData) {
-    assert(initialized, 'MatchState not initialized');
-    int actualDataSize = 0;
-
-    final data = <String, dynamic>{};
-
-    for (int i = 0; i < MatchState().players.length; i++) {
-      final p = MatchState().players[i];
-      final ext = p.imagePath.split('.').last;
-      data['player_name_$i'] = p.name;
-      data['player_image_$i.$ext'] = Networking.encodeMedia(p.imagePath);
-      actualDataSize += FileStat.statSync(StorageHandler.getFullPath(p.imagePath)).size;
-    }
+      message: pm,
+    ).encode().codeUnits.length;
+    fp.writeAsStringSync(pm);
 
     final obsPath = DataManager.getMatchQuestions<ObstacleMatch>(MatchState().match.name).imagePath;
-    data['obstacle_image.${obsPath.split('.').last}'] = Networking.encodeMedia(obsPath);
-    actualDataSize += FileStat.statSync(StorageHandler.getFullPath(obsPath)).size;
+    md['obstacle_image.${obsPath.split('.').last}'] = Networking.encodeMedia(obsPath);
+    DataSize.matchActualDataSize += FileStat.statSync(StorageHandler.getFullPath(obsPath)).size;
+    pd.clear();
 
     for (final i in range(0, 3)) {
       final q = DataManager.getMatchQuestions<AccelMatch>(MatchState().match.name).questions[i];
       for (final j in range(0, q.imagePaths.length - 1)) {
         final ext = q.imagePaths[j].split('.').last;
-        data['accel_image_${i}_$j.$ext'] = Networking.encodeMedia(q.imagePaths[j]);
-        actualDataSize += FileStat.statSync(StorageHandler.getFullPath(q.imagePaths[j])).size;
+        md['accel_image_${i}_$j.$ext'] = Networking.encodeMedia(q.imagePaths[j]);
+        DataSize.matchActualDataSize += FileStat.statSync(StorageHandler.getFullPath(q.imagePaths[j])).size;
       }
     }
 
     DataManager.getMatchQuestions<FinishMatch>(MatchState().match.name).questions.forEach((q) {
       if (q.mediaPath.isEmpty) return;
       final ext = q.mediaPath.split('.').last;
-      data['finish_${q.mediaPath.split(r'\').last}.$ext'] = Networking.encodeMedia(q.mediaPath);
-      actualDataSize += FileStat.statSync(StorageHandler.getFullPath(q.mediaPath)).size;
+      md['finish_${q.mediaPath.split(r'\').last}.$ext'] = Networking.encodeMedia(q.mediaPath);
+      DataSize.matchActualDataSize += FileStat.statSync(StorageHandler.getFullPath(q.mediaPath)).size;
     });
 
-    final msg = KLISocketMessage(
+    final mm = String.fromCharCodes(zlib.encode(jsonEncode(md).codeUnits));
+    DataSize.playerMessageSize = KLISocketMessage(
       senderID: ConnectionID.host,
       type: KLIMessageType.matchData,
-      message: String.fromCharCodes(zlib.encode(jsonEncode(data).codeUnits)),
-    );
-
-    sendData
-        ? KLIServer.sendMessage(id, msg)
-        : KLIServer.sendMessage(
-            id,
-            KLISocketMessage(
-              senderID: ConnectionID.host,
-              type: KLIMessageType.dataSize,
-              message: '${(msg.encode() + Networking.eom).codeUnits.length}|$actualDataSize',
-            ),
-          );
+      message: mm,
+    ).encode().codeUnits.length;
+    fm.writeAsStringSync(mm);
   }
 
-  void getDataSize() {
+  static void sendPlayerData(ConnectionID id, bool sendData, String playerDataPath) {
     assert(initialized, 'MatchState not initialized');
-    int matchAtualDataSize = 0;
+    if (sendData) {
+      final msg = File(playerDataPath).readAsStringSync();
 
-    final data = <String, dynamic>{};
-
-    for (int i = 0; i < MatchState().players.length; i++) {
-      final p = MatchState().players[i];
-      final ext = p.imagePath.split('.').last;
-      data['player_name_$i'] = p.name;
-      data['player_image_$i.$ext'] = Networking.encodeMedia(p.imagePath);
-      matchAtualDataSize += FileStat.statSync(StorageHandler.getFullPath(p.imagePath)).size;
+      KLIServer.sendMessage(
+        id,
+        KLISocketMessage(
+          senderID: ConnectionID.host,
+          type: KLIMessageType.playerData,
+          message: msg,
+        ),
+      );
+      return;
     }
+    KLIServer.sendMessage(
+      id,
+      KLISocketMessage(
+        senderID: ConnectionID.host,
+        type: KLIMessageType.dataSize,
+        message: '${DataSize.playerMessageSize}|${DataSize.playerActualDataSize}',
+      ),
+    );
+  }
 
-    final obsPath = DataManager.getMatchQuestions<ObstacleMatch>(MatchState().match.name).imagePath;
-    data['obstacle_image.${obsPath.split('.').last}'] = Networking.encodeMedia(obsPath);
-    matchAtualDataSize += FileStat.statSync(StorageHandler.getFullPath(obsPath)).size;
+  static void sendMatchData(ConnectionID id, bool sendData, String matchDataPath) {
+    assert(initialized, 'MatchState not initialized');
+    if (sendData) {
+      final msg = File(matchDataPath).readAsStringSync();
 
-    for (final i in range(0, 3)) {
-      final q = DataManager.getMatchQuestions<AccelMatch>(MatchState().match.name).questions[i];
-      for (final j in range(0, q.imagePaths.length - 1)) {
-        final ext = q.imagePaths[j].split('.').last;
-        data['accel_image_${i}_$j.$ext'] = Networking.encodeMedia(q.imagePaths[j]);
-        matchAtualDataSize += FileStat.statSync(StorageHandler.getFullPath(q.imagePaths[j])).size;
-      }
+      KLIServer.sendMessage(
+        id,
+        KLISocketMessage(
+          senderID: ConnectionID.host,
+          type: KLIMessageType.matchData,
+          message: msg,
+        ),
+      );
+      return;
     }
-
-    DataManager.getMatchQuestions<FinishMatch>(MatchState().match.name).questions.forEach((q) {
-      if (q.mediaPath.isEmpty) return;
-      final ext = q.mediaPath.split('.').last;
-      data['finish_${q.mediaPath.split(r'\').last}.$ext'] = Networking.encodeMedia(q.mediaPath);
-      matchAtualDataSize += FileStat.statSync(StorageHandler.getFullPath(q.mediaPath)).size;
-    });
-
-    final msg = KLISocketMessage(
-      senderID: ConnectionID.host,
-      type: KLIMessageType.matchData,
-      message: String.fromCharCodes(zlib.encode(jsonEncode(data).codeUnits)),
+    KLIServer.sendMessage(
+      id,
+      KLISocketMessage(
+        senderID: ConnectionID.host,
+        type: KLIMessageType.dataSize,
+        message: '${DataSize.matchMessageSize}|${DataSize.matchActualDataSize}',
+      ),
     );
   }
 

@@ -20,6 +20,7 @@ class ServerSetup extends StatefulWidget {
 class _ServerSetupState extends State<ServerSetup> {
   String localAddress = '';
   final List<StreamSubscription> subscriptions = [];
+  String popupContent = 'The app is preparing the match data. Please wait for it to finish.';
 
   @override
   void initState() {
@@ -28,6 +29,12 @@ class _ServerSetupState extends State<ServerSetup> {
     KLIServer.stop();
     logHandler.info('Opened Server Setup page');
     getIpAddresses();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      showPopupMessage(context, title: 'Match data', content: popupContent);
+      MatchState.prepareMatchData(storageHandler.matchData, storageHandler.playerData);
+      setState(() => popupContent = 'Done! You can close this now.');
+    });
   }
 
   void getIpAddresses() async {
@@ -201,8 +208,8 @@ class _ServerSetupState extends State<ServerSetup> {
       if (m.type == KLIMessageType.dataSize) {
         final id = m.senderID.name;
         id.contains('player')
-            ? MatchState.sendPlayerData(m.senderID, false)
-            : MatchState.sendMatchData(m.senderID, false);
+            ? MatchState.sendPlayerData(m.senderID, false, storageHandler.playerData)
+            : MatchState.sendMatchData(m.senderID, false, storageHandler.matchData);
       }
 
       if (m.type == KLIMessageType.matchName) {
@@ -217,11 +224,11 @@ class _ServerSetupState extends State<ServerSetup> {
       }
 
       if (m.type == KLIMessageType.playerData) {
-        MatchState.sendPlayerData(m.senderID, true);
+        MatchState.sendPlayerData(m.senderID, true, storageHandler.playerData);
       }
 
       if (m.type == KLIMessageType.matchData) {
-        MatchState.sendMatchData(m.senderID, true);
+        MatchState.sendMatchData(m.senderID, true, storageHandler.matchData);
       }
 
       if (m.type == KLIMessageType.playerReady) {
