@@ -21,6 +21,7 @@ class _ServerSetupState extends State<ServerSetup> {
   String localAddress = '';
   final List<StreamSubscription> subscriptions = [];
   bool canClosePopup = false;
+  final ipController = TextEditingController();
 
   @override
   void initState() {
@@ -29,6 +30,7 @@ class _ServerSetupState extends State<ServerSetup> {
     KLIServer.stop();
     logHandler.info('Opened Server Setup page');
     getIpAddresses();
+    ipController.text = 'Local IP: $localAddress\n';
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       showPopupMessage(
@@ -41,6 +43,7 @@ class _ServerSetupState extends State<ServerSetup> {
         () {
           MatchState.prepareMatchData(storageHandler.matchData, storageHandler.playerData);
           showToastMessage(context, 'Done! You can close this now.');
+          setState(() {});
         },
       );
     });
@@ -49,6 +52,7 @@ class _ServerSetupState extends State<ServerSetup> {
   void getIpAddresses() async {
     KLIServer.serverAddress = await Networking.getLocalIP();
     localAddress = KLIServer.serverIP;
+    ipController.text = 'Local IP: $localAddress\n';
     updateDebugOverlay();
     setState(() {});
   }
@@ -143,11 +147,28 @@ class _ServerSetupState extends State<ServerSetup> {
 
   Widget serverStatus() {
     const s = TextStyle(fontSize: fontSizeLarge);
-    return Text(
-      'Server status: ${KLIServer.started ? '🟢' : '🔴'}\n'
-      'Local IP: $localAddress\n',
-      textAlign: TextAlign.center,
-      style: s,
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Text(
+          'Server status: ${KLIServer.started ? '🟢' : '🔴'}\n',
+          textAlign: TextAlign.center,
+          style: s,
+        ),
+        IntrinsicWidth(
+          child: TextFormField(
+            style: const TextStyle(fontSize: fontSizeLarge),
+            decoration: const InputDecoration(
+              border: UnderlineInputBorder(),
+            ),
+            textAlign: TextAlign.center,
+            maxLines: 1,
+            readOnly: true,
+            controller: ipController,
+          ),
+        ),
+      ],
     );
   }
 

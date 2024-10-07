@@ -152,7 +152,7 @@ class _HelpScreenState extends State<HelpScreen> {
     Giao diện:
     - Đây là màn hình chính, để chuyển sang các phần của phần mềm, chọn tab tương ứng ở bên trái.
     - Ở các phần của phần mềm cũng có hướng dẫn cụ thể.
-    - Sử dụng nút mở thư mục chứa phần mềm để truy cập, chỉnh sửa dữ liệu phần mềm nếu cần. Các dữ liệu của phần mềm được lưu ở thư mục 'UserData'.
+    - Sử dụng nút mở thư mục chứa phần mềm để truy cập, chỉnh sửa dữ liệu phần mềm nếu cần. Các dữ liệu của phần mềm được lưu ở thư mục 'user_data'.
     
     Quản lý dữ liệu:
     - Mở phần quản lý dữ liệu ở bên trái.
@@ -167,7 +167,7 @@ class _HelpScreenState extends State<HelpScreen> {
     - Chọn mục âm thanh ở bên trái. Mở thư mục Assets để quản lý.''',
     // * Background & Sounds
     '''
-    Hình nền và âm thanh của phần mềm được lưu ở 'UserData/Assets'.
+    Hình nền và âm thanh của phần mềm được lưu ở 'user_data/assets'.
     
     Có thể vào trang 'Âm thanh' để kiểm tra âm thanh có trong phần mềm. Ở phía trên có nút mở thư mục 'Assets' để đễ quản lý hình nền và âm thanh.
     
@@ -178,16 +178,16 @@ class _HelpScreenState extends State<HelpScreen> {
     '''
     Ngoài hình nền và âm thanh, loại dữ liệu khác cần quản lý là dữ liệu trận đấu và câu hỏi.
     
-    Dữ liệu trận đấu và câu hỏi được phần mềm lưu ở 'UserData/SavedData'. Không nên chỉnh sửa nếu không hiểu rõ cấu trúc dữ liệu, điều này có thể gây lỗi dữ liệu khi đọc.
+    Dữ liệu trận đấu và câu hỏi được phần mềm lưu ở 'user_data/saved_data'. Không nên chỉnh sửa nếu không hiểu rõ cấu trúc dữ liệu, điều này có thể gây lỗi dữ liệu khi đọc.
     
-    Các file hình ảnh, video được sử dụng cho các trận đấu lưu ở 'UserData/Media' để dễ quản lý.''',
+    Các file hình ảnh, video được sử dụng cho các trận đấu lưu ở 'user_data/media' để dễ quản lý.''',
     // * Import from Excel
     '''
     Khi nhập dữ liệu câu hỏi, có thể thêm một cách thủ công hoặc nhập từ file Excel.
     
     File Excel cần phải đúng định dạng, nếu không có thể gây ra lỗi khi hiển thị câu hỏi. Ngoài ra có thể xem trước dữ liệu đã đọc trước khi xác nhận nhập.
     
-    Các file Excel nên lưu ở 'UserData/NewData' nếu muốn lưu trữ cùng với phần mềm.
+    Các file Excel nên lưu ở 'user_data/new_data' nếu muốn lưu trữ cùng với phần mềm.
     
     Định dạng chung của dữ liệu lưu trong file Excel:
     - Bắt đầu từ ô A1.

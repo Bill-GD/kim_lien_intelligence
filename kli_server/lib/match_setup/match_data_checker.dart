@@ -294,7 +294,7 @@ class _MatchDataCheckerState extends State<MatchDataChecker> {
       }
       for (final q in savedMatch.questions) {
         if (q.mediaPath.isNotEmpty && !File(StorageHandler.getFullPath(q.mediaPath)).existsSync()) {
-          errorList.add('Không tìm thấy ảnh ${q.mediaPath}');
+          errorList.add('Không tìm thấy video ${q.mediaPath}');
         }
       }
     } on StateError {

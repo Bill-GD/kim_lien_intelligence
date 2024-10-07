@@ -142,6 +142,7 @@ const String changelog = """
   - Finish manager shows which question has video
   - Back buttons also pops client-side routes
   - Added 'Show rows' to Obstacle & Accel screen: shows rows on viewer screen
+  - The host IP can be selected to copy
 
   0.4.5.3 ({085715f}):
   - Added video player to Finish UI: hides question, shows video & answer
