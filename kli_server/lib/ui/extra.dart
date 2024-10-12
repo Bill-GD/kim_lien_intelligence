@@ -9,8 +9,8 @@ import '../global.dart';
 
 class ExtraScreen extends StatefulWidget {
   final timeLimitSec = 15.0;
-  final int playerCount;
-  const ExtraScreen({super.key, required this.playerCount});
+  final List<bool> players;
+  const ExtraScreen({super.key, required this.players});
 
   @override
   State<ExtraScreen> createState() => _ExtraScreenState();
@@ -18,17 +18,12 @@ class ExtraScreen extends StatefulWidget {
 
 class _ExtraScreenState extends State<ExtraScreen> {
   double currentTimeSec = 0;
-  bool canNext = true,
-      canStart = false,
-      canShowQuestion = false,
-      canAnnounce = false,
-      canEnd = false,
-      canStopTimer = false,
-      timerStopped = false;
+  bool canNext = true, canStart = false, canShowQuestion = false, canAnnounce = false, canEnd = false, canStopTimer = false, timerStopped = false;
   late ExtraQuestion currentQuestion;
   Timer? timer;
   int questionNum = 0, answeredCount = 0;
   late StreamSubscription<KLISocketMessage> sub;
+  late final int playerCount = widget.players.where((e) => e).length;
 
   @override
   void initState() {
@@ -36,13 +31,15 @@ class _ExtraScreenState extends State<ExtraScreen> {
     sub = KLIServer.onMessageReceived.listen((m) async {
       if (m.type == KLIMessageType.extraSignal) {
         // stop timer, show popup
-        // returm: continue timer if wrong
+        // return: continue timer if wrong
         final pos = m.senderID.index - 1;
 
         KLIServer.sendToAllClients(KLISocketMessage(
           senderID: ConnectionID.host,
           type: KLIMessageType.stopTimer,
+          message: '$pos',
         ));
+
         timer?.cancel();
         setState(() {});
 
@@ -70,7 +67,7 @@ class _ExtraScreenState extends State<ExtraScreen> {
             MatchState().extraScores[pos]++;
             canEnd = true;
           } else {
-            if (answeredCount == widget.playerCount) {
+            if (answeredCount == playerCount) {
               if (questionNum == 3) {
                 canEnd = true;
               } else {
@@ -175,7 +172,10 @@ class _ExtraScreenState extends State<ExtraScreen> {
                 alignment: Alignment.center,
                 child: Text(
                   '${MatchState().players[i].name} (${MatchState().scores[i]} - ${MatchState().extraScores[i]})',
-                  style: const TextStyle(fontSize: fontSizeMedium),
+                  style: TextStyle(
+                    fontSize: fontSizeMedium,
+                    color: Theme.of(context).colorScheme.onBackground.withOpacity(widget.players[i] ? 1 : 0.35),
+                  ),
                 ),
               ),
             ),

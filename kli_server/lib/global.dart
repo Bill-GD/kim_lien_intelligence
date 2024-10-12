@@ -136,12 +136,17 @@ class DataSize {
 }
 
 const String changelog = """
-  0.4.5.4 ({latest}):
+  0.4.5.5 ({latest}):
+  - Highlights players participating in Extra
+  - Sends who participating in Extra to clients
+
+  0.4.5.4 ({035ee5d}):
   - Added Debug overlay: version, build date, test mode, server status, host IP, port, device IP...
   - Can start match with no player
   - Finish manager shows which question has video
   - Back buttons also pops client-side routes
   - Added 'Show rows' to Obstacle & Accel screen: shows rows on viewer screen
+  - Changed folder name to snake_case
   - The host IP can be selected to copy
 
   0.4.5.3 ({085715f}):

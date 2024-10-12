@@ -483,7 +483,7 @@ class _FinishScreenState extends State<FinishScreen> {
               }
             : null,
         child: MouseRegion(
-          cursor: canUseStar && canSelectQuestion && !started
+          cursor: canUseStar && canSelectQuestion && !started //
               ? SystemMouseCursors.click
               : SystemMouseCursors.basic,
           onEnter: (event) {

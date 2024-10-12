@@ -45,7 +45,11 @@ String getSizeString(int bytes) {
 }
 
 const String changelog = """
-  0.3.3 ({latest}):
+  0.3.4 ({latest}):
+  - Added viewer extra screen: question, timer, participating players, who's answering
+  - Fixed player can still answer after answering wrong in Extra
+
+  0.3.3 ({00c9f62}):
   - Added viewer finish screen: question, timer, point value, player names, scores
   - Added viewer finish video screen: plays video on demand
 

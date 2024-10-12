@@ -3,12 +3,13 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_acrylic/flutter_acrylic.dart';
-import 'package:kli_client/ui/viewer/finish.dart';
 import 'package:kli_lib/kli_lib.dart';
 
 import '../../global.dart';
 import '../../match_data.dart';
 import 'accel.dart';
+import 'extra.dart';
+import 'finish.dart';
 import 'obstacle_main.dart';
 import 'start.dart';
 
@@ -58,9 +59,13 @@ class _ViewerWaitScreenState extends State<ViewerWaitScreen> {
           );
           break;
         case KLIMessageType.enterExtra:
-          // Navigator.of(context).pushReplacement<void, void>(
-          //   MaterialPageRoute(builder: (_) => const PlayerExtraScreen()),
-          // );
+          Navigator.of(context).pushReplacement<void, void>(
+            MaterialPageRoute(
+              builder: (_) => ViewerExtraScreen(
+                players: jsonDecode(m.message).cast<int>(),
+              ),
+            ),
+          );
           break;
         default:
           break;

@@ -18,7 +18,7 @@ class PlayerExtraScreen extends StatefulWidget {
 
 class _PlayerExtraScreenState extends State<PlayerExtraScreen> {
   double currentTimeSec = 0;
-  bool canShowQuestion = false, canAnswer = false, timeEnded = false;
+  bool canShowQuestion = false, canAnswer = false, alreadyAnswered = false, timeEnded = false;
   late ExtraQuestion currentQuestion;
   Timer? timer;
   late final StreamSubscription<KLISocketMessage> sub;
@@ -37,7 +37,7 @@ class _PlayerExtraScreenState extends State<PlayerExtraScreen> {
       }
 
       if (m.type == KLIMessageType.continueTimer) {
-        canAnswer = true;
+        if (!alreadyAnswered) canAnswer = true;
         timer = Timer.periodic(1.seconds, (timer) {
           if (currentTimeSec <= 0) {
             timer.cancel();
@@ -102,7 +102,7 @@ class _PlayerExtraScreenState extends State<PlayerExtraScreen> {
               ),
               Padding(
                 padding: const EdgeInsets.only(left: 48),
-                child: playerInfo(),
+                child: sideWidgets(),
               ),
             ],
           ),
@@ -123,9 +123,7 @@ class _PlayerExtraScreenState extends State<PlayerExtraScreen> {
               ),
               child: Container(
                 decoration: BoxDecoration(
-                  color: i == MatchData().playerPos
-                      ? Theme.of(context).colorScheme.primaryContainer
-                      : Colors.transparent,
+                  color: i == MatchData().playerPos ? Theme.of(context).colorScheme.primaryContainer : Colors.transparent,
                   border: BorderDirectional(
                     end: BorderSide(
                       color: i > 2 ? Colors.transparent : Theme.of(context).colorScheme.onBackground,
@@ -189,7 +187,7 @@ class _PlayerExtraScreenState extends State<PlayerExtraScreen> {
     );
   }
 
-  Widget playerInfo() {
+  Widget sideWidgets() {
     return Column(
       children: [
         AnimatedCircularProgressBar(
@@ -208,6 +206,7 @@ class _PlayerExtraScreenState extends State<PlayerExtraScreen> {
               senderID: KLIClient.clientID!,
               type: KLIMessageType.extraSignal,
             ));
+            alreadyAnswered = true;
             canAnswer = false;
             setState(() {});
           },

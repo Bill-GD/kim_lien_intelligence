@@ -286,11 +286,12 @@ class _MatchOverviewState extends State<MatchOverview> {
               KLIServer.sendToAllClients(KLISocketMessage(
                 senderID: ConnectionID.host,
                 type: KLIMessageType.enterExtra,
+                message: jsonEncode(allowExtra.asMap().entries.where((e) => e.value).map((e) => e.key).toList()),
               ));
 
               await Navigator.of(context).push<void>(
                 MaterialPageRoute(
-                  builder: (context) => ExtraScreen(playerCount: allowExtra.where((e) => e).length),
+                  builder: (context) => ExtraScreen(players: allowExtra),
                 ),
               );
               setState(() => canEndMatch = true);
@@ -315,8 +316,8 @@ class _MatchOverviewState extends State<MatchOverview> {
   }
 
   Widget playerWidget(int pos) {
-    final bool isCurrentPlayer =
-        (MatchState().section == MatchSection.start || MatchState().section == MatchSection.finish) &&
+    final bool isCurrentPlayer = //
+        (MatchState().section == MatchSection.start || MatchState().section == MatchSection.finish) && //
             MatchState().startOrFinishPos == pos;
 
     return IntrinsicWidth(
