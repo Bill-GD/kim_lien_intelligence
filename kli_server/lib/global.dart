@@ -136,7 +136,7 @@ class DataSize {
 }
 
 const String changelog = """
-  0.4.5.5 ({latest}):
+  0.4.5.5 ({2c329e0}):
   - Highlights players participating in Extra
   - Sends who participating in Extra to clients
   - Added section result screen

@@ -45,9 +45,12 @@ String getSizeString(int bytes) {
 }
 
 const String changelog = """
-  0.4 ({latest}):
+  0.4.1 ({latest}):
+  - Added audio for obstacle screens
+
+  0.4 ({2c329e0}):
   - Added section result screen when a section ends
-  - Added sounds (& its logic) for start
+  - Added audio (& its logic) for start
 
   0.3.4 ({b51899f}):
   - Added viewer extra screen: question, timer, participating players, who's answering

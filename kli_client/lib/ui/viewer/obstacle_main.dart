@@ -20,8 +20,7 @@ class ViewerObstacleMainScreen extends StatefulWidget {
   State<ViewerObstacleMainScreen> createState() => _ViewerObstacleMainScreenState();
 }
 
-class _ViewerObstacleMainScreenState extends State<ViewerObstacleMainScreen>
-    with SingleTickerProviderStateMixin {
+class _ViewerObstacleMainScreenState extends State<ViewerObstacleMainScreen> with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   bool canShowQuestion = false;
   late ObstacleQuestion currentQuestion;
@@ -39,6 +38,7 @@ class _ViewerObstacleMainScreenState extends State<ViewerObstacleMainScreen>
     KLIClient.sendMessage(
       KLISocketMessage(senderID: KLIClient.clientID!, type: KLIMessageType.rowCharCounts),
     );
+    audioHandler.play(assetHandler.obsStart);
 
     sub = KLIClient.onMessageReceived.listen((m) async {
       if (m.type == KLIMessageType.obstacleQuestion) {
@@ -47,6 +47,7 @@ class _ViewerObstacleMainScreenState extends State<ViewerObstacleMainScreen>
             _controller.forward();
           });
         }
+        audioHandler.play(assetHandler.obsBackground, true);
         currentQuestion = ObstacleQuestion.fromJson(jsonDecode(m.message));
         canShowQuestion = true;
         final qId = currentQuestion.id;
@@ -78,10 +79,13 @@ class _ViewerObstacleMainScreenState extends State<ViewerObstacleMainScreen>
 
       if (m.type == KLIMessageType.stopTimer) {
         _controller.stop();
+        audioHandler.play(assetHandler.obsSignal);
+        audioHandler.pause(true);
       }
 
       if (m.type == KLIMessageType.continueTimer) {
         _controller.forward();
+        audioHandler.resume(true);
       }
 
       if (m.type == KLIMessageType.showObstacleRows) {
@@ -111,6 +115,10 @@ class _ViewerObstacleMainScreenState extends State<ViewerObstacleMainScreen>
         Navigator.of(context).pushReplacement<void, void>(
           MaterialPageRoute(builder: (_) => const ViewerWaitScreen()),
         );
+      }
+
+      if (m.type == KLIMessageType.playAudio) {
+        audioHandler.play(m.message);
       }
 
       if (m.type == KLIMessageType.showAnswers) {

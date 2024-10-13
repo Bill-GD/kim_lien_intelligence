@@ -25,6 +25,7 @@ class _ViewerObstacleRowsScreenState extends State<ViewerObstacleRowsScreen> {
   @override
   void initState() {
     super.initState();
+    audioHandler.play(assetHandler.obsStart);
     sub = KLIClient.onMessageReceived.listen((m) {
       if (m.type == KLIMessageType.pop) {
         Navigator.of(context).pop();

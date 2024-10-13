@@ -22,7 +22,7 @@ class ObstacleQuestionScreen extends StatefulWidget {
 class _ObstacleQuestionScreenState extends State<ObstacleQuestionScreen> {
   int questionIndex = -1;
   double currentTimeSec = 15;
-  bool canStart = false,
+  bool canStart = false, //
       canShowAnswers = false,
       canAnnounceAnswer = false,
       canShowImage = false,
@@ -38,6 +38,8 @@ class _ObstacleQuestionScreenState extends State<ObstacleQuestionScreen> {
     super.initState();
     logHandler.info('Image reveal order: ${MatchState().imagePartOrder}');
     updateChild = () => setState(() {});
+    audioHandler.play(assetHandler.obsStart);
+
     sub = KLIServer.onMessageReceived.listen((m) async {
       if (m.type == KLIMessageType.rowCharCounts) {
         KLIServer.sendMessage(
@@ -61,11 +63,13 @@ class _ObstacleQuestionScreenState extends State<ObstacleQuestionScreen> {
           senderID: ConnectionID.host,
           type: KLIMessageType.stopTimer,
         ));
-        KLIServer.sendToAllClients(KLISocketMessage(
+        KLIServer.sendToPlayers(KLISocketMessage(
           senderID: ConnectionID.host,
           type: KLIMessageType.disableGuessObstacle,
         ));
         timer?.cancel();
+        audioHandler.play(assetHandler.obsSignal);
+        audioHandler.stop(true);
 
         if (mounted) {
           final res = await dialogWithActions<bool>(
@@ -76,11 +80,27 @@ class _ObstacleQuestionScreenState extends State<ObstacleQuestionScreen> {
             actions: [
               KLIButton(
                 'Correct',
-                onPressed: () => Navigator.of(context).pop(true),
+                onPressed: () {
+                  audioHandler.play(assetHandler.obsCorrectObstacle);
+                  KLIServer.sendToNonPlayer(KLISocketMessage(
+                    senderID: ConnectionID.host,
+                    type: KLIMessageType.playAudio,
+                    message: assetHandler.obsCorrectObstacle,
+                  ));
+                  Navigator.of(context).pop(true);
+                },
               ),
               KLIButton(
                 'Wrong',
-                onPressed: () => Navigator.of(context).pop(false),
+                onPressed: () {
+                  audioHandler.play(assetHandler.obsIncorrectObstacle);
+                  KLIServer.sendToNonPlayer(KLISocketMessage(
+                    senderID: ConnectionID.host,
+                    type: KLIMessageType.playAudio,
+                    message: assetHandler.obsIncorrectObstacle,
+                  ));
+                  Navigator.of(context).pop(false);
+                },
               ),
             ],
           );
@@ -169,8 +189,19 @@ class _ObstacleQuestionScreenState extends State<ObstacleQuestionScreen> {
                   if (answerResults[i] == true) MatchState().modifyScore(i, 10);
                 }
                 MatchState().answeredObstacleRows[questionIndex] = true;
-                MatchState().revealedImageParts[MatchState().imagePartOrder.indexOf(questionIndex)] =
-                    MatchState().revealedObstacleRows[questionIndex] = answerResults.any((e) => e == true);
+                MatchState().revealedImageParts[MatchState().imagePartOrder.indexOf(questionIndex)] //
+                    = MatchState().revealedObstacleRows[questionIndex] //
+                        = answerResults.any((e) => e == true);
+
+                final a = MatchState().revealedImageParts[MatchState().imagePartOrder.indexOf(questionIndex)] //
+                    ? assetHandler.obsCorrectRow
+                    : assetHandler.obsIncorrectRow;
+                audioHandler.play(a);
+                KLIServer.sendToNonPlayer(KLISocketMessage(
+                  senderID: ConnectionID.host,
+                  type: KLIMessageType.playAudio,
+                  message: a,
+                ));
 
                 if (MatchState().revealedObstacleRows[questionIndex]) {
                   KLIServer.sendToNonPlayer(KLISocketMessage(
@@ -257,6 +288,7 @@ class _ObstacleQuestionScreenState extends State<ObstacleQuestionScreen> {
                     senderID: ConnectionID.host,
                     type: KLIMessageType.showObstacleRows,
                   ));
+                  audioHandler.play(assetHandler.obsShowRow);
                   canShowRows = false;
                   setState(() {});
                 },
@@ -281,6 +313,8 @@ class _ObstacleQuestionScreenState extends State<ObstacleQuestionScreen> {
                               currentTimeSec = widget.timeLimitSec;
                               MatchState().rowAnswers.fillRange(0, 4, '');
                               answerResults.fillRange(0, 4, null);
+                              audioHandler.play(assetHandler.obsChoseRow);
+
                               if (MatchState().answeredObstacleRows.where((e) => e).length == 3) {
                                 canShowRows = false;
                               }
@@ -329,11 +363,9 @@ class _ObstacleQuestionScreenState extends State<ObstacleQuestionScreen> {
           ),
           KLIButton(
             'Get Middle Row',
-            enableCondition: MatchState().allRowsAnswered &&
-                !MatchState().answeredObstacleRows[4] &&
-                questionIndex != 4 &&
-                canSelectQuestion,
+            enableCondition: MatchState().allRowsAnswered && !MatchState().answeredObstacleRows[4] && questionIndex != 4 && canSelectQuestion,
             onPressed: () {
+              audioHandler.play(assetHandler.obsChoseRow);
               answerResults.fillRange(0, 4, null);
               questionIndex = 4;
               canAnnounceAnswer = false;
@@ -351,6 +383,7 @@ class _ObstacleQuestionScreenState extends State<ObstacleQuestionScreen> {
                   answerResults[i] = false;
                 }
               }
+              audioHandler.play(assetHandler.obsShowAnswer);
               _key.currentState?.openEndDrawer();
               setState(() {});
             },
@@ -365,14 +398,13 @@ class _ObstacleQuestionScreenState extends State<ObstacleQuestionScreen> {
                 enableCondition: canStart,
                 onPressed: () {
                   canSelectQuestion = canStart = canShowRows = false;
-                  KLIServer.sendToAllClients(
-                    KLISocketMessage(
-                      senderID: ConnectionID.host,
-                      type: KLIMessageType.obstacleQuestion,
-                      message: jsonEncode(MatchState().obstacleMatch!.hintQuestions[questionIndex]!.toJson()),
-                    ),
-                  );
+                  KLIServer.sendToAllClients(KLISocketMessage(
+                    senderID: ConnectionID.host,
+                    type: KLIMessageType.obstacleQuestion,
+                    message: jsonEncode(MatchState().obstacleMatch!.hintQuestions[questionIndex]!.toJson()),
+                  ));
 
+                  audioHandler.play(assetHandler.obsBackground, true);
                   createTimer();
                   setState(() {});
                 },
