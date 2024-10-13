@@ -45,7 +45,11 @@ String getSizeString(int bytes) {
 }
 
 const String changelog = """
-  0.3.4 ({latest}):
+  0.4 ({latest}):
+  - Added section result screen when a section ends
+  - Added sounds (& its logic) for start
+
+  0.3.4 ({b51899f}):
   - Added viewer extra screen: question, timer, participating players, who's answering
   - Fixed player can still answer after answering wrong in Extra
 

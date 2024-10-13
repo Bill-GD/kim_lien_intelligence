@@ -134,18 +134,19 @@ class _ObstacleManagerState extends State<ObstacleManager> {
             enabledLabel: 'Cho phép nhập dữ liệu từ file Excel',
             disabledLabel: 'Chưa chọn trận đấu',
             onPressed: () async {
-              Map<String, dynamic>? data =
-                  await Navigator.of(context).push<Map<String, dynamic>>(DialogRoute<Map<String, dynamic>>(
-                context: context,
-                barrierDismissible: false,
-                barrierLabel: '',
-                builder: (_) => ImportQuestionDialog(
-                  matchName: selectedMatch.matchName,
-                  maxColumnCount: 5,
-                  maxSheetCount: 1,
-                  columnWidths: const [100, 75, 500, 200, 500],
+              Map<String, dynamic>? data = await Navigator.of(context).push<Map<String, dynamic>>(
+                DialogRoute<Map<String, dynamic>>(
+                  context: context,
+                  barrierDismissible: false,
+                  barrierLabel: '',
+                  builder: (_) => ImportQuestionDialog(
+                    matchName: selectedMatch.matchName,
+                    maxColumnCount: 5,
+                    maxSheetCount: 1,
+                    columnWidths: const [100, 75, 500, 200, 500],
+                  ),
                 ),
-              ));
+              );
 
               if (data == null) return;
 
@@ -322,14 +323,15 @@ class _ObstacleManagerState extends State<ObstacleManager> {
                 ? Image.file(File(fullImagePath), fit: BoxFit.contain)
                 : Material(
                     child: Center(
-                    child: Text(
-                      !hasSelectedMatch
-                          ? 'Chưa chọn trận đấu'
-                          : selectedMatch.imagePath.isEmpty
-                              ? 'Không có ảnh'
-                              : 'Không tìm thấy ảnh $fullImagePath',
+                      child: Text(
+                        !hasSelectedMatch
+                            ? 'Chưa chọn trận đấu'
+                            : selectedMatch.imagePath.isEmpty
+                                ? 'Không có ảnh'
+                                : 'Không tìm thấy ảnh $fullImagePath',
+                      ),
                     ),
-                  )),
+                  ),
           ),
           const SizedBox(height: 20),
           if (!hasSelectedMatch)

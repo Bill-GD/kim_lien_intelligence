@@ -38,6 +38,25 @@ class _ViewerWaitScreenState extends State<ViewerWaitScreen> {
             i++;
           }
           break;
+        case KLIMessageType.showScores:
+          final l = MatchData().players.map((e) => (e.name, e.fullImagePath, e.point)).toList();
+
+          l.sort((a, b) => b.$3.compareTo(a.$3));
+
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => SectionResult(
+                backgroundImage: bgDecorationImage!,
+                players: l.map((e) => e.$1).toList(),
+                images: l.map((e) => e.$2).toList(),
+                scores: l.map((e) => e.$3).toList(),
+                playMusic: audioHandler.play,
+                allowClose: true,
+              ),
+            ),
+          );
+          break;
         case KLIMessageType.enterStart:
           Navigator.of(context).pushReplacement<void, void>(
             MaterialPageRoute(builder: (_) => ViewerStartScreen(playerPos: int.parse(m.message))),

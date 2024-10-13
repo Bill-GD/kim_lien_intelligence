@@ -162,6 +162,7 @@ class _MatchOverviewState extends State<MatchOverview> {
 
               if (MatchState().startOrFinishPos == 3) {
                 MatchState().nextSection();
+                showSectionResult();
               }
               MatchState().nextPlayer();
               setState(() {});
@@ -186,6 +187,7 @@ class _MatchOverviewState extends State<MatchOverview> {
               );
 
               MatchState().nextSection();
+              showSectionResult();
               setState(() {});
             },
           ),
@@ -209,6 +211,7 @@ class _MatchOverviewState extends State<MatchOverview> {
               );
 
               MatchState().nextSection();
+              showSectionResult();
               setState(() {});
               MatchState().startOrFinishPos = 0;
             },
@@ -236,6 +239,7 @@ class _MatchOverviewState extends State<MatchOverview> {
               MatchState().finishPlayerDone[MatchState().startOrFinishPos] = true;
               if (MatchState().allFinishPlayerDone) {
                 MatchState().nextSection();
+                showSectionResult();
                 if (mounted) {
                   final s = await Navigator.of(context).push<List<bool>>(
                     PageRouteBuilder(
@@ -294,6 +298,8 @@ class _MatchOverviewState extends State<MatchOverview> {
                   builder: (context) => ExtraScreen(players: allowExtra),
                 ),
               );
+
+              showSectionResult();
               setState(() => canEndMatch = true);
               KLIServer.sendToAllClients(KLISocketMessage(
                 senderID: ConnectionID.host,
@@ -369,6 +375,39 @@ class _MatchOverviewState extends State<MatchOverview> {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  void showSectionResult() {
+    final l = <(String, String, int)>[];
+    for (int i = 0; i < 4; i++) {
+      l.add((
+        MatchState().players[i].name,
+        StorageHandler.getFullPath(MatchState().players[i].imagePath),
+        MatchState().scores[i],
+      ));
+    }
+
+    l.sort((a, b) => b.$3.compareTo(a.$3));
+
+    KLIServer.sendToNonPlayer(KLISocketMessage(
+      senderID: ConnectionID.host,
+      type: KLIMessageType.showScores,
+    ));
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => SectionResult(
+          backgroundImage: bgDecorationImage,
+          players: l.map((e) => e.$1).toList(),
+          images: l.map((e) => e.$2).toList(),
+          scores: l.map((e) => e.$3).toList(),
+          playMusic: audioHandler.play,
+          allowClose: true,
+          isServer: true,
+        ),
       ),
     );
   }

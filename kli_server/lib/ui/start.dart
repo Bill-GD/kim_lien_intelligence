@@ -26,6 +26,12 @@ class _StartScreenState extends State<StartScreen> {
   int questionNum = 0;
 
   @override
+  void initState() {
+    super.initState();
+    audioHandler.play(assetHandler.startPlayerStart);
+  }
+
+  @override
   void dispose() {
     timer?.cancel();
     super.dispose();
@@ -108,9 +114,7 @@ class _StartScreenState extends State<StartScreen> {
               ),
               child: Container(
                 decoration: BoxDecoration(
-                  color: i == widget.playerPos
-                      ? Theme.of(context).colorScheme.primaryContainer
-                      : Colors.transparent,
+                  color: i == widget.playerPos ? Theme.of(context).colorScheme.primaryContainer : Colors.transparent,
                   border: BorderDirectional(
                     end: BorderSide(
                       color: i > 2 ? Colors.transparent : Theme.of(context).colorScheme.onBackground,
@@ -216,10 +220,11 @@ class _StartScreenState extends State<StartScreen> {
               disabledLabel: "Can't answer now",
               onPressed: () {
                 MatchState().modifyScore(widget.playerPos, 10);
+                audioHandler.play(assetHandler.startCorrect);
                 KLIServer.sendToAllClients(KLISocketMessage(
                   senderID: ConnectionID.host,
-                  message: MatchState().scores[widget.playerPos].toString(),
                   type: KLIMessageType.correctStartAnswer,
+                  message: MatchState().scores[widget.playerPos].toString(),
                 ));
                 nextQuestion();
                 setState(() {});
@@ -233,7 +238,13 @@ class _StartScreenState extends State<StartScreen> {
               enableCondition: !timeEnded && started,
               disabledLabel: "Can't answer now",
               onPressed: () {
+                audioHandler.play(assetHandler.startIncorrect);
                 nextQuestion();
+                KLIServer.sendToNonPlayer(KLISocketMessage(
+                  senderID: ConnectionID.host,
+                  type: KLIMessageType.playAudio,
+                  message: assetHandler.startIncorrect,
+                ));
                 setState(() {});
               },
             ),
@@ -252,6 +263,8 @@ class _StartScreenState extends State<StartScreen> {
         senderID: ConnectionID.host,
         type: KLIMessageType.stopTimer,
       ));
+
+      audioHandler.stop(true);
       return;
     }
     questionNum++;
@@ -272,6 +285,7 @@ class _StartScreenState extends State<StartScreen> {
               enableCondition: timeEnded,
               disabledLabel: 'Currently ongoing',
               onPressed: () {
+                audioHandler.play(assetHandler.startEndPlayer);
                 KLIServer.sendToAllClients(KLISocketMessage(
                   senderID: ConnectionID.host,
                   type: KLIMessageType.endSection,
@@ -286,19 +300,35 @@ class _StartScreenState extends State<StartScreen> {
               'Start',
               enableCondition: !started,
               onPressed: () {
-                nextQuestion();
-                timer = Timer.periodic(1.seconds, (timer) {
-                  if (currentTimeSec <= 0) {
-                    timer.cancel();
-                    timeEnded = true;
-                    setState(() {});
-                  } else {
-                    currentTimeSec--;
-                    setState(() {});
-                  }
+                KLIServer.sendToNonPlayer(KLISocketMessage(
+                  senderID: ConnectionID.host,
+                  type: KLIMessageType.playAudio,
+                  message: assetHandler.startShowQuestions,
+                ));
+                audioHandler.play(assetHandler.startShowQuestions);
+
+                Future.delayed(4.7.seconds, () {
+                  KLIServer.sendToNonPlayer(KLISocketMessage(
+                    senderID: ConnectionID.host,
+                    type: KLIMessageType.playAudio,
+                    message: assetHandler.startBackground,
+                  ));
+                  audioHandler.play(assetHandler.startBackground, true);
+
+                  nextQuestion();
+                  timer = Timer.periodic(1.seconds, (timer) {
+                    if (currentTimeSec <= 0) {
+                      timer.cancel();
+                      timeEnded = true;
+                      setState(() {});
+                    } else {
+                      currentTimeSec--;
+                      setState(() {});
+                    }
+                  });
+                  started = true;
+                  setState(() {});
                 });
-                started = true;
-                setState(() {});
               },
             ),
           );

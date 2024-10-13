@@ -20,14 +20,20 @@ class _SoundTestState extends State<SoundTest> {
         padding: const EdgeInsets.only(top: 10),
         child: Column(
           children: [
-            KLIButton(
-              'Mở thư mục Assets',
-              onPressed: () async {
-                await launchUrlString(
-                  Uri.directory(AssetHandler.assetFolder).toFilePath(windows: true),
-                  mode: LaunchMode.externalApplication,
-                );
-              },
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                KLIButton(
+                  'Mở thư mục Assets',
+                  onPressed: () async {
+                    await launchUrlString(
+                      Uri.directory(AssetHandler.assetFolder).toFilePath(windows: true),
+                      mode: LaunchMode.externalApplication,
+                    );
+                  },
+                ),
+                KLIButton('Stop all sound', onPressed: audioHandler.stop),
+              ],
             ),
             Flexible(
               child: ListView.builder(

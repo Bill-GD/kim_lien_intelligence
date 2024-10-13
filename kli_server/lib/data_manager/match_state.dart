@@ -179,7 +179,7 @@ class MatchState {
   void loadQuestions() {
     switch (section) {
       case MatchSection.start:
-        questionList = DataManager.getMatchQuestions<StartMatch>(match.name)
+        questionList = DataManager.getMatchQuestions<StartMatch>(match.name) //
             .questions
             .where((e) => e.pos == startOrFinishPos)
             .toList()
@@ -275,7 +275,7 @@ class MatchState {
   late final List<KLIPlayer> players;
   static final playerReady = <bool>[false, false, false, false];
   bool get allPlayerReady => playerReady.every((e) => e);
-  MatchSection section = MatchSection.finish;
+  MatchSection section = MatchSection.start;
 
   /// For Start, Accel, Finish, Extra. For Obstacle, use [obstacleMatch]
   List<BaseQuestion>? questionList;

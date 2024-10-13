@@ -31,22 +31,6 @@ class _ServerSetupState extends State<ServerSetup> {
     logHandler.info('Opened Server Setup page');
     getIpAddresses();
     ipController.text = 'Local IP: $localAddress\n';
-
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      showPopupMessage(
-        context,
-        title: 'Match data',
-        content: 'The app is preparing the match data. Please wait for it to finish.',
-      );
-      Future.delayed(
-        500.ms,
-        () {
-          MatchState.prepareMatchData(storageHandler.matchData, storageHandler.playerData);
-          showToastMessage(context, 'Done! You can close this now.');
-          setState(() {});
-        },
-      );
-    });
   }
 
   void getIpAddresses() async {
@@ -184,6 +168,13 @@ class _ServerSetupState extends State<ServerSetup> {
             await KLIServer.start(updateDebugOverlay);
             updateDebugOverlay();
             addClientListeners();
+            if (DataSize.matchActualDataSize == 0 && mounted) {
+              showPopupMessage(
+                context,
+                title: 'Match data',
+                content: 'Please remember to prepare the match data before any client connect.',
+              );
+            }
             setState(() {});
           },
         ),
@@ -203,6 +194,8 @@ class _ServerSetupState extends State<ServerSetup> {
           enableCondition: KLIServer.started && (isTesting || MatchState().allPlayerReady),
           disabledLabel: !KLIServer.started ? 'No server exist' : 'Not enough player',
           onPressed: () async {
+            if (MatchState().section == MatchSection.start) audioHandler.play(assetHandler.startStart);
+
             KLIServer.sendToAllClients(KLISocketMessage(
               senderID: ConnectionID.host,
               type: KLIMessageType.startMatch,
@@ -222,6 +215,26 @@ class _ServerSetupState extends State<ServerSetup> {
                 MaterialPageRoute<void>(builder: (context) => const MatchOverview()),
               );
             }
+          },
+        ),
+        KLIButton(
+          'Prepare match data',
+          onPressed: () async {
+            showPopupMessage(
+              context,
+              title: 'Match data',
+              content: '''
+              The app is preparing the match data. Please wait for it to finish.
+              This data will be used by the clients while playing the match.''',
+            );
+            Future.delayed(
+              300.ms,
+              () {
+                MatchState.prepareMatchData(storageHandler.matchData, storageHandler.playerData);
+                showPopupMessage(context, title: 'Finish', content: 'Done! You can close this now.');
+                setState(() {});
+              },
+            );
           },
         ),
         if (isTesting)
@@ -252,9 +265,7 @@ class _ServerSetupState extends State<ServerSetup> {
     subscriptions.add(KLIServer.onMessageReceived.listen((m) {
       if (m.type == KLIMessageType.dataSize) {
         final id = m.senderID.name;
-        id.contains('player')
-            ? MatchState.sendPlayerData(m.senderID, false, storageHandler.playerData)
-            : MatchState.sendMatchData(m.senderID, false, storageHandler.matchData);
+        id.contains('player') ? MatchState.sendPlayerData(m.senderID, false, storageHandler.playerData) : MatchState.sendMatchData(m.senderID, false, storageHandler.matchData);
       }
 
       if (m.type == KLIMessageType.matchName) {

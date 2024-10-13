@@ -130,7 +130,7 @@ SideNavigationBarTheme sideNavigationTheme(BuildContext context, [double height 
 class DataSize {
   static int matchActualDataSize = 0;
   static int matchMessageSize = 0;
-  
+
   static int playerActualDataSize = 0;
   static int playerMessageSize = 0;
 }
@@ -139,6 +139,8 @@ const String changelog = """
   0.4.5.5 ({latest}):
   - Highlights players participating in Extra
   - Sends who participating in Extra to clients
+  - Added section result screen
+  - Added sounds for match
 
   0.4.5.4 ({035ee5d}):
   - Added Debug overlay: version, build date, test mode, server status, host IP, port, device IP...
