@@ -57,6 +57,9 @@ class _ViewerWaitScreenState extends State<ViewerWaitScreen> {
             ),
           );
           break;
+        case KLIMessageType.playAudio:
+          audioHandler.play(m.message, m.message.contains('background'));
+          break;
         case KLIMessageType.enterStart:
           Navigator.of(context).pushReplacement<void, void>(
             MaterialPageRoute(builder: (_) => ViewerStartScreen(playerPos: int.parse(m.message))),

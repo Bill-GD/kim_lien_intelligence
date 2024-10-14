@@ -30,9 +30,10 @@ class _ViewerFinishScreenState extends State<ViewerFinishScreen> with SingleTick
   void initState() {
     super.initState();
     updateChild = () => setState(() {});
+    audioHandler.play(assetHandler.finishPlayerStart);
+    Future.delayed(1.seconds, () => audioHandler.play(assetHandler.finishShowPacks));
     Window.setEffect(effect: WindowEffect.transparent);
-    _controller = AnimationController(vsync: this, duration: maxTimeSec.seconds)
-      ..addListener(() => setState(() {}));
+    _controller = AnimationController(vsync: this, duration: maxTimeSec.seconds)..addListener(() => setState(() {}));
 
     sub = KLIClient.onMessageReceived.listen((m) {
       if (m.type == KLIMessageType.finishQuestion) {
@@ -55,8 +56,13 @@ class _ViewerFinishScreenState extends State<ViewerFinishScreen> with SingleTick
         }
       }
 
+      if (m.type == KLIMessageType.playAudio) {
+        audioHandler.play(m.message);
+      }
+
       if (m.type == KLIMessageType.continueTimer) {
         Future.delayed(1.seconds, () => _controller.forward());
+        audioHandler.play(assetHandler.finishBackground[currentQuestion.point]!, true);
       }
 
       if (m.type == KLIMessageType.scores) {
@@ -67,7 +73,12 @@ class _ViewerFinishScreenState extends State<ViewerFinishScreen> with SingleTick
         }
       }
 
+      if (m.type == KLIMessageType.enableSteal) {
+        audioHandler.play(assetHandler.finishStealWait, true);
+      }
+
       if (m.type == KLIMessageType.endSection) {
+        audioHandler.play(assetHandler.finishEndPlayer);
         Navigator.of(context).pushReplacement<void, void>(
           MaterialPageRoute(builder: (_) => const ViewerWaitScreen()),
         );
@@ -186,9 +197,7 @@ class _ViewerFinishScreenState extends State<ViewerFinishScreen> with SingleTick
             ),
             child: Container(
               decoration: BoxDecoration(
-                color: i == widget.playerPos
-                    ? Theme.of(context).colorScheme.primaryContainer
-                    : Theme.of(context).colorScheme.background,
+                color: i == widget.playerPos ? Theme.of(context).colorScheme.primaryContainer : Theme.of(context).colorScheme.background,
                 border: i < 3
                     ? BorderDirectional(
                         end: BorderSide(color: Theme.of(context).colorScheme.onBackground),

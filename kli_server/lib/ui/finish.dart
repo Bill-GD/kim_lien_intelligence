@@ -44,9 +44,12 @@ class _FinishScreenState extends State<FinishScreen> {
   void initState() {
     super.initState();
     updateChild = () => setState(() {});
-    
+    audioHandler.play(assetHandler.finishPlayerStart);
+    Future.delayed(1.seconds, () => audioHandler.play(assetHandler.finishShowPacks));
+
     sub = KLIServer.onMessageReceived.listen((m) async {
       if (m.type == KLIMessageType.stealAnswer) {
+        audioHandler.play(assetHandler.finishSteal);
         stealer = m.senderID.index - 1;
 
         KLIServer.sendToAllClients(KLISocketMessage(
@@ -66,11 +69,27 @@ class _FinishScreenState extends State<FinishScreen> {
             actions: [
               KLIButton(
                 'Correct',
-                onPressed: () => Navigator.of(context).pop(true),
+                onPressed: () {
+                  audioHandler.play(assetHandler.finishCorrect);
+                  KLIServer.sendToNonPlayer(KLISocketMessage(
+                    senderID: ConnectionID.host,
+                    type: KLIMessageType.playAudio,
+                    message: assetHandler.finishCorrect,
+                  ));
+                  Navigator.of(context).pop(true);
+                },
               ),
               KLIButton(
                 'Wrong',
-                onPressed: () => Navigator.of(context).pop(false),
+                onPressed: () {
+                  audioHandler.play(assetHandler.finishIncorrect);
+                  KLIServer.sendToNonPlayer(KLISocketMessage(
+                    senderID: ConnectionID.host,
+                    type: KLIMessageType.playAudio,
+                    message: assetHandler.finishIncorrect,
+                  ));
+                  Navigator.of(context).pop(false);
+                },
               ),
             ],
           );
@@ -326,6 +345,12 @@ class _FinishScreenState extends State<FinishScreen> {
                   message: jsonEncode(MatchState().scores),
                   type: KLIMessageType.scores,
                 ));
+                audioHandler.play(assetHandler.finishCorrect);
+                KLIServer.sendToAllClients(KLISocketMessage(
+                  senderID: ConnectionID.host,
+                  type: KLIMessageType.playAudio,
+                  message: assetHandler.finishCorrect,
+                ));
                 canSelectQuestion = questionNum < 3;
                 canEnd = questionNum == 3;
                 timeEnded = false;
@@ -351,6 +376,14 @@ class _FinishScreenState extends State<FinishScreen> {
                     type: KLIMessageType.scores,
                   ));
                 }
+                audioHandler.play(assetHandler.finishIncorrect);
+                KLIServer.sendToAllClients(KLISocketMessage(
+                  senderID: ConnectionID.host,
+                  type: KLIMessageType.playAudio,
+                  message: assetHandler.finishIncorrect,
+                ));
+
+                audioHandler.play(assetHandler.finishStealWait, true);
                 KLIServer.sendToAllExcept(
                   [ConnectionID.values[widget.playerPos + 1]],
                   KLISocketMessage(
@@ -400,6 +433,14 @@ class _FinishScreenState extends State<FinishScreen> {
                   chosenQuestions[chosenQuestionCount++] = i * 10;
                   canSelectQuestion = chosenQuestionCount == 3;
                   canSelectPoint = !canSelectQuestion;
+                  if (!canSelectPoint) {
+                    audioHandler.play(assetHandler.finishChosePack);
+                    KLIServer.sendToAllClients(KLISocketMessage(
+                      senderID: ConnectionID.host,
+                      type: KLIMessageType.playAudio,
+                      message: assetHandler.finishChosePack,
+                    ));
+                  }
                   setState(() {});
                 },
               ),
@@ -480,6 +521,14 @@ class _FinishScreenState extends State<FinishScreen> {
             ? () {
                 if (started) return;
                 chosenStar = !chosenStar;
+                if (chosenStar) {
+                  audioHandler.play(assetHandler.finishChoseStar);
+                  KLIServer.sendToNonPlayer(KLISocketMessage(
+                    senderID: ConnectionID.host,
+                    type: KLIMessageType.playAudio,
+                    message: assetHandler.finishChoseStar,
+                  ));
+                }
                 // chosenStar ? pointValue *= 2 : pointValue ~/= 2;
                 setState(() {});
               }
@@ -522,6 +571,7 @@ class _FinishScreenState extends State<FinishScreen> {
               setState(() {});
             }
           });
+          audioHandler.play(assetHandler.finishBackground[currentQuestion.point]!, true);
 
           KLIServer.sendToAllClients(KLISocketMessage(
             senderID: ConnectionID.host,
@@ -535,6 +585,7 @@ class _FinishScreenState extends State<FinishScreen> {
         enableCondition: canEnd,
         disabledLabel: 'Currently ongoing',
         onPressed: () {
+          audioHandler.play(assetHandler.finishEndPlayer);
           KLIServer.sendToAllClients(KLISocketMessage(
             senderID: ConnectionID.host,
             type: KLIMessageType.endSection,

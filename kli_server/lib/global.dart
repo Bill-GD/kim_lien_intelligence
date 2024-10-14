@@ -139,6 +139,7 @@ const String changelog = """
   0.4.5.5 ({2c329e0}):
   - Highlights players participating in Extra
   - Sends who participating in Extra to clients
+  - Missing dev state update in match screens
   - Added section result screen
   - Added sounds for match
 

@@ -194,8 +194,6 @@ class _ServerSetupState extends State<ServerSetup> {
           enableCondition: KLIServer.started && (isTesting || MatchState().allPlayerReady),
           disabledLabel: !KLIServer.started ? 'No server exist' : 'Not enough player',
           onPressed: () async {
-            if (MatchState().section == MatchSection.start) audioHandler.play(assetHandler.startStart);
-
             KLIServer.sendToAllClients(KLISocketMessage(
               senderID: ConnectionID.host,
               type: KLIMessageType.startMatch,
