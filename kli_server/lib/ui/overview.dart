@@ -151,6 +151,14 @@ class _MatchOverviewState extends State<MatchOverview> {
               if (MatchState().startOrFinishPos > 3) {
                 throw KLIException('Start is done', 'All players have finished Start section');
               }
+              if (MatchState().startOrFinishPos == 0) {
+                audioHandler.play(assetHandler.startStart);
+                KLIServer.sendToNonPlayer(KLISocketMessage(
+                  senderID: ConnectionID.host,
+                  type: KLIMessageType.playAudio,
+                  message: assetHandler.startStart,
+                ));
+              }
 
               MatchState().loadQuestions();
               KLIServer.sendToAllClients(KLISocketMessage(
@@ -220,7 +228,8 @@ class _MatchOverviewState extends State<MatchOverview> {
               MatchState().nextSection();
               showSectionResult();
               setState(() {});
-              MatchState().startOrFinishPos = 0;
+              // MatchState().startOrFinishPos = 0;
+              MatchState().nextPlayer();
             },
           ),
           KLIButton(
@@ -229,6 +238,15 @@ class _MatchOverviewState extends State<MatchOverview> {
             enabledLabel: 'To Finish',
             disabledLabel: 'Current section: ${MatchState().section.name}',
             onPressed: () async {
+              if (MatchState().finishPlayerDone.where((e) => e).isEmpty) {
+                audioHandler.play(assetHandler.finishStart);
+                KLIServer.sendToNonPlayer(KLISocketMessage(
+                  senderID: ConnectionID.host,
+                  type: KLIMessageType.playAudio,
+                  message: assetHandler.finishStart,
+                ));
+              }
+
               if (MatchState().finishNotStarted) MatchState().loadQuestions();
 
               KLIServer.sendToAllClients(KLISocketMessage(
