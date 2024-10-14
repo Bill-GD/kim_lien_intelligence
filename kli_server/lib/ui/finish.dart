@@ -43,6 +43,8 @@ class _FinishScreenState extends State<FinishScreen> {
   @override
   void initState() {
     super.initState();
+    updateChild = () => setState(() {});
+    
     sub = KLIServer.onMessageReceived.listen((m) async {
       if (m.type == KLIMessageType.stealAnswer) {
         stealer = m.senderID.index - 1;

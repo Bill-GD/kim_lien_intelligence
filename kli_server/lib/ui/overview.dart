@@ -29,6 +29,7 @@ class _MatchOverviewState extends State<MatchOverview> {
   @override
   void initState() {
     super.initState();
+    updateChild = () => setState(() {});
 
     sub ??= KLIServer.onMessageReceived.listen((m) {
       // if (m.type == KLIMessageType.reconnect) {
@@ -55,6 +56,12 @@ class _MatchOverviewState extends State<MatchOverview> {
         );
       }
     });
+  }
+
+  @override
+  void didUpdateWidget(covariant MatchOverview oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    updateChild = () => setState(() {});
   }
 
   @override

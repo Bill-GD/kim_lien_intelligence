@@ -35,10 +35,13 @@ class _ViewerAnswerSlideState extends State<ViewerAnswerSlide> {
   void initState() {
     super.initState();
     updateChild = () => setState(() {});
+
     Future.delayed(300.ms, () {
       offset = Offset(0, offset.dy);
+      audioHandler.play(assetHandler.accelShowAnswer);
       setState(() {});
     });
+    
     sub = KLIClient.onMessageReceived.listen((m) {
       if (m.type == KLIMessageType.revealAnswerResults) {
         answerResult = (jsonDecode(m.message) as List).map((e) => e as bool?);

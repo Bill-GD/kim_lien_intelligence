@@ -28,6 +28,8 @@ class _ExtraScreenState extends State<ExtraScreen> {
   @override
   void initState() {
     super.initState();
+    updateChild = () => setState(() {});
+    
     sub = KLIServer.onMessageReceived.listen((m) async {
       if (m.type == KLIMessageType.extraSignal) {
         // stop timer, show popup

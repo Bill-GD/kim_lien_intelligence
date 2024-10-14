@@ -28,6 +28,7 @@ class _StartScreenState extends State<StartScreen> {
   @override
   void initState() {
     super.initState();
+    updateChild = () => setState(() {});
     audioHandler.play(assetHandler.startPlayerStart);
   }
 

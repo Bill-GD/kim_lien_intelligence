@@ -30,6 +30,7 @@ class _ViewerAccelScreenState extends State<ViewerAccelScreen> with SingleTicker
   void initState() {
     super.initState();
     updateChild = () => setState(() {});
+    audioHandler.play(assetHandler.accelStart);
 
     sub = KLIClient.onMessageReceived.listen((m) async {
       if (m.type == KLIMessageType.accelQuestion) {
@@ -62,11 +63,13 @@ class _ViewerAccelScreenState extends State<ViewerAccelScreen> with SingleTicker
         totalImageCount = images.length;
         timePerImage = isArrange ? 30 : 30 / totalImageCount;
         imageIndex = -1;
+        audioHandler.play(assetHandler.accelShowQuestion);
       }
 
       if (m.type == KLIMessageType.continueTimer) {
         imageIndex = 0;
         _controller.forward();
+        audioHandler.play(assetHandler.accelBackground, true);
       }
 
       if (m.type == KLIMessageType.revealArrangeAnswer) {
@@ -77,6 +80,10 @@ class _ViewerAccelScreenState extends State<ViewerAccelScreen> with SingleTicker
         Navigator.of(context).pushReplacement<void, void>(
           MaterialPageRoute(builder: (_) => const ViewerWaitScreen()),
         );
+      }
+
+      if (m.type == KLIMessageType.playAudio) {
+        audioHandler.play(m.message);
       }
 
       if (m.type == KLIMessageType.showAnswers) {

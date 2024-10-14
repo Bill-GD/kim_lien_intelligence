@@ -45,7 +45,10 @@ String getSizeString(int bytes) {
 }
 
 const String changelog = """
-  0.4.1 ({latest}):
+  0.4.2 ({latest}):
+  - Added audio for accel screen
+
+  0.4.1 ({4bf9051}):
   - Added audio for obstacle screens
 
   0.4 ({2c329e0}):

@@ -23,7 +23,7 @@ class AccelScreen extends StatefulWidget {
 
 class _AccelScreenState extends State<AccelScreen> {
   double currentTimeSec = 30;
-  bool canNext = true,
+  bool canNext = true, //
       canStart = false,
       started = false,
       canShowQuestion = false,
@@ -43,6 +43,9 @@ class _AccelScreenState extends State<AccelScreen> {
   @override
   void initState() {
     super.initState();
+    updateChild = () => setState(() {});
+    audioHandler.play(assetHandler.accelStart);
+
     sub = KLIServer.onMessageReceived.listen((m) {
       if (m.type == KLIMessageType.accelAnswer) {
         final split = m.message.split('|');
@@ -113,6 +116,16 @@ class _AccelScreenState extends State<AccelScreen> {
                   }
                 }
 
+                final a = answerResults.any((e) => e == true) //
+                    ? assetHandler.accelCorrect
+                    : assetHandler.accelIncorrect;
+                audioHandler.play(a);
+                KLIServer.sendToNonPlayer(KLISocketMessage(
+                  senderID: ConnectionID.host,
+                  type: KLIMessageType.playAudio,
+                  message: a,
+                ));
+
                 canAnnounceAnswer = false;
                 canNext = true;
                 if (questionNum == 4) canEnd = true;
@@ -142,10 +155,7 @@ class _AccelScreenState extends State<AccelScreen> {
           padding: const EdgeInsets.symmetric(horizontal: 64, vertical: 64),
           child: Row(
             children: [
-              Expanded(
-                flex: 9,
-                child: questionContainer(),
-              ),
+              Expanded(flex: 9, child: questionContainer()),
               Flexible(
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -248,8 +258,7 @@ class _AccelScreenState extends State<AccelScreen> {
                           File(StorageHandler.getFullPath(e)),
                         ),
                       ),
-                      shouldShowArrangeResult:
-                          currentQuestion.type == AccelQuestionType.arrange && canShowArrangeAns,
+                      shouldShowArrangeResult: currentQuestion.type == AccelQuestionType.arrange && canShowArrangeAns,
                       isArrange: currentQuestion.type == AccelQuestionType.arrange,
                     )
                   : null,
@@ -330,6 +339,7 @@ class _AccelScreenState extends State<AccelScreen> {
                 setState(() {});
               }
             });
+            audioHandler.play(assetHandler.accelBackground, true);
             KLIServer.sendToAllClients(KLISocketMessage(
               senderID: ConnectionID.host,
               type: KLIMessageType.continueTimer,
@@ -371,6 +381,7 @@ class _AccelScreenState extends State<AccelScreen> {
             currentTimeSec = widget.timeLimitSec;
             canShowQuestion = canStart = true;
             timeEnded = canNext = started = false;
+            audioHandler.play(assetHandler.accelShowQuestion);
             setState(() {});
           },
         ),
@@ -382,6 +393,7 @@ class _AccelScreenState extends State<AccelScreen> {
           onPressed: () {
             setState(() {});
             _key.currentState?.openEndDrawer();
+            audioHandler.play(assetHandler.accelShowAnswer);
           },
         ),
         KLIButton(
