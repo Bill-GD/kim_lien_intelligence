@@ -182,7 +182,7 @@ class _MatchManagerState extends State<MatchManager> {
               child: matches.isEmpty
                   ? Container(
                       decoration: BoxDecoration(
-                        border: Border.all(color: Theme.of(context).colorScheme.onPrimary),
+                        border: Border.all(color: Theme.of(context).colorScheme.onBackground),
                         color: Theme.of(context).colorScheme.background,
                       ),
                       alignment: Alignment.center,
