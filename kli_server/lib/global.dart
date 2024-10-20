@@ -1,7 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:kli_lib/kli_lib.dart';
-import 'package:package_info_plus/package_info_plus.dart';
 import 'package:side_navigation/side_navigation.dart';
 
 bool isTesting = kDebugMode, showDebugInfo = false;
@@ -12,31 +11,10 @@ late void Function() updateDebugOverlay;
 late void Function() updateChild;
 
 late final LogHandler logHandler;
-void initLogHandler() {
-  logHandler = LogHandler(logFile: StorageHandler.getFullPath('log.txt'));
-}
-
 late final String appVersionString;
-Future<void> initPackageInfo() async {
-  final packageInfo = await PackageInfo.fromPlatform();
-  appVersionString = 'v${packageInfo.version}.${packageInfo.buildNumber}';
-  logHandler.info('PackageInfo init: $appVersionString');
-}
-
 late final StorageHandler storageHandler;
-void initStorageHandler() {
-  storageHandler = StorageHandler.init();
-}
-
 late final AudioHandler audioHandler;
-void initAudioHandler() {
-  audioHandler = AudioHandler.init(updateDebugOverlay);
-}
-
 late final AssetHandler assetHandler;
-void initAssetHandler() {
-  assetHandler = AssetHandler.init();
-}
 
 AppBar managerAppBar(
   BuildContext context,

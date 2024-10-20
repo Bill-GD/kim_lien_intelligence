@@ -42,7 +42,7 @@ void main() async {
     return true;
   };
 
-  initLogHandler();
+  logHandler = LogHandler(logFile: StorageHandler.getFullPath('log.txt'));
   logHandler.info('Starting KLIClient');
 
   logMessageStream.listen((m) {

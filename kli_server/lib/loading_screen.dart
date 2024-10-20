@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:kli_lib/kli_lib.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
@@ -30,14 +31,16 @@ class _LoadingScreenState extends State<LoadingScreen> {
 
   void initializeApp() async {
     try {
-      await initPackageInfo();
+      final packageInfo = await PackageInfo.fromPlatform();
+      appVersionString = 'v${packageInfo.version}.${packageInfo.buildNumber}';
+      logHandler.info('PackageInfo init: $appVersionString');
 
       setState(() => loadingText = 'Checking assets..');
-      initAssetHandler();
+      assetHandler = AssetHandler.init();
       await Future.delayed(widget.delayMilli);
 
       setState(() => loadingText = 'Initializing audio handler...');
-      initAudioHandler();
+      audioHandler = AudioHandler.init(updateDebugOverlay);
       await Future.delayed(widget.delayMilli);
 
       setState(() => loadingText = 'Loading background image...');
@@ -45,7 +48,7 @@ class _LoadingScreenState extends State<LoadingScreen> {
       await Future.delayed(widget.delayMilli);
 
       setState(() => loadingText = 'Initializing storage handler...');
-      initStorageHandler();
+      storageHandler = StorageHandler.init();
       await Future.delayed(widget.delayMilli);
 
       setState(() => loadingText = 'Finished initialization');

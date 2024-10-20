@@ -41,7 +41,7 @@ void main() async {
     return true;
   };
 
-  initLogHandler();
+  logHandler = LogHandler(logFile: StorageHandler.getFullPath('log.txt'));
   logMessageStream.listen((m) {
     if (m.$1 == LogType.info) logHandler.info(m.$2);
     if (m.$1 == LogType.warn) logHandler.warn(m.$2);

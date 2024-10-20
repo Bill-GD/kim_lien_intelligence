@@ -1,7 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:kli_lib/kli_lib.dart';
-import 'package:package_info_plus/package_info_plus.dart';
 
 late final String cachePath;
 bool isTesting = kDebugMode, showDebugInfo = false;
@@ -12,26 +11,9 @@ late void Function() updateDebugOverlay;
 late void Function() updateChild;
 
 late final LogHandler logHandler;
-void initLogHandler() {
-  logHandler = LogHandler(logFile: StorageHandler.getFullPath('log.txt'));
-}
-
 late final String appVersionString;
-Future<void> initPackageInfo() async {
-  final packageInfo = await PackageInfo.fromPlatform();
-  appVersionString = 'v${packageInfo.version}.${packageInfo.buildNumber}';
-  logHandler.info('PackageInfo init: $appVersionString');
-}
-
 late final AssetHandler assetHandler;
-void initAssetHandler() {
-  assetHandler = AssetHandler.init();
-}
-
 late final AudioHandler audioHandler;
-void initAudioHandler() {
-  audioHandler = AudioHandler.init(updateDebugOverlay);
-}
 
 String getSizeString(int bytes) {
   const units = ['B', 'KB', 'MB', 'GB'];
@@ -45,7 +27,7 @@ String getSizeString(int bytes) {
 }
 
 const String changelog = """
-  0.4.4 ({latest}):
+  0.4.4 ({260db35}):
   - Added audio for extra screen
 
   0.4.3 ({17c0818}):
