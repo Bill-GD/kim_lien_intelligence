@@ -255,11 +255,11 @@ class _MatchOverviewState extends State<MatchOverview> {
                 message: '${MatchState().startOrFinishPos}',
               ));
 
-              await Navigator.of(context).push<void>(
-                MaterialPageRoute(
-                  builder: (context) => FinishScreen(playerPos: MatchState().startOrFinishPos),
+              await Navigator.of(context).push<void>(MaterialPageRoute(
+                builder: (context) => FinishScreen(
+                  playerPos: MatchState().startOrFinishPos,
                 ),
-              );
+              ));
 
               MatchState().finishPlayerDone[MatchState().startOrFinishPos] = true;
               if (MatchState().allFinishPlayerDone) {

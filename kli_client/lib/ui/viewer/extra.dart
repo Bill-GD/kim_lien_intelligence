@@ -46,6 +46,7 @@ class _ViewerExtraScreenState extends State<ViewerExtraScreen> with SingleTicker
       if (m.type == KLIMessageType.continueTimer) {
         Future.delayed(1.seconds, () => _controller.forward());
         signaledPlayer = -1;
+        audioHandler.play(assetHandler.accelBackground, true);
       }
 
       if (m.type == KLIMessageType.stopTimer) {

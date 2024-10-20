@@ -29,7 +29,7 @@ class _ExtraScreenState extends State<ExtraScreen> {
   void initState() {
     super.initState();
     updateChild = () => setState(() {});
-    
+
     sub = KLIServer.onMessageReceived.listen((m) async {
       if (m.type == KLIMessageType.extraSignal) {
         // stop timer, show popup
@@ -331,6 +331,7 @@ class _ExtraScreenState extends State<ExtraScreen> {
                 type: KLIMessageType.continueTimer,
               ),
             );
+            audioHandler.play(assetHandler.accelBackground, true);
             createTimer();
             setState(() {});
           },
