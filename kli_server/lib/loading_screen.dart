@@ -35,6 +35,10 @@ class _LoadingScreenState extends State<LoadingScreen> {
       appVersionString = 'v${packageInfo.version}.${packageInfo.buildNumber}';
       logHandler.info('PackageInfo init: $appVersionString');
 
+      setState(() => loadingText = 'Initializing storage handler...');
+      storageHandler = StorageHandler.init();
+      await Future.delayed(widget.delayMilli);
+
       setState(() => loadingText = 'Checking assets..');
       assetHandler = AssetHandler.init();
       await Future.delayed(widget.delayMilli);
@@ -45,10 +49,6 @@ class _LoadingScreenState extends State<LoadingScreen> {
 
       setState(() => loadingText = 'Loading background image...');
       bgDecorationImage = await getBackgroundWidget(assetHandler);
-      await Future.delayed(widget.delayMilli);
-
-      setState(() => loadingText = 'Initializing storage handler...');
-      storageHandler = StorageHandler.init();
       await Future.delayed(widget.delayMilli);
 
       setState(() => loadingText = 'Finished initialization');
