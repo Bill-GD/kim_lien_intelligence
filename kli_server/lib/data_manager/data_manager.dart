@@ -29,7 +29,9 @@ class DataManager {
     List<KLIMatch> matches = [];
     Directory(storageHandler.saveDataDir).listSync().forEach((d) {
       if (d is File) return;
-      matches.add(KLIMatch.fromJson(jsonDecode(storageHandler.readFromFile('${d.path}\\match.kli'))));
+      final c = storageHandler.readFromFile('${d.path}\\match.kli');
+      if (c.isEmpty) return;
+      matches.add(KLIMatch.fromJson(jsonDecode(c)));
     });
     return matches;
   }
