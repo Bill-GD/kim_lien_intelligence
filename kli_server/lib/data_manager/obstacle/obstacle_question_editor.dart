@@ -82,6 +82,7 @@ class _ObstacleQuestionEditorState extends State<ObstacleQuestionEditor> {
               },
               controller: answerController,
               labelText: 'Đáp án',
+              maxLines: 1,
               errorText: aErrorText,
             ),
           ],

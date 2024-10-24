@@ -4,7 +4,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:kli_lib/kli_lib.dart';
 
-import '../../connect_screen/overview.dart';
+import 'overview.dart';
 import '../../global.dart';
 import '../../match_data.dart';
 
@@ -57,7 +57,7 @@ class _PlayerStartScreenState extends State<PlayerStartScreen> {
       }
       if (m.type == KLIMessageType.endSection) {
         Navigator.of(context).pushReplacement<void, void>(
-          MaterialPageRoute(builder: (_) => const Overview()),
+          MaterialPageRoute(builder: (_) => const PlayerOverviewScreen()),
         );
       }
 

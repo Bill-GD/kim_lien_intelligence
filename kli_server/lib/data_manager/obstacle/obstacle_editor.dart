@@ -58,6 +58,7 @@ class _ObstacleEditorState extends State<ObstacleEditor> {
               },
               controller: keywordController,
               labelText: 'Keyword',
+              maxLines: 1,
               errorText: kErrorText,
             ),
             const SizedBox(height: 30),

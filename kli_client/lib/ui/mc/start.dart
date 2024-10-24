@@ -8,68 +8,55 @@ import 'overview.dart';
 import '../../global.dart';
 import '../../match_data.dart';
 
-class PlayerFinishScreen extends StatefulWidget {
+class MCStartScreen extends StatefulWidget {
+  final double timeLimitSec = 60;
   final int playerPos;
 
-  const PlayerFinishScreen({super.key, required this.playerPos});
+  const MCStartScreen({super.key, required this.playerPos});
 
   @override
-  State<PlayerFinishScreen> createState() => _PlayerFinishScreenState();
+  State<MCStartScreen> createState() => _MCStartScreenState();
 }
 
-class _PlayerFinishScreenState extends State<PlayerFinishScreen> {
-  double timeLimitSec = 1, currentTimeSec = 0;
-  bool canShowQuestion = false, canSteal = false;
-  late FinishQuestion currentQuestion;
+class _MCStartScreenState extends State<MCStartScreen> {
+  double currentTimeSec = 60;
+  bool started = false;
+  late StartQuestion currentQuestion;
   Timer? timer;
   late final StreamSubscription<KLISocketMessage> sub;
-  int questionNum = 0, stealer = -1;
+  int questionNum = 0;
 
   @override
   void initState() {
     super.initState();
     updateChild = () => setState(() {});
     sub = KLIClient.onMessageReceived.listen((m) {
-      if (m.type == KLIMessageType.finishQuestion) {
-        currentQuestion = FinishQuestion.fromJson(jsonDecode(m.message));
-        questionNum++;
-        canShowQuestion = true;
-        timeLimitSec = currentTimeSec = currentQuestion.point / 10 * 5 + 5;
-        stealer = -1;
-      }
-
-      if (m.type == KLIMessageType.continueTimer) {
-        timer = Timer.periodic(1.seconds, (timer) {
-          if (currentTimeSec <= 0) {
-            timer.cancel();
+      if (m.type == KLIMessageType.startQuestion) {
+        if (!started) {
+          timer = Timer.periodic(1.seconds, (timer) {
+            if (currentTimeSec <= 0) {
+              timer.cancel();
+              started = false;
+              setState(() {});
+              return;
+            }
+            currentTimeSec -= 1;
             setState(() {});
-            return;
-          }
-          currentTimeSec -= 1;
-          setState(() {});
-        });
-      }
-
-      if (m.type == KLIMessageType.scores) {
-        int i = 0;
-        for (int s in jsonDecode(m.message) as List) {
-          MatchData().players[i].point = s;
-          i++;
+          });
         }
+        questionNum++;
+        currentQuestion = StartQuestion.fromJson(jsonDecode(m.message));
+        started = true;
       }
-
-      if (m.type == KLIMessageType.enableSteal) {
-        canSteal = true;
+      if (m.type == KLIMessageType.correctStartAnswer) {
+        MatchData().players[widget.playerPos].point = int.parse(m.message);
       }
-
-      if (m.type == KLIMessageType.disableSteal) {
-        canSteal = false;
-        stealer = int.parse(m.message);
+      if (m.type == KLIMessageType.stopTimer) {
+        timer?.cancel();
       }
-
       if (m.type == KLIMessageType.endSection) {
         Navigator.of(context).pushReplacement<void, void>(
-          MaterialPageRoute(builder: (_) => const PlayerOverviewScreen()),
+          MaterialPageRoute(builder: (_) => const MCOverviewScreen()),
         );
       }
 
@@ -105,7 +92,17 @@ class _PlayerFinishScreenState extends State<PlayerFinishScreen> {
               ),
               Padding(
                 padding: const EdgeInsets.only(left: 48),
-                child: playerInfo(),
+                child: Column(
+                  children: [
+                    AnimatedCircularProgressBar(
+                      currentTimeSec: currentTimeSec,
+                      totalTimeSec: widget.timeLimitSec,
+                      strokeWidth: 20,
+                      valueColor: const Color(0xFF00A906),
+                      backgroundColor: Colors.red,
+                    ),
+                  ],
+                ),
               ),
             ],
           ),
@@ -117,7 +114,7 @@ class _PlayerFinishScreenState extends State<PlayerFinishScreen> {
   Widget containerTop() {
     return Row(
       children: [
-        for (int i = 0; i < 4; i++)
+        for (final i in range(0, 3))
           Expanded(
             child: ClipRRect(
               borderRadius: BorderRadius.only(
@@ -126,15 +123,9 @@ class _PlayerFinishScreenState extends State<PlayerFinishScreen> {
               ),
               child: Container(
                 decoration: BoxDecoration(
-                  color: i == widget.playerPos
-                      ? Theme.of(context).colorScheme.primaryContainer
-                      : i == stealer
-                          ? Colors.yellow.shade800.withOpacity(0.7)
-                          : Colors.transparent,
+                  color: Colors.transparent,
                   border: BorderDirectional(
-                    end: BorderSide(
-                      color: i > 2 ? Colors.transparent : Theme.of(context).colorScheme.onBackground,
-                    ),
+                    end: BorderSide(color: Theme.of(context).colorScheme.onBackground),
                   ),
                 ),
                 padding: const EdgeInsets.symmetric(vertical: 16),
@@ -163,7 +154,7 @@ class _PlayerFinishScreenState extends State<PlayerFinishScreen> {
           Expanded(
             child: Stack(
               children: [
-                canShowQuestion
+                started
                     ? Padding(
                         padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
                         child: Text(
@@ -174,11 +165,11 @@ class _PlayerFinishScreenState extends State<PlayerFinishScreen> {
                     : const SizedBox(),
                 Positioned(
                   right: 0,
-                  child: canShowQuestion
+                  child: started
                       ? Padding(
                           padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
                           child: Text(
-                            '${currentQuestion.point} điểm',
+                            StartQuestion.mapTypeDisplay(currentQuestion.subject),
                             style: const TextStyle(fontSize: fontSizeLarge),
                           ),
                         )
@@ -192,42 +183,33 @@ class _PlayerFinishScreenState extends State<PlayerFinishScreen> {
                   ),
                   padding: const EdgeInsets.symmetric(horizontal: 128),
                   alignment: Alignment.center,
-                  child: Text(
-                    canShowQuestion ? currentQuestion.question : '',
-                    textAlign: TextAlign.center,
-                    style: const TextStyle(fontSize: fontSizeLarge),
-                  ),
+                  child: started
+                      ? Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              currentQuestion.question,
+                              textAlign: TextAlign.center,
+                              style: const TextStyle(fontSize: fontSizeLarge),
+                            ),
+                            Text(
+                              currentQuestion.answer,
+                              textAlign: TextAlign.center,
+                              style: const TextStyle(
+                                fontSize: fontSizeMedium,
+                                fontStyle: FontStyle.italic,
+                              ),
+                            ),
+                          ],
+                        )
+                      : null,
                 ),
               ],
             ),
           ),
         ],
       ),
-    );
-  }
-
-  Widget playerInfo() {
-    return Column(
-      children: [
-        AnimatedCircularProgressBar(
-          currentTimeSec: currentTimeSec,
-          totalTimeSec: timeLimitSec,
-          strokeWidth: 20,
-          valueColor: const Color(0xFF00A906),
-          backgroundColor: Colors.red,
-        ),
-        const Expanded(child: SizedBox()),
-        KLIButton(
-          'Steal',
-          enableCondition: canSteal,
-          onPressed: () {
-            KLIClient.sendMessage(KLISocketMessage(
-              senderID: KLIClient.clientID!,
-              type: KLIMessageType.stealAnswer,
-            ));
-          },
-        ),
-      ],
     );
   }
 }

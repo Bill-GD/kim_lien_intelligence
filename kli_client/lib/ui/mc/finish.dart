@@ -8,18 +8,18 @@ import 'overview.dart';
 import '../../global.dart';
 import '../../match_data.dart';
 
-class PlayerFinishScreen extends StatefulWidget {
+class MCFinishScreen extends StatefulWidget {
   final int playerPos;
 
-  const PlayerFinishScreen({super.key, required this.playerPos});
+  const MCFinishScreen({super.key, required this.playerPos});
 
   @override
-  State<PlayerFinishScreen> createState() => _PlayerFinishScreenState();
+  State<MCFinishScreen> createState() => _MCFinishScreenState();
 }
 
-class _PlayerFinishScreenState extends State<PlayerFinishScreen> {
+class _MCFinishScreenState extends State<MCFinishScreen> {
   double timeLimitSec = 1, currentTimeSec = 0;
-  bool canShowQuestion = false, canSteal = false;
+  bool canShowQuestion = false;
   late FinishQuestion currentQuestion;
   Timer? timer;
   late final StreamSubscription<KLISocketMessage> sub;
@@ -50,6 +50,10 @@ class _PlayerFinishScreenState extends State<PlayerFinishScreen> {
         });
       }
 
+      if (m.type == KLIMessageType.disableSteal) {
+        stealer = int.parse(m.message);
+      }
+
       if (m.type == KLIMessageType.scores) {
         int i = 0;
         for (int s in jsonDecode(m.message) as List) {
@@ -58,18 +62,9 @@ class _PlayerFinishScreenState extends State<PlayerFinishScreen> {
         }
       }
 
-      if (m.type == KLIMessageType.enableSteal) {
-        canSteal = true;
-      }
-
-      if (m.type == KLIMessageType.disableSteal) {
-        canSteal = false;
-        stealer = int.parse(m.message);
-      }
-
       if (m.type == KLIMessageType.endSection) {
         Navigator.of(context).pushReplacement<void, void>(
-          MaterialPageRoute(builder: (_) => const PlayerOverviewScreen()),
+          MaterialPageRoute(builder: (_) => const MCOverviewScreen()),
         );
       }
 
@@ -105,7 +100,18 @@ class _PlayerFinishScreenState extends State<PlayerFinishScreen> {
               ),
               Padding(
                 padding: const EdgeInsets.only(left: 48),
-                child: playerInfo(),
+                child: Container(
+                  padding: const EdgeInsets.only(top: 16, bottom: 8),
+                  constraints: const BoxConstraints(maxWidth: 200),
+                  alignment: Alignment.center,
+                  child: AnimatedCircularProgressBar(
+                    currentTimeSec: currentTimeSec,
+                    totalTimeSec: timeLimitSec,
+                    strokeWidth: 20,
+                    valueColor: const Color(0xFF00A906),
+                    backgroundColor: Colors.red,
+                  ),
+                ),
               ),
             ],
           ),
@@ -192,42 +198,33 @@ class _PlayerFinishScreenState extends State<PlayerFinishScreen> {
                   ),
                   padding: const EdgeInsets.symmetric(horizontal: 128),
                   alignment: Alignment.center,
-                  child: Text(
-                    canShowQuestion ? currentQuestion.question : '',
-                    textAlign: TextAlign.center,
-                    style: const TextStyle(fontSize: fontSizeLarge),
-                  ),
+                  child: canShowQuestion
+                      ? Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              currentQuestion.question,
+                              textAlign: TextAlign.center,
+                              style: const TextStyle(fontSize: fontSizeLarge),
+                            ),
+                            Text(
+                              currentQuestion.answer,
+                              textAlign: TextAlign.center,
+                              style: const TextStyle(
+                                fontSize: fontSizeMedium,
+                                fontStyle: FontStyle.italic,
+                              ),
+                            ),
+                          ],
+                        )
+                      : null,
                 ),
               ],
             ),
           ),
         ],
       ),
-    );
-  }
-
-  Widget playerInfo() {
-    return Column(
-      children: [
-        AnimatedCircularProgressBar(
-          currentTimeSec: currentTimeSec,
-          totalTimeSec: timeLimitSec,
-          strokeWidth: 20,
-          valueColor: const Color(0xFF00A906),
-          backgroundColor: Colors.red,
-        ),
-        const Expanded(child: SizedBox()),
-        KLIButton(
-          'Steal',
-          enableCondition: canSteal,
-          onPressed: () {
-            KLIClient.sendMessage(KLISocketMessage(
-              senderID: KLIClient.clientID!,
-              type: KLIMessageType.stealAnswer,
-            ));
-          },
-        ),
-      ],
     );
   }
 }

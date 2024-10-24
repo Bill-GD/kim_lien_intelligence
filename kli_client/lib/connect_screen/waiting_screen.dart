@@ -7,8 +7,9 @@ import 'package:kli_lib/kli_lib.dart';
 
 import '../global.dart';
 import '../match_data.dart';
+import '../ui/mc/overview.dart';
+import '../ui/player/overview.dart';
 import '../ui/viewer/viewer_wait.dart';
-import 'overview.dart';
 
 class WaitingScreen extends StatefulWidget {
   const WaitingScreen({super.key});
@@ -186,7 +187,13 @@ class _WaitingScreenState extends State<WaitingScreen> {
         type: KLIMessageType.playerReady,
       ));
       Navigator.of(context).pushReplacement<void, void>(
-        MaterialPageRoute<void>(builder: (context) => const Overview()),
+        MaterialPageRoute<void>(builder: (context) => const PlayerOverviewScreen()),
+      );
+      return;
+    }
+    if (KLIClient.clientID!.name.contains('mc')) {
+      Navigator.of(context).pushReplacement<void, void>(
+        MaterialPageRoute<void>(builder: (context) => const MCOverviewScreen()),
       );
       return;
     }
@@ -197,8 +204,7 @@ class _WaitingScreenState extends State<WaitingScreen> {
 
   bool checkCache() {
     if (KLIClient.isPlayer) {
-      if (File('$cachePath\\$matchName\\player\\size.txt').existsSync() &&
-          File('$cachePath\\$matchName\\player\\names.txt').existsSync()) {
+      if (File('$cachePath\\$matchName\\player\\size.txt').existsSync() && File('$cachePath\\$matchName\\player\\names.txt').existsSync()) {
         final s = StorageHandler().readFromFile('$cachePath\\$matchName\\player\\size.txt');
         final n = StorageHandler().readFromFile('$cachePath\\$matchName\\player\\names.txt').split('|');
 
@@ -218,7 +224,7 @@ class _WaitingScreenState extends State<WaitingScreen> {
       }
       return false;
     } else {
-      if (File('$cachePath\\$matchName\\other\\size.txt').existsSync() &&
+      if (File('$cachePath\\$matchName\\other\\size.txt').existsSync() && //
           File('$cachePath\\$matchName\\other\\names.txt').existsSync()) {
         final s = StorageHandler().readFromFile('$cachePath\\$matchName\\other\\size.txt');
         final n = StorageHandler().readFromFile('$cachePath\\$matchName\\other\\names.txt').split('|');

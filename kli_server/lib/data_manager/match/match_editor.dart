@@ -60,6 +60,7 @@ class _MatchEditorState extends State<MatchEditor> {
         titlePadding: const EdgeInsets.symmetric(vertical: 32, horizontal: 256),
         title: KLITextField(
           style: const TextStyle(fontSize: fontSizeSmall),
+          maxLines: 1,
           onChanged: (value) {
             if (value.isEmpty) {
               matchNameError = 'Không được trống';
@@ -173,6 +174,7 @@ class _MatchEditorState extends State<MatchEditor> {
               child: KLITextField(
                 style: const TextStyle(fontSize: fontSizeSmall),
                 controller: playerNameControllers[index],
+                maxLines: 1,
                 labelText: 'Tên',
               ),
             ),

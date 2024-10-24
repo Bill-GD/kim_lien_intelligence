@@ -5,22 +5,22 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:kli_lib/kli_lib.dart';
 
-import '../global.dart';
-import '../match_data.dart';
-import '../ui/player/accel.dart';
-import '../ui/player/extra.dart';
-import '../ui/player/finish.dart';
-import '../ui/player/obstacle.dart';
-import '../ui/player/start.dart';
+import '../../global.dart';
+import '../../match_data.dart';
+import 'accel.dart';
+import 'extra.dart';
+import 'finish.dart';
+import 'obstacle.dart';
+import 'start.dart';
 
-class Overview extends StatefulWidget {
-  const Overview({super.key});
+class MCOverviewScreen extends StatefulWidget {
+  const MCOverviewScreen({super.key});
 
   @override
-  State<Overview> createState() => _OverviewState();
+  State<MCOverviewScreen> createState() => _MCOverviewScreenState();
 }
 
-class _OverviewState extends State<Overview> {
+class _MCOverviewScreenState extends State<MCOverviewScreen> {
   final List<StreamSubscription<void>> messageSubscriptions = [];
   final playerReady = <bool>[false, false, false, false];
   String overviewMessage = 'Chờ máy chủ bắt đầu trận đấu';
@@ -44,40 +44,32 @@ class _OverviewState extends State<Overview> {
         case KLIMessageType.section:
           overviewMessage = 'Phần thi: ${m.message}';
           break;
-        case KLIMessageType.endMatch:
-          showPopupMessage(
-            context,
-            title: 'Match ended',
-            content: 'The match has ended for you. You can exit now.',
-          );
-          ended = true;
-          break;
         case KLIMessageType.startMatch:
           overviewMessage = 'Phần thi: khởi động';
           break;
         case KLIMessageType.enterStart:
           Navigator.of(context).pushReplacement<void, void>(
-            MaterialPageRoute(builder: (_) => PlayerStartScreen(playerPos: int.parse(m.message))),
+            MaterialPageRoute(builder: (_) => MCStartScreen(playerPos: int.parse(m.message))),
           );
           break;
         case KLIMessageType.enterObstacle:
           Navigator.of(context).pushReplacement<void, void>(
-            MaterialPageRoute(builder: (_) => const PlayerObstacleScreen()),
+            MaterialPageRoute(builder: (_) => const MCObstacleScreen()),
           );
           break;
         case KLIMessageType.enterAccel:
           Navigator.of(context).pushReplacement<void, void>(
-            MaterialPageRoute(builder: (_) => const PlayerAccelScreen()),
+            MaterialPageRoute(builder: (_) => const MCAccelScreen()),
           );
           break;
         case KLIMessageType.enterFinish:
           Navigator.of(context).pushReplacement<void, void>(
-            MaterialPageRoute(builder: (_) => PlayerFinishScreen(playerPos: int.parse(m.message))),
+            MaterialPageRoute(builder: (_) => MCFinishScreen(playerPos: int.parse(m.message))),
           );
           break;
         case KLIMessageType.enterExtra:
           Navigator.of(context).pushReplacement<void, void>(
-            MaterialPageRoute(builder: (_) => const PlayerExtraScreen()),
+            MaterialPageRoute(builder: (_) => const MCExtraScreen()),
           );
           break;
         default:

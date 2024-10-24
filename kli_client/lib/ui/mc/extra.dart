@@ -8,34 +8,32 @@ import 'overview.dart';
 import '../../global.dart';
 import '../../match_data.dart';
 
-class PlayerFinishScreen extends StatefulWidget {
-  final int playerPos;
-
-  const PlayerFinishScreen({super.key, required this.playerPos});
+class MCExtraScreen extends StatefulWidget {
+  final timeLimitSec = 15.0;
+  const MCExtraScreen({super.key});
 
   @override
-  State<PlayerFinishScreen> createState() => _PlayerFinishScreenState();
+  State<MCExtraScreen> createState() => _MCExtraScreenState();
 }
 
-class _PlayerFinishScreenState extends State<PlayerFinishScreen> {
-  double timeLimitSec = 1, currentTimeSec = 0;
-  bool canShowQuestion = false, canSteal = false;
-  late FinishQuestion currentQuestion;
+class _MCExtraScreenState extends State<MCExtraScreen> {
+  double currentTimeSec = 0;
+  bool canShowQuestion = false;
+  late ExtraQuestion currentQuestion;
   Timer? timer;
   late final StreamSubscription<KLISocketMessage> sub;
-  int questionNum = 0, stealer = -1;
+  int questionNum = 0;
 
   @override
   void initState() {
     super.initState();
     updateChild = () => setState(() {});
     sub = KLIClient.onMessageReceived.listen((m) {
-      if (m.type == KLIMessageType.finishQuestion) {
-        currentQuestion = FinishQuestion.fromJson(jsonDecode(m.message));
-        questionNum++;
+      if (m.type == KLIMessageType.extraQuestion) {
+        currentQuestion = ExtraQuestion.fromJson(jsonDecode(m.message));
         canShowQuestion = true;
-        timeLimitSec = currentTimeSec = currentQuestion.point / 10 * 5 + 5;
-        stealer = -1;
+        questionNum++;
+        currentTimeSec = widget.timeLimitSec;
       }
 
       if (m.type == KLIMessageType.continueTimer) {
@@ -50,6 +48,10 @@ class _PlayerFinishScreenState extends State<PlayerFinishScreen> {
         });
       }
 
+      if (m.type == KLIMessageType.stopTimer) {
+        timer?.cancel();
+      }
+
       if (m.type == KLIMessageType.scores) {
         int i = 0;
         for (int s in jsonDecode(m.message) as List) {
@@ -58,18 +60,9 @@ class _PlayerFinishScreenState extends State<PlayerFinishScreen> {
         }
       }
 
-      if (m.type == KLIMessageType.enableSteal) {
-        canSteal = true;
-      }
-
-      if (m.type == KLIMessageType.disableSteal) {
-        canSteal = false;
-        stealer = int.parse(m.message);
-      }
-
       if (m.type == KLIMessageType.endSection) {
         Navigator.of(context).pushReplacement<void, void>(
-          MaterialPageRoute(builder: (_) => const PlayerOverviewScreen()),
+          MaterialPageRoute(builder: (_) => const MCOverviewScreen()),
         );
       }
 
@@ -105,7 +98,18 @@ class _PlayerFinishScreenState extends State<PlayerFinishScreen> {
               ),
               Padding(
                 padding: const EdgeInsets.only(left: 48),
-                child: playerInfo(),
+                child: Container(
+                  padding: const EdgeInsets.only(top: 16, bottom: 8),
+                  constraints: const BoxConstraints(maxWidth: 200),
+                  alignment: Alignment.center,
+                  child: AnimatedCircularProgressBar(
+                    currentTimeSec: currentTimeSec,
+                    totalTimeSec: widget.timeLimitSec,
+                    strokeWidth: 20,
+                    valueColor: const Color(0xFF00A906),
+                    backgroundColor: Colors.red,
+                  ),
+                ),
               ),
             ],
           ),
@@ -126,11 +130,7 @@ class _PlayerFinishScreenState extends State<PlayerFinishScreen> {
               ),
               child: Container(
                 decoration: BoxDecoration(
-                  color: i == widget.playerPos
-                      ? Theme.of(context).colorScheme.primaryContainer
-                      : i == stealer
-                          ? Colors.yellow.shade800.withOpacity(0.7)
-                          : Colors.transparent,
+                  color: i == MatchData().playerPos ? Theme.of(context).colorScheme.primaryContainer : Colors.transparent,
                   border: BorderDirectional(
                     end: BorderSide(
                       color: i > 2 ? Colors.transparent : Theme.of(context).colorScheme.onBackground,
@@ -172,18 +172,6 @@ class _PlayerFinishScreenState extends State<PlayerFinishScreen> {
                         ),
                       )
                     : const SizedBox(),
-                Positioned(
-                  right: 0,
-                  child: canShowQuestion
-                      ? Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
-                          child: Text(
-                            '${currentQuestion.point} điểm',
-                            style: const TextStyle(fontSize: fontSizeLarge),
-                          ),
-                        )
-                      : const SizedBox(),
-                ),
                 Container(
                   decoration: const BoxDecoration(
                     border: BorderDirectional(
@@ -192,42 +180,33 @@ class _PlayerFinishScreenState extends State<PlayerFinishScreen> {
                   ),
                   padding: const EdgeInsets.symmetric(horizontal: 128),
                   alignment: Alignment.center,
-                  child: Text(
-                    canShowQuestion ? currentQuestion.question : '',
-                    textAlign: TextAlign.center,
-                    style: const TextStyle(fontSize: fontSizeLarge),
-                  ),
+                  child: canShowQuestion
+                      ? Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              currentQuestion.question,
+                              textAlign: TextAlign.center,
+                              style: const TextStyle(fontSize: fontSizeLarge),
+                            ),
+                            Text(
+                              currentQuestion.answer,
+                              textAlign: TextAlign.center,
+                              style: const TextStyle(
+                                fontSize: fontSizeMedium,
+                                fontStyle: FontStyle.italic,
+                              ),
+                            ),
+                          ],
+                        )
+                      : null,
                 ),
               ],
             ),
           ),
         ],
       ),
-    );
-  }
-
-  Widget playerInfo() {
-    return Column(
-      children: [
-        AnimatedCircularProgressBar(
-          currentTimeSec: currentTimeSec,
-          totalTimeSec: timeLimitSec,
-          strokeWidth: 20,
-          valueColor: const Color(0xFF00A906),
-          backgroundColor: Colors.red,
-        ),
-        const Expanded(child: SizedBox()),
-        KLIButton(
-          'Steal',
-          enableCondition: canSteal,
-          onPressed: () {
-            KLIClient.sendMessage(KLISocketMessage(
-              senderID: KLIClient.clientID!,
-              type: KLIMessageType.stealAnswer,
-            ));
-          },
-        ),
-      ],
     );
   }
 }

@@ -8,23 +8,21 @@ import 'overview.dart';
 import '../../global.dart';
 import '../../match_data.dart';
 
-class PlayerObstacleScreen extends StatefulWidget {
+class MCObstacleScreen extends StatefulWidget {
   final double timeLimitSec = 15;
 
-  const PlayerObstacleScreen({super.key});
+  const MCObstacleScreen({super.key});
 
   @override
-  State<PlayerObstacleScreen> createState() => _PlayerObstacleScreenState();
+  State<MCObstacleScreen> createState() => _MCObstacleScreenState();
 }
 
-class _PlayerObstacleScreenState extends State<PlayerObstacleScreen> {
+class _MCObstacleScreenState extends State<MCObstacleScreen> {
   double currentTimeSec = 15;
-  bool canShowQuestion = false, canAnswer = false, canGuessObstacle = false, eliminated = false;
-  String submittedAnswer = '';
+  bool canShowQuestion = false;
   late ObstacleQuestion currentQuestion;
   Timer? timer;
   late final StreamSubscription<KLISocketMessage> sub;
-  final answerTextController = TextEditingController();
 
   @override
   void initState() {
@@ -33,13 +31,11 @@ class _PlayerObstacleScreenState extends State<PlayerObstacleScreen> {
     sub = KLIClient.onMessageReceived.listen((m) {
       if (m.type == KLIMessageType.endSection) {
         Navigator.of(context).pushReplacement<void, void>(
-          MaterialPageRoute(builder: (_) => const PlayerOverviewScreen()),
+          MaterialPageRoute(builder: (_) => const MCOverviewScreen()),
         );
       }
 
       if (m.type == KLIMessageType.eliminated) {
-        eliminated = true;
-        canAnswer = canGuessObstacle = false;
         currentTimeSec = 0;
         timer?.cancel();
       }
@@ -53,50 +49,28 @@ class _PlayerObstacleScreenState extends State<PlayerObstacleScreen> {
       }
 
       if (m.type == KLIMessageType.obstacleQuestion) {
-        canGuessObstacle = true;
-        if (canAnswer) return;
-
+        // if (canAnswer) return;
         currentQuestion = ObstacleQuestion.fromJson(jsonDecode(m.message));
         canShowQuestion = true;
         setState(() {});
-
-        if (eliminated) return;
         createTimer();
-        canAnswer = true;
       }
 
       if (m.type == KLIMessageType.hideQuestion) {
-        answerTextController.text = '';
-        submittedAnswer = '';
         canShowQuestion = false;
-        if (!eliminated) currentTimeSec = 15;
+        currentTimeSec = 15;
       }
 
       setState(() {});
-
-      if (eliminated) {
-        setState(() {});
-        return;
-      }
 
       if (m.type == KLIMessageType.stopTimer) {
         timer?.cancel();
       }
 
       if (m.type == KLIMessageType.continueTimer) {
-        canGuessObstacle = true;
         createTimer();
       }
 
-      if (m.type == KLIMessageType.disableGuessObstacle) {
-        canGuessObstacle = false;
-      }
-
-      if (m.type == KLIMessageType.correctObstacleAnswer) {
-        canAnswer = canGuessObstacle = false;
-        timer?.cancel();
-      }
-      
       setState(() {});
     });
   }
@@ -112,7 +86,6 @@ class _PlayerObstacleScreenState extends State<PlayerObstacleScreen> {
     timer = Timer.periodic(1.seconds, (timer) {
       if (currentTimeSec <= 0) {
         timer.cancel();
-        canAnswer = false;
         setState(() {});
         return;
       }
@@ -138,17 +111,22 @@ class _PlayerObstacleScreenState extends State<PlayerObstacleScreen> {
             children: [
               Flexible(
                 flex: 9,
-                child: Column(
-                  children: [
-                    questionContainer(),
-                    const SizedBox(height: 32),
-                    answerInput(),
-                  ],
-                ),
+                child: questionContainer(),
               ),
               Padding(
                 padding: const EdgeInsets.only(left: 48),
-                child: playerInfo(),
+                child: Container(
+                  padding: const EdgeInsets.only(top: 16, bottom: 8),
+                  constraints: const BoxConstraints(maxWidth: 200),
+                  alignment: Alignment.topCenter,
+                  child: AnimatedCircularProgressBar(
+                    currentTimeSec: currentTimeSec,
+                    totalTimeSec: widget.timeLimitSec,
+                    strokeWidth: 20,
+                    valueColor: const Color(0xFF00A906),
+                    backgroundColor: Colors.red,
+                  ),
+                ),
               ),
             ],
           ),
@@ -219,10 +197,24 @@ class _PlayerObstacleScreenState extends State<PlayerObstacleScreen> {
                     padding: const EdgeInsets.symmetric(horizontal: 128),
                     alignment: Alignment.center,
                     child: canShowQuestion
-                        ? Text(
-                            currentQuestion.question,
-                            textAlign: TextAlign.center,
-                            style: const TextStyle(fontSize: fontSizeLarge),
+                        ? Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(
+                                currentQuestion.question,
+                                textAlign: TextAlign.center,
+                                style: const TextStyle(fontSize: fontSizeLarge),
+                              ),
+                              Text(
+                                currentQuestion.answer,
+                                textAlign: TextAlign.center,
+                                style: const TextStyle(
+                                  fontSize: fontSizeMedium,
+                                  fontStyle: FontStyle.italic,
+                                ),
+                              ),
+                            ],
                           )
                         : null,
                   ),
@@ -231,63 +223,6 @@ class _PlayerObstacleScreenState extends State<PlayerObstacleScreen> {
             ),
           ],
         ),
-      ),
-    );
-  }
-
-  Widget answerInput() {
-    return KLITextField(
-      readOnly: !canAnswer,
-      controller: answerTextController,
-      maxLines: 1,
-      hintText: 'Enter Answer and press Enter to submit',
-      onSubmitted: (text) {
-        submittedAnswer = text;
-        KLIClient.sendMessage(KLISocketMessage(
-          senderID: KLIClient.clientID!,
-          type: KLIMessageType.obstacleRowAnswer,
-          message: text,
-        ));
-      },
-    );
-  }
-
-  Widget playerInfo() {
-    return Container(
-      padding: const EdgeInsets.only(top: 16, bottom: 8),
-      constraints: const BoxConstraints(maxWidth: 200),
-      alignment: Alignment.center,
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          AnimatedCircularProgressBar(
-            currentTimeSec: currentTimeSec,
-            totalTimeSec: widget.timeLimitSec,
-            strokeWidth: 20,
-            valueColor: const Color(0xFF00A906),
-            backgroundColor: Colors.red,
-          ),
-          const SizedBox(height: 512),
-          KLIButton(
-            'Obstacle',
-            enableCondition: canGuessObstacle,
-            onPressed: () {
-              timer?.cancel();
-              KLIClient.sendMessage(KLISocketMessage(
-                senderID: KLIClient.clientID!,
-                type: KLIMessageType.guessObstacle,
-              ));
-              canGuessObstacle = false;
-              setState(() {});
-            },
-          ),
-          Text(
-            'Submitted:\n$submittedAnswer',
-            softWrap: true,
-            style: const TextStyle(fontSize: fontSizeMedium),
-            textAlign: TextAlign.center,
-          ),
-        ],
       ),
     );
   }

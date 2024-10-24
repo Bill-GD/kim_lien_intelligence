@@ -4,7 +4,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:kli_lib/kli_lib.dart';
 
-import '../../connect_screen/overview.dart';
+import 'overview.dart';
 import '../../global.dart';
 import '../../match_data.dart';
 
@@ -18,7 +18,7 @@ class PlayerExtraScreen extends StatefulWidget {
 
 class _PlayerExtraScreenState extends State<PlayerExtraScreen> {
   double currentTimeSec = 0;
-  bool canShowQuestion = false, canAnswer = false, alreadyAnswered = false, timeEnded = false;
+  bool canShowQuestion = false, canAnswer = false, alreadyAnswered = false;
   late ExtraQuestion currentQuestion;
   Timer? timer;
   late final StreamSubscription<KLISocketMessage> sub;
@@ -41,7 +41,6 @@ class _PlayerExtraScreenState extends State<PlayerExtraScreen> {
         timer = Timer.periodic(1.seconds, (timer) {
           if (currentTimeSec <= 0) {
             timer.cancel();
-            timeEnded = true;
             canAnswer = false;
             setState(() {});
             return;
@@ -66,7 +65,7 @@ class _PlayerExtraScreenState extends State<PlayerExtraScreen> {
 
       if (m.type == KLIMessageType.endSection) {
         Navigator.of(context).pushReplacement<void, void>(
-          MaterialPageRoute(builder: (_) => const Overview()),
+          MaterialPageRoute(builder: (_) => const PlayerOverviewScreen()),
         );
       }
 
