@@ -27,6 +27,9 @@ String getSizeString(int bytes) {
 }
 
 const String changelog = """
+  0.4.2 ({latest}):
+  - Moved cache location from local appdata to app folder
+
   0.4.1 ({260db35}):
   - Added audio for extra screen
   - Added audio for finish screen

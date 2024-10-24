@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:kli_lib/kli_lib.dart';
 import 'package:package_info_plus/package_info_plus.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
@@ -47,19 +48,8 @@ class _LoadingScreenState extends State<LoadingScreen> {
       bgDecorationImage = await getBackgroundWidget(assetHandler);
       await Future.delayed(widget.delayMilli);
 
-      cachePath = await StorageHandler.appCacheDirectory;
       setState(() => loadingText = 'Clearing cache...');
-      logHandler.info('Cache: $cachePath');
-      StorageHandler.clearCache();
-      StorageHandler().writeStringToFile(
-        '$cachePath\\cache.txt',
-        dedent('''
-        The folder(s) here are used for caching match data (names, images, videos)
-        so that the client app doesn't need to request new data every time joining a match.
-        '''),
-        createIfNotExists: true,
-        abortIfExists: true,
-      );
+      initCache();
       await Future.delayed(widget.delayMilli);
 
       setState(() => loadingText = 'Finished initialization');
@@ -134,5 +124,48 @@ class _LoadingScreenState extends State<LoadingScreen> {
               ),
       ),
     );
+  }
+
+  void initCache() {
+    cachePath = StorageHandler.clientMatchDataPath;
+    logHandler.info('Data path: $cachePath');
+
+    getApplicationCacheDirectory().then((oldCache) {
+      final newCache = Directory(cachePath);
+      if (newCache.existsSync()) {
+        oldCache.deleteSync(recursive: true);
+        return;
+      }
+      if (oldCache.existsSync()) {
+        // oldCache.renameSync(cachePath);
+        copyDirectory(oldCache.path, cachePath);
+
+        oldCache.deleteSync(recursive: true);
+        return;
+      }
+
+      newCache.createSync(recursive: true);
+      StorageHandler().writeStringToFile(
+        '$cachePath\\cache.txt',
+        dedent('''The folder(s) here are used for caching match data (names, images, videos)
+        so that the client app doesn't need to request new data every time joining a match.'''),
+        createIfNotExists: true,
+        abortIfExists: true,
+      );
+    });
+  }
+
+  void copyDirectory(String oldPath, String newPath) {
+    final oldDir = Directory(oldPath), newDir = Directory(newPath);
+
+    for (final m in oldDir.listSync()) {
+      if (m is File) {
+        final newFile = File(m.path.replaceAll(oldDir.path, newDir.path));
+        if (!newFile.existsSync()) newFile.createSync(recursive: true);
+        m.copySync(newFile.path);
+      } else {
+        copyDirectory(m.path, m.path.replaceAll(oldDir.path, newDir.path));
+      }
+    }
   }
 }

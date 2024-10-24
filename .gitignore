@@ -1,3 +1,4 @@
 .vscode/*
 kli_lib/*
 kli_lib
+*.exe

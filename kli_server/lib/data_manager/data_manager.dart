@@ -61,7 +61,7 @@ class DataManager {
 
     storageHandler.writeStringToFile(
       files[0],
-      jsonEncode(KLIMatch(name: name, playerList: [])),
+      jsonEncode(KLIMatch(name: name, playerList: List.generate(4, (_) => null))),
     );
   }
 
