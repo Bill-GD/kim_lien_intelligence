@@ -4,13 +4,14 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:kli_lib/kli_lib.dart';
 
-import 'overview.dart';
 import '../../global.dart';
 import '../../match_data.dart';
+import 'overview.dart';
 
 class MCExtraScreen extends StatefulWidget {
   final timeLimitSec = 15.0;
-  const MCExtraScreen({super.key});
+  final List<int> players;
+  const MCExtraScreen({super.key, required this.players});
 
   @override
   State<MCExtraScreen> createState() => _MCExtraScreenState();
@@ -98,17 +99,16 @@ class _MCExtraScreenState extends State<MCExtraScreen> {
               ),
               Padding(
                 padding: const EdgeInsets.only(left: 48),
-                child: Container(
-                  padding: const EdgeInsets.only(top: 16, bottom: 8),
-                  constraints: const BoxConstraints(maxWidth: 200),
-                  alignment: Alignment.center,
-                  child: AnimatedCircularProgressBar(
-                    currentTimeSec: currentTimeSec,
-                    totalTimeSec: widget.timeLimitSec,
-                    strokeWidth: 20,
-                    valueColor: const Color(0xFF00A906),
-                    backgroundColor: Colors.red,
-                  ),
+                child: Column(
+                  children: [
+                    AnimatedCircularProgressBar(
+                      currentTimeSec: currentTimeSec,
+                      totalTimeSec: widget.timeLimitSec,
+                      strokeWidth: 20,
+                      valueColor: const Color(0xFF00A906),
+                      backgroundColor: Colors.red,
+                    ),
+                  ],
                 ),
               ),
             ],
@@ -141,7 +141,10 @@ class _MCExtraScreenState extends State<MCExtraScreen> {
                 alignment: Alignment.center,
                 child: Text(
                   '${MatchData().players[i].name} (${MatchData().players[i].point})',
-                  style: const TextStyle(fontSize: fontSizeMedium),
+                  style: TextStyle(
+                    fontSize: fontSizeMedium,
+                    color: Colors.white.withOpacity(widget.players.contains(i) ? 1 : 0.35),
+                  ),
                 ),
               ),
             ),

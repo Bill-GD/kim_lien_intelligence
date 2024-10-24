@@ -104,7 +104,7 @@ class _KliClientAppState extends State<KliClientApp> {
               builder: (context, child) {
                 ErrorWidget.builder = (d) => WidgetErrorScreen(e: d);
                 updateDebugOverlay = () {
-                  setState(() {});
+                  if (context.mounted) setState(() {});
                 };
                 return Stack(
                   children: [

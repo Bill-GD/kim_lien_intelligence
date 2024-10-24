@@ -101,7 +101,7 @@ class _KliServerAppState extends State<KliServerApp> {
               ErrorWidget.builder = (errorDetails) => WidgetErrorScreen(e: errorDetails);
               updateDebugOverlay = () {
                 // logHandler.info('Updating debug overlay');
-                setState(() {});
+                if (context.mounted) setState(() {});
               };
               return Stack(
                 children: [

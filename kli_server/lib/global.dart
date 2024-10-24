@@ -114,7 +114,7 @@ class DataSize {
 }
 
 const String changelog = """
-  0.4.5.6 ({latest}):
+  0.4.5.6 ({1090754}):
   - Reworked DataManager
   - Saved data is now separated by match name
   - Some short text input is now limited to 1 line

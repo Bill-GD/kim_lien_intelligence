@@ -69,7 +69,11 @@ class _MCOverviewScreenState extends State<MCOverviewScreen> {
           break;
         case KLIMessageType.enterExtra:
           Navigator.of(context).pushReplacement<void, void>(
-            MaterialPageRoute(builder: (_) => const MCExtraScreen()),
+            MaterialPageRoute(
+              builder: (_) => MCExtraScreen(
+                players: jsonDecode(m.message).cast<int>(),
+              ),
+            ),
           );
           break;
         default:

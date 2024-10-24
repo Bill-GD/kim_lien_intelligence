@@ -4,9 +4,9 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:kli_lib/kli_lib.dart';
 
-import 'overview.dart';
 import '../../global.dart';
 import '../../match_data.dart';
+import 'overview.dart';
 
 class MCFinishScreen extends StatefulWidget {
   final int playerPos;
@@ -100,17 +100,16 @@ class _MCFinishScreenState extends State<MCFinishScreen> {
               ),
               Padding(
                 padding: const EdgeInsets.only(left: 48),
-                child: Container(
-                  padding: const EdgeInsets.only(top: 16, bottom: 8),
-                  constraints: const BoxConstraints(maxWidth: 200),
-                  alignment: Alignment.center,
-                  child: AnimatedCircularProgressBar(
-                    currentTimeSec: currentTimeSec,
-                    totalTimeSec: timeLimitSec,
-                    strokeWidth: 20,
-                    valueColor: const Color(0xFF00A906),
-                    backgroundColor: Colors.red,
-                  ),
+                child: Column(
+                  children: [
+                    AnimatedCircularProgressBar(
+                      currentTimeSec: currentTimeSec,
+                      totalTimeSec: timeLimitSec,
+                      strokeWidth: 20,
+                      valueColor: const Color(0xFF00A906),
+                      backgroundColor: Colors.red,
+                    ),
+                  ],
                 ),
               ),
             ],
