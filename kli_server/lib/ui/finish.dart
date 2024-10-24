@@ -346,7 +346,7 @@ class _FinishScreenState extends State<FinishScreen> {
                   type: KLIMessageType.scores,
                 ));
                 audioHandler.play(assetHandler.finishCorrect);
-                KLIServer.sendToAllClients(KLISocketMessage(
+                KLIServer.sendToNonPlayer(KLISocketMessage(
                   senderID: ConnectionID.host,
                   type: KLIMessageType.playAudio,
                   message: assetHandler.finishCorrect,
@@ -377,7 +377,7 @@ class _FinishScreenState extends State<FinishScreen> {
                   ));
                 }
                 audioHandler.play(assetHandler.finishIncorrect);
-                KLIServer.sendToAllClients(KLISocketMessage(
+                KLIServer.sendToNonPlayer(KLISocketMessage(
                   senderID: ConnectionID.host,
                   type: KLIMessageType.playAudio,
                   message: assetHandler.finishIncorrect,
@@ -435,7 +435,7 @@ class _FinishScreenState extends State<FinishScreen> {
                   canSelectPoint = !canSelectQuestion;
                   if (!canSelectPoint) {
                     audioHandler.play(assetHandler.finishChosePack);
-                    KLIServer.sendToAllClients(KLISocketMessage(
+                    KLIServer.sendToNonPlayer(KLISocketMessage(
                       senderID: ConnectionID.host,
                       type: KLIMessageType.playAudio,
                       message: assetHandler.finishChosePack,

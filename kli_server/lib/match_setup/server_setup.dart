@@ -264,7 +264,9 @@ class _ServerSetupState extends State<ServerSetup> {
     subscriptions.add(KLIServer.onMessageReceived.listen((m) {
       if (m.type == KLIMessageType.dataSize) {
         final id = m.senderID.name;
-        id.contains('player') ? MatchState.sendPlayerData(m.senderID, false, storageHandler.playerData) : MatchState.sendMatchData(m.senderID, false, storageHandler.matchData);
+        id.contains('player') || id.contains('mc') //
+            ? MatchState.sendPlayerData(m.senderID, false, storageHandler.playerData)
+            : MatchState.sendMatchData(m.senderID, false, storageHandler.matchData);
       }
 
       if (m.type == KLIMessageType.matchName) {

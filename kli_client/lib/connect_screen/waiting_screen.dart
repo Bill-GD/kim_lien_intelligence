@@ -123,7 +123,7 @@ class _WaitingScreenState extends State<WaitingScreen> {
                           setState(() => progressMessage = 'Requesting data of "$matchName"...');
                           KLIClient.sendMessage(KLISocketMessage(
                             senderID: KLIClient.clientID!,
-                            type: KLIClient.isPlayer //
+                            type: KLIClient.isPlayer || KLIClient.isMC //
                                 ? KLIMessageType.playerData
                                 : KLIMessageType.matchData,
                           ));
@@ -191,7 +191,7 @@ class _WaitingScreenState extends State<WaitingScreen> {
       );
       return;
     }
-    if (KLIClient.clientID!.name.contains('mc')) {
+    if (KLIClient.isMC) {
       Navigator.of(context).pushReplacement<void, void>(
         MaterialPageRoute<void>(builder: (context) => const MCOverviewScreen()),
       );
@@ -203,7 +203,7 @@ class _WaitingScreenState extends State<WaitingScreen> {
   }
 
   bool checkCache() {
-    if (KLIClient.isPlayer) {
+    if (KLIClient.isPlayer || KLIClient.isMC) {
       if (File('$cachePath\\$matchName\\player\\size.txt').existsSync() && File('$cachePath\\$matchName\\player\\names.txt').existsSync()) {
         final s = StorageHandler().readFromFile('$cachePath\\$matchName\\player\\size.txt');
         final n = StorageHandler().readFromFile('$cachePath\\$matchName\\player\\names.txt').split('|');
@@ -295,7 +295,7 @@ class _WaitingScreenState extends State<WaitingScreen> {
 
     for (var e in d.entries) {
       if (e.key.contains('pn')) {
-        final pos = int.parse(e.key.split('_').last);
+        final pos = int.parse(e.key.split('_').last.characters.first);
         n[pos] = e.value;
       }
 

@@ -4,9 +4,9 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:kli_lib/kli_lib.dart';
 
-import 'overview.dart';
 import '../../global.dart';
 import '../../match_data.dart';
+import 'overview.dart';
 
 class MCStartScreen extends StatefulWidget {
   final double timeLimitSec = 60;
@@ -123,7 +123,7 @@ class _MCStartScreenState extends State<MCStartScreen> {
               ),
               child: Container(
                 decoration: BoxDecoration(
-                  color: Colors.transparent,
+                  color: i == widget.playerPos ? Theme.of(context).colorScheme.primaryContainer : Colors.transparent,
                   border: BorderDirectional(
                     end: BorderSide(color: Theme.of(context).colorScheme.onBackground),
                   ),
