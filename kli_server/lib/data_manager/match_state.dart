@@ -29,12 +29,8 @@ class MatchState {
   static void instantiate(String matchName) {
     if (_inst != null && _inst!.match.name == matchName) return;
 
-    final value = storageHandler.readFromFile(storageHandler.matchSaveFile);
-
-    final newMatch = KLIMatch.fromJson((jsonDecode(value) as Iterable).firstWhere(
-      (e) => e['name'] == matchName,
-      orElse: () => throw Exception('Match not found'),
-    ));
+    final savedData = storageHandler.readFromFile(storageHandler.matchSaveFile(matchName));
+    final newMatch = KLIMatch.fromJson((jsonDecode(savedData)));
 
     _inst = MatchState._internal(newMatch);
     _inst!.imagePartOrder.shuffle();

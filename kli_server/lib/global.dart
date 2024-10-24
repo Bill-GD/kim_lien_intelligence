@@ -115,7 +115,8 @@ class DataSize {
 
 const String changelog = """
   0.4.5.6 ({latest}):
-  - Updated to use reworked DataManager
+  - Reworked DataManager
+  - Saved data is now separated by match name
 
   0.4.5.5 ({2c329e0}):
   - Highlights players participating in Extra

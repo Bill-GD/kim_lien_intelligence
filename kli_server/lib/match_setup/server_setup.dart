@@ -92,6 +92,7 @@ class _ServerSetupState extends State<ServerSetup> {
                   const Text('obstacle: oi'),
                   const Text('accel: ai_<q>_<i>'),
                   const Text('finish: f_<path>'),
+                  const Text(''),
                   Text('Match data: ${DataSize.matchActualDataSize}'),
                   Text('Match msg data: ${DataSize.matchMessageSize}'),
                   Text('Player data: ${DataSize.playerActualDataSize}'),

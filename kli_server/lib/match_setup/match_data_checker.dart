@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -52,9 +51,7 @@ class _MatchDataCheckerState extends State<MatchDataChecker> {
   @override
   Widget build(BuildContext context) {
     return CallbackShortcuts(
-      bindings: <ShortcutActivator, VoidCallback>{
-        const SingleActivator(LogicalKeyboardKey.escape): exitHandler
-      },
+      bindings: <ShortcutActivator, VoidCallback>{const SingleActivator(LogicalKeyboardKey.escape): exitHandler},
       child: Focus(
         autofocus: true,
         child: Container(
@@ -182,9 +179,10 @@ class _MatchDataCheckerState extends State<MatchDataChecker> {
   (bool, List<String>) checkMatch() {
     final errorList = <String>[];
 
-    final match = (jsonDecode(storageHandler.readFromFile(storageHandler.matchSaveFile)) as List)
-        .map((e) => KLIMatch.fromJson(e))
-        .firstWhere((e) => e.name == matchNames[selectedMatchIndex]);
+    // final match = (jsonDecode(storageHandler.readFromFile(storageHandler.matchSaveFile)) as List)
+    //     .map((e) => KLIMatch.fromJson(e))
+    //     .firstWhere((e) => e.name == matchNames[selectedMatchIndex]);
+    final match = DataManager.getMatch(matchNames[selectedMatchIndex]);
 
     if (!match.playerList.every((e) => e != null)) {
       errorList.add('Không đủ thông tin 4 thí sinh');
@@ -219,7 +217,10 @@ class _MatchDataCheckerState extends State<MatchDataChecker> {
             errorList.add('Thí sinh $i:');
             errorList.add('  + Chưa có ${misingSubjects.join(', ')}');
           }
-          if (qList.length < 20) errorList.add('  + Ít hơn 20 câu hỏi');
+          if (qList.length < 20) {
+            if (misingSubjects.isEmpty) errorList.add('Thí sinh $i:');
+            errorList.add('  + Ít hơn 20 câu hỏi: ${qList.length}');
+          }
         } on RangeError {
           errorList.add('Thí sinh $i: chưa có câu hỏi');
         }
@@ -268,8 +269,7 @@ class _MatchDataCheckerState extends State<MatchDataChecker> {
 
         final missing = q.imagePaths.where((e) => !File(StorageHandler.getFullPath(e)).existsSync());
         if (missing.isNotEmpty) {
-          errorList
-              .add('Câu $i (${AccelQuestion.mapTypeDisplay(q.type)}): Không tìm thấy ${missing.join(', ')}');
+          errorList.add('Câu $i (${AccelQuestion.mapTypeDisplay(q.type)}): Không tìm thấy ${missing.join(', ')}');
         }
       }
     } on StateError {

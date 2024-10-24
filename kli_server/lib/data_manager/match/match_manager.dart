@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -25,18 +24,10 @@ class _MatchManagerState extends State<MatchManager> {
     super.initState();
     logHandler.info('Opened Match Manager');
 
-    final value = storageHandler.readFromFile(storageHandler.matchSaveFile);
-    if (value.isNotEmpty) {
-      matches = (jsonDecode(value) as List).map((e) => KLIMatch.fromJson(e)).toList();
-      currentMatchIndex = -1;
-      setState(() {});
-    }
+    matches = DataManager.getAllMatches();
+    currentMatchIndex = -1;
     setState(() => isLoading = false);
     logHandler.info('Loaded ${matches.length} matches');
-  }
-
-  void overwriteSave() {
-    storageHandler.writeStringToFile(storageHandler.matchSaveFile, jsonEncode(matches));
   }
 
   @override
@@ -105,7 +96,7 @@ class _MatchManagerState extends State<MatchManager> {
 
               if (newMatch != null) {
                 matches.add(newMatch);
-                overwriteSave();
+                DataManager.addMatch(newMatch.name);
                 setState(() {});
               }
             },
@@ -131,7 +122,7 @@ class _MatchManagerState extends State<MatchManager> {
                 String oldName = matches[currentMatchIndex].name;
                 bool changedName = newMatch.name != oldName;
                 matches[currentMatchIndex] = newMatch;
-                overwriteSave();
+                DataManager.updateMatch(newMatch);
                 if (changedName) {
                   DataManager.changeMatchName(oldName: oldName, newName: newMatch.name);
                 }
@@ -150,8 +141,8 @@ class _MatchManagerState extends State<MatchManager> {
                 acceptLogMessage: 'Removed match: ${matches[currentMatchIndex].name}',
                 onAccept: () async {
                   if (mounted) showToastMessage(context, 'Đã xóa trận: ${matches[currentMatchIndex].name}');
+                  DataManager.deleteMatch(matches[currentMatchIndex].name);
                   matches.removeAt(currentMatchIndex);
-                  overwriteSave();
                   setState(() => currentMatchIndex = -1);
                 },
               );
