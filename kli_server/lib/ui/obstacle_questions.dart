@@ -82,7 +82,7 @@ class _ObstacleQuestionScreenState extends State<ObstacleQuestionScreen> {
                 'Correct',
                 onPressed: () {
                   audioHandler.play(assetHandler.obsCorrectObstacle);
-                  KLIServer.sendToNonPlayer(KLISocketMessage(
+                  KLIServer.sendToViewers(KLISocketMessage(
                     senderID: ConnectionID.host,
                     type: KLIMessageType.playAudio,
                     message: assetHandler.obsCorrectObstacle,
@@ -94,7 +94,7 @@ class _ObstacleQuestionScreenState extends State<ObstacleQuestionScreen> {
                 'Wrong',
                 onPressed: () {
                   audioHandler.play(assetHandler.obsIncorrectObstacle);
-                  KLIServer.sendToNonPlayer(KLISocketMessage(
+                  KLIServer.sendToViewers(KLISocketMessage(
                     senderID: ConnectionID.host,
                     type: KLIMessageType.playAudio,
                     message: assetHandler.obsIncorrectObstacle,
@@ -197,7 +197,7 @@ class _ObstacleQuestionScreenState extends State<ObstacleQuestionScreen> {
                     ? assetHandler.obsCorrectRow
                     : assetHandler.obsIncorrectRow;
                 audioHandler.play(a);
-                KLIServer.sendToNonPlayer(KLISocketMessage(
+                KLIServer.sendToViewers(KLISocketMessage(
                   senderID: ConnectionID.host,
                   type: KLIMessageType.playAudio,
                   message: a,

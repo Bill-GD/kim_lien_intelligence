@@ -114,10 +114,11 @@ class DataSize {
 }
 
 const String changelog = """
-  0.4.5.6 ({1090754}):
+  0.4.5.6 ({latest}):
   - Reworked DataManager
   - Saved data is now separated by match name
   - Some short text input is now limited to 1 line
+  - Fixed play audio message is sent to MC
 
   0.4.5.5 ({2c329e0}):
   - Highlights players participating in Extra

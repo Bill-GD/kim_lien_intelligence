@@ -241,7 +241,7 @@ class _StartScreenState extends State<StartScreen> {
               onPressed: () {
                 audioHandler.play(assetHandler.startIncorrect);
                 nextQuestion();
-                KLIServer.sendToNonPlayer(KLISocketMessage(
+                KLIServer.sendToViewers(KLISocketMessage(
                   senderID: ConnectionID.host,
                   type: KLIMessageType.playAudio,
                   message: assetHandler.startIncorrect,
@@ -301,7 +301,7 @@ class _StartScreenState extends State<StartScreen> {
               'Start',
               enableCondition: !started,
               onPressed: () {
-                KLIServer.sendToNonPlayer(KLISocketMessage(
+                KLIServer.sendToViewers(KLISocketMessage(
                   senderID: ConnectionID.host,
                   type: KLIMessageType.playAudio,
                   message: assetHandler.startShowQuestions,
@@ -309,7 +309,7 @@ class _StartScreenState extends State<StartScreen> {
                 audioHandler.play(assetHandler.startShowQuestions);
 
                 Future.delayed(4.7.seconds, () {
-                  KLIServer.sendToNonPlayer(KLISocketMessage(
+                  KLIServer.sendToViewers(KLISocketMessage(
                     senderID: ConnectionID.host,
                     type: KLIMessageType.playAudio,
                     message: assetHandler.startBackground,

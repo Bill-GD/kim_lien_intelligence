@@ -153,7 +153,7 @@ class _MatchOverviewState extends State<MatchOverview> {
               }
               if (MatchState().startOrFinishPos == 0) {
                 audioHandler.play(assetHandler.startStart);
-                KLIServer.sendToNonPlayer(KLISocketMessage(
+                KLIServer.sendToViewers(KLISocketMessage(
                   senderID: ConnectionID.host,
                   type: KLIMessageType.playAudio,
                   message: assetHandler.startStart,
@@ -240,7 +240,7 @@ class _MatchOverviewState extends State<MatchOverview> {
             onPressed: () async {
               if (MatchState().finishPlayerDone.where((e) => e).isEmpty) {
                 audioHandler.play(assetHandler.finishStart);
-                KLIServer.sendToNonPlayer(KLISocketMessage(
+                KLIServer.sendToViewers(KLISocketMessage(
                   senderID: ConnectionID.host,
                   type: KLIMessageType.playAudio,
                   message: assetHandler.finishStart,

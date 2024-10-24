@@ -71,7 +71,7 @@ class _FinishScreenState extends State<FinishScreen> {
                 'Correct',
                 onPressed: () {
                   audioHandler.play(assetHandler.finishCorrect);
-                  KLIServer.sendToNonPlayer(KLISocketMessage(
+                  KLIServer.sendToViewers(KLISocketMessage(
                     senderID: ConnectionID.host,
                     type: KLIMessageType.playAudio,
                     message: assetHandler.finishCorrect,
@@ -83,7 +83,7 @@ class _FinishScreenState extends State<FinishScreen> {
                 'Wrong',
                 onPressed: () {
                   audioHandler.play(assetHandler.finishIncorrect);
-                  KLIServer.sendToNonPlayer(KLISocketMessage(
+                  KLIServer.sendToViewers(KLISocketMessage(
                     senderID: ConnectionID.host,
                     type: KLIMessageType.playAudio,
                     message: assetHandler.finishIncorrect,
@@ -346,7 +346,7 @@ class _FinishScreenState extends State<FinishScreen> {
                   type: KLIMessageType.scores,
                 ));
                 audioHandler.play(assetHandler.finishCorrect);
-                KLIServer.sendToNonPlayer(KLISocketMessage(
+                KLIServer.sendToViewers(KLISocketMessage(
                   senderID: ConnectionID.host,
                   type: KLIMessageType.playAudio,
                   message: assetHandler.finishCorrect,
@@ -377,7 +377,7 @@ class _FinishScreenState extends State<FinishScreen> {
                   ));
                 }
                 audioHandler.play(assetHandler.finishIncorrect);
-                KLIServer.sendToNonPlayer(KLISocketMessage(
+                KLIServer.sendToViewers(KLISocketMessage(
                   senderID: ConnectionID.host,
                   type: KLIMessageType.playAudio,
                   message: assetHandler.finishIncorrect,
@@ -435,7 +435,7 @@ class _FinishScreenState extends State<FinishScreen> {
                   canSelectPoint = !canSelectQuestion;
                   if (!canSelectPoint) {
                     audioHandler.play(assetHandler.finishChosePack);
-                    KLIServer.sendToNonPlayer(KLISocketMessage(
+                    KLIServer.sendToViewers(KLISocketMessage(
                       senderID: ConnectionID.host,
                       type: KLIMessageType.playAudio,
                       message: assetHandler.finishChosePack,
@@ -523,7 +523,7 @@ class _FinishScreenState extends State<FinishScreen> {
                 chosenStar = !chosenStar;
                 if (chosenStar) {
                   audioHandler.play(assetHandler.finishChoseStar);
-                  KLIServer.sendToNonPlayer(KLISocketMessage(
+                  KLIServer.sendToViewers(KLISocketMessage(
                     senderID: ConnectionID.host,
                     type: KLIMessageType.playAudio,
                     message: assetHandler.finishChoseStar,

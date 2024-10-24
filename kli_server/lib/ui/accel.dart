@@ -120,7 +120,7 @@ class _AccelScreenState extends State<AccelScreen> {
                     ? assetHandler.accelCorrect
                     : assetHandler.accelIncorrect;
                 audioHandler.play(a);
-                KLIServer.sendToNonPlayer(KLISocketMessage(
+                KLIServer.sendToViewers(KLISocketMessage(
                   senderID: ConnectionID.host,
                   type: KLIMessageType.playAudio,
                   message: a,
