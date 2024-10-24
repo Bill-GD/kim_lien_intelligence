@@ -27,7 +27,6 @@ class _FinishManagerState extends State<FinishManager> {
     selectedMatch = FinishMatch.empty();
     matchNames = DataManager.getMatchNames();
     setState(() => isLoading = false);
-    DataManager.removeDeletedMatchQuestions<FinishMatch>();
   }
 
   @override
@@ -107,7 +106,7 @@ class _FinishManagerState extends State<FinishManager> {
           matchSelector(matchNames, (value) async {
             logHandler.info('Selected match: $value');
             hasSelectedMatch = value != null;
-            selectedMatch = DataManager.getMatchQuestions<FinishMatch>(value!);
+            selectedMatch = DataManager.getSectionQuestionsOfMatch<FinishMatch>(value!);
             setState(() {});
           }),
           // sort point
@@ -143,7 +142,7 @@ class _FinishManagerState extends State<FinishManager> {
               ));
               if (newQ != null) {
                 selectedMatch.questions.add(newQ);
-                DataManager.updateQuestions<FinishMatch>(selectedMatch);
+                DataManager.updateSectionDataOfMatch<FinishMatch>(selectedMatch);
               }
               setState(() {});
             },
@@ -170,7 +169,7 @@ class _FinishManagerState extends State<FinishManager> {
               if (data == null) return;
 
               getNewQuestion(data);
-              DataManager.saveNewQuestions<FinishMatch>(selectedMatch);
+              DataManager.updateSectionDataOfMatch<FinishMatch>(selectedMatch);
               setState(() {});
             },
           ),
@@ -188,7 +187,7 @@ class _FinishManagerState extends State<FinishManager> {
                   if (mounted) {
                     showToastMessage(context, 'Đã xóa (match: ${selectedMatch.matchName})');
                   }
-                  DataManager.removeQuestionsOfMatch<FinishMatch>(selectedMatch);
+                  DataManager.removeSectionDataOfMatch<FinishMatch>(selectedMatch);
                   selectedMatch = FinishMatch.empty();
                   setState(() {});
                 },
@@ -255,7 +254,7 @@ class _FinishManagerState extends State<FinishManager> {
                                 acceptLogMessage: 'Removed finish question (p=${q.$2.point})',
                                 onAccept: () async {
                                   selectedMatch.questions.removeAt(q.$1);
-                                  DataManager.updateQuestions<FinishMatch>(selectedMatch);
+                                  DataManager.updateSectionDataOfMatch<FinishMatch>(selectedMatch);
                                   setState(() {});
                                 },
                               );
@@ -275,7 +274,7 @@ class _FinishManagerState extends State<FinishManager> {
 
                         if (newQ != null) {
                           selectedMatch.questions[q.$1] = newQ;
-                          DataManager.updateQuestions<FinishMatch>(selectedMatch);
+                          DataManager.updateSectionDataOfMatch<FinishMatch>(selectedMatch);
                         }
                         setState(() {});
                       },

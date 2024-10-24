@@ -1,64 +1,18 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:kli_lib/kli_lib.dart';
 
 import '../global.dart';
 
 class DataManager {
-  static String _mapTypeToFile(Type type) {
-    if (type == StartMatch) return storageHandler.startSaveFile;
-    if (type == ObstacleMatch) return storageHandler.obstacleSaveFile;
-    if (type == AccelMatch) return storageHandler.accelSaveFile;
-    if (type == FinishMatch) return storageHandler.finishSaveFile;
-    if (type == ExtraMatch) return storageHandler.extraSaveFile;
+  static String _mapTypeToFile(Type type, String match) {
+    if (type == StartMatch) return storageHandler.startSaveFile(match);
+    if (type == ObstacleMatch) return storageHandler.obstacleSaveFile(match);
+    if (type == AccelMatch) return storageHandler.accelSaveFile(match);
+    if (type == FinishMatch) return storageHandler.finishSaveFile(match);
+    if (type == ExtraMatch) return storageHandler.extraSaveFile(match);
     throw Exception('Unknown type');
-  }
-
-  static List<T> getAllSavedQuestions<T extends BaseMatch>() {
-    logHandler.info('Getting all saved $T questions');
-    final saved = storageHandler.readFromFile(_mapTypeToFile(T));
-    if (saved.isEmpty) return <T>[];
-
-    List<T> q = [];
-    try {
-      q = (jsonDecode(saved) as List).map((j) => BaseMatch.fromJson<T>(j)).toList();
-    } on Exception catch (e, stack) {
-      logHandler.error('$e', stackTrace: stack);
-    }
-    return q;
-  }
-
-  static void updateQuestions<T extends BaseMatch>(T match) {
-    logHandler.info('Updating questions of match: ${match.matchName}');
-    final saved = getAllSavedQuestions<T>();
-    saved.removeWhere((e) => e.matchName == match.matchName);
-    saved.add(match);
-    overwriteSave(saved, _mapTypeToFile(T));
-  }
-
-  static void updateAllQuestionMatchName({required String oldName, required String newName}) {
-    logHandler.info(
-      'Match name update detected. Updating match name of all questions (\'$oldName\' -> \'$newName\')',
-    );
-
-    List<Type> types = [StartMatch, ObstacleMatch, AccelMatch, FinishMatch, ExtraMatch];
-
-    for (final type in types) {
-      List<BaseMatch> m = switch (type) {
-        StartMatch => getAllSavedQuestions<StartMatch>(),
-        ObstacleMatch => getAllSavedQuestions<ObstacleMatch>(),
-        AccelMatch => getAllSavedQuestions<AccelMatch>(),
-        FinishMatch => getAllSavedQuestions<FinishMatch>(),
-        ExtraMatch => getAllSavedQuestions<ExtraMatch>(),
-        _ => throw Exception('Unknown type'),
-      };
-
-      for (final e in m) {
-        if (e.matchName == oldName) e.matchName = newName;
-      }
-      overwriteSave(m, _mapTypeToFile(type));
-      logHandler.info('Updated $type');
-    }
   }
 
   static List<String> getMatchNames() {
@@ -70,45 +24,73 @@ class DataManager {
     return matchNames;
   }
 
-  static void saveNewQuestions<T extends BaseMatch>(T selectedMatch) {
-    logHandler.info('Saving new questions of match: ${selectedMatch.matchName}');
-    final saved = getAllSavedQuestions<T>();
-    saved.removeWhere((e) => e.matchName == selectedMatch.matchName);
-    saved.add(selectedMatch);
-    overwriteSave(saved, _mapTypeToFile(T));
-  }
-
-  static void removeDeletedMatchQuestions<T extends BaseMatch>() {
-    logHandler.info('Removing questions of deleted matches');
-    final matchNames = getMatchNames();
-    final saved = (getAllSavedQuestions<T>()).where((e) => matchNames.contains(e.matchName)).toList();
-    overwriteSave(saved, _mapTypeToFile(T));
-  }
-
-  static void removeQuestionsOfMatch<T extends BaseMatch>(T match) {
-    logHandler.info('Removing all questions of match: ${match.matchName}');
-    final saved = (getAllSavedQuestions<T>())..removeWhere((e) => e.matchName == match.matchName);
-    overwriteSave(saved, _mapTypeToFile(T));
-  }
-
-  static T getMatchQuestions<T extends BaseMatch>(String matchName) {
-    final saved = getAllSavedQuestions<T>();
+  static T getSectionQuestionsOfMatch<T extends BaseMatch>(String matchName) {
+    logHandler.info('Getting all saved $T questions');
+    final saved = storageHandler.readFromFile(_mapTypeToFile(T, matchName));
     if (saved.isEmpty) return BaseMatch.empty<T>(matchName);
 
-    T selectedMatch;
-
+    T q = BaseMatch.empty<T>(matchName);
     try {
-      selectedMatch = saved.firstWhere((e) => e.matchName == matchName);
+      q = BaseMatch.fromJson<T>(json.decode(saved));
       logHandler.info("Loaded questions of $T named '$matchName'");
-    } on StateError {
-      logHandler.info("$T named '$matchName' not found, temp empty match created");
-      selectedMatch = BaseMatch.empty<T>(matchName);
+    } on Exception catch (e, stack) {
+      logHandler.error('$e', stackTrace: stack);
     }
-    return selectedMatch;
+    return q;
   }
 
-  static void overwriteSave<T>(List<T> q, String filePath) {
+  static void changeMatchName({required String oldName, required String newName}) {
+    logHandler.info(
+      'Match name update detected. Updating match name of all questions (\'$oldName\' -> \'$newName\')',
+    );
+
+    List<Type> types = [StartMatch, ObstacleMatch, AccelMatch, FinishMatch, ExtraMatch];
+
+    for (final type in types) {
+      BaseMatch m = switch (type) {
+        StartMatch => getSectionQuestionsOfMatch<StartMatch>(oldName),
+        ObstacleMatch => getSectionQuestionsOfMatch<ObstacleMatch>(oldName),
+        AccelMatch => getSectionQuestionsOfMatch<AccelMatch>(oldName),
+        FinishMatch => getSectionQuestionsOfMatch<FinishMatch>(oldName),
+        ExtraMatch => getSectionQuestionsOfMatch<ExtraMatch>(oldName),
+        _ => throw Exception('Unknown type'),
+      };
+
+      m.matchName = newName;
+
+      // overwriteSave('', _mapTypeToFile(type, oldName));
+      overwriteSave(jsonEncode(m), _mapTypeToFile(type, newName));
+      logHandler.info('Updated $type');
+    }
+    Directory('${storageHandler.saveDataDir}\\$oldName').deleteSync(recursive: true);
+  }
+
+  static void updateSectionDataOfMatch<T extends BaseMatch>(T match) {
+    logHandler.info('Saving new questions of match: ${match.matchName}');
+    overwriteSave(jsonEncode(match), _mapTypeToFile(T, match.matchName));
+  }
+
+  static void removeSectionDataOfMatch<T extends BaseMatch>(T match) {
+    logHandler.info('Removing all questions of match: ${match.matchName}');
+    overwriteSave('', _mapTypeToFile(T, match.matchName));
+  }
+
+  static void removeDeletedMatchData() {
+    logHandler.info('Removing data of deleted matches');
+    final matchNames = getMatchNames();
+    final savedMatchNames = Directory(storageHandler.saveDataDir) //
+        .listSync()
+        .map((e) => e.path.split('\\').last)
+        .where((e) => !e.contains('match'));
+
+    for (final matchName in savedMatchNames) {
+      if (matchNames.contains(matchName)) continue;
+      Directory('${storageHandler.saveDataDir}\\$matchName').deleteSync(recursive: true);
+    }
+  }
+
+  static void overwriteSave<T>(String json, String filePath) {
     logHandler.info('Overwriting save');
-    storageHandler.writeStringToFile(filePath, jsonEncode(q));
+    storageHandler.writeStringToFile(filePath, json, createIfNotExists: true);
   }
 }

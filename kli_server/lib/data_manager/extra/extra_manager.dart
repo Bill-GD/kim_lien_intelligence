@@ -25,7 +25,6 @@ class _ExtraManagerState extends State<ExtraManager> {
     selectedMatch = ExtraMatch.empty();
     matchNames = DataManager.getMatchNames();
     setState(() => isLoading = false);
-    DataManager.removeDeletedMatchQuestions<ExtraMatch>();
   }
 
   void getNewQuestion(Map<String, dynamic> data) {
@@ -91,7 +90,7 @@ class _ExtraManagerState extends State<ExtraManager> {
           matchSelector(matchNames, (value) async {
             logHandler.info('Selected match: $value');
             hasSelectedMatch = value != null;
-            selectedMatch = DataManager.getMatchQuestions(value!);
+            selectedMatch = DataManager.getSectionQuestionsOfMatch(value!);
             setState(() {});
           }),
           KLIButton(
@@ -108,7 +107,7 @@ class _ExtraManagerState extends State<ExtraManager> {
               ));
               if (newQ != null) {
                 selectedMatch.questions.add(newQ);
-                DataManager.updateQuestions<ExtraMatch>(selectedMatch);
+                DataManager.updateSectionDataOfMatch<ExtraMatch>(selectedMatch);
               }
               setState(() {});
             },
@@ -135,7 +134,7 @@ class _ExtraManagerState extends State<ExtraManager> {
               if (data == null) return;
 
               getNewQuestion(data);
-              DataManager.saveNewQuestions<ExtraMatch>(selectedMatch);
+              DataManager.updateSectionDataOfMatch<ExtraMatch>(selectedMatch);
               setState(() {});
             },
           ),
@@ -153,7 +152,7 @@ class _ExtraManagerState extends State<ExtraManager> {
                   if (mounted) {
                     showToastMessage(context, 'Đã xóa (match: ${selectedMatch.matchName})');
                   }
-                  DataManager.removeQuestionsOfMatch<ExtraMatch>(selectedMatch);
+                  DataManager.removeSectionDataOfMatch<ExtraMatch>(selectedMatch);
                   selectedMatch = ExtraMatch.empty();
                   setState(() {});
                 },
@@ -205,7 +204,7 @@ class _ExtraManagerState extends State<ExtraManager> {
                                 acceptLogMessage: 'Removed an extra question',
                                 onAccept: () async {
                                   selectedMatch.questions.removeAt(index);
-                                  DataManager.updateQuestions<ExtraMatch>(selectedMatch);
+                                  DataManager.updateSectionDataOfMatch<ExtraMatch>(selectedMatch);
                                   logHandler.info('Deleted extra question of ${selectedMatch.matchName}');
                                   setState(() {});
                                 },
@@ -225,7 +224,7 @@ class _ExtraManagerState extends State<ExtraManager> {
                         ));
                         if (newQ != null) {
                           selectedMatch.questions[index] = newQ;
-                          DataManager.updateQuestions<ExtraMatch>(selectedMatch);
+                          DataManager.updateSectionDataOfMatch<ExtraMatch>(selectedMatch);
                         }
                         setState(() {});
                       },

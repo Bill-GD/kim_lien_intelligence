@@ -114,6 +114,9 @@ class DataSize {
 }
 
 const String changelog = """
+  0.4.5.6 ({latest}):
+  - Updated to use reworked DataManager
+
   0.4.5.5 ({2c329e0}):
   - Highlights players participating in Extra
   - Sends who participating in Extra to clients

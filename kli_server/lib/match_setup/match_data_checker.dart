@@ -200,7 +200,7 @@ class _MatchDataCheckerState extends State<MatchDataChecker> {
   (bool, List<String>) checkStartQuestions() {
     final errorList = <String>[];
 
-    final savedMatch = DataManager.getMatchQuestions<StartMatch>(matchNames[selectedMatchIndex]);
+    final savedMatch = DataManager.getSectionQuestionsOfMatch<StartMatch>(matchNames[selectedMatchIndex]);
 
     try {
       if (savedMatch.isEmpty) return (false, ['Chưa có câu hỏi']);
@@ -234,7 +234,7 @@ class _MatchDataCheckerState extends State<MatchDataChecker> {
   (bool, List<String>) checkObstacleQuestions() {
     final errorList = <String>[];
 
-    final savedMatch = DataManager.getMatchQuestions<ObstacleMatch>(matchNames[selectedMatchIndex]);
+    final savedMatch = DataManager.getSectionQuestionsOfMatch<ObstacleMatch>(matchNames[selectedMatchIndex]);
     if (savedMatch.isEmpty) return (false, ['Chưa có dữ liệu']);
 
     try {
@@ -254,7 +254,7 @@ class _MatchDataCheckerState extends State<MatchDataChecker> {
   (bool, List<String>) checkAccelQuestions() {
     final errorList = <String>[];
 
-    final savedMatch = DataManager.getMatchQuestions<AccelMatch>(matchNames[selectedMatchIndex]);
+    final savedMatch = DataManager.getSectionQuestionsOfMatch<AccelMatch>(matchNames[selectedMatchIndex]);
     if (savedMatch.isEmpty) return (false, ['Chưa có dữ liệu']);
 
     try {
@@ -282,7 +282,7 @@ class _MatchDataCheckerState extends State<MatchDataChecker> {
   (bool, List<String>) checkFinishQuestions() {
     final errorList = <String>[];
 
-    final savedMatch = DataManager.getMatchQuestions<FinishMatch>(matchNames[selectedMatchIndex]);
+    final savedMatch = DataManager.getSectionQuestionsOfMatch<FinishMatch>(matchNames[selectedMatchIndex]);
     if (savedMatch.isEmpty) return (false, ['Chưa có dữ liệu']);
 
     try {
@@ -307,7 +307,7 @@ class _MatchDataCheckerState extends State<MatchDataChecker> {
   (bool, List<String>) checkExtraQuestions() {
     final errorList = <String>[];
 
-    final savedMatch = DataManager.getMatchQuestions<ExtraMatch>(matchNames[selectedMatchIndex]);
+    final savedMatch = DataManager.getSectionQuestionsOfMatch<ExtraMatch>(matchNames[selectedMatchIndex]);
 
     try {
       if (savedMatch.isEmpty) errorList.add('Chưa có câu hỏi');

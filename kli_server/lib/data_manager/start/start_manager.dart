@@ -27,7 +27,6 @@ class _StartQuestionManagerState extends State<StartQuestionManager> {
     selectedMatch = StartMatch.empty();
     matchNames = DataManager.getMatchNames();
     setState(() => isLoading = false);
-    DataManager.removeDeletedMatchQuestions<StartMatch>();
   }
 
   void getNewQuestion(Map<String, dynamic> data) {
@@ -108,7 +107,7 @@ class _StartQuestionManagerState extends State<StartQuestionManager> {
           matchSelector(matchNames, (value) async {
             logHandler.info('Selected match: $value');
             hasSelectedMatch = value != null;
-            selectedMatch = DataManager.getMatchQuestions<StartMatch>(value!);
+            selectedMatch = DataManager.getSectionQuestionsOfMatch<StartMatch>(value!);
             setState(() {});
           }),
           // sort player pos
@@ -165,7 +164,7 @@ class _StartQuestionManagerState extends State<StartQuestionManager> {
               if (ret == null) return;
 
               selectedMatch.questions.add(ret);
-              DataManager.updateQuestions<StartMatch>(selectedMatch);
+              DataManager.updateSectionDataOfMatch<StartMatch>(selectedMatch);
               setState(() {});
             },
           ),
@@ -175,8 +174,7 @@ class _StartQuestionManagerState extends State<StartQuestionManager> {
             enabledLabel: 'Cho phép nhập dữ liệu từ file Excel',
             disabledLabel: 'Chưa chọn trận đấu',
             onPressed: () async {
-              Map<String, dynamic>? data =
-                  await Navigator.of(context).push<Map<String, dynamic>>(DialogRoute<Map<String, dynamic>>(
+              Map<String, dynamic>? data = await Navigator.of(context).push<Map<String, dynamic>>(DialogRoute<Map<String, dynamic>>(
                 context: context,
                 barrierDismissible: false,
                 barrierLabel: '',
@@ -191,7 +189,7 @@ class _StartQuestionManagerState extends State<StartQuestionManager> {
               if (data == null) return;
 
               getNewQuestion(data);
-              DataManager.saveNewQuestions<StartMatch>(selectedMatch);
+              DataManager.updateSectionDataOfMatch<StartMatch>(selectedMatch);
 
               setState(() {});
             },
@@ -209,7 +207,7 @@ class _StartQuestionManagerState extends State<StartQuestionManager> {
                 onAccept: () async {
                   if (mounted) showToastMessage(context, 'Đã xóa (trận: ${selectedMatch.matchName})');
 
-                  DataManager.removeQuestionsOfMatch<StartMatch>(selectedMatch);
+                  DataManager.removeSectionDataOfMatch<StartMatch>(selectedMatch);
                   selectedMatch = StartMatch.empty(selectedMatch.matchName);
                   setState(() {});
                 },
@@ -272,7 +270,7 @@ class _StartQuestionManagerState extends State<StartQuestionManager> {
                                 acceptLogMessage: 'Removed start question: pos=${q.pos}, idx=$index',
                                 onAccept: () async {
                                   selectedMatch.questions.removeWhere((e) => e == q);
-                                  DataManager.updateQuestions<StartMatch>(selectedMatch);
+                                  DataManager.updateSectionDataOfMatch<StartMatch>(selectedMatch);
                                   setState(() {});
                                 },
                               );
@@ -282,8 +280,7 @@ class _StartQuestionManagerState extends State<StartQuestionManager> {
                         )
                       ],
                       onTap: () async {
-                        final ret =
-                            await Navigator.of(context).push<StartQuestion>(DialogRoute<StartQuestion>(
+                        final ret = await Navigator.of(context).push<StartQuestion>(DialogRoute<StartQuestion>(
                           context: context,
                           barrierDismissible: false,
                           barrierLabel: '',
@@ -293,7 +290,7 @@ class _StartQuestionManagerState extends State<StartQuestionManager> {
                         if (ret == null) return;
 
                         selectedMatch.questions[selectedMatch.questions.indexOf(q)] = ret;
-                        DataManager.updateQuestions<StartMatch>(selectedMatch);
+                        DataManager.updateSectionDataOfMatch<StartMatch>(selectedMatch);
 
                         setState(() {});
                       },

@@ -30,7 +30,6 @@ class _ObstacleManagerState extends State<ObstacleManager> {
     selectedMatch = ObstacleMatch.empty();
     matchNames = DataManager.getMatchNames();
     setState(() => isLoading = false);
-    DataManager.removeDeletedMatchQuestions<ObstacleMatch>();
   }
 
   @override
@@ -125,7 +124,7 @@ class _ObstacleManagerState extends State<ObstacleManager> {
           matchSelector(matchNames, (value) async {
             logHandler.info('Selected match: $value');
             hasSelectedMatch = value != null;
-            selectedMatch = DataManager.getMatchQuestions<ObstacleMatch>(value!);
+            selectedMatch = DataManager.getSectionQuestionsOfMatch<ObstacleMatch>(value!);
             setState(() {});
           }),
           KLIButton(
@@ -151,7 +150,7 @@ class _ObstacleManagerState extends State<ObstacleManager> {
               if (data == null) return;
 
               getNewQuestion(data);
-              DataManager.saveNewQuestions<ObstacleMatch>(selectedMatch);
+              DataManager.updateSectionDataOfMatch<ObstacleMatch>(selectedMatch);
               setState(() {});
             },
           ),
@@ -169,7 +168,7 @@ class _ObstacleManagerState extends State<ObstacleManager> {
                 onAccept: () async {
                   if (mounted) showToastMessage(context, 'Đã xóa (match: ${selectedMatch.matchName})');
 
-                  DataManager.removeQuestionsOfMatch<ObstacleMatch>(selectedMatch);
+                  DataManager.removeSectionDataOfMatch<ObstacleMatch>(selectedMatch);
                   selectedMatch = ObstacleMatch.empty(selectedMatch.matchName);
                   setState(() {});
                 },
@@ -244,7 +243,7 @@ class _ObstacleManagerState extends State<ObstacleManager> {
 
                     if (nQ == null) return;
                     selectedMatch.hintQuestions[index] = nQ;
-                    DataManager.updateQuestions<ObstacleMatch>(selectedMatch);
+                    DataManager.updateSectionDataOfMatch<ObstacleMatch>(selectedMatch);
                     setState(() {});
                   },
                 );
@@ -305,7 +304,7 @@ class _ObstacleManagerState extends State<ObstacleManager> {
                           selectedMatch.keyword = newO.$1;
                           selectedMatch.explanation = newO.$2;
                           selectedMatch.charCount = newO.$1.replaceAll(' ', '').length;
-                          DataManager.updateQuestions<ObstacleMatch>(selectedMatch);
+                          DataManager.updateSectionDataOfMatch<ObstacleMatch>(selectedMatch);
                           setState(() {});
                         },
                       ),
@@ -350,7 +349,7 @@ class _ObstacleManagerState extends State<ObstacleManager> {
                 if (result != null) {
                   final p = result.files.single.path!;
                   selectedMatch.imagePath = StorageHandler.getRelative(p);
-                  DataManager.updateQuestions<ObstacleMatch>(selectedMatch);
+                  DataManager.updateSectionDataOfMatch<ObstacleMatch>(selectedMatch);
                   logHandler.info('Chose ${selectedMatch.imagePath}');
                   setState(() {});
                 }

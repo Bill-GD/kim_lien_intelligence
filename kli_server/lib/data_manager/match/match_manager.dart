@@ -133,7 +133,7 @@ class _MatchManagerState extends State<MatchManager> {
                 matches[currentMatchIndex] = newMatch;
                 overwriteSave();
                 if (changedName) {
-                  DataManager.updateAllQuestionMatchName(oldName: oldName, newName: newMatch.name);
+                  DataManager.changeMatchName(oldName: oldName, newName: newMatch.name);
                 }
                 setState(() {});
               }

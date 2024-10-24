@@ -6,6 +6,7 @@ import 'package:side_navigation/side_navigation.dart';
 
 import '../global.dart';
 import 'accel/accel_manager.dart';
+import 'data_manager.dart';
 import 'extra/extra_manager.dart';
 import 'finish/finish_manager.dart';
 import 'match/match_manager.dart';
@@ -38,6 +39,7 @@ class _DataManagerPageState extends State<DataManagerPage> {
       const FinishManager(),
       const ExtraManager(),
     ];
+    DataManager.removeDeletedMatchData();
     setState(() => isLoading = false);
   }
 

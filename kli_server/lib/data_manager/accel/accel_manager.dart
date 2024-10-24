@@ -33,7 +33,6 @@ class _AccelManagerState extends State<AccelManager> {
 
     matchNames = DataManager.getMatchNames();
     setState(() => isLoading = false);
-    DataManager.removeDeletedMatchQuestions<AccelMatch>();
   }
 
   void getNewQuestion(Map<String, dynamic> data) {
@@ -120,7 +119,7 @@ class _AccelManagerState extends State<AccelManager> {
           matchSelector(matchNames, (value) async {
             logHandler.info('Selected match: $value');
             hasSelectedMatch = value != null;
-            selectedMatch = DataManager.getMatchQuestions<AccelMatch>(value!);
+            selectedMatch = DataManager.getSectionQuestionsOfMatch<AccelMatch>(value!);
             selectedQuestionIndex = -1;
             selectedImageIndex = -1;
             setState(() {});
@@ -137,7 +136,7 @@ class _AccelManagerState extends State<AccelManager> {
               ));
               if (newQ != null) {
                 selectedMatch.questions[selectedQuestionIndex] = newQ;
-                DataManager.updateQuestions<AccelMatch>(selectedMatch);
+                DataManager.updateSectionDataOfMatch<AccelMatch>(selectedMatch);
               }
               setState(() {});
             },
@@ -165,7 +164,7 @@ class _AccelManagerState extends State<AccelManager> {
               if (data == null) return;
 
               getNewQuestion(data);
-              DataManager.saveNewQuestions<AccelMatch>(selectedMatch);
+              DataManager.updateSectionDataOfMatch<AccelMatch>(selectedMatch);
               selectedQuestionIndex = -1;
               selectedImageIndex = -1;
               setState(() {});
@@ -185,7 +184,7 @@ class _AccelManagerState extends State<AccelManager> {
                   if (mounted) {
                     showToastMessage(context, 'Đã xóa (match: ${selectedMatch.matchName})');
                   }
-                  DataManager.removeQuestionsOfMatch<AccelMatch>(selectedMatch);
+                  DataManager.removeSectionDataOfMatch<AccelMatch>(selectedMatch);
                   selectedMatch = AccelMatch.empty(selectedMatch.matchName);
                   selectedQuestionIndex = -1;
                   selectedImageIndex = -1;
@@ -270,7 +269,7 @@ class _AccelManagerState extends State<AccelManager> {
                       logHandler.info('Selected question is null, creating new question');
                       selectedQuestion = AccelQuestion.empty();
                       selectedMatch.questions[index] = selectedQuestion;
-                      DataManager.updateQuestions<AccelMatch>(selectedMatch);
+                      DataManager.updateSectionDataOfMatch<AccelMatch>(selectedMatch);
                     } else {
                       selectedQuestion = q;
                     }
@@ -333,7 +332,7 @@ class _AccelManagerState extends State<AccelManager> {
                     selectedQuestion.imagePaths.length,
                   );
                   if (selectedImageIndex < 0) selectedImageIndex = 0;
-                  DataManager.updateQuestions<AccelMatch>(selectedMatch);
+                  DataManager.updateSectionDataOfMatch<AccelMatch>(selectedMatch);
                   setState(() {});
                 },
               ),
@@ -353,7 +352,7 @@ class _AccelManagerState extends State<AccelManager> {
                   selectedQuestion.type = AccelQuestion.getTypeFromImageCount(
                     selectedQuestion.imagePaths.length,
                   );
-                  DataManager.updateQuestions<AccelMatch>(selectedMatch);
+                  DataManager.updateSectionDataOfMatch<AccelMatch>(selectedMatch);
                   setState(() {});
                 },
               ),
