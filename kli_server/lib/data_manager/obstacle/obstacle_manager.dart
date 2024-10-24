@@ -20,14 +20,14 @@ class ObstacleManager extends StatefulWidget {
 class _ObstacleManagerState extends State<ObstacleManager> {
   bool isLoading = true, hasSelectedMatch = false;
   List<String> matchNames = [];
-  late ObstacleMatch selectedMatch;
+  late ObstacleSection selectedMatch;
   final obstacleController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
     logHandler.info('Opened Obstacle Manager');
-    selectedMatch = ObstacleMatch.empty();
+    selectedMatch = ObstacleSection.empty();
     matchNames = DataManager.getMatchNames();
     setState(() => isLoading = false);
   }
@@ -56,7 +56,7 @@ class _ObstacleManagerState extends State<ObstacleManager> {
     }
 
     try {
-      selectedMatch = ObstacleMatch(
+      selectedMatch = ObstacleSection(
         matchName: selectedMatch.matchName,
         keyword: sheet[5].values.elementAt(3),
         imagePath: '',
@@ -124,7 +124,7 @@ class _ObstacleManagerState extends State<ObstacleManager> {
           matchSelector(matchNames, (value) async {
             logHandler.info('Selected match: $value');
             hasSelectedMatch = value != null;
-            selectedMatch = DataManager.getSectionQuestionsOfMatch<ObstacleMatch>(value!);
+            selectedMatch = DataManager.getSectionQuestionsOfMatch<ObstacleSection>(value!);
             setState(() {});
           }),
           KLIButton(
@@ -150,7 +150,7 @@ class _ObstacleManagerState extends State<ObstacleManager> {
               if (data == null) return;
 
               getNewQuestion(data);
-              DataManager.updateSectionDataOfMatch<ObstacleMatch>(selectedMatch);
+              DataManager.updateSectionDataOfMatch<ObstacleSection>(selectedMatch);
               setState(() {});
             },
           ),
@@ -168,8 +168,8 @@ class _ObstacleManagerState extends State<ObstacleManager> {
                 onAccept: () async {
                   if (mounted) showToastMessage(context, 'Đã xóa (match: ${selectedMatch.matchName})');
 
-                  DataManager.removeSectionDataOfMatch<ObstacleMatch>(selectedMatch);
-                  selectedMatch = ObstacleMatch.empty(selectedMatch.matchName);
+                  DataManager.removeSectionDataOfMatch<ObstacleSection>(selectedMatch);
+                  selectedMatch = ObstacleSection.empty(selectedMatch.matchName);
                   setState(() {});
                 },
               );
@@ -243,7 +243,7 @@ class _ObstacleManagerState extends State<ObstacleManager> {
 
                     if (nQ == null) return;
                     selectedMatch.hintQuestions[index] = nQ;
-                    DataManager.updateSectionDataOfMatch<ObstacleMatch>(selectedMatch);
+                    DataManager.updateSectionDataOfMatch<ObstacleSection>(selectedMatch);
                     setState(() {});
                   },
                 );
@@ -304,7 +304,7 @@ class _ObstacleManagerState extends State<ObstacleManager> {
                           selectedMatch.keyword = newO.$1;
                           selectedMatch.explanation = newO.$2;
                           selectedMatch.charCount = newO.$1.replaceAll(' ', '').length;
-                          DataManager.updateSectionDataOfMatch<ObstacleMatch>(selectedMatch);
+                          DataManager.updateSectionDataOfMatch<ObstacleSection>(selectedMatch);
                           setState(() {});
                         },
                       ),
@@ -349,7 +349,7 @@ class _ObstacleManagerState extends State<ObstacleManager> {
                 if (result != null) {
                   final p = result.files.single.path!;
                   selectedMatch.imagePath = StorageHandler.getRelative(p);
-                  DataManager.updateSectionDataOfMatch<ObstacleMatch>(selectedMatch);
+                  DataManager.updateSectionDataOfMatch<ObstacleSection>(selectedMatch);
                   logHandler.info('Chose ${selectedMatch.imagePath}');
                   setState(() {});
                 }

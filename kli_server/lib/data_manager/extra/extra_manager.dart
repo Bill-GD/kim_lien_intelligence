@@ -16,13 +16,13 @@ class ExtraManager extends StatefulWidget {
 class _ExtraManagerState extends State<ExtraManager> {
   bool isLoading = true, hasSelectedMatch = false;
   List<String> matchNames = [];
-  late ExtraMatch selectedMatch;
+  late ExtraSection selectedMatch;
 
   @override
   void initState() {
     super.initState();
     logHandler.info('Opened Extra Manager');
-    selectedMatch = ExtraMatch.empty();
+    selectedMatch = ExtraSection.empty();
     matchNames = DataManager.getMatchNames();
     setState(() => isLoading = false);
   }
@@ -37,7 +37,7 @@ class _ExtraManagerState extends State<ExtraManager> {
       allQ.add(q);
     }
 
-    selectedMatch = ExtraMatch(matchName: selectedMatch.matchName, questions: allQ);
+    selectedMatch = ExtraSection(matchName: selectedMatch.matchName, questions: allQ);
     logHandler.info('Loaded ${selectedMatch.questions.length} questions from excel');
   }
 
@@ -107,7 +107,7 @@ class _ExtraManagerState extends State<ExtraManager> {
               ));
               if (newQ != null) {
                 selectedMatch.questions.add(newQ);
-                DataManager.updateSectionDataOfMatch<ExtraMatch>(selectedMatch);
+                DataManager.updateSectionDataOfMatch<ExtraSection>(selectedMatch);
               }
               setState(() {});
             },
@@ -118,8 +118,7 @@ class _ExtraManagerState extends State<ExtraManager> {
             enabledLabel: 'Cho phép nhập dữ liệu từ file Excel',
             disabledLabel: 'Chưa chọn trận đấu',
             onPressed: () async {
-              Map<String, dynamic>? data =
-                  await Navigator.of(context).push<Map<String, dynamic>>(DialogRoute<Map<String, dynamic>>(
+              Map<String, dynamic>? data = await Navigator.of(context).push<Map<String, dynamic>>(DialogRoute<Map<String, dynamic>>(
                 context: context,
                 barrierDismissible: false,
                 barrierLabel: '',
@@ -134,7 +133,7 @@ class _ExtraManagerState extends State<ExtraManager> {
               if (data == null) return;
 
               getNewQuestion(data);
-              DataManager.updateSectionDataOfMatch<ExtraMatch>(selectedMatch);
+              DataManager.updateSectionDataOfMatch<ExtraSection>(selectedMatch);
               setState(() {});
             },
           ),
@@ -152,8 +151,8 @@ class _ExtraManagerState extends State<ExtraManager> {
                   if (mounted) {
                     showToastMessage(context, 'Đã xóa (match: ${selectedMatch.matchName})');
                   }
-                  DataManager.removeSectionDataOfMatch<ExtraMatch>(selectedMatch);
-                  selectedMatch = ExtraMatch.empty();
+                  DataManager.removeSectionDataOfMatch<ExtraSection>(selectedMatch);
+                  selectedMatch = ExtraSection.empty();
                   setState(() {});
                 },
               );
@@ -204,7 +203,7 @@ class _ExtraManagerState extends State<ExtraManager> {
                                 acceptLogMessage: 'Removed an extra question',
                                 onAccept: () async {
                                   selectedMatch.questions.removeAt(index);
-                                  DataManager.updateSectionDataOfMatch<ExtraMatch>(selectedMatch);
+                                  DataManager.updateSectionDataOfMatch<ExtraSection>(selectedMatch);
                                   logHandler.info('Deleted extra question of ${selectedMatch.matchName}');
                                   setState(() {});
                                 },
@@ -215,8 +214,7 @@ class _ExtraManagerState extends State<ExtraManager> {
                         )
                       ],
                       onTap: () async {
-                        final newQ =
-                            await Navigator.of(context).push<ExtraQuestion>(DialogRoute<ExtraQuestion>(
+                        final newQ = await Navigator.of(context).push<ExtraQuestion>(DialogRoute<ExtraQuestion>(
                           context: context,
                           barrierDismissible: false,
                           barrierLabel: '',
@@ -224,7 +222,7 @@ class _ExtraManagerState extends State<ExtraManager> {
                         ));
                         if (newQ != null) {
                           selectedMatch.questions[index] = newQ;
-                          DataManager.updateSectionDataOfMatch<ExtraMatch>(selectedMatch);
+                          DataManager.updateSectionDataOfMatch<ExtraSection>(selectedMatch);
                         }
                         setState(() {});
                       },

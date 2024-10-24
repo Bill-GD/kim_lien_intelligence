@@ -16,7 +16,7 @@ class StartQuestionManager extends StatefulWidget {
 class _StartQuestionManagerState extends State<StartQuestionManager> {
   bool isLoading = true, hasSelectedMatch = false;
   List<String> matchNames = [];
-  late StartMatch selectedMatch;
+  late StartSection selectedMatch;
   int sortPlayerPos = -1;
   StartQuestionSubject? sortType;
 
@@ -24,7 +24,7 @@ class _StartQuestionManagerState extends State<StartQuestionManager> {
   void initState() {
     super.initState();
     logHandler.info('Opened Start Manager');
-    selectedMatch = StartMatch.empty();
+    selectedMatch = StartSection.empty();
     matchNames = DataManager.getMatchNames();
     setState(() => isLoading = false);
   }
@@ -49,7 +49,7 @@ class _StartQuestionManagerState extends State<StartQuestionManager> {
       }
       idx++;
     }
-    selectedMatch = StartMatch(matchName: selectedMatch.matchName, questions: questions);
+    selectedMatch = StartSection(matchName: selectedMatch.matchName, questions: questions);
     logHandler.info('Loaded ${selectedMatch.questionCount} questions from excel');
   }
 
@@ -107,7 +107,7 @@ class _StartQuestionManagerState extends State<StartQuestionManager> {
           matchSelector(matchNames, (value) async {
             logHandler.info('Selected match: $value');
             hasSelectedMatch = value != null;
-            selectedMatch = DataManager.getSectionQuestionsOfMatch<StartMatch>(value!);
+            selectedMatch = DataManager.getSectionQuestionsOfMatch<StartSection>(value!);
             setState(() {});
           }),
           // sort player pos
@@ -164,7 +164,7 @@ class _StartQuestionManagerState extends State<StartQuestionManager> {
               if (ret == null) return;
 
               selectedMatch.questions.add(ret);
-              DataManager.updateSectionDataOfMatch<StartMatch>(selectedMatch);
+              DataManager.updateSectionDataOfMatch<StartSection>(selectedMatch);
               setState(() {});
             },
           ),
@@ -189,7 +189,7 @@ class _StartQuestionManagerState extends State<StartQuestionManager> {
               if (data == null) return;
 
               getNewQuestion(data);
-              DataManager.updateSectionDataOfMatch<StartMatch>(selectedMatch);
+              DataManager.updateSectionDataOfMatch<StartSection>(selectedMatch);
 
               setState(() {});
             },
@@ -207,8 +207,8 @@ class _StartQuestionManagerState extends State<StartQuestionManager> {
                 onAccept: () async {
                   if (mounted) showToastMessage(context, 'Đã xóa (trận: ${selectedMatch.matchName})');
 
-                  DataManager.removeSectionDataOfMatch<StartMatch>(selectedMatch);
-                  selectedMatch = StartMatch.empty(selectedMatch.matchName);
+                  DataManager.removeSectionDataOfMatch<StartSection>(selectedMatch);
+                  selectedMatch = StartSection.empty(selectedMatch.matchName);
                   setState(() {});
                 },
               );
@@ -270,7 +270,7 @@ class _StartQuestionManagerState extends State<StartQuestionManager> {
                                 acceptLogMessage: 'Removed start question: pos=${q.pos}, idx=$index',
                                 onAccept: () async {
                                   selectedMatch.questions.removeWhere((e) => e == q);
-                                  DataManager.updateSectionDataOfMatch<StartMatch>(selectedMatch);
+                                  DataManager.updateSectionDataOfMatch<StartSection>(selectedMatch);
                                   setState(() {});
                                 },
                               );
@@ -290,7 +290,7 @@ class _StartQuestionManagerState extends State<StartQuestionManager> {
                         if (ret == null) return;
 
                         selectedMatch.questions[selectedMatch.questions.indexOf(q)] = ret;
-                        DataManager.updateSectionDataOfMatch<StartMatch>(selectedMatch);
+                        DataManager.updateSectionDataOfMatch<StartSection>(selectedMatch);
 
                         setState(() {});
                       },

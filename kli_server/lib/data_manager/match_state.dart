@@ -73,13 +73,13 @@ class MatchState {
     fp.writeAsStringSync(pm);
     logHandler.info('Player data done');
 
-    final obsPath = DataManager.getSectionQuestionsOfMatch<ObstacleMatch>(MatchState().match.name).imagePath;
+    final obsPath = DataManager.getSectionQuestionsOfMatch<ObstacleSection>(MatchState().match.name).imagePath;
     md['oi.${obsPath.split('.').last}'] = Networking.encodeMedia(obsPath);
     DataSize.matchActualDataSize += FileStat.statSync(StorageHandler.getFullPath(obsPath)).size;
     pd.clear();
 
     for (final i in range(0, 3)) {
-      final q = DataManager.getSectionQuestionsOfMatch<AccelMatch>(MatchState().match.name).questions[i];
+      final q = DataManager.getSectionQuestionsOfMatch<AccelSection>(MatchState().match.name).questions[i];
       for (final j in range(0, q.imagePaths.length - 1)) {
         final ext = q.imagePaths[j].split('.').last;
         md['ai_${i}_$j.$ext'] = Networking.encodeMedia(q.imagePaths[j]);
@@ -87,7 +87,7 @@ class MatchState {
       }
     }
 
-    DataManager.getSectionQuestionsOfMatch<FinishMatch>(MatchState().match.name).questions.forEach((q) {
+    DataManager.getSectionQuestionsOfMatch<FinishSection>(MatchState().match.name).questions.forEach((q) {
       if (q.mediaPath.isEmpty) return;
       if (md.containsKey('f_${q.mediaPath.split(r'\').last}')) return;
 
@@ -175,7 +175,7 @@ class MatchState {
   void loadQuestions() {
     switch (section) {
       case MatchSection.start:
-        questionList = DataManager.getSectionQuestionsOfMatch<StartMatch>(match.name) //
+        questionList = DataManager.getSectionQuestionsOfMatch<StartSection>(match.name) //
             .questions
             .where((e) => e.pos == startOrFinishPos)
             .toList()
@@ -183,18 +183,18 @@ class MatchState {
         break;
       case MatchSection.obstacle:
         questionList = null;
-        obstacleMatch = DataManager.getSectionQuestionsOfMatch<ObstacleMatch>(match.name);
+        obstacleMatch = DataManager.getSectionQuestionsOfMatch<ObstacleSection>(match.name);
         break;
       case MatchSection.accel:
         obstacleMatch = null;
-        questionList = DataManager.getSectionQuestionsOfMatch<AccelMatch>(match.name).questions.reversed.toList();
+        questionList = DataManager.getSectionQuestionsOfMatch<AccelSection>(match.name).questions.reversed.toList();
         break;
       case MatchSection.finish:
         startOrFinishPos = 0;
-        questionList = DataManager.getSectionQuestionsOfMatch<FinishMatch>(match.name).questions;
+        questionList = DataManager.getSectionQuestionsOfMatch<FinishSection>(match.name).questions;
         break;
       case MatchSection.extra:
-        questionList = DataManager.getSectionQuestionsOfMatch<ExtraMatch>(match.name).questions.reversed.toList();
+        questionList = DataManager.getSectionQuestionsOfMatch<ExtraSection>(match.name).questions.reversed.toList();
         break;
       default:
         throw Exception('Invalid section, this should not happen.');
@@ -275,7 +275,7 @@ class MatchState {
 
   /// For Start, Accel, Finish, Extra. For Obstacle, use [obstacleMatch]
   List<BaseQuestion>? questionList;
-  ObstacleMatch? obstacleMatch;
+  ObstacleSection? obstacleMatch;
 
   // start & finish
   int startOrFinishPos = 0;

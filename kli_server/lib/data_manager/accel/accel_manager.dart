@@ -20,7 +20,7 @@ class _AccelManagerState extends State<AccelManager> {
   bool isLoading = true, hasSelectedMatch = false;
   List<String> matchNames = [];
   int selectedQuestionIndex = -1, selectedImageIndex = -1;
-  late AccelMatch selectedMatch;
+  late AccelSection selectedMatch;
   late AccelQuestion selectedQuestion;
 
   @override
@@ -28,7 +28,7 @@ class _AccelManagerState extends State<AccelManager> {
     super.initState();
     logHandler.info('Opened Accel Manager');
 
-    selectedMatch = AccelMatch.empty();
+    selectedMatch = AccelSection.empty();
     selectedQuestion = AccelQuestion.empty();
 
     matchNames = DataManager.getMatchNames();
@@ -62,7 +62,7 @@ class _AccelManagerState extends State<AccelManager> {
         allQ.add(AccelQuestion.empty());
       }
     }
-    selectedMatch = AccelMatch(matchName: selectedMatch.matchName, questions: allQ);
+    selectedMatch = AccelSection(matchName: selectedMatch.matchName, questions: allQ);
     logHandler.info('Loaded ${selectedMatch.questions.length} questions from excel');
   }
 
@@ -119,7 +119,7 @@ class _AccelManagerState extends State<AccelManager> {
           matchSelector(matchNames, (value) async {
             logHandler.info('Selected match: $value');
             hasSelectedMatch = value != null;
-            selectedMatch = DataManager.getSectionQuestionsOfMatch<AccelMatch>(value!);
+            selectedMatch = DataManager.getSectionQuestionsOfMatch<AccelSection>(value!);
             selectedQuestionIndex = -1;
             selectedImageIndex = -1;
             setState(() {});
@@ -136,7 +136,7 @@ class _AccelManagerState extends State<AccelManager> {
               ));
               if (newQ != null) {
                 selectedMatch.questions[selectedQuestionIndex] = newQ;
-                DataManager.updateSectionDataOfMatch<AccelMatch>(selectedMatch);
+                DataManager.updateSectionDataOfMatch<AccelSection>(selectedMatch);
               }
               setState(() {});
             },
@@ -164,7 +164,7 @@ class _AccelManagerState extends State<AccelManager> {
               if (data == null) return;
 
               getNewQuestion(data);
-              DataManager.updateSectionDataOfMatch<AccelMatch>(selectedMatch);
+              DataManager.updateSectionDataOfMatch<AccelSection>(selectedMatch);
               selectedQuestionIndex = -1;
               selectedImageIndex = -1;
               setState(() {});
@@ -184,8 +184,8 @@ class _AccelManagerState extends State<AccelManager> {
                   if (mounted) {
                     showToastMessage(context, 'Đã xóa (match: ${selectedMatch.matchName})');
                   }
-                  DataManager.removeSectionDataOfMatch<AccelMatch>(selectedMatch);
-                  selectedMatch = AccelMatch.empty(selectedMatch.matchName);
+                  DataManager.removeSectionDataOfMatch<AccelSection>(selectedMatch);
+                  selectedMatch = AccelSection.empty(selectedMatch.matchName);
                   selectedQuestionIndex = -1;
                   selectedImageIndex = -1;
                   setState(() {});
@@ -269,7 +269,7 @@ class _AccelManagerState extends State<AccelManager> {
                       logHandler.info('Selected question is null, creating new question');
                       selectedQuestion = AccelQuestion.empty();
                       selectedMatch.questions[index] = selectedQuestion;
-                      DataManager.updateSectionDataOfMatch<AccelMatch>(selectedMatch);
+                      DataManager.updateSectionDataOfMatch<AccelSection>(selectedMatch);
                     } else {
                       selectedQuestion = q;
                     }
@@ -321,9 +321,7 @@ class _AccelManagerState extends State<AccelManager> {
                   if (result == null) return;
 
                   final picks = result.files;
-                  picks.length == 1
-                      ? logHandler.info('Chose ${StorageHandler.getRelative(picks.first.path!)}')
-                      : logHandler.info('Chose ${picks.length} files');
+                  picks.length == 1 ? logHandler.info('Chose ${StorageHandler.getRelative(picks.first.path!)}') : logHandler.info('Chose ${picks.length} files');
 
                   for (final p in picks) {
                     selectedQuestion.imagePaths.add(StorageHandler.getRelative(p.path!));
@@ -332,7 +330,7 @@ class _AccelManagerState extends State<AccelManager> {
                     selectedQuestion.imagePaths.length,
                   );
                   if (selectedImageIndex < 0) selectedImageIndex = 0;
-                  DataManager.updateSectionDataOfMatch<AccelMatch>(selectedMatch);
+                  DataManager.updateSectionDataOfMatch<AccelSection>(selectedMatch);
                   setState(() {});
                 },
               ),
@@ -352,7 +350,7 @@ class _AccelManagerState extends State<AccelManager> {
                   selectedQuestion.type = AccelQuestion.getTypeFromImageCount(
                     selectedQuestion.imagePaths.length,
                   );
-                  DataManager.updateSectionDataOfMatch<AccelMatch>(selectedMatch);
+                  DataManager.updateSectionDataOfMatch<AccelSection>(selectedMatch);
                   setState(() {});
                 },
               ),
@@ -394,13 +392,12 @@ class _AccelManagerState extends State<AccelManager> {
               ),
               IconButton(
                 icon: const Icon(Icons.arrow_forward_ios_rounded),
-                onPressed:
-                    selectedQuestionIndex >= 0 && selectedImageIndex < selectedQuestion.imagePaths.length - 1
-                        ? () {
-                            if (selectedImageIndex >= selectedQuestion.imagePaths.length - 1) return;
-                            setState(() => selectedImageIndex++);
-                          }
-                        : null,
+                onPressed: selectedQuestionIndex >= 0 && selectedImageIndex < selectedQuestion.imagePaths.length - 1
+                    ? () {
+                        if (selectedImageIndex >= selectedQuestion.imagePaths.length - 1) return;
+                        setState(() => selectedImageIndex++);
+                      }
+                    : null,
               )
             ],
           )

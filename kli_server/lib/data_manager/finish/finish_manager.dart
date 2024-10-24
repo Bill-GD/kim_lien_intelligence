@@ -17,14 +17,14 @@ class _FinishManagerState extends State<FinishManager> {
   bool isLoading = true, hasSelectedMatch = false;
   List<String> matchNames = [];
   int sortPoint = -1;
-  late FinishMatch selectedMatch;
+  late FinishSection selectedMatch;
   final obstacleController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
     logHandler.info('Opened Finish Manager');
-    selectedMatch = FinishMatch.empty();
+    selectedMatch = FinishSection.empty();
     matchNames = DataManager.getMatchNames();
     setState(() => isLoading = false);
   }
@@ -50,7 +50,7 @@ class _FinishManagerState extends State<FinishManager> {
       }
     }
 
-    selectedMatch = FinishMatch(matchName: selectedMatch.matchName, questions: questions);
+    selectedMatch = FinishSection(matchName: selectedMatch.matchName, questions: questions);
     logHandler.info('Loaded ${questions.length} Finish questions of ${selectedMatch.matchName}');
   }
 
@@ -106,7 +106,7 @@ class _FinishManagerState extends State<FinishManager> {
           matchSelector(matchNames, (value) async {
             logHandler.info('Selected match: $value');
             hasSelectedMatch = value != null;
-            selectedMatch = DataManager.getSectionQuestionsOfMatch<FinishMatch>(value!);
+            selectedMatch = DataManager.getSectionQuestionsOfMatch<FinishSection>(value!);
             setState(() {});
           }),
           // sort point
@@ -142,7 +142,7 @@ class _FinishManagerState extends State<FinishManager> {
               ));
               if (newQ != null) {
                 selectedMatch.questions.add(newQ);
-                DataManager.updateSectionDataOfMatch<FinishMatch>(selectedMatch);
+                DataManager.updateSectionDataOfMatch<FinishSection>(selectedMatch);
               }
               setState(() {});
             },
@@ -153,8 +153,7 @@ class _FinishManagerState extends State<FinishManager> {
             enabledLabel: 'Cho phép nhập dữ liệu từ file Excel',
             disabledLabel: 'Chưa chọn trận đấu',
             onPressed: () async {
-              Map<String, dynamic>? data =
-                  await Navigator.of(context).push<Map<String, dynamic>>(DialogRoute<Map<String, dynamic>>(
+              Map<String, dynamic>? data = await Navigator.of(context).push<Map<String, dynamic>>(DialogRoute<Map<String, dynamic>>(
                 context: context,
                 barrierDismissible: false,
                 barrierLabel: '',
@@ -169,7 +168,7 @@ class _FinishManagerState extends State<FinishManager> {
               if (data == null) return;
 
               getNewQuestion(data);
-              DataManager.updateSectionDataOfMatch<FinishMatch>(selectedMatch);
+              DataManager.updateSectionDataOfMatch<FinishSection>(selectedMatch);
               setState(() {});
             },
           ),
@@ -187,8 +186,8 @@ class _FinishManagerState extends State<FinishManager> {
                   if (mounted) {
                     showToastMessage(context, 'Đã xóa (match: ${selectedMatch.matchName})');
                   }
-                  DataManager.removeSectionDataOfMatch<FinishMatch>(selectedMatch);
-                  selectedMatch = FinishMatch.empty();
+                  DataManager.removeSectionDataOfMatch<FinishSection>(selectedMatch);
+                  selectedMatch = FinishSection.empty();
                   setState(() {});
                 },
               );
@@ -254,7 +253,7 @@ class _FinishManagerState extends State<FinishManager> {
                                 acceptLogMessage: 'Removed finish question (p=${q.$2.point})',
                                 onAccept: () async {
                                   selectedMatch.questions.removeAt(q.$1);
-                                  DataManager.updateSectionDataOfMatch<FinishMatch>(selectedMatch);
+                                  DataManager.updateSectionDataOfMatch<FinishSection>(selectedMatch);
                                   setState(() {});
                                 },
                               );
@@ -265,16 +264,12 @@ class _FinishManagerState extends State<FinishManager> {
                       ],
                       onTap: () async {
                         final newQ = await Navigator.of(context).push<FinishQuestion>(
-                          DialogRoute<FinishQuestion>(
-                              context: context,
-                              barrierDismissible: false,
-                              barrierLabel: '',
-                              builder: (_) => FinishQuestionEditor(question: q.$2)),
+                          DialogRoute<FinishQuestion>(context: context, barrierDismissible: false, barrierLabel: '', builder: (_) => FinishQuestionEditor(question: q.$2)),
                         );
 
                         if (newQ != null) {
                           selectedMatch.questions[q.$1] = newQ;
-                          DataManager.updateSectionDataOfMatch<FinishMatch>(selectedMatch);
+                          DataManager.updateSectionDataOfMatch<FinishSection>(selectedMatch);
                         }
                         setState(() {});
                       },
