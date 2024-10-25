@@ -47,8 +47,8 @@ class _PlayerOverviewScreenState extends State<PlayerOverviewScreen> {
         case KLIMessageType.endMatch:
           showPopupMessage(
             context,
-            title: 'Match ended',
-            content: 'The match has ended for you. You can exit now.',
+            title: 'Trận đấu đã kết thúc',
+            content: 'Trận đấu đã kết thúc. Bạn có thể thoát ra.',
           );
           ended = true;
           break;

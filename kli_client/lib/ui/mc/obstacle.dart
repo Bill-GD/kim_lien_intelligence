@@ -247,7 +247,7 @@ class _MCObstacleScreenState extends State<MCObstacleScreen> {
                       ? Padding(
                           padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
                           child: Text(
-                            'Question ${currentQuestion.id + 1}',
+                            'Hàng ngang ${currentQuestion.id + 1}',
                             style: const TextStyle(fontSize: fontSizeLarge),
                           ),
                         )

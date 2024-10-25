@@ -218,7 +218,7 @@ class _PlayerFinishScreenState extends State<PlayerFinishScreen> {
         ),
         const Expanded(child: SizedBox()),
         KLIButton(
-          'Steal',
+          'Tín hiệu',
           enableCondition: canSteal,
           onPressed: () {
             KLIClient.sendMessage(KLISocketMessage(

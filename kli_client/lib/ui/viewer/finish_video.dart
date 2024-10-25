@@ -71,7 +71,7 @@ class _ViewerFinishVideoScreenState extends State<ViewerFinishVideoScreen> {
               padding: EdgeInsets.symmetric(vertical: 16),
               child: Text(
                 // widget.question,
-                'Answer the following question',
+                'Trả lời câu hỏi trong video',
                 style: TextStyle(fontSize: fontSizeMedium),
                 textAlign: TextAlign.center,
               ),

@@ -198,7 +198,7 @@ class _PlayerExtraScreenState extends State<PlayerExtraScreen> {
         ),
         const Expanded(child: SizedBox()),
         KLIButton(
-          'Answer',
+          'Trả lời',
           enableCondition: canAnswer,
           onPressed: () {
             KLIClient.sendMessage(KLISocketMessage(

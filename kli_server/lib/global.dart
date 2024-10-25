@@ -114,7 +114,7 @@ class DataSize {
 }
 
 const String changelog = """
-  0.4.6 ({latest}):
+  0.4.6 ({2df09fb}):
   - Translated all text to Vietnamese
   - Added help for match control
   - Fixed some help text

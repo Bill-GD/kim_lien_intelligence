@@ -210,7 +210,7 @@ class _PlayerAccelScreenState extends State<PlayerAccelScreen> {
       controller: answerTextController,
       maxLines: 1,
       autofocus: canAnswer,
-      hintText: 'Enter Answer and press Enter to submit',
+      hintText: 'Nhập câu trả lời và nhấn Enter để gửi',
       onSubmitted: (text) {
         if (!canAnswer) return;
         submittedAnswer = text;
@@ -239,7 +239,7 @@ class _PlayerAccelScreenState extends State<PlayerAccelScreen> {
             backgroundColor: Colors.red,
           ),
           Text(
-            'Submitted:\n$submittedAnswer',
+            'Đã gửi:\n$submittedAnswer',
             softWrap: true,
             style: const TextStyle(fontSize: fontSizeMedium),
             textAlign: TextAlign.center,

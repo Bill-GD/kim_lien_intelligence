@@ -210,7 +210,7 @@ class _ViewerObstacleMainScreenState extends State<ViewerObstacleMainScreen> wit
                     constraints: const BoxConstraints(maxHeight: 80),
                     padding: const EdgeInsets.all(16),
                     child: Text(
-                      canShowQuestion ? 'Question ${currentQuestion.id + 1}' : '',
+                      canShowQuestion ? 'Hàng ngang ${currentQuestion.id + 1}' : '',
                       style: const TextStyle(fontSize: fontSizeLarge),
                     ),
                   ),

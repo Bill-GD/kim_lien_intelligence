@@ -96,7 +96,7 @@ class _ConnectPageState extends State<ConnectPage> {
   Widget connectionStatus() {
     const s = TextStyle(fontSize: fontSizeLarge);
     return Text(
-      'Connection status: ${isConnecting ? '🟡' : isConnected ? '🟢' : '🔴'}',
+      'Trạng thái kết nối: ${isConnecting ? '🟡' : isConnected ? '🟢' : '🔴'}',
       textAlign: TextAlign.center,
       style: s,
     );
@@ -111,10 +111,7 @@ class _ConnectPageState extends State<ConnectPage> {
           initialSelection: selectedID,
           controller: clientTextController,
           label: const Text('Client'),
-          dropdownMenuEntries: [
-            for (final c in ConnectionID.values.getRange(1, ConnectionID.values.length))
-              DropdownMenuEntry(value: c, label: Networking.getClientDisplayID(c))
-          ],
+          dropdownMenuEntries: [for (final c in ConnectionID.values.getRange(1, ConnectionID.values.length)) DropdownMenuEntry(value: c, label: Networking.getClientDisplayID(c))],
           onSelected: (value) {
             selectedID = value;
             setState(() {});
@@ -127,7 +124,7 @@ class _ConnectPageState extends State<ConnectPage> {
           constraints: const BoxConstraints(maxWidth: 250),
           maxLines: 1,
           labelText: 'Host IP',
-          hintText: 'Enter Host IP',
+          hintText: 'Nhập IP của host',
         ),
       ],
     );
@@ -138,16 +135,16 @@ class _ConnectPageState extends State<ConnectPage> {
       mainAxisSize: MainAxisSize.min,
       children: [
         KLIButton(
-          'Connect',
-          disabledLabel: 'Already connected',
+          'Kết nối',
+          disabledLabel: 'Đã kết nối',
           enableCondition: !isConnecting && !isConnected,
           onPressed: () async {
             final ip = ipTextController.value.text.trim();
             if (ip.isEmpty || selectedID == null) {
               showPopupMessage(
                 context,
-                title: 'Client ID and Host IP',
-                content: 'Client ID or host IP not specified',
+                title: 'Thiếu thông tin',
+                content: 'Vui lòng nhập IP và chọn client ID',
               );
               return;
             }
@@ -169,8 +166,8 @@ class _ConnectPageState extends State<ConnectPage> {
               });
               if (e is SocketException) {
                 throw KLIException(
-                  'Connection problem',
-                  'Please make sure host IP ($ip) is correct or the server has started',
+                  'Lỗi kết nối',
+                  'Vui lòng đảm bảo IP của host ($ip) là chính xác hoặc server đã được mở',
                 );
               }
             }
@@ -178,8 +175,8 @@ class _ConnectPageState extends State<ConnectPage> {
         ),
         const SizedBox(width: 20),
         KLIButton(
-          'Disconnect',
-          disabledLabel: 'Not connected',
+          'Ngắt kết nối',
+          disabledLabel: 'Chưa kết nối',
           enableCondition: isConnected,
           onPressed: () {
             KLIClient.disconnect();
@@ -191,9 +188,9 @@ class _ConnectPageState extends State<ConnectPage> {
         ),
         const SizedBox(width: 20),
         KLIButton(
-          'To waiting room',
-          enabledLabel: "When you're ready",
-          disabledLabel: 'Not connected',
+          'Vào phòng chờ',
+          enabledLabel: "Khi đã sẵn sàng",
+          disabledLabel: 'Chưa kết nối',
           enableCondition: isConnected,
           onPressed: () {
             Navigator.of(context).push(
@@ -207,7 +204,7 @@ class _ConnectPageState extends State<ConnectPage> {
 
   Widget cacheButton() {
     return KLIButton(
-      'Manage cache',
+      'Quản lý data',
       onPressed: () {
         _key.currentState?.openEndDrawer();
       },

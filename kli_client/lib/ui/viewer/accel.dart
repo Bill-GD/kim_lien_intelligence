@@ -164,7 +164,7 @@ class _ViewerAccelScreenState extends State<ViewerAccelScreen> with SingleTicker
                           padding: const EdgeInsets.symmetric(vertical: 16),
                           alignment: Alignment.center,
                           child: Text(
-                            canShowQuestion ? 'Question ${questionNum + 1}' : '',
+                            canShowQuestion ? 'Câu ${questionNum + 1}' : '',
                             style: const TextStyle(fontSize: fontSizeMedium),
                           ),
                         ),

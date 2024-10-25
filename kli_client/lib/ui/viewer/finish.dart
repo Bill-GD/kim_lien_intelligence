@@ -149,7 +149,7 @@ class _ViewerFinishScreenState extends State<ViewerFinishScreen> with SingleTick
                     constraints: const BoxConstraints(maxHeight: 80),
                     padding: const EdgeInsets.all(16),
                     child: Text(
-                      canShowQuestion ? '${currentQuestion.point} point' : '',
+                      canShowQuestion ? '${currentQuestion.point} điểm' : '',
                       style: const TextStyle(fontSize: fontSizeLarge),
                     ),
                   ),
@@ -191,9 +191,7 @@ class _ViewerFinishScreenState extends State<ViewerFinishScreen> with SingleTick
           child: ClipRRect(
             borderRadius: BorderRadius.horizontal(
               left: i == 0 ? const Radius.circular(10) : Radius.zero,
-              // bottomLeft: i == 0 ? const Radius.circular(10) : Radius.zero,
               right: i == 3 ? const Radius.circular(10) : Radius.zero,
-              // bottomRight: i == 3 ? const Radius.circular(10) : Radius.zero,
             ),
             child: Container(
               decoration: BoxDecoration(

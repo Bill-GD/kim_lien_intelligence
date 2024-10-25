@@ -126,7 +126,7 @@ class _ViewerWaitScreenState extends State<ViewerWaitScreen> {
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: const Text(
-                  'Waiting for the game to start...',
+                  'Đang chờ trận đấu bắt đầu...',
                   style: TextStyle(fontSize: fontSizeLarge),
                 ),
               ),

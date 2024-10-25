@@ -171,9 +171,7 @@ class _ViewerStartScreenState extends State<ViewerStartScreen> with SingleTicker
           child: ClipRRect(
             borderRadius: BorderRadius.horizontal(
               left: i == 0 ? const Radius.circular(10) : Radius.zero,
-              // bottomLeft: i == 0 ? const Radius.circular(10) : Radius.zero,
               right: i == 3 ? const Radius.circular(10) : Radius.zero,
-              // bottomRight: i == 3 ? const Radius.circular(10) : Radius.zero,
             ),
             child: Container(
               decoration: BoxDecoration(

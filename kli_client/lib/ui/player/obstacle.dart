@@ -205,7 +205,7 @@ class _PlayerObstacleScreenState extends State<PlayerObstacleScreen> {
                       ? Padding(
                           padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
                           child: Text(
-                            'Question ${currentQuestion.id + 1}',
+                            'Hàng ngang ${currentQuestion.id + 1}',
                             style: const TextStyle(fontSize: fontSizeLarge),
                           ),
                         )
@@ -240,7 +240,7 @@ class _PlayerObstacleScreenState extends State<PlayerObstacleScreen> {
       readOnly: !canAnswer,
       controller: answerTextController,
       maxLines: 1,
-      hintText: 'Enter Answer and press Enter to submit',
+      hintText: 'Nhập câu trả lời và nhấn Enter để gửi',
       onSubmitted: (text) {
         submittedAnswer = text;
         KLIClient.sendMessage(KLISocketMessage(
@@ -269,7 +269,7 @@ class _PlayerObstacleScreenState extends State<PlayerObstacleScreen> {
           ),
           const SizedBox(height: 512),
           KLIButton(
-            'Obstacle',
+            'Trả lời CNV',
             enableCondition: canGuessObstacle,
             onPressed: () {
               timer?.cancel();
@@ -282,7 +282,7 @@ class _PlayerObstacleScreenState extends State<PlayerObstacleScreen> {
             },
           ),
           Text(
-            'Submitted:\n$submittedAnswer',
+            'Đã gửi:\n$submittedAnswer',
             softWrap: true,
             style: const TextStyle(fontSize: fontSizeMedium),
             textAlign: TextAlign.center,
