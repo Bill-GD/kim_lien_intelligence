@@ -32,7 +32,7 @@ class _AllowExtraDialogState extends State<AllowExtraDialog> {
             mainAxisSize: MainAxisSize.min,
             children: [
               const Text(
-                'Who will be participating the Extra section?',
+                'Ai sẽ tham gia câu hỏi phụ?',
                 style: TextStyle(fontSize: fontSizeMedium),
               ),
               SizedBox(height: widget.spacing),
@@ -68,7 +68,7 @@ class _AllowExtraDialogState extends State<AllowExtraDialog> {
                   ),
                   TextButton(
                     onPressed: Navigator.of(context).pop,
-                    child: const Text('None, end match', style: TextStyle(color: Colors.red)),
+                    child: const Text('Kết thúc trận đấu luôn', style: TextStyle(color: Colors.red)),
                   ),
                 ],
               ),

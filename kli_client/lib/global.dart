@@ -27,7 +27,7 @@ String getSizeString(int bytes) {
 }
 
 const String changelog = """
-  0.4.3 ({latest}):
+  0.4.3 ({486a5bb}):
   - Added MC screens: overview, start, obstacle, accel, finish, extra
   - Shows section results screen to MC
 

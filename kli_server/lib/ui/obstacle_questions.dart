@@ -74,12 +74,12 @@ class _ObstacleQuestionScreenState extends State<ObstacleQuestionScreen> {
         if (mounted) {
           final res = await dialogWithActions<bool>(
             context,
-            title: 'Guess Obstacle',
-            content: '${Networking.getClientDisplayID(m.senderID)} has decided to guess the obstacle.',
+            title: 'Đoán Chướng ngại vật',
+            content: '${Networking.getClientDisplayID(m.senderID)} đã đoán chướng ngại vật',
             time: 150.ms,
             actions: [
               KLIButton(
-                'Correct',
+                'Đúng',
                 onPressed: () {
                   audioHandler.play(assetHandler.obsCorrectObstacle);
                   KLIServer.sendToViewers(KLISocketMessage(
@@ -91,7 +91,7 @@ class _ObstacleQuestionScreenState extends State<ObstacleQuestionScreen> {
                 },
               ),
               KLIButton(
-                'Wrong',
+                'Sai',
                 onPressed: () {
                   audioHandler.play(assetHandler.obsIncorrectObstacle);
                   KLIServer.sendToViewers(KLISocketMessage(
@@ -151,7 +151,7 @@ class _ObstacleQuestionScreenState extends State<ObstacleQuestionScreen> {
         key: _key,
         appBar: managerAppBar(
           context,
-          'Obstacle: ${MatchState().obstacleMatch!.keyword}',
+          'CNV: ${MatchState().obstacleMatch!.keyword}',
           leading: isTesting
               ? BackButton(
                   onPressed: () {
@@ -181,7 +181,7 @@ class _ObstacleQuestionScreenState extends State<ObstacleQuestionScreen> {
           playerNames: Iterable.generate(4, (i) => MatchState().players[i].name),
           actions: [
             KLIButton(
-              'Announce Result',
+              'Công bố kết quả',
               enableCondition: canAnnounceAnswer && questionIndex >= 0,
               onPressed: () {
                 obstacleWait();
@@ -280,9 +280,9 @@ class _ObstacleQuestionScreenState extends State<ObstacleQuestionScreen> {
               right: 20,
               bottom: 20,
               child: KLIButton(
-                'Show rows',
+                'Hiện các hàng',
                 enableCondition: canShowRows,
-                enabledLabel: 'Show rows to viewers',
+                enabledLabel: 'Hiện các hàng cho viewer',
                 onPressed: () {
                   KLIServer.sendToNonPlayer(KLISocketMessage(
                     senderID: ConnectionID.host,
@@ -343,7 +343,7 @@ class _ObstacleQuestionScreenState extends State<ObstacleQuestionScreen> {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           KLIButton(
-            'Show Image',
+            'Hiện hình ảnh',
             // enableCondition: canShowImage,
             onPressed: () async {
               KLIServer.sendToAllClients(KLISocketMessage(
@@ -362,7 +362,7 @@ class _ObstacleQuestionScreenState extends State<ObstacleQuestionScreen> {
             },
           ),
           KLIButton(
-            'Get Middle Row',
+            'Trung tâm',
             enableCondition: MatchState().allRowsAnswered && !MatchState().answeredObstacleRows[4] && questionIndex != 4 && canSelectQuestion,
             onPressed: () {
               audioHandler.play(assetHandler.obsChoseRow);
@@ -375,7 +375,7 @@ class _ObstacleQuestionScreenState extends State<ObstacleQuestionScreen> {
             },
           ),
           KLIButton(
-            'Show Answers',
+            'Hiện đáp án',
             enableCondition: canShowAnswers,
             onPressed: () {
               for (final i in range(0, 3)) {
@@ -393,7 +393,7 @@ class _ObstacleQuestionScreenState extends State<ObstacleQuestionScreen> {
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
               KLIButton(
-                'Start',
+                'Bắt đầu',
                 // enableCondition: questionIndex >= 0 && !timeEnded && !(timer?.isActive == true),
                 enableCondition: canStart,
                 onPressed: () {
@@ -410,7 +410,7 @@ class _ObstacleQuestionScreenState extends State<ObstacleQuestionScreen> {
                 },
               ),
               KLIButton(
-                'End',
+                'Kết thúc',
                 enableCondition: canEnd,
                 onPressed: () {
                   KLIServer.sendToAllClients(KLISocketMessage(
@@ -482,8 +482,8 @@ class _ObstacleQuestionScreenState extends State<ObstacleQuestionScreen> {
     final qDisplay = questionIndex < 0
         ? ''
         : questionIndex == 4
-            ? 'Middle Question'
-            : 'Question ${questionIndex + 1}';
+            ? 'Câu trung tâm'
+            : 'Hàng ngang ${questionIndex + 1}';
 
     return Expanded(
       child: Container(

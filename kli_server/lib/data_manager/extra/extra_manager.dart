@@ -90,7 +90,7 @@ class _ExtraManagerState extends State<ExtraManager> {
           matchSelector(matchNames, (value) async {
             logHandler.info('Selected match: $value');
             hasSelectedMatch = value != null;
-            selectedMatch = DataManager.getSectionQuestionsOfMatch(value!);
+            selectedMatch = DataManager.getSectionOfMatch(value!);
             setState(() {});
           }),
           KLIButton(

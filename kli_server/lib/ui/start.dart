@@ -46,7 +46,7 @@ class _StartScreenState extends State<StartScreen> {
         extendBodyBehindAppBar: true,
         appBar: managerAppBar(
           context,
-          'Start',
+          'Khởi động',
           leading: BackButton(
             onPressed: isTesting
                 ? () {
@@ -216,9 +216,9 @@ class _StartScreenState extends State<StartScreen> {
         children: [
           Expanded(
             child: KLIButton(
-              'Correct',
+              'Đúng',
               enableCondition: !timeEnded && started,
-              disabledLabel: "Can't answer now",
+              disabledLabel: "Chưa thể trả lời",
               onPressed: () {
                 MatchState().modifyScore(widget.playerPos, 10);
                 audioHandler.play(assetHandler.startCorrect);
@@ -235,9 +235,9 @@ class _StartScreenState extends State<StartScreen> {
           const SizedBox(width: 16),
           Expanded(
             child: KLIButton(
-              'Incorrect',
+              'Sai',
               enableCondition: !timeEnded && started,
-              disabledLabel: "Can't answer now",
+              disabledLabel: "Chưa thể trả lời",
               onPressed: () {
                 audioHandler.play(assetHandler.startIncorrect);
                 nextQuestion();
@@ -282,7 +282,7 @@ class _StartScreenState extends State<StartScreen> {
         ? Padding(
             padding: widget.buttonPadding,
             child: KLIButton(
-              'End',
+              'Kết thúc',
               enableCondition: timeEnded,
               disabledLabel: 'Currently ongoing',
               onPressed: () {
@@ -298,7 +298,7 @@ class _StartScreenState extends State<StartScreen> {
         : Padding(
             padding: widget.buttonPadding,
             child: KLIButton(
-              'Start',
+              'Bắt đầu',
               enableCondition: !started,
               onPressed: () {
                 KLIServer.sendToViewers(KLISocketMessage(

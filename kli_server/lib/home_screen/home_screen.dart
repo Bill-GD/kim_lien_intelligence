@@ -71,8 +71,8 @@ class _HomeScreenState extends State<HomeScreen> {
                 SideNavigationBarItem(label: 'Hướng dẫn', icon: FontAwesomeIcons.circleQuestion),
                 SideNavigationBarItem(label: 'Quản lý dữ liệu', icon: FontAwesomeIcons.database),
                 SideNavigationBarItem(label: 'Bắt đầu trận', icon: Icons.settings_rounded),
-                SideNavigationBarItem(label: 'Log', icon: FontAwesomeIcons.solidFile),
                 SideNavigationBarItem(label: 'Âm thanh', icon: FontAwesomeIcons.music),
+                SideNavigationBarItem(label: 'Log', icon: FontAwesomeIcons.solidFile),
               ],
               onTap: (newIndex) {
                 setState(() => sidebarIndex = newIndex);
@@ -99,8 +99,9 @@ class _HomeScreenState extends State<HomeScreen> {
                       );
                     },
                   ),
+                  const SoundTest(),
                   KLIButton(
-                    'Open Log File',
+                    'Mở file log',
                     onPressed: () async {
                       logHandler.info('Opening log...');
                       await launchUrlString(
@@ -109,7 +110,6 @@ class _HomeScreenState extends State<HomeScreen> {
                       );
                     },
                   ),
-                  const SoundTest(),
                 ].elementAt(sidebarIndex),
               ),
             ),

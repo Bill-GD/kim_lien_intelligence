@@ -101,22 +101,27 @@ class _MatchOverviewState extends State<MatchOverview> {
                 Phần thi khởi động sẽ tự động kích hoạt. Nhấn nút tương ứng để bắt đầu phần thi.
                 Sau khi mỗi phần thi kết thúc, phần thi tiếp theo sẽ được kích hoạt.
                 
-                - Khởi động: Chuyển tự động sang người chơi tiếp theo sau khi người chơi trước hoàn thành.
-                  Người chơi được chọn sẽ được đánh dấu màu xanh.
+                - Khởi động: Chuyển tự động sang thí sinh tiếp theo sau khi thí sinh trước hoàn thành.
+                  Thí sinh hiện tại sẽ được đánh dấu màu xanh.
                   Nhấn 'Start' để bắt đầu đếm giờ và hiển thị câu hỏi.
-                  Nếu người chơi trả lời hết câu hỏi, hoặc hết giờ, tất cả chức năng sẽ bị khóa.
-                  Nhấn 'End' để kết thúc phần thi.
-                - Obstacle: First select question. Press 'Start' to start the timer and it'll lock question selection.
-                  After time is up, Press 'Show answers' to show the answer and time.
-                  Press 'Show image' to show the image after announcing the result.
-                  Repeat until all 4 question are selected. Press 'Middle question' to show the middle question.
-                  If all questions are selected, press 'End' to finish the section.
-                - Accel: NA
-                - Finish: The order is determined by the score. The player with the highest score will be selected first.
-                  After each player, the player with the next highest score will be selected.
-                  If there are two players with the same score, the player whose position is smaller will be selected.
-                  The seleted player will be highlighted. 
-                - Extra: NA''',
+                  Nếu thí sinh trả lời hết câu hỏi, hoặc hết giờ, tất cả chức năng sẽ bị khóa.
+                  Nhấn 'Kết thúc' để kết thúc phần thi.
+                - Chướng ngại vật: Đầu tiên chọn câu hỏi. Nhấn 'Bắt đầu' để bắt đầu đếm giờ và khóa chọn câu hỏi.
+                  Sau khi hết giờ, nhấn 'Hiện đáp án' để hiển thị của trả lời của thí sinh.
+                  Nhấn 'Hiện hình ảnh' để hiển thị hình ảnh sau khi công bố kết quả.
+                  Lặp lại cho đến khi tất cả 4 câu hỏi được chọn. Nhấn 'Trung tâm' để hiển thị câu hỏi trung tâm.
+                  Nếu tất cả các câu hỏi đã được chọn, nhấn 'Kết thúc' để hoàn thành phần thi.
+                - Tăng tốc: Bấm 'Câu tiếp theo' để hiện câu hỏi.
+                  Bấm 'Bắt đầu' để bắt đầu đếm giờ.
+                  Sau khi hết giờ, nhấn 'Hiển thị đáp án' để hiển thị của trả lời của thí sinh và thời gian.
+                  Bấm 'Giải thích' để hiện giải thích câu hỏi.
+                - Về đích: Thứ tự được xác định bởi điểm số. Thí sinh có điểm số cao nhất sẽ được chọn trước.
+                  Sau mỗi thí sinh, thí sinh có điểm số cao tiếp theo sẽ được chọn.
+                  Nếu có hai thí sinh có cùng điểm số, thí sinh có vị trí nhỏ hơn sẽ được chọn.
+                  Người chơi được chọn sẽ được đánh dấu.
+                - Câu hỏi phụ: Chọn các thí sinh tham gia sau phần về đích.
+                  Bấm 'Câu tiếp theo' để chuyển sang câu hỏi tiếp theo.
+                  Khi thí sinh ra tín hiệu trả lời, hiện ô thông tin thí sinh trả lời và dừng thời gian. Nếu đúng sẽ kết thúc, nếu sai các thí sinh còn lại có thể trả lời và tiếp tục thời gian.''',
             ),
           ],
         ),
@@ -140,7 +145,7 @@ class _MatchOverviewState extends State<MatchOverview> {
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
           KLIButton(
-            'Start',
+            'Khởi động',
             enableCondition: MatchState().section == MatchSection.start,
             enabledLabel: 'To Start',
             disabledLabel: 'Current section: ${MatchState().section.name}',
@@ -184,7 +189,7 @@ class _MatchOverviewState extends State<MatchOverview> {
             },
           ),
           KLIButton(
-            'Obstacle',
+            'Chướng ngại vật',
             enableCondition: MatchState().section == MatchSection.obstacle,
             enabledLabel: 'To Obstacle',
             disabledLabel: 'Current section: ${MatchState().section.name}',
@@ -207,7 +212,7 @@ class _MatchOverviewState extends State<MatchOverview> {
             },
           ),
           KLIButton(
-            'Accel',
+            'Tăng tốc',
             enableCondition: MatchState().section == MatchSection.accel,
             enabledLabel: 'To Accel',
             disabledLabel: 'Current section: ${MatchState().section.name}',
@@ -233,7 +238,7 @@ class _MatchOverviewState extends State<MatchOverview> {
             },
           ),
           KLIButton(
-            'Finish',
+            'Về đích',
             enableCondition: MatchState().section == MatchSection.finish,
             enabledLabel: 'To Finish',
             disabledLabel: 'Current section: ${MatchState().section.name}',
@@ -306,7 +311,7 @@ class _MatchOverviewState extends State<MatchOverview> {
             },
           ),
           KLIButton(
-            'Extra',
+            'Câu hỏi phụ',
             enableCondition: canStartExtra && MatchState().section == MatchSection.extra,
             enabledLabel: 'To Extra',
             disabledLabel: 'Current section: ${MatchState().section.name}',

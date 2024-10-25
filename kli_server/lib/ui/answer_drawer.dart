@@ -118,8 +118,9 @@ class _AnswerDrawerState extends State<AnswerDrawer> {
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 KLIButton(
-                  '${viewerShowingAnswers ? 'Hide' : 'Show'} answers',
+                  '${viewerShowingAnswers ? 'Ẩn' : 'Hiện'} đáp án',
                   // enableCondition: widget.canCheck,
+                  enabledLabel: 'Hiện đáp án cho viewer',
                   onPressed: () {
                     KLIServer.sendToNonPlayer(KLISocketMessage(
                       senderID: ConnectionID.host,
@@ -136,7 +137,7 @@ class _AnswerDrawerState extends State<AnswerDrawer> {
                   },
                 ),
                 KLIButton(
-                  'All correct',
+                  'Tất cả đúng',
                   enableCondition: widget.canCheck,
                   onPressed: () {
                     for (var i = 0; i < widget.answers.length; i++) {
@@ -145,7 +146,7 @@ class _AnswerDrawerState extends State<AnswerDrawer> {
                   },
                 ),
                 KLIButton(
-                  'All wrong',
+                  'Tất cả sai',
                   enableCondition: widget.canCheck,
                   onPressed: () {
                     for (var i = 0; i < widget.answers.length; i++) {

@@ -124,7 +124,7 @@ class _ObstacleManagerState extends State<ObstacleManager> {
           matchSelector(matchNames, (value) async {
             logHandler.info('Selected match: $value');
             hasSelectedMatch = value != null;
-            selectedMatch = DataManager.getSectionQuestionsOfMatch<ObstacleSection>(value!);
+            selectedMatch = DataManager.getSectionOfMatch<ObstacleSection>(value!);
             setState(() {});
           }),
           KLIButton(

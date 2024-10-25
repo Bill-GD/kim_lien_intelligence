@@ -48,16 +48,16 @@ class _ExtraScreenState extends State<ExtraScreen> {
         if (mounted) {
           final res = await dialogWithActions<bool>(
             context,
-            title: 'Answer',
+            title: 'Trả lời',
             content: '${Networking.getClientDisplayID(m.senderID)} has decided to answer.',
             time: 150.ms,
             actions: [
               KLIButton(
-                'Correct',
+                'Đúng',
                 onPressed: () => Navigator.of(context).pop(true),
               ),
               KLIButton(
-                'Wrong',
+                'Sai',
                 onPressed: () {
                   Navigator.of(context).pop(false);
                 },
@@ -107,7 +107,7 @@ class _ExtraScreenState extends State<ExtraScreen> {
       child: Scaffold(
         appBar: managerAppBar(
           context,
-          'Extra',
+          'Câu hỏi phụ',
           leading: isTesting
               ? BackButton(
                   onPressed: () {
@@ -255,9 +255,9 @@ class _ExtraScreenState extends State<ExtraScreen> {
         children: [
           Expanded(
             child: KLIButton(
-              'Next',
+              'Câu tiếp theo',
               enableCondition: canNext,
-              disabledLabel: "Question not answered",
+              disabledLabel: "Chưa trả lời",
               onPressed: () {
                 nextQuestion();
                 currentTimeSec = widget.timeLimitSec;
@@ -319,9 +319,9 @@ class _ExtraScreenState extends State<ExtraScreen> {
       Padding(
         padding: const EdgeInsets.symmetric(vertical: 32),
         child: KLIButton(
-          'Start',
+          'Bắt đầu',
           enableCondition: canStart,
-          disabledLabel: 'Currently ongoing',
+          disabledLabel: 'Phần thi chưa kết thúc',
           onPressed: () {
             canStart = false;
             canStopTimer = true;
@@ -338,9 +338,9 @@ class _ExtraScreenState extends State<ExtraScreen> {
         ),
       ),
       KLIButton(
-        'End',
+        'Kết thúc',
         enableCondition: canEnd,
-        disabledLabel: 'Currently ongoing',
+        disabledLabel: 'Phần thi chưa kết thúc',
         onPressed: () {
           KLIServer.sendToAllClients(KLISocketMessage(
             senderID: ConnectionID.host,

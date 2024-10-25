@@ -34,7 +34,7 @@ class _ObstacleImageScreenState extends State<ObstacleImageScreen> {
       child: Scaffold(
         appBar: managerAppBar(
           context,
-          'Obstacle',
+          'Hình ảnh chướng ngại vật',
           leading: isTesting
               ? BackButton(
                   onPressed: () {

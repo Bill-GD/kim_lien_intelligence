@@ -41,11 +41,12 @@ class MatchState {
 
   static void reset() => _inst = null;
 
-  static void prepareMatchData(String matchDataPath, String playerDataPath) {
+  static void prepareMatchData(String matchName) {
     if (!initialized) return;
     logHandler.info('Preparing match data');
 
-    final fm = File(matchDataPath), fp = File(playerDataPath);
+    final fm = File(storageHandler.matchData), fp = File(storageHandler.playerData);
+
     DataSize.matchActualDataSize = 0;
     DataSize.playerActualDataSize = 0;
 
@@ -58,42 +59,86 @@ class MatchState {
       md['pn_$i'] = pd['pn_$i'] = p.name;
       md['pi_$i.$ext'] = pd['pi_$i.$ext'] = Networking.encodeMedia(p.imagePath);
 
+      File file = File('${storageHandler.preparedData}\\$matchName\\other\\pi_$i.$ext');
+      if (!file.existsSync()) file.createSync(recursive: true);
+      file.writeAsBytesSync(File(StorageHandler.getFullPath(p.imagePath)).readAsBytesSync().toList());
+
+      file = File('${storageHandler.preparedData}\\$matchName\\player\\pi_$i.$ext');
+      if (!file.existsSync()) file.createSync(recursive: true);
+      file.writeAsBytesSync(File(StorageHandler.getFullPath(p.imagePath)).readAsBytesSync().toList());
+
       DataSize.playerActualDataSize += FileStat.statSync(StorageHandler.getFullPath(p.imagePath)).size;
       DataSize.matchActualDataSize += FileStat.statSync(StorageHandler.getFullPath(p.imagePath)).size;
     }
 
+    storageHandler.writeStringToFile(
+      '${storageHandler.preparedData}\\$matchName\\player\\size.txt',
+      DataSize.playerActualDataSize.toString(),
+      createIfNotExists: true,
+    );
+    storageHandler.writeStringToFile(
+      '${storageHandler.preparedData}\\$matchName\\player\\name.txt',
+      MatchState().players.map((e) => e.name).join('|'),
+      createIfNotExists: true,
+    );
+
     final pm = String.fromCharCodes(zlib.encode(jsonEncode(pd).codeUnits));
     // final pm = jsonEncode(pd);
+
     DataSize.playerMessageSize = KLISocketMessage(
       senderID: ConnectionID.host,
       type: KLIMessageType.playerData,
       message: pm,
       // message: String.fromCharCodes(zlib.encode(pm.codeUnits)),
     ).encode().codeUnits.length;
+
     fp.writeAsStringSync(pm);
     logHandler.info('Player data done');
-
-    final obsPath = DataManager.getSectionQuestionsOfMatch<ObstacleSection>(MatchState().match.name).imagePath;
-    md['oi.${obsPath.split('.').last}'] = Networking.encodeMedia(obsPath);
-    DataSize.matchActualDataSize += FileStat.statSync(StorageHandler.getFullPath(obsPath)).size;
     pd.clear();
 
+    final obsPath = DataManager.getSectionOfMatch<ObstacleSection>(MatchState().match.name).imagePath;
+    md['oi.${obsPath.split('.').last}'] = Networking.encodeMedia(obsPath);
+    DataSize.matchActualDataSize += FileStat.statSync(StorageHandler.getFullPath(obsPath)).size;
+
+    File file = File('${storageHandler.preparedData}\\$matchName\\other\\oi.${obsPath.split('.').last}');
+    if (!file.existsSync()) file.createSync(recursive: true);
+    file.writeAsBytesSync(File(StorageHandler.getFullPath(obsPath)).readAsBytesSync().toList());
+
     for (final i in range(0, 3)) {
-      final q = DataManager.getSectionQuestionsOfMatch<AccelSection>(MatchState().match.name).questions[i];
+      final q = DataManager.getSectionOfMatch<AccelSection>(MatchState().match.name).questions[i];
       for (final j in range(0, q.imagePaths.length - 1)) {
         final ext = q.imagePaths[j].split('.').last;
         md['ai_${i}_$j.$ext'] = Networking.encodeMedia(q.imagePaths[j]);
         DataSize.matchActualDataSize += FileStat.statSync(StorageHandler.getFullPath(q.imagePaths[j])).size;
+
+        file = File('${storageHandler.preparedData}\\$matchName\\other\\ai_${i}_$j.$ext');
+        if (!file.existsSync()) file.createSync(recursive: true);
+        file.writeAsBytesSync(File(StorageHandler.getFullPath(q.imagePaths[j])).readAsBytesSync().toList());
       }
     }
 
-    DataManager.getSectionQuestionsOfMatch<FinishSection>(MatchState().match.name).questions.forEach((q) {
+    DataManager.getSectionOfMatch<FinishSection>(MatchState().match.name).questions.forEach((q) {
       if (q.mediaPath.isEmpty) return;
       if (md.containsKey('f_${q.mediaPath.split(r'\').last}')) return;
 
       md['f_${q.mediaPath.split(r'\').last}'] = Networking.encodeMedia(q.mediaPath);
       DataSize.matchActualDataSize += FileStat.statSync(StorageHandler.getFullPath(q.mediaPath)).size;
+
+      file = File('${storageHandler.preparedData}\\$matchName\\other\\f_${q.mediaPath.split(r'\').last}');
+      if (!file.existsSync()) file.createSync(recursive: true);
+      file.writeAsBytesSync(File(StorageHandler.getFullPath(q.mediaPath)).readAsBytesSync().toList());
     });
+
+    storageHandler.writeStringToFile(
+      '${storageHandler.preparedData}\\$matchName\\other\\size.txt',
+      DataSize.matchActualDataSize.toString(),
+      createIfNotExists: true,
+    );
+    storageHandler.writeStringToFile(
+      '${storageHandler.preparedData}\\$matchName\\other\\name.txt',
+      MatchState().players.map((e) => e.name).join('|'),
+      createIfNotExists: true,
+    );
 
     // final mm = jsonEncode(md);
     final mm = String.fromCharCodes(zlib.encode(jsonEncode(md).codeUnits));
@@ -103,6 +148,7 @@ class MatchState {
       message: mm,
       // message: String.fromCharCodes(zlib.encode(mm.codeUnits)),
     ).encode().codeUnits.length;
+
     fm.writeAsStringSync(mm);
     logHandler.info('Match data done');
   }
@@ -175,7 +221,7 @@ class MatchState {
   void loadQuestions() {
     switch (section) {
       case MatchSection.start:
-        questionList = DataManager.getSectionQuestionsOfMatch<StartSection>(match.name) //
+        questionList = DataManager.getSectionOfMatch<StartSection>(match.name) //
             .questions
             .where((e) => e.pos == startOrFinishPos)
             .toList()
@@ -183,18 +229,18 @@ class MatchState {
         break;
       case MatchSection.obstacle:
         questionList = null;
-        obstacleMatch = DataManager.getSectionQuestionsOfMatch<ObstacleSection>(match.name);
+        obstacleMatch = DataManager.getSectionOfMatch<ObstacleSection>(match.name);
         break;
       case MatchSection.accel:
         obstacleMatch = null;
-        questionList = DataManager.getSectionQuestionsOfMatch<AccelSection>(match.name).questions.reversed.toList();
+        questionList = DataManager.getSectionOfMatch<AccelSection>(match.name).questions.reversed.toList();
         break;
       case MatchSection.finish:
         startOrFinishPos = 0;
-        questionList = DataManager.getSectionQuestionsOfMatch<FinishSection>(match.name).questions;
+        questionList = DataManager.getSectionOfMatch<FinishSection>(match.name).questions;
         break;
       case MatchSection.extra:
-        questionList = DataManager.getSectionQuestionsOfMatch<ExtraSection>(match.name).questions.reversed.toList();
+        questionList = DataManager.getSectionOfMatch<ExtraSection>(match.name).questions.reversed.toList();
         break;
       default:
         throw Exception('Invalid section, this should not happen.');

@@ -70,7 +70,7 @@ class _AccelScreenState extends State<AccelScreen> {
         key: _key,
         appBar: managerAppBar(
           context,
-          'Accel',
+          'Tăng tốc',
           leading: isTesting
               ? BackButton(
                   onPressed: () {
@@ -100,16 +100,11 @@ class _AccelScreenState extends State<AccelScreen> {
           showTime: true,
           actions: [
             KLIButton(
-              'Announce Result',
+              'Công bố kết quả',
               enableCondition: canAnnounceAnswer,
               onPressed: () {
                 int mul = 0;
                 for (int i = 0; i < 4; i++) {
-                  // if (answers[i].$3 < 0) {
-                  //   answerResults[i] = false;
-                  //   continue;
-                  // }
-                  // answerResults[i] = answers[i].$2.toLowerCase() == currentQuestion.answer.toLowerCase();
                   if (answerResults[i] == true) {
                     MatchState().modifyScore(answers[i].$1, (4 - mul) * 10);
                     mul++;
@@ -185,7 +180,7 @@ class _AccelScreenState extends State<AccelScreen> {
                 padding: const EdgeInsets.symmetric(vertical: 16),
                 alignment: Alignment.center,
                 child: Text(
-                  questionNum > 0 ? 'Question $questionNum' : '',
+                  questionNum > 0 ? 'Câu $questionNum' : '',
                   style: const TextStyle(fontSize: fontSizeMedium),
                 ),
               ),
@@ -312,7 +307,7 @@ class _AccelScreenState extends State<AccelScreen> {
         ),
         const SizedBox(height: 160),
         KLIButton(
-          hideAns ? 'Show ans' : 'Hide ans',
+          hideAns ? 'Hiện đáp án' : 'Ẩn đáp án',
           enabledLabel: 'Temporarily hide answer',
           textAlign: TextAlign.center,
           onPressed: () {
@@ -320,9 +315,9 @@ class _AccelScreenState extends State<AccelScreen> {
           },
         ),
         KLIButton(
-          'Start',
+          'Bắt đầu',
           enableCondition: canStart,
-          disabledLabel: 'Question is not yet answered',
+          disabledLabel: 'Câu hỏi chưa được trả lời',
           onPressed: () {
             canStart = false;
             started = true;
@@ -348,14 +343,14 @@ class _AccelScreenState extends State<AccelScreen> {
           },
         ),
         KLIButton(
-          'Explanation',
+          'Giải thích',
           enableCondition: timeEnded,
-          disabledLabel: 'Question is not yet answered',
+          disabledLabel: 'Câu hỏi chưa được trả lời',
           textAlign: TextAlign.center,
           onPressed: () {
             showPopupMessage(
               context,
-              title: 'Explanation',
+              title: 'Giải thích',
               content: currentQuestion.explanation,
               horizontalPadding: 500,
             );
@@ -370,9 +365,9 @@ class _AccelScreenState extends State<AccelScreen> {
           },
         ),
         KLIButton(
-          'Next question',
+          'Câu tiếp theo',
           enableCondition: canNext && questionNum < 4,
-          disabledLabel: 'Question is not yet answered',
+          disabledLabel: 'Câu hỏi chưa được trả lời',
           textAlign: TextAlign.center,
           onPressed: () {
             nextQuestion();
@@ -386,9 +381,9 @@ class _AccelScreenState extends State<AccelScreen> {
           },
         ),
         KLIButton(
-          'Show answers',
+          'Hiện đáp án',
           enableCondition: timeEnded,
-          disabledLabel: 'Timer is still running',
+          disabledLabel: 'Thời gian chưa hết',
           textAlign: TextAlign.center,
           onPressed: () {
             setState(() {});
@@ -397,9 +392,9 @@ class _AccelScreenState extends State<AccelScreen> {
           },
         ),
         KLIButton(
-          'End',
+          'Kết thúc',
           enableCondition: canEnd,
-          disabledLabel: 'Currently ongoing',
+          disabledLabel: 'Phần thi chưa kết thúc',
           onPressed: () {
             KLIServer.sendToAllClients(KLISocketMessage(
               senderID: ConnectionID.host,

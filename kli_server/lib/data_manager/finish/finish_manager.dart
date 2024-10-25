@@ -106,7 +106,7 @@ class _FinishManagerState extends State<FinishManager> {
           matchSelector(matchNames, (value) async {
             logHandler.info('Selected match: $value');
             hasSelectedMatch = value != null;
-            selectedMatch = DataManager.getSectionQuestionsOfMatch<FinishSection>(value!);
+            selectedMatch = DataManager.getSectionOfMatch<FinishSection>(value!);
             setState(() {});
           }),
           // sort point

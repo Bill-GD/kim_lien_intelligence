@@ -18,7 +18,6 @@ class ServerSetup extends StatefulWidget {
 }
 
 class _ServerSetupState extends State<ServerSetup> {
-  String localAddress = '';
   final List<StreamSubscription> subscriptions = [];
   bool canClosePopup = false;
   final ipController = TextEditingController();
@@ -30,13 +29,11 @@ class _ServerSetupState extends State<ServerSetup> {
     KLIServer.stop();
     logHandler.info('Opened Server Setup page');
     getIpAddresses();
-    ipController.text = 'Local IP: $localAddress\n';
   }
 
   void getIpAddresses() async {
     KLIServer.serverAddress = await Networking.getLocalIP();
-    localAddress = KLIServer.serverIP;
-    ipController.text = 'Local IP: $localAddress\n';
+    ipController.text = 'Local IP: ${KLIServer.serverIP}\n';
     updateDebugOverlay();
     setState(() {});
   }
@@ -136,17 +133,18 @@ class _ServerSetupState extends State<ServerSetup> {
       crossAxisAlignment: CrossAxisAlignment.center,
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Text(
-          'Server status: ${KLIServer.started ? '🟢' : '🔴'}\n',
-          textAlign: TextAlign.center,
-          style: s,
+        Tooltip(
+          message: KLIServer.started ? 'Mở' : 'Đóng',
+          child: Text(
+            'Trạng thái server: ${KLIServer.started ? '🟢' : '🔴'}\n',
+            textAlign: TextAlign.center,
+            style: s,
+          ),
         ),
         IntrinsicWidth(
           child: TextFormField(
             style: const TextStyle(fontSize: fontSizeLarge),
-            decoration: const InputDecoration(
-              border: UnderlineInputBorder(),
-            ),
+            decoration: const InputDecoration(border: UnderlineInputBorder()),
             textAlign: TextAlign.center,
             maxLines: 1,
             readOnly: true,
@@ -162,9 +160,9 @@ class _ServerSetupState extends State<ServerSetup> {
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
         KLIButton(
-          'Start Server',
+          'Mở Server',
           enableCondition: !KLIServer.started,
-          disabledLabel: 'Server already started',
+          disabledLabel: 'Server đã được mở',
           onPressed: () async {
             await KLIServer.start(updateDebugOverlay);
             updateDebugOverlay();
@@ -172,16 +170,16 @@ class _ServerSetupState extends State<ServerSetup> {
             if (DataSize.matchActualDataSize == 0 && mounted) {
               showPopupMessage(
                 context,
-                title: 'Match data',
-                content: 'Please remember to prepare the match data before any client connect.',
+                title: 'Chuẩn bị dữ liệu',
+                content: 'Hãy nhớ chuẩn bị dữ liệu trước khi client kết nối.',
               );
             }
             setState(() {});
           },
         ),
         KLIButton(
-          'Stop Server',
-          disabledLabel: 'No server exist',
+          'Đóng Server',
+          disabledLabel: 'Chưa mở server',
           enableCondition: KLIServer.started,
           onPressed: () async {
             // MatchState.reset();
@@ -191,9 +189,9 @@ class _ServerSetupState extends State<ServerSetup> {
           },
         ),
         KLIButton(
-          'Start Match',
+          'Bắt đầu trận',
           enableCondition: KLIServer.started && (isTesting || MatchState().allPlayerReady),
-          disabledLabel: !KLIServer.started ? 'No server exist' : 'Not enough player',
+          disabledLabel: !KLIServer.started ? 'Chưa mở server' : 'Không đủ thí sinh',
           onPressed: () async {
             KLIServer.sendToAllClients(KLISocketMessage(
               senderID: ConnectionID.host,
@@ -217,20 +215,23 @@ class _ServerSetupState extends State<ServerSetup> {
           },
         ),
         KLIButton(
-          'Prepare match data',
+          'Chuẩn bị dữ liệu',
           onPressed: () async {
             showPopupMessage(
               context,
-              title: 'Match data',
+              title: 'Chuẩn bị dữ liệu',
+              // content: '''
+              // The app is preparing the match data. Please wait for it to finish.
+              // This data will be used by the clients while playing the match.''',
               content: '''
-              The app is preparing the match data. Please wait for it to finish.
-              This data will be used by the clients while playing the match.''',
+              Ứng dụng đang chuẩn bị dữ liệu trận đấu. Vui lòng đợi cho đến khi hoàn thành.
+              Dữ liệu này sẽ được sử dụng bởi các client trong khi tham gia.''',
             );
             Future.delayed(
               300.ms,
               () {
-                MatchState.prepareMatchData(storageHandler.matchData, storageHandler.playerData);
-                showPopupMessage(context, title: 'Finish', content: 'Done! You can close this now.');
+                MatchState.prepareMatchData(MatchState().match.name);
+                showPopupMessage(context, title: 'Hoàn tất', content: 'Đã xong! Bạn có thể tắt thông báo này.');
                 setState(() {});
               },
             );
@@ -311,14 +312,14 @@ class _ServerSetupState extends State<ServerSetup> {
     for (int index = 0; index < KLIServer.totalClientCount; index++) {
       final client = KLIServer.getClientSocket(index);
       final clientConnected = client != null;
-      String ip = clientConnected ? '${client.remoteAddress.address}:${client.remotePort}' : 'Not connected';
+      String ip = clientConnected ? '${client.remoteAddress.address}:${client.remotePort}' : 'Chưa kết nối';
 
       String t = Networking.getClientDisplayID(ConnectionID.values[index + 1]);
       Widget w = Text(t);
       if (index < 4) {
         t += MatchState.initialized && MatchState.playerReady[index] ? '  ✔️' : '  ❌';
         w = Tooltip(
-          message: MatchState.playerReady[index] ? 'Ready' : 'Not ready',
+          message: MatchState.playerReady[index] ? 'Sẵn sàng' : 'Chưa sẵn sàng',
           child: Text(t),
         );
       }
@@ -334,12 +335,12 @@ class _ServerSetupState extends State<ServerSetup> {
           trailing: KLIIconButton(
             const FaIcon(FontAwesomeIcons.linkSlash),
             enableCondition: clientConnected,
-            enabledLabel: 'Disconnect ${Networking.getClientDisplayID(ConnectionID.values[index + 1])}',
-            disabledLabel: 'Not connected',
+            enabledLabel: 'Ngắt kết nối ${Networking.getClientDisplayID(ConnectionID.values[index + 1])}',
+            disabledLabel: 'Chưa kết nối',
             onPressed: () async {
               await confirmDialog(
                 context,
-                message: 'Disconnect client?',
+                message: 'Ngắt kết nối client?',
                 acceptLogMessage: 'Forced disconnect Client: ${ConnectionID.values[index + 1]}',
                 onAccept: () async {
                   KLIServer.disconnectClient(ConnectionID.values[index + 1], 'Server forced disconnection');

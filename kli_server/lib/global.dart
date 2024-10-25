@@ -114,7 +114,15 @@ class DataSize {
 }
 
 const String changelog = """
-  0.4.5.6 ({latest}):
+  0.4.6 ({latest}):
+  - Translated all text to Vietnamese
+  - Added help for match control
+  - Fixed some help text
+  - Sound page is above log
+  - Fixed extra requires at least 3 questions instead of 1
+  - Prepare to files for alternative data transfer
+
+  0.4.5.6 ({486a5bb}):
   - Reworked DataManager
   - Saved data is now separated by match name
   - Some short text input is now limited to 1 line

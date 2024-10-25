@@ -63,12 +63,12 @@ class _FinishScreenState extends State<FinishScreen> {
         if (mounted) {
           final res = await dialogWithActions<bool>(
             context,
-            title: 'Stealing',
-            content: '${Networking.getClientDisplayID(m.senderID)} has decided to steal the right to answer.',
+            title: 'Cướp câu trả lời',
+            content: '${Networking.getClientDisplayID(m.senderID)} muốn cướp câu trả lời.',
             time: 150.ms,
             actions: [
               KLIButton(
-                'Correct',
+                'Đúng',
                 onPressed: () {
                   audioHandler.play(assetHandler.finishCorrect);
                   KLIServer.sendToViewers(KLISocketMessage(
@@ -80,7 +80,7 @@ class _FinishScreenState extends State<FinishScreen> {
                 },
               ),
               KLIButton(
-                'Wrong',
+                'Sai',
                 onPressed: () {
                   audioHandler.play(assetHandler.finishIncorrect);
                   KLIServer.sendToViewers(KLISocketMessage(
@@ -129,7 +129,7 @@ class _FinishScreenState extends State<FinishScreen> {
       child: Scaffold(
         appBar: managerAppBar(
           context,
-          'Finish',
+          'Về đích',
           leading: isTesting
               ? BackButton(
                   onPressed: () {
@@ -302,7 +302,7 @@ class _FinishScreenState extends State<FinishScreen> {
                                     alignment: Alignment.centerRight,
                                     padding: const EdgeInsets.only(right: 100),
                                     child: KLIButton(
-                                      'Play',
+                                      'Chạy',
                                       enableCondition: canShowQuestion && canPlayVideo,
                                       onPressed: () {
                                         vidController!.play();
@@ -335,9 +335,9 @@ class _FinishScreenState extends State<FinishScreen> {
         children: [
           Expanded(
             child: KLIButton(
-              'Correct',
+              'Đúng',
               enableCondition: timeEnded && !canSelectQuestion,
-              disabledLabel: "Can't answer now",
+              disabledLabel: "Chưa thể trả lời",
               onPressed: () {
                 MatchState().modifyScore(widget.playerPos, pointValue);
                 KLIServer.sendToAllClients(KLISocketMessage(
@@ -361,9 +361,9 @@ class _FinishScreenState extends State<FinishScreen> {
           const SizedBox(width: 16),
           Expanded(
             child: KLIButton(
-              'Incorrect',
+              'Sai',
               enableCondition: timeEnded && !canSelectQuestion,
-              disabledLabel: "Can't answer now",
+              disabledLabel: "Chưa thể trả lời",
               onPressed: () {
                 canSelectQuestion = questionNum < 3;
                 canEnd = questionNum == 3;
@@ -398,12 +398,12 @@ class _FinishScreenState extends State<FinishScreen> {
           const SizedBox(width: 16),
           Expanded(
             child: KLIButton(
-              'Explanation',
+              'Giải thích',
               enableCondition: canShowQuestion,
               onPressed: () {
                 showPopupMessage(
                   context,
-                  title: 'Explanation',
+                  title: 'Giải thích',
                   content: currentQuestion.explanation,
                   horizontalPadding: 400,
                 );
@@ -428,7 +428,7 @@ class _FinishScreenState extends State<FinishScreen> {
               child: KLIButton(
                 (i * 10).toString(),
                 enableCondition: canSelectPoint,
-                disabledLabel: 'Already chosen',
+                disabledLabel: 'Đã chọn',
                 onPressed: () {
                   chosenQuestions[chosenQuestionCount++] = i * 10;
                   canSelectQuestion = chosenQuestionCount == 3;
@@ -498,7 +498,7 @@ class _FinishScreenState extends State<FinishScreen> {
               child: KLIButton(
                 'Q${i + 1}: ${chosenQuestions[i]}',
                 enableCondition: canSelectQuestion && questionNum == i,
-                disabledLabel: 'Not chosen yet',
+                disabledLabel: 'Chưa chọn',
                 onPressed: () {
                   nextQuestion(chosenQuestions[i]);
                   canSelectQuestion = false;
@@ -552,9 +552,9 @@ class _FinishScreenState extends State<FinishScreen> {
       ),
       const SizedBox(height: 32),
       KLIButton(
-        'Start',
+        'Bắt đầu',
         enableCondition: canStart,
-        disabledLabel: 'Currently ongoing',
+        disabledLabel: 'Phần thi chưa kết thúc',
         onPressed: () {
           canStart = false;
           started = true;
@@ -581,9 +581,9 @@ class _FinishScreenState extends State<FinishScreen> {
       ),
       const SizedBox(height: 32),
       KLIButton(
-        'End',
+        'Kết thúc',
         enableCondition: canEnd,
-        disabledLabel: 'Currently ongoing',
+        disabledLabel: 'Phần thi chưa kết thúc',
         onPressed: () {
           audioHandler.play(assetHandler.finishEndPlayer);
           KLIServer.sendToAllClients(KLISocketMessage(

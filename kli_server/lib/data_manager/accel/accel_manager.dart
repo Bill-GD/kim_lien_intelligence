@@ -119,7 +119,7 @@ class _AccelManagerState extends State<AccelManager> {
           matchSelector(matchNames, (value) async {
             logHandler.info('Selected match: $value');
             hasSelectedMatch = value != null;
-            selectedMatch = DataManager.getSectionQuestionsOfMatch<AccelSection>(value!);
+            selectedMatch = DataManager.getSectionOfMatch<AccelSection>(value!);
             selectedQuestionIndex = -1;
             selectedImageIndex = -1;
             setState(() {});

@@ -32,7 +32,7 @@ class _SoundTestState extends State<SoundTest> {
                     );
                   },
                 ),
-                KLIButton('Stop all sound', onPressed: audioHandler.stop),
+                KLIButton('Dừng âm thanh', onPressed: audioHandler.stop),
               ],
             ),
             Flexible(
@@ -44,7 +44,7 @@ class _SoundTestState extends State<SoundTest> {
                     title: Text(sound),
                     trailing: ElevatedButton(
                       onPressed: () => audioHandler.play(sound),
-                      child: const Text('Play'),
+                      child: const Text('Chạy'),
                     ),
                   );
                 },

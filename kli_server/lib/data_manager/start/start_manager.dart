@@ -107,7 +107,7 @@ class _StartQuestionManagerState extends State<StartQuestionManager> {
           matchSelector(matchNames, (value) async {
             logHandler.info('Selected match: $value');
             hasSelectedMatch = value != null;
-            selectedMatch = DataManager.getSectionQuestionsOfMatch<StartSection>(value!);
+            selectedMatch = DataManager.getSectionOfMatch<StartSection>(value!);
             setState(() {});
           }),
           // sort player pos

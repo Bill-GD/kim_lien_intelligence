@@ -72,7 +72,7 @@ class DataManager {
     Directory('${storageHandler.saveDataDir}\\$name').deleteSync(recursive: true);
   }
 
-  static T getSectionQuestionsOfMatch<T extends BaseSection>(String matchName) {
+  static T getSectionOfMatch<T extends BaseSection>(String matchName) {
     logHandler.info('Getting all saved $T questions');
     final saved = storageHandler.readFromFile(_mapTypeToFile(T, matchName));
     if (saved.isEmpty) return BaseSection.empty<T>(matchName);
@@ -96,11 +96,11 @@ class DataManager {
 
     for (final type in types) {
       final m = switch (type) {
-        StartSection => getSectionQuestionsOfMatch<StartSection>(oldName),
-        ObstacleSection => getSectionQuestionsOfMatch<ObstacleSection>(oldName),
-        AccelSection => getSectionQuestionsOfMatch<AccelSection>(oldName),
-        FinishSection => getSectionQuestionsOfMatch<FinishSection>(oldName),
-        ExtraSection => getSectionQuestionsOfMatch<ExtraSection>(oldName),
+        StartSection => getSectionOfMatch<StartSection>(oldName),
+        ObstacleSection => getSectionOfMatch<ObstacleSection>(oldName),
+        AccelSection => getSectionOfMatch<AccelSection>(oldName),
+        FinishSection => getSectionOfMatch<FinishSection>(oldName),
+        ExtraSection => getSectionOfMatch<ExtraSection>(oldName),
         _ => throw Exception('Unknown type'),
       };
       m.matchName = newName;
