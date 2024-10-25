@@ -47,9 +47,11 @@ class _ViewerAnswerSlideState extends State<ViewerAnswerSlide> {
         answerResult = (jsonDecode(m.message) as List).map((e) => e as bool?);
         setState(() {});
       }
+
       if (m.type == KLIMessageType.showAnswers) {
         Navigator.pop(context);
       }
+
       if (m.type == KLIMessageType.pop) {
         Navigator.pop(context);
       }

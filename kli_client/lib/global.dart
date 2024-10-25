@@ -29,6 +29,7 @@ String getSizeString(int bytes) {
 const String changelog = """
   0.4.3 ({latest}):
   - Added MC screens: overview, start, obstacle, accel, finish, extra
+  - Shows section results screen to MC
 
   0.4.2 ({5234e88}):
   - Moved cache location from local appdata to app folder

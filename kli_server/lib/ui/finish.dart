@@ -306,7 +306,7 @@ class _FinishScreenState extends State<FinishScreen> {
                                       enableCondition: canShowQuestion && canPlayVideo,
                                       onPressed: () {
                                         vidController!.play();
-                                        KLIServer.sendToNonPlayer(KLISocketMessage(
+                                        KLIServer.sendToViewers(KLISocketMessage(
                                           senderID: ConnectionID.host,
                                           type: KLIMessageType.playVideo,
                                         ));

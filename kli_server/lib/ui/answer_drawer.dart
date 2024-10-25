@@ -121,18 +121,16 @@ class _AnswerDrawerState extends State<AnswerDrawer> {
                   '${viewerShowingAnswers ? 'Hide' : 'Show'} answers',
                   // enableCondition: widget.canCheck,
                   onPressed: () {
-                    KLIServer.sendToNonPlayer(
-                      KLISocketMessage(
-                        senderID: ConnectionID.host,
-                        type: KLIMessageType.showAnswers,
-                        message: viewerShowingAnswers
-                            ? ''
-                            : jsonEncode({
-                                'answers': widget.answers.map((e) => e.$1).toList(),
-                                'times': widget.answers.map((e) => max(e.$2, 0.0)).toList(),
-                              }),
-                      ),
-                    );
+                    KLIServer.sendToNonPlayer(KLISocketMessage(
+                      senderID: ConnectionID.host,
+                      type: KLIMessageType.showAnswers,
+                      message: viewerShowingAnswers
+                          ? ''
+                          : jsonEncode({
+                              'answers': widget.answers.map((e) => e.$1).toList(),
+                              'times': widget.answers.map((e) => max(e.$2, 0.0)).toList(),
+                            }),
+                    ));
                     viewerShowingAnswers = !viewerShowingAnswers;
                     setState(() {});
                   },
