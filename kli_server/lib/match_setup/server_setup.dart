@@ -11,6 +11,7 @@ import '../ui/overview.dart';
 
 class ServerSetup extends StatefulWidget {
   final String matchName;
+
   const ServerSetup(this.matchName, {super.key});
 
   @override
@@ -48,8 +49,8 @@ class _ServerSetupState extends State<ServerSetup> {
       context,
       message: 'Bạn có chắc bạn muốn thoát?\nServer sẽ tự động đóng.',
       acceptLogMessage: 'Leaving Server Setup page...',
-      onAccept: () async {
-        await KLIServer.stop();
+      onAccept: () {
+        KLIServer.stop();
         updateDebugOverlay();
         if (mounted) Navigator.pop(context);
       },
@@ -183,7 +184,7 @@ class _ServerSetupState extends State<ServerSetup> {
           enableCondition: KLIServer.started,
           onPressed: () async {
             // MatchState.reset();
-            await KLIServer.stop();
+            KLIServer.stop();
             updateDebugOverlay();
             setState(() {});
           },
@@ -342,7 +343,7 @@ class _ServerSetupState extends State<ServerSetup> {
                 context,
                 message: 'Ngắt kết nối client?',
                 acceptLogMessage: 'Forced disconnect Client: ${ConnectionID.values[index + 1]}',
-                onAccept: () async {
+                onAccept: () {
                   KLIServer.disconnectClient(ConnectionID.values[index + 1], 'Server forced disconnection');
                   if (clientConnected) client.destroy();
                 },

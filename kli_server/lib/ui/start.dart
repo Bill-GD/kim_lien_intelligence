@@ -20,7 +20,7 @@ class StartScreen extends StatefulWidget {
 
 class _StartScreenState extends State<StartScreen> {
   double currentTimeSec = 60;
-  bool started = false, timeEnded = false;
+  bool started = false, timeEnded = false, disableStart = false;
   late StartQuestion currentQuestion;
   Timer? timer;
   int questionNum = 0;
@@ -286,12 +286,19 @@ class _StartScreenState extends State<StartScreen> {
               enableCondition: timeEnded,
               disabledLabel: 'Currently ongoing',
               onPressed: () {
-                audioHandler.play(assetHandler.startEndPlayer);
-                KLIServer.sendToAllClients(KLISocketMessage(
-                  senderID: ConnectionID.host,
-                  type: KLIMessageType.endSection,
-                ));
-                Navigator.of(context).pop();
+                confirmDialog(
+                  context,
+                  message: 'Kết thúc phần thi?',
+                  acceptLogMessage: 'Section finished',
+                  onAccept: () {
+                    Navigator.of(context).pop();
+                    audioHandler.play(assetHandler.startEndPlayer);
+                    KLIServer.sendToAllClients(KLISocketMessage(
+                      senderID: ConnectionID.host,
+                      type: KLIMessageType.endSection,
+                    ));
+                  },
+                );
               },
             ),
           )
@@ -299,7 +306,7 @@ class _StartScreenState extends State<StartScreen> {
             padding: widget.buttonPadding,
             child: KLIButton(
               'Bắt đầu',
-              enableCondition: !started,
+              enableCondition: !started && !disableStart,
               onPressed: () {
                 KLIServer.sendToViewers(KLISocketMessage(
                   senderID: ConnectionID.host,
@@ -307,8 +314,9 @@ class _StartScreenState extends State<StartScreen> {
                   message: assetHandler.startShowQuestions,
                 ));
                 audioHandler.play(assetHandler.startShowQuestions);
+                setState(() => disableStart = true);
 
-                Future.delayed(4.7.seconds, () {
+                Future.delayed(4.5.seconds, () {
                   KLIServer.sendToViewers(KLISocketMessage(
                     senderID: ConnectionID.host,
                     type: KLIMessageType.playAudio,
@@ -327,8 +335,7 @@ class _StartScreenState extends State<StartScreen> {
                       setState(() {});
                     }
                   });
-                  started = true;
-                  setState(() {});
+                  setState(() => started = true);
                 });
               },
             ),

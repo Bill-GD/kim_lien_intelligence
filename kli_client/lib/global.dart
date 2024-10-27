@@ -5,7 +5,7 @@ import 'package:kli_lib/kli_lib.dart';
 late final String cachePath;
 bool isTesting = kDebugMode, showDebugInfo = false;
 DecorationImage? bgDecorationImage;
-final buildDate = DateTime(2024, 9, 11);
+final buildDate = DateTime(2024, 10, 25);
 
 late void Function() updateDebugOverlay;
 late void Function() updateChild;
@@ -27,7 +27,7 @@ String getSizeString(int bytes) {
 }
 
 const String changelog = """
-  0.4.3 ({latest}):
+  0.4.3 ({cb0f451}):
   - Added MC screens: overview, start, obstacle, accel, finish, extra
   - Shows section results screen to MC
   - Translated all text to Vietnamese

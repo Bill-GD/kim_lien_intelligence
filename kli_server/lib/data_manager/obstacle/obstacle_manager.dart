@@ -165,9 +165,8 @@ class _ObstacleManagerState extends State<ObstacleManager> {
                 context,
                 message: 'Bạn có muốn xóa tất cả hàng ngang của trận: ${selectedMatch.matchName}?',
                 acceptLogMessage: 'Removed all obstacle questions for match: ${selectedMatch.matchName}',
-                onAccept: () async {
-                  if (mounted) showToastMessage(context, 'Đã xóa (match: ${selectedMatch.matchName})');
-
+                onAccept: () {
+                  showToastMessage(context, 'Đã xóa (match: ${selectedMatch.matchName})');
                   DataManager.removeSectionDataOfMatch<ObstacleSection>(selectedMatch);
                   selectedMatch = ObstacleSection.empty(selectedMatch.matchName);
                   setState(() {});

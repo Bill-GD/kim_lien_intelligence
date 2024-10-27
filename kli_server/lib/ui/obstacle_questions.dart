@@ -13,6 +13,7 @@ final _key = GlobalKey<ScaffoldState>();
 
 class ObstacleQuestionScreen extends StatefulWidget {
   final double timeLimitSec = 15;
+
   const ObstacleQuestionScreen({super.key});
 
   @override
@@ -352,9 +353,7 @@ class _ObstacleQuestionScreenState extends State<ObstacleQuestionScreen> {
                 message: jsonEncode(MatchState().revealedImageParts),
               ));
               await Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (context) => const ObstacleImageScreen(),
-                ),
+                MaterialPageRoute(builder: (context) => const ObstacleImageScreen()),
               );
               canShowImage = false;
               canSelectQuestion = canShowRows = true;
@@ -363,7 +362,10 @@ class _ObstacleQuestionScreenState extends State<ObstacleQuestionScreen> {
           ),
           KLIButton(
             'Trung tâm',
-            enableCondition: MatchState().allRowsAnswered && !MatchState().answeredObstacleRows[4] && questionIndex != 4 && canSelectQuestion,
+            enableCondition: MatchState().allRowsAnswered &&
+                !MatchState().answeredObstacleRows[4] &&
+                questionIndex != 4 &&
+                canSelectQuestion,
             onPressed: () {
               audioHandler.play(assetHandler.obsChoseRow);
               answerResults.fillRange(0, 4, null);
@@ -413,11 +415,18 @@ class _ObstacleQuestionScreenState extends State<ObstacleQuestionScreen> {
                 'Kết thúc',
                 enableCondition: canEnd,
                 onPressed: () {
-                  KLIServer.sendToAllClients(KLISocketMessage(
-                    senderID: ConnectionID.host,
-                    type: KLIMessageType.endSection,
-                  ));
-                  Navigator.of(context).pop();
+                  confirmDialog(
+                    context,
+                    message: 'Kết thúc phần thi?',
+                    acceptLogMessage: 'Section finished',
+                    onAccept: () {
+                      KLIServer.sendToAllClients(KLISocketMessage(
+                        senderID: ConnectionID.host,
+                        type: KLIMessageType.endSection,
+                      ));
+                      Navigator.of(context).pop();
+                    },
+                  );
                 },
               ),
             ],

@@ -139,8 +139,8 @@ class _MatchManagerState extends State<MatchManager> {
                 context,
                 message: 'Bạn có muốn xóa trận: ${matches[currentMatchIndex].name}?',
                 acceptLogMessage: 'Removed match: ${matches[currentMatchIndex].name}',
-                onAccept: () async {
-                  if (mounted) showToastMessage(context, 'Đã xóa trận: ${matches[currentMatchIndex].name}');
+                onAccept: () {
+                  showToastMessage(context, 'Đã xóa trận: ${matches[currentMatchIndex].name}');
                   DataManager.deleteMatch(matches[currentMatchIndex].name);
                   matches.removeAt(currentMatchIndex);
                   setState(() => currentMatchIndex = -1);

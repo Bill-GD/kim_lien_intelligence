@@ -153,7 +153,8 @@ class _FinishManagerState extends State<FinishManager> {
             enabledLabel: 'Cho phép nhập dữ liệu từ file Excel',
             disabledLabel: 'Chưa chọn trận đấu',
             onPressed: () async {
-              Map<String, dynamic>? data = await Navigator.of(context).push<Map<String, dynamic>>(DialogRoute<Map<String, dynamic>>(
+              Map<String, dynamic>? data =
+                  await Navigator.of(context).push<Map<String, dynamic>>(DialogRoute<Map<String, dynamic>>(
                 context: context,
                 barrierDismissible: false,
                 barrierLabel: '',
@@ -182,10 +183,8 @@ class _FinishManagerState extends State<FinishManager> {
                 context,
                 message: 'Bạn có muốn xóa tất cả câu hỏi về đích của trận: ${selectedMatch.matchName}?',
                 acceptLogMessage: 'Removed all finish questions for match: ${selectedMatch.matchName}',
-                onAccept: () async {
-                  if (mounted) {
-                    showToastMessage(context, 'Đã xóa (match: ${selectedMatch.matchName})');
-                  }
+                onAccept: () {
+                  showToastMessage(context, 'Đã xóa (match: ${selectedMatch.matchName})');
                   DataManager.removeSectionDataOfMatch<FinishSection>(selectedMatch);
                   selectedMatch = FinishSection.empty();
                   setState(() {});
@@ -251,7 +250,7 @@ class _FinishManagerState extends State<FinishManager> {
                                 context,
                                 message: 'Bạn có muốn xóa câu hỏi này?\n"${q.$2.question}"',
                                 acceptLogMessage: 'Removed finish question (p=${q.$2.point})',
-                                onAccept: () async {
+                                onAccept: () {
                                   selectedMatch.questions.removeAt(q.$1);
                                   DataManager.updateSectionDataOfMatch<FinishSection>(selectedMatch);
                                   setState(() {});
@@ -264,7 +263,11 @@ class _FinishManagerState extends State<FinishManager> {
                       ],
                       onTap: () async {
                         final newQ = await Navigator.of(context).push<FinishQuestion>(
-                          DialogRoute<FinishQuestion>(context: context, barrierDismissible: false, barrierLabel: '', builder: (_) => FinishQuestionEditor(question: q.$2)),
+                          DialogRoute<FinishQuestion>(
+                              context: context,
+                              barrierDismissible: false,
+                              barrierLabel: '',
+                              builder: (_) => FinishQuestionEditor(question: q.$2)),
                         );
 
                         if (newQ != null) {

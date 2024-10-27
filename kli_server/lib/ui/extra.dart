@@ -10,6 +10,7 @@ import '../global.dart';
 class ExtraScreen extends StatefulWidget {
   final timeLimitSec = 15.0;
   final List<bool> players;
+
   const ExtraScreen({super.key, required this.players});
 
   @override
@@ -18,7 +19,13 @@ class ExtraScreen extends StatefulWidget {
 
 class _ExtraScreenState extends State<ExtraScreen> {
   double currentTimeSec = 0;
-  bool canNext = true, canStart = false, canShowQuestion = false, canAnnounce = false, canEnd = false, canStopTimer = false, timerStopped = false;
+  bool canNext = true,
+      canStart = false,
+      canShowQuestion = false,
+      canAnnounce = false,
+      canEnd = false,
+      canStopTimer = false,
+      timerStopped = false;
   late ExtraQuestion currentQuestion;
   Timer? timer;
   int questionNum = 0, answeredCount = 0;
@@ -29,6 +36,7 @@ class _ExtraScreenState extends State<ExtraScreen> {
   void initState() {
     super.initState();
     updateChild = () => setState(() {});
+    audioHandler.stop();
 
     sub = KLIServer.onMessageReceived.listen((m) async {
       if (m.type == KLIMessageType.extraSignal) {
@@ -64,6 +72,7 @@ class _ExtraScreenState extends State<ExtraScreen> {
               ),
             ],
           );
+          answeredCount++;
 
           if (res == true) {
             MatchState().extraScores[pos]++;
@@ -72,6 +81,7 @@ class _ExtraScreenState extends State<ExtraScreen> {
             if (answeredCount == playerCount) {
               if (questionNum == 3) {
                 canEnd = true;
+                canNext = false;
               } else {
                 canNext = true;
               }
@@ -276,7 +286,9 @@ class _ExtraScreenState extends State<ExtraScreen> {
     timer = Timer.periodic(1.seconds, (timer) {
       if (currentTimeSec <= 0) {
         timer.cancel();
-        timerStopped = canNext = true;
+        timerStopped = true;
+        canNext = MatchState().questionList!.isNotEmpty;
+        canEnd = !canNext;
         canStopTimer = canAnnounce = false;
         setState(() {});
       } else {
@@ -331,7 +343,7 @@ class _ExtraScreenState extends State<ExtraScreen> {
                 type: KLIMessageType.continueTimer,
               ),
             );
-            audioHandler.play(assetHandler.accelBackground, true);
+            audioHandler.play(assetHandler.obsBackground, true);
             createTimer();
             setState(() {});
           },
@@ -342,12 +354,18 @@ class _ExtraScreenState extends State<ExtraScreen> {
         enableCondition: canEnd,
         disabledLabel: 'Phần thi chưa kết thúc',
         onPressed: () {
-          KLIServer.sendToAllClients(KLISocketMessage(
-            senderID: ConnectionID.host,
-            type: KLIMessageType.endSection,
-          ));
-
-          Navigator.of(context).pop();
+          confirmDialog(
+            context,
+            message: 'Kết thúc phần thi?',
+            acceptLogMessage: 'Section finished',
+            onAccept: () {
+              KLIServer.sendToAllClients(KLISocketMessage(
+                senderID: ConnectionID.host,
+                type: KLIMessageType.endSection,
+              ));
+              Navigator.of(context).pop();
+            },
+          );
         },
       ),
     ];

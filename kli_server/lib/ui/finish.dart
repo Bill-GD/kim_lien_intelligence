@@ -38,6 +38,7 @@ class _FinishScreenState extends State<FinishScreen> {
   late final StreamSubscription<KLISocketMessage> sub;
   final List<int> chosenQuestions = [0, 0, 0];
   VideoPlayerController? vidController;
+
   bool get isVidQuestion => currentQuestion.mediaPath.isNotEmpty;
 
   @override
@@ -383,7 +384,15 @@ class _FinishScreenState extends State<FinishScreen> {
                   message: assetHandler.finishIncorrect,
                 ));
 
-                audioHandler.play(assetHandler.finishStealWait, true);
+                audioHandler.play(assetHandler.finishStealWait, true).then((_) {
+                  KLIServer.sendToAllExcept(
+                    [ConnectionID.values[widget.playerPos + 1]],
+                    KLISocketMessage(
+                      senderID: ConnectionID.host,
+                      type: KLIMessageType.disableSteal,
+                    ),
+                  );
+                });
                 KLIServer.sendToAllExcept(
                   [ConnectionID.values[widget.playerPos + 1]],
                   KLISocketMessage(
@@ -585,13 +594,19 @@ class _FinishScreenState extends State<FinishScreen> {
         enableCondition: canEnd,
         disabledLabel: 'Phần thi chưa kết thúc',
         onPressed: () {
-          audioHandler.play(assetHandler.finishEndPlayer);
-          KLIServer.sendToAllClients(KLISocketMessage(
-            senderID: ConnectionID.host,
-            type: KLIMessageType.endSection,
-          ));
-
-          Navigator.of(context).pop();
+          confirmDialog(
+            context,
+            message: 'Kết thúc phần thi?',
+            acceptLogMessage: 'Section finished',
+            onAccept: () {
+              audioHandler.play(assetHandler.finishEndPlayer);
+              KLIServer.sendToAllClients(KLISocketMessage(
+                senderID: ConnectionID.host,
+                type: KLIMessageType.endSection,
+              ));
+              Navigator.of(context).pop();
+            },
+          );
         },
       ),
     ];

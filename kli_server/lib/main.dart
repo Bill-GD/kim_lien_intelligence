@@ -64,6 +64,7 @@ void main() async {
 
 class KliServerApp extends StatefulWidget {
   final GlobalKey<NavigatorState> navKey;
+
   const KliServerApp({super.key, required this.navKey});
 
   @override

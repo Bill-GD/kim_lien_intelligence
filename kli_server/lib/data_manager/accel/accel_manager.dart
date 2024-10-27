@@ -180,10 +180,8 @@ class _AccelManagerState extends State<AccelManager> {
                 context,
                 message: 'Bạn có muốn xóa tất cả câu hỏi tăng tốc của trận: ${selectedMatch.matchName}?',
                 acceptLogMessage: 'Removed all accel questions for match: ${selectedMatch.matchName}',
-                onAccept: () async {
-                  if (mounted) {
-                    showToastMessage(context, 'Đã xóa (match: ${selectedMatch.matchName})');
-                  }
+                onAccept: () {
+                  showToastMessage(context, 'Đã xóa (match: ${selectedMatch.matchName})');
                   DataManager.removeSectionDataOfMatch<AccelSection>(selectedMatch);
                   selectedMatch = AccelSection.empty(selectedMatch.matchName);
                   selectedQuestionIndex = -1;
@@ -321,7 +319,9 @@ class _AccelManagerState extends State<AccelManager> {
                   if (result == null) return;
 
                   final picks = result.files;
-                  picks.length == 1 ? logHandler.info('Chose ${StorageHandler.getRelative(picks.first.path!)}') : logHandler.info('Chose ${picks.length} files');
+                  picks.length == 1
+                      ? logHandler.info('Chose ${StorageHandler.getRelative(picks.first.path!)}')
+                      : logHandler.info('Chose ${picks.length} files');
 
                   for (final p in picks) {
                     selectedQuestion.imagePaths.add(StorageHandler.getRelative(p.path!));

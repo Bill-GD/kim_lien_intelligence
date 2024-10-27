@@ -396,11 +396,18 @@ class _AccelScreenState extends State<AccelScreen> {
           enableCondition: canEnd,
           disabledLabel: 'Phần thi chưa kết thúc',
           onPressed: () {
-            KLIServer.sendToAllClients(KLISocketMessage(
-              senderID: ConnectionID.host,
-              type: KLIMessageType.endSection,
-            ));
-            Navigator.of(context).pop();
+            confirmDialog(
+              context,
+              message: 'Kết thúc phần thi?',
+              acceptLogMessage: 'Section finished',
+              onAccept: () {
+                KLIServer.sendToAllClients(KLISocketMessage(
+                  senderID: ConnectionID.host,
+                  type: KLIMessageType.endSection,
+                ));
+                Navigator.of(context).pop();
+              },
+            );
           },
         ),
       ],

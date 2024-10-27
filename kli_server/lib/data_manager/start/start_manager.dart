@@ -174,7 +174,8 @@ class _StartQuestionManagerState extends State<StartQuestionManager> {
             enabledLabel: 'Cho phép nhập dữ liệu từ file Excel',
             disabledLabel: 'Chưa chọn trận đấu',
             onPressed: () async {
-              Map<String, dynamic>? data = await Navigator.of(context).push<Map<String, dynamic>>(DialogRoute<Map<String, dynamic>>(
+              Map<String, dynamic>? data =
+                  await Navigator.of(context).push<Map<String, dynamic>>(DialogRoute<Map<String, dynamic>>(
                 context: context,
                 barrierDismissible: false,
                 barrierLabel: '',
@@ -204,9 +205,8 @@ class _StartQuestionManagerState extends State<StartQuestionManager> {
                 context,
                 message: 'Bạn có muốn xóa tất cả câu hỏi khởi động của trận: ${selectedMatch.matchName}?',
                 acceptLogMessage: 'Removed all start questions for match: ${selectedMatch.matchName}',
-                onAccept: () async {
-                  if (mounted) showToastMessage(context, 'Đã xóa (trận: ${selectedMatch.matchName})');
-
+                onAccept: () {
+                  showToastMessage(context, 'Đã xóa (trận: ${selectedMatch.matchName})');
                   DataManager.removeSectionDataOfMatch<StartSection>(selectedMatch);
                   selectedMatch = StartSection.empty(selectedMatch.matchName);
                   setState(() {});
@@ -268,7 +268,7 @@ class _StartQuestionManagerState extends State<StartQuestionManager> {
                                 context,
                                 message: 'Bạn có muốn xóa câu hỏi này?\n"${q.question}"',
                                 acceptLogMessage: 'Removed start question: pos=${q.pos}, idx=$index',
-                                onAccept: () async {
+                                onAccept: () {
                                   selectedMatch.questions.removeWhere((e) => e == q);
                                   DataManager.updateSectionDataOfMatch<StartSection>(selectedMatch);
                                   setState(() {});

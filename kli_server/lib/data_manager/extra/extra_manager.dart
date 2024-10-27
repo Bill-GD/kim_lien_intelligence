@@ -118,7 +118,8 @@ class _ExtraManagerState extends State<ExtraManager> {
             enabledLabel: 'Cho phép nhập dữ liệu từ file Excel',
             disabledLabel: 'Chưa chọn trận đấu',
             onPressed: () async {
-              Map<String, dynamic>? data = await Navigator.of(context).push<Map<String, dynamic>>(DialogRoute<Map<String, dynamic>>(
+              Map<String, dynamic>? data =
+                  await Navigator.of(context).push<Map<String, dynamic>>(DialogRoute<Map<String, dynamic>>(
                 context: context,
                 barrierDismissible: false,
                 barrierLabel: '',
@@ -147,10 +148,8 @@ class _ExtraManagerState extends State<ExtraManager> {
                 context,
                 message: 'Bạn có muốn xóa tất cả câu hỏi phụ của trận: ${selectedMatch.matchName}?',
                 acceptLogMessage: 'Removed all extra questions for match: ${selectedMatch.matchName}',
-                onAccept: () async {
-                  if (mounted) {
-                    showToastMessage(context, 'Đã xóa (match: ${selectedMatch.matchName})');
-                  }
+                onAccept: () {
+                  showToastMessage(context, 'Đã xóa (match: ${selectedMatch.matchName})');
                   DataManager.removeSectionDataOfMatch<ExtraSection>(selectedMatch);
                   selectedMatch = ExtraSection.empty();
                   setState(() {});
@@ -201,7 +200,7 @@ class _ExtraManagerState extends State<ExtraManager> {
                                 context,
                                 message: 'Bạn có muốn xóa câu hỏi này?\n"${q.question}"',
                                 acceptLogMessage: 'Removed an extra question',
-                                onAccept: () async {
+                                onAccept: () {
                                   selectedMatch.questions.removeAt(index);
                                   DataManager.updateSectionDataOfMatch<ExtraSection>(selectedMatch);
                                   logHandler.info('Deleted extra question of ${selectedMatch.matchName}');

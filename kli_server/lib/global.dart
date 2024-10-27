@@ -5,9 +5,9 @@ import 'package:side_navigation/side_navigation.dart';
 
 bool isTesting = kDebugMode, showDebugInfo = false;
 late final DecorationImage bgDecorationImage;
-final buildDate = DateTime(2024, 9, 11);
+final buildDate = DateTime(2024, 10, 28);
 
-late void Function() updateDebugOverlay;
+void Function() updateDebugOverlay = () {};
 late void Function() updateChild;
 
 late final LogHandler logHandler;
@@ -114,6 +114,12 @@ class DataSize {
 }
 
 const String changelog = """
+  0.4.6.1 ({latest}):
+  - Added confirmation to end section
+  - Removed some async calls
+  - Fixed can get next extra question after end
+  - Fixed wrong extra background audio length
+
   0.4.6 ({2df09fb}):
   - Translated all text to Vietnamese
   - Added help for match control
