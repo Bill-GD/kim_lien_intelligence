@@ -1,7 +1,6 @@
 import 'dart:io';
 import 'dart:ui';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:kli_lib/kli_lib.dart';
@@ -17,6 +16,14 @@ void main() async {
 
   RenderErrorBox.backgroundColor = Colors.transparent;
   final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+
+  logHandler = LogHandler(logFile: StorageHandler.getFullPath('log.txt'));
+  logMessageStream.listen((m) {
+    if (m.$1 == LogType.info) logHandler.info(m.$2);
+    if (m.$1 == LogType.warn) logHandler.warn(m.$2);
+    if (m.$1 == LogType.error) logHandler.error(m.$2);
+  });
+  logHandler.info('Starting KLIServer');
 
   PlatformDispatcher.instance.onError = (e, s) {
     logHandler.error(e.toString(), stackTrace: s);
@@ -41,23 +48,19 @@ void main() async {
     return true;
   };
 
-  logHandler = LogHandler(logFile: StorageHandler.getFullPath('log.txt'));
-  logMessageStream.listen((m) {
-    if (m.$1 == LogType.info) logHandler.info(m.$2);
-    if (m.$1 == LogType.warn) logHandler.warn(m.$2);
-    if (m.$1 == LogType.error) logHandler.error(m.$2);
-  });
-  logHandler.info('Starting KLIServer');
-
-  if (!kIsWeb && Platform.isWindows) {
+  if (Platform.isWindows) {
     await windowManager.hide();
     await windowManager.ensureInitialized();
+    await windowManager.waitUntilReadyToShow(null, () async {
+      await windowManager.setFullScreen(true);
+      await windowManager.show();
+      await windowManager.focus();
+    });
   }
-  await windowManager.waitUntilReadyToShow(null, () async {
-    await windowManager.setFullScreen(true);
-    await windowManager.show();
-    await windowManager.focus();
-  });
+  if (Platform.isAndroid) {
+    // final storagePath = (await getExternalStorageDirectory())?.path ?? '';
+    debugPrint(StorageHandler.appRootDirectory());
+  }
 
   runApp(KliServerApp(navKey: navigatorKey));
 }

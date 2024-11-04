@@ -51,9 +51,9 @@ class _HelpScreenState extends State<HelpScreen> {
                 KLIButton(
                   'Mở thư mục chứa phần mềm',
                   onPressed: () async {
-                    logHandler.info('Opened parent folder: ${StorageHandler.appRootDirectory}');
+                    logHandler.info('Opened parent folder: ${StorageHandler.appRootDirectory()}');
                     await launchUrlString(
-                      Uri.directory(StorageHandler.appRootDirectory).toFilePath(windows: true),
+                      Uri.directory(StorageHandler.appRootDirectory()).toFilePath(windows: true),
                       mode: LaunchMode.externalApplication,
                     );
                   },
